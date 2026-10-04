@@ -35,6 +35,35 @@ def _transport(cfg, dry: bool):
     return SerialTransport(c.get("port", "auto"), int(c.get("baud", 115200)))
 
 
+def _scan_offline(cfg, a) -> int:
+    from .scan import demo
+    from .scan.colmap import write_model
+    from .scan.geometry import intrinsics
+    from .scan.plan import check_object, rings_plan
+    cfg4 = cfg.with_phase(max(cfg.installed_phase, 4))
+    if a.action == "plan":
+        check_object(cfg4)
+        plan = rings_plan(cfg4)
+        print(json.dumps({"views": len(plan), "rings": cfg4.scan["rings"],
+                          "first": plan[0].pose, "last": plan[-1].pose}, indent=2))
+    elif a.action == "sync-ids":
+        from .scan.colmap import sync_image_ids
+        print(f"updated {sync_image_ids(a.db, a.model)} image IDs")
+    elif a.action == "export-colmap":
+        plan = rings_plan(cfg4)
+        K = intrinsics(cfg4.for_scan(), cfg4.scan["camera_distance_mm"])
+        calib = None
+        if cfg4.scan.get("calibration"):
+            from .scan.calibrate import CameraCalibration
+            calib = CameraCalibration.load(cfg4.scan["calibration"])
+        out = write_model(f"{a.out}/sparse_known", cfg4.for_scan(), plan, K,
+                          float(cfg4.scan["platter_offset_mm"]), calib)
+        print(f"wrote {out} ({len(plan)} images) and {a.out}/run_colmap.sh")
+    elif a.action == "demo":
+        print(json.dumps(demo.run(cfg4, a.out), indent=2))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="opengonio")
     ap.add_argument("--config")
@@ -47,6 +76,13 @@ def main(argv: list[str] | None = None) -> int:
     mv = sub.add_parser("move"); mv.add_argument("pose", nargs="+")
     li = sub.add_parser("light"); li.add_argument("state", choices=["on", "off"]); li.add_argument("--name", default="white")
     sub.add_parser("panel")
+    sc = sub.add_parser("scan", help="Phase 6 photo scanner")
+    sc.add_argument("action", choices=["plan", "export-colmap", "demo", "run", "calibrate", "sync-ids"])
+    sc.add_argument("--db", default="database.db")
+    sc.add_argument("--model", default="sparse_known")
+    sc.add_argument("--background", action="store_true", help="capture the empty-platter pass")
+    sc.add_argument("--out", default="scan_out")
+    sc.add_argument("--exposure-ms", type=float, default=20.0)
     a = ap.parse_args(argv)
     cfg = load_config(a.config) if a.config else load_config()
 
@@ -62,6 +98,9 @@ def main(argv: list[str] | None = None) -> int:
         poses = inplane.grid(cfg, a.step) if a.kind == "inplane" else inplane.mirror_sweep(a.theta)
         print(json.dumps(poses))
         return 0
+
+    if a.cmd == "scan" and a.action not in ("run", "calibrate"):
+        return _scan_offline(cfg, a)
 
     t = _transport(cfg, a.dry_run)
     g = Gantry(cfg, FluidNC(t))
@@ -95,6 +134,19 @@ def main(argv: list[str] | None = None) -> int:
                 panel.handle(ev.kind, ev.value)
                 print(panel.log[-1] if panel.log else ev)
             panel.tick()
+    elif a.cmd == "scan":  # pragma: no cover - hardware
+        from .camera.uvc import UvcCamera
+        from .gantry.hub import Hub
+        from .scan.run import run_scan
+        c = cfg.camera
+        g.home()
+        if a.action == "calibrate":
+            from .scan.run import calibrate_scan
+            calibrate_scan(cfg, g, UvcCamera(int(c["index"]), int(c["width"]), int(c["height"])),
+                           f"{a.out}/scan_calibration.yaml")
+            return 0
+        run_scan(cfg, g, UvcCamera(int(c["index"]), int(c["width"]), int(c["height"])),
+                 Hub(cfg.hub.get("port", "auto")), a.out, a.exposure_ms, background=a.background)
     if isinstance(t, RecordingTransport):
         print("\n".join(t.lines))
     return 0

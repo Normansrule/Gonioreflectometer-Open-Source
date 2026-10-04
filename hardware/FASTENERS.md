@@ -14,3 +14,4 @@ Counts from the current design; recount after each module's CAD. Most come from 
 | tilt-yoke-m2 | M3×8 ×8, M3 inserts ×6 | 608 ×2 |
 | spin-platter-m1 | M3×8 ×6, M3 inserts ×4 | 608 ×2 |
 | multispectral-kit | M3×8 ×4 | pre-crimped leads from CTL-06 |
+| scan-kit | M3×8 ×2 (riser to hub), M5×10 ×1 + T-nut (650 mm stop) | putty |

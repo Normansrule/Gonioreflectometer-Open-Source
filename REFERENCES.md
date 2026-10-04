@@ -42,6 +42,33 @@ Figures in this repo are original drawings; no figure is copied from any source.
 | **R39** | X-Rite TAC7 user guide — [PDF](https://www.xrite.com/-/media/xrite/files/manuals_and_userguides/t/tac7_user_guide_en.pdf) | Context |
 | **R40** | X-Rite PANTORA — [link](https://www.xrite.com/pantora-software) | Context |
 
+## 3D photo scanner (Phase 6)
+
+| ID | Source | Used for |
+|---|---|---|
+| **S1** | COLMAP output format — [format.html](https://colmap.github.io/format.html) ([source](https://colmap.github.io/_sources/format.rst.txt)); camera models — [cameras](https://colmap.github.io/_sources/cameras.rst.txt); PINHOLE params comment in [models.h](https://github.com/colmap/colmap/blob/ff8842e7d9e985bd0dd87169f61d5aaeb309ab32/src/colmap/sensor/models.h#L197) (found via [blog](https://www.cnblogs.com/xiaohuidi/p/15767477.html), not opened) | cameras.txt / images.txt / points3D.txt, Hamilton quaternion, world-to-camera pose |
+| **S2** | COLMAP FAQ, "Reconstruct sparse/dense model from known camera poses" — [faq.html](https://colmap.github.io/faq.html); CLI — [cli.html](https://colmap.github.io/cli.html) | `run_colmap.sh` command sequence, meshing |
+| **S3** | J. L. Schönberger, J.-M. Frahm, "Structure-from-Motion Revisited," CVPR 2016 — [CVF](https://openaccess.thecvf.com/content_cvpr_2016/html/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.html), [PDF](https://openaccess.thecvf.com/content_cvpr_2016/papers/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.pdf); J. L. Schönberger, E. Zheng, M. Pollefeys, J.-M. Frahm, "Pixelwise View Selection for Unstructured Multi-View Stereo," ECCV 2016 — [doi:10.1007/978-3-319-46487-9_31](https://link.springer.com/chapter/10.1007/978-3-319-46487-9_31), [mlanthology](https://mlanthology.org/eccv/2016/schonberger2016eccv-pixelwise/); COLMAP licence (BSD) — [license](https://colmap.github.io/license.html) | Photogrammetry engine |
+| **S4** | R. J. Woodham, "Photometric method for determining surface orientation from multiple images," *Optical Engineering* 19(1), 1980 — [doi:10.1117/12.7972479](https://www.spiedigitallibrary.org/journals/optical-engineering/volume-19/issue-1/191139/Photometric-Method-For-Determining-Surface-Orientation-From-Multiple-Images/10.1117/12.7972479.short) | Photometric stereo |
+| **S5** | A. Laurentini, "The Visual Hull Concept for Silhouette-Based Image Understanding," *IEEE TPAMI* 16(2), 1994 — [doi:10.1109/34.273735](https://dl.acm.org/doi/10.1109/34.273735) | Visual hull |
+| **S6** | R. Szeliski, "Rapid Octree Construction from Image Sequences," *CVGIP: Image Understanding* 58(1), 1993 — [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S1049966083710296) | Voxel carving |
+| **S7** | K. N. Kutulakos, S. M. Seitz, "A Theory of Shape by Space Carving," *IJCV*, 2000 — [doi:10.1023/A:1008191222954](https://link.springer.com/article/10.1023/A:1008191222954), [PDF (Toronto)](https://www.cs.toronto.edu/~kyros/pubs/00.ijcv.carve.pdf), [PDF (CMU)](https://www.cs.cmu.edu/~seitz/papers/kutu-ijcv00.pdf) | Space carving |
+| **S8** | MVTec HALCON `photometric_stereo` reference — [link](https://www.mvtec.com/doc/halcon/13/en/photometric_stereo.html) | ≥ 3 images, non-coplanar light directions |
+| **S9** | A. W. Fitzgibbon, G. Cross, A. Zisserman, "Automatic 3D Model Construction for Turn-Table Sequences," SMILE 1998 — [doi:10.1007/3-540-49437-5_11](https://link.springer.com/chapter/10.1007/3-540-49437-5_11), [open copy](https://ora.ox.ac.uk/objects/uuid:f4e19b7a-4606-4f63-b532-6a0d0bf19845) | Turntable (rotating-object) reconstruction |
+| **S10** | Meshroom / AliceVision — [alicevision.org](https://alicevision.org/), [Meshroom](https://alicevision.org/view/meshroom.html), [GitHub](https://github.com/alicevision/meshroom), [licence MPL2](https://github.com/alicevision/meshroom/blob/develop/COPYING.md) | Alternative reconstruction |
+| **S11** | OpenCV `solvePnP` — [docs](https://docs.opencv.org/4.13.0/d5/d1f/calib3d_solvePnP.html) | Camera axis convention, pose checks |
+| **S12** | OpenCV ChArUco calibration — [tutorial](https://docs.opencv.org/4.13.0/da/d13/tutorial_aruco_calibration.html), [detection](https://docs.opencv.org/4.13.0/df/d4a/tutorial_charuco_detection.html) | Scan-mode intrinsics, scanning mat |
+| **S13** | D. Schnieders, K.-Y. K. Wong, "Camera and light calibration from reflections on a sphere," *CVIU*, 2013 — [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S1077314213001082), [PDF](https://i.cs.hku.hk/~kykwong/publications/dschnieders_cviu2013.pdf) | Chrome-ball light calibration |
+| **S14** | Yu, Chen, Da, "Geometric calibration for photometric stereo under near-field point light sources using spheres," *Optics & Laser Technology* 180, 2025 — [link](https://www.sciencedirect.com/science/article/pii/S0030399224010156) | Near-light correction (M6.7) |
+| **S15** | D. B. Goldman, B. Curless, A. Hertzmann, S. M. Seitz, "Shape and Spatially-Varying BRDFs from Photometric Stereo," ICCV 2005 — [doi:10.1109/ICCV.2005.219](https://mlanthology.org/iccv/2005/goldman2005iccv-shape/) | On-object SVBRDF + normals (Phase 7) |
+| **S16** | Blender manual: [PLY](https://docs.blender.org/manual/en/latest/files/import_export/ply.html), [OBJ](https://docs.blender.org/manual/en/latest/files/import_export/obj.html), [glTF 2.0](https://docs.blender.org/manual/en/latest/addons/scene_gltf2.html), [formats](https://docs.blender.org/manual/en/latest/files/import_export/index.html) | Mesh import check |
+| **S17** | OpenMVS — [GitHub](https://github.com/cdcseacave/openMVS), [licence AGPL](https://github.com/cdcseacave/openMVS/blob/develop/COPYRIGHT.md) | Optional dense/mesh stage |
+| **S18** | RealityScan (formerly RealityCapture) — [licence](https://www.realityscan.com/license), [2.0 rename](https://www.realityscan.com/news/realityscan-20-new-release-brings-powerful-new-features-to-a-rebranded-realitycapture), [CG Channel 2.0](https://www.cgchannel.com/2025/06/epic-games-to-rebrand-realitycapture-as-realityscan-2-0/), [CG Channel 2.2](https://www.cgchannel.com/2026/06/epic-games-releases-realityscan-2-2-with-amd-gpu-support/) | Optional reconstruction (free under $1M revenue, students) |
+| **S19** | QuakeHold! museum putty — [SOS Products](https://www.sosproducts.com/quakehold-museum-putty-p/64810.htm), [Fire Supply Depot](https://www.firesupplydepot.com/quakehold-museum-putty-white-22111.html) | Heavier-object option |
+| **S20** | Loctite Fun-Tak 2 oz — [Staples](https://www.staples.com/Loctite-Fun-Tak-2-oz-Mounting-Adhesive-Putty-1270884/product_1480018), [Amazon](https://www.amazon.com/Loctite-Fun-Tak-Mounting-2-Ounce-1270884-12/dp/B074R72PSH) | $3.49 object mount |
+
+Note: [R1] (Ansari-Asl et al. 2024) covers flat samples only; the scanner phase extends beyond that paper.
+
 ## Firmware, protocols, software
 
 | ID | Source | Used for |
@@ -123,7 +150,7 @@ Figures in this repo are original drawings; no figure is copied from any source.
 | **P7** | Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) | $2.73 |
 | **P8** | IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) | Rds(on), Vgs |
 | **P9** | onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) | $0.28 |
-| **P10** | P6KE30A — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) | $0.94 |
+| **P10** | P6KE30A (Littelfuse via Verical, chosen; ST at Mouser compared) — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) | $0.94 |
 | **P11** | Nichicon UFW1H101MPD1TD — [Mouser](https://www.mouser.com/ProductDetail/Nichicon/UFW1H101MPD1TD?qs=WJSLByB5Mu30jPPJ2KiG3A%3D%3D) | $0.59 |
 | **P12** | Vishay BAT85S-TAP — [Mouser](https://www.mouser.com/ProductDetail/Vishay-Semiconductors/BAT85S-TAP?qs=yIvl1B2wDi5bZOHuqaPTHw%3D%3D) | Considered for the sense clamp (replaced by an optocoupler) |
 | **P13** | Bulgin C1353ABNAB — [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) | 10 A DC rating |

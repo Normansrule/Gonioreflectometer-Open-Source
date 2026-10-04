@@ -8,7 +8,7 @@
 </defs>
 <text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
 <text x="56" y="196" class="t b" font-size="40">Open-Source</text>
-<text x="58" y="236" fill="#f0883e" font-size="18" class="b">OpenGonio · low-cost multispectral material appearance capture</text>
+<text x="58" y="236" fill="#f0883e" font-size="18" class="b">OpenGonio · low-cost multispectral material capture + 3D scanner</text>
 <text x="58" y="270" class="m" font-size="15">fixed camera · 3-axis sample stage · rotating light arm · laptop-controlled</text>
 <text x="58" y="294" class="m" font-size="15">USB / WiFi / Bluetooth · physical buttons · 0.1° target repeatability</text>
 <text x="58" y="340" class="m" font-size="12">Architecture after Ansari-Asl et al., J. Imaging 10(3):55, 2024 · theory after Hanrahan, CS348b</text>

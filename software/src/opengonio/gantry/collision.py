@@ -59,7 +59,12 @@ def light_capsules(cfg: Machine, m4: float) -> list[Capsule]:
     l = light_dir(m4)
     arm = Capsule(cfg.ring_radius_mm * l, (cfg.light_distance_mm + 40) * l, cfg.arm_radius_mm, "light arm")
     head = Capsule(cfg.light_distance_mm * l, cfg.light_distance_mm * l, cfg.lamp_head_radius_mm, "lamp head")
-    return [arm, head]
+    caps = [arm, head]
+    if "multispectral" in cfg.lights:          # LED bank mast (printed, built in Phase 5)
+        bank = cfg.light_distance_mm * light_dir(m4, cfg.light_elevation("multispectral"))
+        caps.append(Capsule(cfg.light_distance_mm * l, bank, cfg.arm_radius_mm, "LED mast"))
+        caps.append(Capsule(bank, bank, cfg.lamp_head_radius_mm, "LED bank"))
+    return caps
 
 
 def clearance_mm(cfg: Machine, m4: float) -> float:

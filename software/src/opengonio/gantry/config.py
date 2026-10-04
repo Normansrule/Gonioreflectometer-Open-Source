@@ -58,6 +58,7 @@ class Machine:
     hub: dict[str, Any] = field(default_factory=dict)
     camera: dict[str, Any] = field(default_factory=dict)
     lights: dict[str, dict] = field(default_factory=dict)
+    scan: dict[str, Any] = field(default_factory=dict)
 
     @property
     def active_axes(self) -> dict[str, Axis]:
@@ -67,6 +68,13 @@ class Machine:
     @property
     def active_lights(self) -> dict[str, int]:
         return {k: v["output"] for k, v in self.lights.items() if v["phase"] <= self.installed_phase}
+
+    def light_elevation(self, name: str) -> float:
+        return float(self.lights.get(name, {}).get("elevation_deg", 0.0))
+
+    def for_scan(self) -> "Machine":
+        """Camera slid to the scan position on the outrigger (Phase 6)."""
+        return replace(self, camera_distance_mm=float(self.scan["camera_distance_mm"]))
 
     def with_phase(self, phase: int) -> "Machine":
         return replace(self, installed_phase=phase)
@@ -99,5 +107,5 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
         arm_radius_mm=float(m["arm_radius_mm"]), keep_out_mm=float(m["keep_out_mm"]),
         min_phase_angle_deg=float(m["min_phase_angle_deg"]), repeatability_target_deg=float(m["repeatability_target_deg"]),
         axes=axes, controller=raw.get("controller", {}), hub=raw.get("hub", {}),
-        camera=raw.get("camera", {}), lights=raw.get("lights", {}),
+        camera=raw.get("camera", {}), lights=raw.get("lights", {}), scan=raw.get("scan", {}),
     )

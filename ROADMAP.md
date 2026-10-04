@@ -7,13 +7,16 @@ milestone whose progress bar fills as issues close. Generated from `.github/mile
 | Milestone | Goal | Cap | Items |
 |---|---|---:|---:|
 | M0 - Design baseline | Architecture, interfaces and budget agreed before buying. | — | 2 |
-| M1 - Phase 1: In-plane gonioreflectometer | Fixed camera, light arm M4 and table M3 work from the laptop and the buttons; both axes repeat within 0.1 deg; the mirror peak appears at M3 = M4/2. | $350 | 8 |
-| M2 - Phase 2: Calibrated BRDF and game materials | A fitted swatch rendered in Unreal/Unity matches a photo under the same light angle. | $74 | 7 |
-| M3 - Phase 3: Isotropic BRDF (add M2 tilt) | Full isotropic scan of one swatch runs unattended with the collision model active. | $23 | 3 |
-| M4 - Phase 4: Anisotropic BRDF and SVBRDF (add M1 spin) | Brushed metal highlight follows M1; per-pixel SVBRDF of a textured swatch. | $23 | 3 |
-| M5 - Phase 5: Multispectral | Eight-band reflectance of a colour target matches its reference trend; polarized capture separates specular. | $30 | 2 |
-| M6 - Phase 6: Scanning, SVBRDF maps, release | Object scanned with M1/M2 in front of the fixed camera; textures render in-engine; project public and OSHWA-ready. | $0 | 3 |
-| M7 - Stretch: research-grade upgrades | Upgrades from published rigs without breaking the low-cost build. | — | 3 |
+| M1 - Phase 1: In-plane gonioreflectometer | Fixed camera, light arm M4 and table M3 work from the laptop and the buttons; both axes repeat within 0.1 deg; the mirror peak appears at M3 = M4/2. | $347 | 8 |
+| M2 - Phase 2: Calibrated BRDF and game materials | A fitted swatch rendered in Unreal/Unity matches a photo under the same light angle. | $73.5 | 7 |
+| M3 - Phase 3: Isotropic BRDF (add M2 tilt) | Full isotropic scan of one swatch runs unattended with the collision model active. | $22.5 | 3 |
+| M4 - Phase 4: Anisotropic BRDF and SVBRDF (add M1 spin) | Brushed metal highlight follows M1; per-pixel SVBRDF of a textured swatch. | $22.5 | 3 |
+| M5 - Phase 5: Multispectral and polarization | Eight-band reflectance of a colour target repeats within 3 %; crossed polarizers separate specular from diffuse. | $30 | 4 |
+| M6 - Phase 6: 3D photo scanner | A 40 mm printed cube scans to within 0.5 mm on every edge, and a 1:43 model car mesh imports cleanly into Blender. | $4.5 | 8 |
+| M7 - Phase 7: On-object appearance | The scanned model car rendered in-engine matches a gantry photo under the same light. | $0 | 4 |
+| M8 - OpenGonio Studio (laptop app) | Every workflow (BRDF scan, multispectral, 3D scan) runs from one laptop app or the physical buttons, with no terminal. | — | 3 |
+| M9 - Release and certification | Public, documented, OSHWA-certified open hardware with a v1.0 release. | — | 3 |
+| M10 - Stretch: research-grade upgrades | Upgrades from published rigs without breaking the low-cost build. | — | 4 |
 
 ## M0 - Design baseline
 
@@ -66,7 +69,7 @@ milestone whose progress bar fills as issues close. Generated from `.github/mile
 
 - [ ] Cut 600 x 600 base, drill full drill map
 - [ ] Tee nuts, feet, level
-- [ ] Camera outrigger + post
+- [ ] Camera outrigger + post; mark the 350 mm (BRDF) and 650 mm (scan) positions
 - [ ] Print protractor scales
 - [ ] **Acceptance:** Ring footprint and table post concentric within 0.5 mm.
 
@@ -194,6 +197,7 @@ milestone whose progress bar fills as issues close. Generated from `.github/mile
 ### M4.1 — Spin platter M1
 
 - [ ] Platter on yoke
+- [ ] Spindle hub accepts scan-kit risers (Phase 6)
 - [ ] Home flag on TH0
 - [ ] installed_phase: 4
 - [ ] **Acceptance:** M1 repeatability <= 0.1 deg.
@@ -210,65 +214,205 @@ milestone whose progress bar fills as issues close. Generated from `.github/mile
 - [ ] **Acceptance:** Highlight stretch follows M1.
 
 
-## M5 - Phase 5: Multispectral
+## M5 - Phase 5: Multispectral and polarization
 
-**Goal:** Eight-band reflectance of a colour target matches its reference trend; polarized capture separates specular.
+**Goal:** Eight-band reflectance of a colour target repeats within 3 %; crossed polarizers separate specular from diffuse.
 
-### M5.1 — LED bank + polarizers
+### M5.1 — LED bank on the 40 deg mast
 
-- [ ] Choose 8 bands, build ring
-- [ ] NLDD-350H on E4 GPIO4, ULN2803A from Pico
-- [ ] Polarizer film on lamp and lens
-- [ ] **Acceptance:** Each band on/off from laptop; crossed polarizers cut mirror highlight >= 20x.
+- [ ] Choose 8 bands (~420-660 nm)
+- [ ] Print LED ring + 40 deg mast on the light arm
+- [ ] NLDD-350H on E4 GPIO4, ULN2803A from Pico GP8-15
+- [ ] Collision model includes the mast
+- [ ] **Acceptance:** Each band on/off from laptop and buttons; mast clears the camera at M4 = 20 deg.
 
-### M5.2 — Spectral calibration
+### M5.2 — Polarizers
+
+- [ ] Film in the lamp slot
+- [ ] Rotatable lens disc with index marks
+- [ ] **Acceptance:** Crossed polarizers cut the mirror highlight >= 20x.
+
+### M5.3 — Spectral calibration
 
 - [ ] Per-band PTFE reference
+- [ ] Per-band light direction (mast elevation) in kinematics
 - [ ] Colour target check (borrowed)
 - [ ] **Acceptance:** Band ratios repeat within 3 %.
 
+### M5.4 — Phase 5 milestone test
 
-## M6 - Phase 6: Scanning, SVBRDF maps, release
+- [ ] Multispectral in-plane BRDF of two paints that look alike in RGB
+- [ ] **Acceptance:** Paints separated in at least one band.
 
-**Goal:** Object scanned with M1/M2 in front of the fixed camera; textures render in-engine; project public and OSHWA-ready.
 
-### M6.1 — Photogrammetry with the rotating stage
+## M6 - Phase 6: 3D photo scanner
 
-- [ ] Pose priors from M1/M2
-- [ ] COLMAP / Meshroom
-- [ ] Scale from ChArUco
-- [ ] **Acceptance:** Test block within 0.5 mm.
+**Goal:** A 40 mm printed cube scans to within 0.5 mm on every edge, and a 1:43 model car mesh imports cleanly into Blender.
 
-### M6.2 — On-object SVBRDF maps
+### M6.1 — Scan kit hardware
 
-- [ ] Base colour, roughness, metallic, normal maps
-- [ ] Engine export
-- [ ] **Acceptance:** Render matches a capture.
+- [ ] Print risers 60/40/20/0 mm (delta = 60 - riser), nest, 650 mm camera stop, outrigger end foot
+- [ ] Buy putty; print the ChArUco mat
+- [ ] Check object sphere r = 55 clears the light arm in ASM - Phase 6
+- [ ] **Acceptance:** Putty holds a 100 g object at 80 deg elevation for 3 turns (test S3).
 
-### M6.3 — Open-source release
+### M6.2 — Scan-mode camera
+
+- [ ] Slide to 650 mm, f/8 stop, refocus, lock
+- [ ] opengonio scan calibrate: ChArUco intrinsics + distortion + measured camera pose
+- [ ] Set scan.calibration in machine.yaml; keep the BRDF-mode (350 mm) profile
+- [ ] **Acceptance:** Reprojection RMS <= 0.5 px (test S1).
+
+### M6.3 — Scan planner and known poses
+
+- [ ] opengonio scan plan: rings 0/20/40/60/80 deg, 144 views
+- [ ] Object-frame poses from M1/M2/M3 + platter offset
+- [ ] Joint fit of camera pose + board placement (AX = YB) at 12 poses
+- [ ] **Acceptance:** Kinematic pose within 0.2 deg / 0.3 mm of solvePnP (test S2).
+
+### M6.4 — Capture run
+
+- [ ] opengonio scan run: lamp at M4 = 30 deg, crossed polarizers
+- [ ] Locked exposure; frames saved as img_0000.jpg ...
+- [ ] Buttons: START runs the scan, PAUSE/STOP work mid-scan
+- [ ] scan.json with poses and settings
+- [ ] **Acceptance:** 144 sharp frames, no motion blur, unattended.
+
+### M6.5 — Visual hull preview
+
+- [ ] Empty-platter background pass (scan run --background)
+- [ ] Silhouettes by background differencing
+- [ ] Voxel carving with known poses, clipped at the support plane
+- [ ] PLY preview in under 1 min on the laptop
+- [ ] **Acceptance:** 40 mm cube hull edges within 1 mm (test S4).
+
+### M6.6 — Photogrammetry with pose priors
+
+- [ ] Export COLMAP model (OPENCV camera when calibrated)
+- [ ] run_colmap.sh: feature_extractor -> sync-ids -> point_triangulator -> patch_match_stereo (CUDA) -> stereo_fusion -> poisson_mesher
+- [ ] Optional bundle_adjuster + model_aligner to the kinematic camera centres
+- [ ] No CUDA: Meshroom / OpenMVS / RealityScan
+- [ ] Mesh units = mm
+- [ ] **Acceptance:** Dense mesh of the cube, no manual alignment.
+
+### M6.7 — Photometric stereo detail
+
+- [ ] PS stations every 60 deg of M1 at 30 deg elevation
+- [ ] LED bank band, 6 M4 positions (non-coplanar via the 40 deg mast)
+- [ ] Light positions refined with chrome balls; near-light directions + 1/r^2 from the hull or mesh
+- [ ] Merge normals into a normal map on the mesh
+- [ ] **Acceptance:** Matte sphere median normal error <= 5 deg (test S6).
+
+### M6.8 — Phase 6 milestone test
+
+- [ ] Scan the 40 mm cube, measure edges in the mesh
+- [ ] Scan a 1:43 car (flip once for the underside, merge)
+- [ ] Import PLY/OBJ/glTF into Blender
+- [ ] **Acceptance:** Cube edges 40.0 +/- 0.5 mm; car imports without repair (tests S5, S7).
+
+
+## M7 - Phase 7: On-object appearance
+
+**Goal:** The scanned model car rendered in-engine matches a gantry photo under the same light.
+
+### M7.1 — Project captures onto the mesh
+
+- [ ] UV-unwrap the mesh
+- [ ] Per-texel visibility over all views and light positions
+- [ ] Per-pixel directions from the known poses
+- [ ] **Acceptance:** Each texel has >= 20 valid observations.
+
+### M7.2 — Per-texel SVBRDF fit
+
+- [ ] Initialise from Phase 2-4 swatch fits
+- [ ] Fit base colour, roughness, metallic, clear-coat; normals from PS
+- [ ] Energy and reciprocity checks
+- [ ] **Acceptance:** Held-out images reproduced within 10 % RMS.
+
+### M7.3 — Engine export
+
+- [ ] glTF 2.0 with PBR textures
+- [ ] Unreal and Unity material setup
+- [ ] **Acceptance:** Imports in both engines without edits.
+
+### M7.4 — Phase 7 milestone test
+
+- [ ] Gantry photo vs in-engine render, same light pose
+- [ ] **Acceptance:** Side-by-side published in docs.
+
+
+## M8 - OpenGonio Studio (laptop app)
+
+**Goal:** Every workflow (BRDF scan, multispectral, 3D scan) runs from one laptop app or the physical buttons, with no terminal.
+
+### M8.1 — Local web UI
+
+- [ ] Connect USB / WiFi / Bluetooth
+- [ ] Live camera view with exposure lock
+- [ ] Jog, home, light controls
+- [ ] Collision preview from the simulator code
+- [ ] **Acceptance:** Full Phase 1 run from the browser.
+
+### M8.2 — Workflow presets
+
+- [ ] BRDF swatch, multispectral, 3D scan presets
+- [ ] Buttons map to the selected preset
+- [ ] Progress and ETA
+- [ ] **Acceptance:** Each preset runs unattended from START.
+
+### M8.3 — Data management
+
+- [ ] Session folders with scan.json
+- [ ] Resume after STOP / e-stop
+- [ ] Export bundle (images, model, materials)
+- [ ] **Acceptance:** Interrupted scan resumes without re-capturing done poses.
+
+
+## M9 - Release and certification
+
+**Goal:** Public, documented, OSHWA-certified open hardware with a v1.0 release.
+
+### M9.1 — Documentation pass
+
+- [ ] All modules have 8 sections
+- [ ] Build video or GIF per phase
+- [ ] STEP + 3MF for every printed part
+- [ ] **Acceptance:** A new builder completes Phase 1 from the docs alone.
+
+### M9.2 — Make public + OSHWA
 
 - [ ] docs/licensing.md checklist
-- [ ] Make repo + Onshape public
-- [ ] Apply for OSHWA
+- [ ] Repo and Onshape public
+- [ ] Apply for OSHWA certification
+- [ ] **Acceptance:** OSHWA UID in README.
+
+### M9.3 — v1.0 release
+
 - [ ] Tag v1.0
-- [ ] **Acceptance:** Public; OSHWA UID in README.
+- [ ] Release notes with measured accuracy numbers
+- [ ] **Acceptance:** Release published.
 
 
-## M7 - Stretch: research-grade upgrades
+## M10 - Stretch: research-grade upgrades
 
 **Goal:** Upgrades from published rigs without breaking the low-cost build.
 
-### M7.1 — Adaptive sampling
+### M10.1 — Adaptive BRDF sampling
 
 - [ ] Prototype RGL-EPFL-style adaptive sampling [R15]
 - [ ] **Acceptance:** Same fit with >= 3x fewer captures.
 
-### M7.2 — Filter-wheel or mono camera multispectral
+### M10.2 — Mono camera + filter wheel multispectral
 
-- [ ] Compare with LED bands; follow [R1] channel design
+- [ ] Compare with LED bands; follow the channel design of [R1]
 - [ ] **Acceptance:** Documented comparison.
 
-### M7.3 — Validation vs MERL / RGL data
+### M10.3 — Space carving with photo-consistency
+
+- [ ] Extend the visual hull to space carving [S7]
+- [ ] **Acceptance:** Concavities recovered on a test bowl.
+
+### M10.4 — Validation vs MERL / RGL data
 
 - [ ] Measure a shared material [R13][R16]
 - [ ] **Acceptance:** Published comparison.

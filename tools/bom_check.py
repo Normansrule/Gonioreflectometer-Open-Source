@@ -32,9 +32,11 @@ COLUMNS = ["ID", "Type", "Phase", "Module", "Part name", "Function", "Qty", "Man
            "STEP file link", "CAD license", "Notes or cheaper alternative", "Stock candidate",
            "Price status", "Refs"]
 TYPES = {"Purchase", "Print", "Owned", "Optional"}
-BRIEF_CAPS = OrderedDict([(1, 300.0), (2, 75.0), (3, 45.0), (4, 35.0), (5, 30.0), (6, 0.0)])
+# Brief caps mapped to this build's phases (brief 5 "scanner" -> 6, brief 6 "on-object" -> 7;
+# phase 5 multispectral is new and comes from the $15 contingency).
+BRIEF_CAPS = OrderedDict([(1, 300.0), (2, 75.0), (3, 45.0), (4, 35.0), (5, 0.0), (6, 30.0), (7, 0.0)])
 # Rebalanced for the fixed-camera architecture: Phase 1 now carries the ring and the table.
-PROPOSED_CAPS = OrderedDict([(1, 350.0), (2, 74.0), (3, 23.0), (4, 23.0), (5, 30.0), (6, 0.0)])
+PROPOSED_CAPS = OrderedDict([(1, 347.0), (2, 73.5), (3, 22.5), (4, 22.5), (5, 30.0), (6, 4.5), (7, 0.0)])
 HARD_CAP = 500.0
 PATHS = ("buy_all", "with_stock")
 
@@ -134,7 +136,7 @@ def budget_svg(t: dict) -> str:
     """Grouped bars: cap vs buy-all per phase, animated on load."""
     w, h, left, bottom, top = 720, 330, 60, 270, 78
     vmax = 360.0
-    bw, gap = 34, 110
+    bw, gap = 30, 92
     bars = []
     for i, p in enumerate(BRIEF_CAPS):
         x0 = left + 20 + i * gap

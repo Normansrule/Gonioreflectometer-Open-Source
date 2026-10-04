@@ -40,7 +40,7 @@ def hero() -> str:
 </defs>
 <text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
 <text x="56" y="196" class="t b" font-size="40">Open-Source</text>
-<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">OpenGonio · low-cost multispectral material appearance capture</text>
+<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">OpenGonio · low-cost multispectral material capture + 3D scanner</text>
 <text x="58" y="270" class="m" font-size="15">fixed camera · 3-axis sample stage · rotating light arm · laptop-controlled</text>
 <text x="58" y="294" class="m" font-size="15">USB / WiFi / Bluetooth · physical buttons · 0.1° target repeatability</text>
 <text x="58" y="340" class="m" font-size="12">Architecture after Ansari-Asl et al., J. Imaging 10(3):55, 2024 · theory after Hanrahan, CS348b</text>
@@ -203,25 +203,85 @@ def brdf() -> str:
 
 
 def phases() -> str:
-    data = [("1", "In-plane BRDF", "M4 + M3 · camera", "$350"), ("2", "Calibrated → engine", "HDR · GGX fit", "$74"),
-            ("3", "Isotropic BRDF", "+ M2 tilt", "$23"), ("4", "Anisotropic · SVBRDF", "+ M1 spin", "$23"),
-            ("5", "Multispectral", "8-band LEDs · polarizer", "$30"), ("6", "Scan + SVBRDF maps", "software only", "$0")]
-    w, gap, y = 175, 20, 60
+    import sys as _s
+    _s.path.insert(0, str(ROOT / "tools"))
+    from bom_check import PROPOSED_CAPS
+    cap = {k: f"${v:g}" for k, v in PROPOSED_CAPS.items()}
+    data = [("1", "In-plane BRDF", "M4 + M3 · camera", cap[1]), ("2", "Calibrated", "HDR · GGX · engine", cap[2]),
+            ("3", "Isotropic BRDF", "+ M2 tilt", cap[3]), ("4", "Anisotropic", "+ M1 spin · SVBRDF", cap[4]),
+            ("5", "Multispectral", "8 bands · polarizer", cap[5]), ("6", "3D photo scanner", "SfM · carving · PS", cap[6]),
+            ("7", "On-object looks", "SVBRDF maps on mesh", cap[7])]
+    w, gap, y = 154, 13, 60
     b = f'<line x1="60" y1="{y + 60}" x2="1140" y2="{y + 60}" stroke="{LINE}" stroke-width="3"/>'
-    b += f'<circle cx="60" cy="{y + 60}" r="6" fill="{ORANGE}"><animate attributeName="cx" from="60" to="1140" dur="6s" repeatCount="indefinite"/></circle>'
-    for i, (n, t, s, cap) in enumerate(data):
+    b += f'<circle cx="60" cy="{y + 60}" r="6" fill="{ORANGE}"><animate attributeName="cx" from="60" to="1140" dur="7s" repeatCount="indefinite"/></circle>'
+    for i, (n, t, sub, c) in enumerate(data):
         x = 20 + i * (w + gap)
-        col = ORANGE if i == 0 else LINE
+        hot = i in (0, 5)
+        col = ORANGE if i == 0 else (BLUE if i == 5 else LINE)
         b += f'<rect x="{x}" y="{y}" width="{w}" height="120" rx="12" fill="{PANEL}" stroke="{col}" stroke-width="2">'
-        if i == 0:
+        if hot:
             b += '<animate attributeName="stroke-opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>'
         b += "</rect>"
-        b += f'<text x="{x + 14}" y="{y + 32}" fill="{ORANGE if i == 0 else MUTED}" font-size="13" class="b">PHASE {n}</text>'
-        b += f'<text x="{x + 14}" y="{y + 58}" class="t b" font-size="14">{t}</text>'
-        b += f'<text x="{x + 14}" y="{y + 80}" class="m" font-size="12">{s}</text>'
-        b += f'<text x="{x + 14}" y="{y + 104}" fill="{GREEN}" font-size="13">cap {cap}</text>'
-    b += f'<text x="24" y="36" class="t b" font-size="18">Build once, extend each phase</text>'
+        b += f'<text x="{x + 12}" y="{y + 32}" fill="{col if hot else MUTED}" font-size="13" class="b">PHASE {n}</text>'
+        b += f'<text x="{x + 12}" y="{y + 58}" class="t b" font-size="14">{t}</text>'
+        b += f'<text x="{x + 12}" y="{y + 80}" class="m" font-size="12">{sub}</text>'
+        b += f'<text x="{x + 12}" y="{y + 104}" fill="{GREEN}" font-size="13">cap {c}</text>'
+    b += '<text x="24" y="36" class="t b" font-size="18">Build once, extend each phase</text>'
     return svg(1200, 210, b)
+
+
+def scanner() -> str:
+    """Fixed camera, object on the tilted platter spinning (M1), elevation stepping (M2), view sphere filling in."""
+    cx, cy = 330, 230
+    b = '<text x="40" y="44" class="t b" font-size="20">3D photo scanner (Phase 6)</text>'
+    b += f'<text x="40" y="70" class="m" font-size="13">camera fixed · M1 spins the object · M2 tilts it · poses known from the axes [R1][S9]</text>'
+    # platter + object, tilt animation
+    b += f'''<g>
+ <animateTransform attributeName="transform" type="rotate" values="0 {cx} {cy};-20 {cx} {cy};-40 {cx} {cy};-60 {cx} {cy};0 {cx} {cy}" keyTimes="0;0.25;0.5;0.75;1" dur="12s" repeatCount="indefinite" calcMode="discrete"/>
+ <rect x="{cx - 70}" y="{cy + 40}" width="140" height="12" rx="4" fill="{PURPLE}"/>
+ <rect x="{cx - 12}" y="{cy + 52}" width="24" height="40" fill="{MUTED}"/>
+ <path d="M{cx - 55} {cy + 40} L{cx - 50} {cy + 8} L{cx - 20} {cy - 6} L{cx + 30} {cy - 6} L{cx + 52} {cy + 14} L{cx + 58} {cy + 40} Z" fill="{ORANGE}" opacity="0.9"/>
+ <rect x="{cx - 14}" y="{cy}" width="34" height="12" rx="3" fill="{BG}" opacity="0.6">
+  <animate attributeName="x" values="{cx - 40};{cx + 10};{cx - 40}" dur="3s" repeatCount="indefinite"/></rect>
+ <circle cx="{cx - 32}" cy="{cy + 40}" r="10" fill="{BG}" stroke="{TXT}" stroke-width="2"/>
+ <circle cx="{cx + 36}" cy="{cy + 40}" r="10" fill="{BG}" stroke="{TXT}" stroke-width="2"/>
+</g>
+<circle cx="{cx}" cy="{cy + 20}" r="4" fill="{YELLOW}"/>
+<line x1="{cx + 330}" y1="{cy + 20}" x2="{cx + 80}" y2="{cy + 20}" stroke="{BLUE}" stroke-width="2" stroke-dasharray="8 6">
+ <animate attributeName="stroke-dashoffset" from="0" to="28" dur="0.8s" repeatCount="indefinite"/></line>
+<rect x="{cx + 330}" y="{cy}" width="70" height="40" rx="6" fill="{PANEL}" stroke="{BLUE}" stroke-width="2"/>
+<rect x="{cx + 330}" y="{cy}" width="70" height="40" rx="6" fill="{TXT}" opacity="0">
+ <animate attributeName="opacity" values="0;0.6;0" dur="0.5s" repeatCount="indefinite"/></rect>
+<text x="{cx + 365}" y="{cy + 62}" fill="{BLUE}" font-size="12" text-anchor="middle">fixed camera</text>
+<text x="{cx - 90}" y="{cy + 120}" fill="{PURPLE}" font-size="12">M2 tilt → view elevation 90° − M2</text>
+<text x="{cx - 90}" y="{cy + 138}" fill="{ORANGE}" font-size="12">M1 spin → 36 views per ring</text>'''
+    # view sphere (orthographic, tilted) with dots appearing ring by ring
+    sx, sy, R = 960, 240, 150
+    b += f'<ellipse cx="{sx}" cy="{sy}" rx="{R}" ry="{R}" fill="none" stroke="{LINE}"/>'
+    rings = [(0, 36), (20, 36), (40, 36), (60, 24), (80, 12)]
+    tilt = math.radians(20)
+    k = 0
+    total = sum(n for _, n in rings)
+    for e, n in rings:
+        er = math.radians(e)
+        b += f'<ellipse cx="{sx}" cy="{sy - R * math.sin(er) * math.cos(tilt):.1f}" rx="{R * math.cos(er):.1f}" ry="{R * math.cos(er) * math.sin(tilt):.1f}" fill="none" stroke="{LINE}" stroke-dasharray="3 4"/>'
+        for j in range(n):
+            a = 2 * math.pi * j / n
+            x = R * math.cos(er) * math.cos(a)
+            yv = R * math.cos(er) * math.sin(a)
+            z = R * math.sin(er)
+            px = sx + x
+            py = sy - (z * math.cos(tilt) - yv * math.sin(tilt))
+            front = yv < 0
+            t0 = 10.0 * k / total
+            col = BLUE if front else "#2d5a8c"
+            b += (f'<circle cx="{px:.1f}" cy="{py:.1f}" r="{3.2 if front else 2.4}" fill="{col}" opacity="0">'
+                  f'<animate attributeName="opacity" values="0;0;1;1" keyTimes="0;{t0 / 12:.3f};{min(t0 / 12 + 0.01, 0.99):.3f};1" dur="12s" repeatCount="indefinite"/></circle>')
+            k += 1
+    b += f'<circle cx="{sx}" cy="{sy}" r="6" fill="{ORANGE}"/>'
+    b += f'<text x="{sx}" y="{sy + R + 40}" class="m" font-size="13" text-anchor="middle">view sphere around the object: 5 rings, 144 images</text>'
+    b += f'<text x="{sx}" y="{sy + R + 60}" class="m" font-size="12" text-anchor="middle">→ COLMAP with known poses · visual hull · photometric stereo</text>'
+    return svg(1200, 470, b)
 
 
 def power_flow() -> str:
@@ -244,7 +304,7 @@ def power_flow() -> str:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in (("hero", hero), ("architecture", architecture), ("axes", axes), ("brdf-lobe", brdf),
-                     ("phases", phases), ("power-flow", power_flow)):
+                     ("phases", phases), ("power-flow", power_flow), ("scanner", scanner)):
         (OUT / f"{name}.svg").write_text(fn(), encoding="utf-8")
         print("wrote", f"docs/assets/{name}.svg")
 

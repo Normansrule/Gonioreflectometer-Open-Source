@@ -6,7 +6,7 @@ Status: planned — full 8-section docs when this milestone starts.
 
 **Interfaces:** Yoke face; harness to E4 E socket + TH0.
 
-**Later phases:** Phase 6 photogrammetry spins objects with M1 and sets elevation with M2.
+**Later phases:** Phase 6 scanner: M1 spins the object, M2 sets view elevation (90° − M2); the spindle hub takes the scan-kit risers.
 
 **BOM:** [`bom/modules/spin-platter-m1.csv`](../../bom/modules/spin-platter-m1.csv) — $22.38 buy-all / $22.38 with own stock.
 

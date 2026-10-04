@@ -19,7 +19,7 @@ milestones:
   - id: M1
     title: "M1 - Phase 1: In-plane gonioreflectometer"
     goal: "Fixed camera, light arm M4 and table M3 work from the laptop and the buttons; both axes repeat within 0.1 deg; the mirror peak appears at M3 = M4/2."
-    cap_usd: 350
+    cap_usd: 347
     due_weeks: 4
     issues:
       - id: M1.1
@@ -35,7 +35,7 @@ milestones:
       - id: M1.3
         title: "Base and frame"
         labels: [phase-1, frame, hardware]
-        tasks: ["Cut 600 x 600 base, drill full drill map", "Tee nuts, feet, level", "Camera outrigger + post", "Print protractor scales"]
+        tasks: ["Cut 600 x 600 base, drill full drill map", "Tee nuts, feet, level", "Camera outrigger + post; mark the 350 mm (BRDF) and 650 mm (scan) positions", "Print protractor scales"]
         acceptance: "Ring footprint and table post concentric within 0.5 mm."
       - id: M1.4
         title: "Light arm M4 (ring)"
@@ -66,7 +66,7 @@ milestones:
   - id: M2
     title: "M2 - Phase 2: Calibrated BRDF and game materials"
     goal: "A fitted swatch rendered in Unreal/Unity matches a photo under the same light angle."
-    cap_usd: 74
+    cap_usd: 73.5
     due_weeks: 3
     issues:
       - {id: M2.1, title: "Enclosure", labels: [phase-2, enclosure], tasks: ["Dowel frame + drape, vents clear", "Stray-light test"], acceptance: "Stray light < 0.1 % of PTFE signal."}
@@ -80,7 +80,7 @@ milestones:
   - id: M3
     title: "M3 - Phase 3: Isotropic BRDF (add M2 tilt)"
     goal: "Full isotropic scan of one swatch runs unattended with the collision model active."
-    cap_usd: 23
+    cap_usd: 22.5
     due_weeks: 2
     issues:
       - {id: M3.1, title: "Tilt yoke M2", labels: [phase-3, axis-M2, hardware], tasks: ["Yoke on table flange", "Drive, home flag at -90", "installed_phase: 3"], acceptance: "M2 repeatability <= 0.1 deg; zero point unchanged."}
@@ -90,36 +90,105 @@ milestones:
   - id: M4
     title: "M4 - Phase 4: Anisotropic BRDF and SVBRDF (add M1 spin)"
     goal: "Brushed metal highlight follows M1; per-pixel SVBRDF of a textured swatch."
-    cap_usd: 23
+    cap_usd: 22.5
     due_weeks: 2
     issues:
-      - {id: M4.1, title: "Spin platter M1", labels: [phase-4, axis-M1, hardware], tasks: ["Platter on yoke", "Home flag on TH0", "installed_phase: 4"], acceptance: "M1 repeatability <= 0.1 deg."}
+      - {id: M4.1, title: "Spin platter M1", labels: [phase-4, axis-M1, hardware], tasks: ["Platter on yoke", "Spindle hub accepts scan-kit risers (Phase 6)", "Home flag on TH0", "installed_phase: 4"], acceptance: "M1 repeatability <= 0.1 deg."}
       - {id: M4.2, title: "Anisotropic + SVBRDF fit", labels: [phase-4, software], tasks: ["Anisotropic GGX", "Per-pixel fit with per-pixel directions"], acceptance: "Brushing direction within 5 deg."}
       - {id: M4.3, title: "Phase 4 milestone test", labels: [phase-4, milestone-test], tasks: ["Brushed metal at 8 M1 angles"], acceptance: "Highlight stretch follows M1."}
 
   - id: M5
-    title: "M5 - Phase 5: Multispectral"
-    goal: "Eight-band reflectance of a colour target matches its reference trend; polarized capture separates specular."
+    title: "M5 - Phase 5: Multispectral and polarization"
+    goal: "Eight-band reflectance of a colour target repeats within 3 %; crossed polarizers separate specular from diffuse."
     cap_usd: 30
     due_weeks: 2
     issues:
-      - {id: M5.1, title: "LED bank + polarizers", labels: [phase-5, hardware], tasks: ["Choose 8 bands, build ring", "NLDD-350H on E4 GPIO4, ULN2803A from Pico", "Polarizer film on lamp and lens"], acceptance: "Each band on/off from laptop; crossed polarizers cut mirror highlight >= 20x."}
-      - {id: M5.2, title: "Spectral calibration", labels: [phase-5, software], tasks: ["Per-band PTFE reference", "Colour target check (borrowed)"], acceptance: "Band ratios repeat within 3 %."}
+      - {id: M5.1, title: "LED bank on the 40 deg mast", labels: [phase-5, hardware], tasks: ["Choose 8 bands (~420-660 nm)", "Print LED ring + 40 deg mast on the light arm", "NLDD-350H on E4 GPIO4, ULN2803A from Pico GP8-15", "Collision model includes the mast"], acceptance: "Each band on/off from laptop and buttons; mast clears the camera at M4 = 20 deg."}
+      - {id: M5.2, title: "Polarizers", labels: [phase-5, hardware], tasks: ["Film in the lamp slot", "Rotatable lens disc with index marks"], acceptance: "Crossed polarizers cut the mirror highlight >= 20x."}
+      - {id: M5.3, title: "Spectral calibration", labels: [phase-5, software], tasks: ["Per-band PTFE reference", "Per-band light direction (mast elevation) in kinematics", "Colour target check (borrowed)"], acceptance: "Band ratios repeat within 3 %."}
+      - {id: M5.4, title: "Phase 5 milestone test", labels: [phase-5, milestone-test], tasks: ["Multispectral in-plane BRDF of two paints that look alike in RGB"], acceptance: "Paints separated in at least one band."}
 
   - id: M6
-    title: "M6 - Phase 6: Scanning, SVBRDF maps, release"
-    goal: "Object scanned with M1/M2 in front of the fixed camera; textures render in-engine; project public and OSHWA-ready."
+    title: "M6 - Phase 6: 3D photo scanner"
+    goal: "A 40 mm printed cube scans to within 0.5 mm on every edge, and a 1:43 model car mesh imports cleanly into Blender."
+    cap_usd: 4.5
+    due_weeks: 3
+    issues:
+      - id: M6.1
+        title: "Scan kit hardware"
+        labels: [phase-6, scanner, hardware]
+        tasks: ["Print risers 60/40/20/0 mm (delta = 60 - riser), nest, 650 mm camera stop, outrigger end foot", "Buy putty; print the ChArUco mat", "Check object sphere r = 55 clears the light arm in ASM - Phase 6"]
+        acceptance: "Putty holds a 100 g object at 80 deg elevation for 3 turns (test S3)."
+      - id: M6.2
+        title: "Scan-mode camera"
+        labels: [phase-6, scanner, camera]
+        tasks: ["Slide to 650 mm, f/8 stop, refocus, lock", "opengonio scan calibrate: ChArUco intrinsics + distortion + measured camera pose", "Set scan.calibration in machine.yaml; keep the BRDF-mode (350 mm) profile"]
+        acceptance: "Reprojection RMS <= 0.5 px (test S1)."
+      - id: M6.3
+        title: "Scan planner and known poses"
+        labels: [phase-6, scanner, software]
+        tasks: ["opengonio scan plan: rings 0/20/40/60/80 deg, 144 views", "Object-frame poses from M1/M2/M3 + platter offset", "Joint fit of camera pose + board placement (AX = YB) at 12 poses"]
+        acceptance: "Kinematic pose within 0.2 deg / 0.3 mm of solvePnP (test S2)."
+      - id: M6.4
+        title: "Capture run"
+        labels: [phase-6, scanner, software]
+        tasks: ["opengonio scan run: lamp at M4 = 30 deg, crossed polarizers", "Locked exposure; frames saved as img_0000.jpg ...", "Buttons: START runs the scan, PAUSE/STOP work mid-scan", "scan.json with poses and settings"]
+        acceptance: "144 sharp frames, no motion blur, unattended."
+      - id: M6.5
+        title: "Visual hull preview"
+        labels: [phase-6, scanner, software]
+        tasks: ["Empty-platter background pass (scan run --background)", "Silhouettes by background differencing", "Voxel carving with known poses, clipped at the support plane", "PLY preview in under 1 min on the laptop"]
+        acceptance: "40 mm cube hull edges within 1 mm (test S4)."
+      - id: M6.6
+        title: "Photogrammetry with pose priors"
+        labels: [phase-6, scanner, software]
+        tasks: ["Export COLMAP model (OPENCV camera when calibrated)", "run_colmap.sh: feature_extractor -> sync-ids -> point_triangulator -> patch_match_stereo (CUDA) -> stereo_fusion -> poisson_mesher", "Optional bundle_adjuster + model_aligner to the kinematic camera centres", "No CUDA: Meshroom / OpenMVS / RealityScan", "Mesh units = mm"]
+        acceptance: "Dense mesh of the cube, no manual alignment."
+      - id: M6.7
+        title: "Photometric stereo detail"
+        labels: [phase-6, scanner, software]
+        tasks: ["PS stations every 60 deg of M1 at 30 deg elevation", "LED bank band, 6 M4 positions (non-coplanar via the 40 deg mast)", "Light positions refined with chrome balls; near-light directions + 1/r^2 from the hull or mesh", "Merge normals into a normal map on the mesh"]
+        acceptance: "Matte sphere median normal error <= 5 deg (test S6)."
+      - id: M6.8
+        title: "Phase 6 milestone test"
+        labels: [phase-6, milestone-test]
+        tasks: ["Scan the 40 mm cube, measure edges in the mesh", "Scan a 1:43 car (flip once for the underside, merge)", "Import PLY/OBJ/glTF into Blender"]
+        acceptance: "Cube edges 40.0 +/- 0.5 mm; car imports without repair (tests S5, S7)."
+
+  - id: M7
+    title: "M7 - Phase 7: On-object appearance"
+    goal: "The scanned model car rendered in-engine matches a gantry photo under the same light."
     cap_usd: 0
     due_weeks: 4
     issues:
-      - {id: M6.1, title: "Photogrammetry with the rotating stage", labels: [phase-6, software], tasks: ["Pose priors from M1/M2", "COLMAP / Meshroom", "Scale from ChArUco"], acceptance: "Test block within 0.5 mm."}
-      - {id: M6.2, title: "On-object SVBRDF maps", labels: [phase-6, software], tasks: ["Base colour, roughness, metallic, normal maps", "Engine export"], acceptance: "Render matches a capture."}
-      - {id: M6.3, title: "Open-source release", labels: [release], tasks: ["docs/licensing.md checklist", "Make repo + Onshape public", "Apply for OSHWA", "Tag v1.0"], acceptance: "Public; OSHWA UID in README."}
+      - {id: M7.1, title: "Project captures onto the mesh", labels: [phase-7, software], tasks: ["UV-unwrap the mesh", "Per-texel visibility over all views and light positions", "Per-pixel directions from the known poses"], acceptance: "Each texel has >= 20 valid observations."}
+      - {id: M7.2, title: "Per-texel SVBRDF fit", labels: [phase-7, software], tasks: ["Initialise from Phase 2-4 swatch fits", "Fit base colour, roughness, metallic, clear-coat; normals from PS", "Energy and reciprocity checks"], acceptance: "Held-out images reproduced within 10 % RMS."}
+      - {id: M7.3, title: "Engine export", labels: [phase-7, software], tasks: ["glTF 2.0 with PBR textures", "Unreal and Unity material setup"], acceptance: "Imports in both engines without edits."}
+      - {id: M7.4, title: "Phase 7 milestone test", labels: [phase-7, milestone-test], tasks: ["Gantry photo vs in-engine render, same light pose"], acceptance: "Side-by-side published in docs."}
 
-  - id: M7
-    title: "M7 - Stretch: research-grade upgrades"
+  - id: M8
+    title: "M8 - OpenGonio Studio (laptop app)"
+    goal: "Every workflow (BRDF scan, multispectral, 3D scan) runs from one laptop app or the physical buttons, with no terminal."
+    due_weeks: 3
+    issues:
+      - {id: M8.1, title: "Local web UI", labels: [software, app], tasks: ["Connect USB / WiFi / Bluetooth", "Live camera view with exposure lock", "Jog, home, light controls", "Collision preview from the simulator code"], acceptance: "Full Phase 1 run from the browser."}
+      - {id: M8.2, title: "Workflow presets", labels: [software, app], tasks: ["BRDF swatch, multispectral, 3D scan presets", "Buttons map to the selected preset", "Progress and ETA"], acceptance: "Each preset runs unattended from START."}
+      - {id: M8.3, title: "Data management", labels: [software, app], tasks: ["Session folders with scan.json", "Resume after STOP / e-stop", "Export bundle (images, model, materials)"], acceptance: "Interrupted scan resumes without re-capturing done poses."}
+
+  - id: M9
+    title: "M9 - Release and certification"
+    goal: "Public, documented, OSHWA-certified open hardware with a v1.0 release."
+    due_weeks: 2
+    issues:
+      - {id: M9.1, title: "Documentation pass", labels: [release, docs], tasks: ["All modules have 8 sections", "Build video or GIF per phase", "STEP + 3MF for every printed part"], acceptance: "A new builder completes Phase 1 from the docs alone."}
+      - {id: M9.2, title: "Make public + OSHWA", labels: [release], tasks: ["docs/licensing.md checklist", "Repo and Onshape public", "Apply for OSHWA certification"], acceptance: "OSHWA UID in README."}
+      - {id: M9.3, title: "v1.0 release", labels: [release], tasks: ["Tag v1.0", "Release notes with measured accuracy numbers"], acceptance: "Release published."}
+
+  - id: M10
+    title: "M10 - Stretch: research-grade upgrades"
     goal: "Upgrades from published rigs without breaking the low-cost build."
     issues:
-      - {id: M7.1, title: "Adaptive sampling", labels: [stretch, software], tasks: ["Prototype RGL-EPFL-style adaptive sampling [R15]"], acceptance: "Same fit with >= 3x fewer captures."}
-      - {id: M7.2, title: "Filter-wheel or mono camera multispectral", labels: [stretch, hardware], tasks: ["Compare with LED bands; follow [R1] channel design"], acceptance: "Documented comparison."}
-      - {id: M7.3, title: "Validation vs MERL / RGL data", labels: [stretch, validation], tasks: ["Measure a shared material [R13][R16]"], acceptance: "Published comparison."}
+      - {id: M10.1, title: "Adaptive BRDF sampling", labels: [stretch, software], tasks: ["Prototype RGL-EPFL-style adaptive sampling [R15]"], acceptance: "Same fit with >= 3x fewer captures."}
+      - {id: M10.2, title: "Mono camera + filter wheel multispectral", labels: [stretch, hardware], tasks: ["Compare with LED bands; follow the channel design of [R1]"], acceptance: "Documented comparison."}
+      - {id: M10.3, title: "Space carving with photo-consistency", labels: [stretch, software], tasks: ["Extend the visual hull to space carving [S7]"], acceptance: "Concavities recovered on a test bowl."}
+      - {id: M10.4, title: "Validation vs MERL / RGL data", labels: [stretch, validation], tasks: ["Measure a shared material [R13][R16]"], acceptance: "Published comparison."}

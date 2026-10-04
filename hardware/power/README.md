@@ -16,7 +16,7 @@
 
 Later phases add only loads on J2 (motors via E4, lights via E4 MOSFETs). Nothing here changes.
 
-## 2. BOM — $67.63 buy-all / $47.89 with own stock
+## 2. BOM — $66.83 buy-all / $47.09 with own stock
 
 [`bom/modules/power.csv`](../../bom/modules/power.csv)
 
@@ -29,7 +29,7 @@ Later phases add only loads on J2 (motors via E4, lights via E4 MOSFETs). Nothin
 | PWR-05 | Fuse 3.15 A T 5×20 | 2 | 0.60 est. | — |
 | PWR-06 | IRF4905PBF | 1 | 2.73 | [P7][P8] |
 | PWR-07 | 1N4742A 12 V zener | 1 | 0.28 | [P9] |
-| PWR-08 | P6KE30A TVS | 1 | 0.94 | [P10] |
+| PWR-08 | P6KE30A TVS (Littelfuse) | 1 | 0.14 | [P10] |
 | PWR-09 | 100 µF 50 V | 1 | 0.59 | [P11] |
 | PWR-10 | PC817 optocoupler | 1 | 0.30 est. | — |
 | PWR-11 | Resistors 10k ×2 | 1 | 0.40 est. | — |

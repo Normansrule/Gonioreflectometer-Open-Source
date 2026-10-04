@@ -1,1 +1,1 @@
-"""Phase 6: photogrammetry with the fixed camera and the rotating stage. PHASE_STATUS = planned."""
+"""Phase 6 photo scanner: scan plans, known poses, COLMAP export, silhouette carving, photometric stereo."""

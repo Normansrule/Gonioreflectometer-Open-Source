@@ -36,6 +36,6 @@ unzip -oq "$ZIP" -d ~/projects && cd ~/projects/Gonioreflectometer-Open-Source
 bash scripts/publish.sh
 ```
 
-`scripts/publish.sh` does: create `Gonioreflectometer-Open-Source` as **private** → push `main` → create labels, 8 milestones, 31 checklist issues → try to enable Pages from `/docs` → run the tests.
+`scripts/publish.sh` does: create `Gonioreflectometer-Open-Source` as **private** → push `main` → create or update labels, 11 milestones, 49 checklist issues (re-runs update renamed items; ticked boxes on unchanged issues are kept) → try to enable Pages from `/docs` → run the tests.
 
 **Pages note:** private repos need GitHub Pro/Team for Pages. Without it, open `docs/index.html` locally (equations need internet for KaTeX).

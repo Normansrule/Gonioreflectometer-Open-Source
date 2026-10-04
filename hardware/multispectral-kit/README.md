@@ -2,7 +2,7 @@
 
 Status: planned — full 8-section docs when this milestone starts.
 
-**Purpose:** Eight narrow-band LEDs (~420–660 nm) on one NLDD-350H, one band at a time via a ULN2803A from the Pico; polarizer film on the lamp and lens. Low-cost stand-in for the multispectral cameras of [R1].
+**Purpose:** Eight narrow-band LEDs on a printed 40° mast at the light-arm end (also the non-coplanar light for Phase 6 photometric stereo) (~420–660 nm) on one NLDD-350H, one band at a time via a ULN2803A from the Pico; polarizer film on the lamp and lens. Low-cost stand-in for the multispectral cameras of [R1].
 
 **Interfaces:** LED ring on the light arm; driver supply switched by E4 GPIO4; band select from Pico GP8–15.
 

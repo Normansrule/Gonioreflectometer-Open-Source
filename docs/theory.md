@@ -99,3 +99,9 @@ The lamp's mirror image shifts $s$ pixels (pitch $p_{px}$, path $P$, lens $f$, l
 $$\Delta\theta_L = \frac{s\,p_{px}\,P}{f\,D_L}$$
 
 About 8 px per 0.1° for this build, so the camera can verify the 0.1° target (as in Fig. 12 of [R1]).
+
+## 8. 3D scanning (Phase 6)
+
+Object pose, COLMAP pose, projection, visual hull and photometric stereo: [`scanner.md`](scanner.md#equations) [S1][S4][S5].
+
+$$R_{oc} = R_{wc}\,R\,P,\quad t_{oc} = -R_{wc}(C+\delta R\hat e_x),\qquad I = L\,g,\; g=\rho\hat n,\; \mathrm{rank}(L)=3$$

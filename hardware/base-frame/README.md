@@ -8,6 +8,6 @@ Status: planned — full 8-section docs when this milestone starts.
 
 **Later phases:** Ring sub-plate (Phase 1) and stage axes bolt to pre-drilled holes; nothing is drilled later.
 
-**BOM:** [`bom/modules/base-frame.csv`](../../bom/modules/base-frame.csv) — $64.12 buy-all / $46.17 with own stock.
+**BOM:** [`bom/modules/base-frame.csv`](../../bom/modules/base-frame.csv) — $62.76 buy-all / $44.81 with own stock.
 
 **Checklist:** purpose · BOM + STEP · Onshape · assembly · wiring · firmware/software · acceptance test · safety (issue `M1.3`).

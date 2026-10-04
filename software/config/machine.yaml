@@ -37,8 +37,24 @@ camera:
   pixel_um: 1.55
 
 lights:                         # FluidNC user digital outputs (M62/M63 P<n>)
-  white: {output: 0, phase: 1}
-  multispectral: {output: 1, phase: 5}
+  white: {output: 0, phase: 1, elevation_deg: 0.0}
+  multispectral: {output: 1, phase: 5, elevation_deg: 40.0}   # LED bank on a 40 deg mast: non-coplanar lights for photometric stereo
+
+scan:                           # Phase 6 photo scanner (camera slid to the far end of the outrigger)
+  camera_distance_mm: 650.0     # f/8: see docs/generated/optics.md (field, DOF, resolution)
+  aperture_f: 8
+  object_max_radius_mm: 55.0    # bounding sphere of the object about its centre (2r <= DOF)
+  platter_offset_mm: 0.0        # delta: support surface below the zero point = 60 - riser height (mm)
+  calibration: null             # path to scan_calibration.yaml from `opengonio scan calibrate` (measured camera pose)
+  lamp_m4_deg: 30.0             # white lamp beside the camera for photogrammetry frames
+  rings:                        # camera elevation above the platter (deg) : images per ring
+    - {elevation_deg: 0, count: 36}
+    - {elevation_deg: 20, count: 36}
+    - {elevation_deg: 40, count: 36}
+    - {elevation_deg: 60, count: 24}
+    - {elevation_deg: 80, count: 12}
+  ps_band: 3                    # LED bank band used for photometric stereo (one band = one albedo)
+  ps_m4_deg: [40, 100, 160, 220, 280, 330]
 
 axes:
   M4:

@@ -27,6 +27,7 @@ Origin = zero point (sample surface). +Z up. Camera on +X at 350 mm, elevation f
 |---|---|
 | Laptop → motion | FluidNC on the FYSETC E4 over USB serial, WiFi (telnet :23) or Bluetooth serial [R24][R30] |
 | Laptop → camera | USB UVC, manual exposure/gain/WB [R47][R50] |
+| Scan mode | camera at 650 mm; object on M1/M2; poses from kinematics → COLMAP [S1][S2] |
 | Buttons → actions | HOME, START, STOP, LIGHT, NEXT on the Pico hub → `opengonio panel` |
 | Without laptop | PAUSE on the E4 feed-hold pin [R27]; jog/home from the FluidNC WebUI on a phone (WiFi build) |
 | Stop | E-STOP (and over-travel switches) cut 24 V to the E4. Pico senses it; on release the software re-initialises the drivers (`$MI`) and forces re-homing |
@@ -42,7 +43,8 @@ Origin = zero point (sample surface). +Z up. Camera on +X at 350 mm, elevation f
 | Table post | (0, 0) | OG-40 |
 | Ring sub-plate | 4 × on Ø250 at 45°/135°/225°/315° | M5 tee nuts |
 | Camera outrigger (2020, 500 mm) | along +X from (200, 0) | 2 × M5 into the base |
-| Camera post | (380, 0) on the outrigger | 2 × M5 T-nuts |
+| Camera post | (380, 0) on the outrigger (BRDF, 350 mm); slides to (680, 0) for scanning (650 mm stop) | 2 × M5 T-nuts |
+| Outrigger end foot | (700, 0) | printed |
 | Power box | (−220, −220) | OG-40 |
 | Controller + panel | (−220, 220) | OG-40 |
 | Feet | 30 mm from each corner | M8 tee nuts |

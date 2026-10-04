@@ -53,7 +53,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 <body>
 <header><nav>
  <b>OpenGonio</b>
- <a href="#machine">Machine</a><a href="#brdf">BRDF</a><a href="#equations">Equations</a>
+ <a href="#machine">Machine</a><a href="#brdf">BRDF</a><a href="#scanner">3D scan</a><a href="#equations">Equations</a>
  <a href="#build">Build</a><a href="#budget">Budget</a><a href="#refs">References</a>
  <button class="toggle" id="theme" aria-label="Toggle light or dark theme">◐</button>
 </nav></header>
@@ -95,6 +95,29 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
    <p class="eq">$$f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r}$$</p>
   </div>
  </div>
+</section>
+
+<section id="scanner">
+ <h2>3D photo scanner</h2>
+ <p class="sub">Phase 6. Camera fixed at 650 mm; M1 spins and M2 tilts the object, so every view's pose is known [S9]. Drag to orbit the view sphere.</p>
+ <div class="grid">
+  <div class="card"><canvas id="sphere" width="900" height="560" aria-label="View sphere of the scan plan"></canvas></div>
+  <div class="card">
+   <label>rings <input id="srings" type="range" min="1" max="5" value="5"><output></output></label>
+   <label>views / ring <input id="sper" type="range" min="8" max="48" step="4" value="36"><output></output></label>
+   <label>PS lights <input id="sps" type="range" min="2" max="8" value="6"><output></output></label>
+   <label>mast elev. <input id="smast" type="range" min="0" max="60" value="40"><output></output></label>
+   <div class="read">
+    <div><small>images</small><span id="snum">–</span></div><div><small>spacing on ring 0</small><span id="sspace">–</span></div>
+    <div><small>light rank</small><span id="srank">–</span></div><div><small>pose error @ 55 mm</small><span>≈ 0.1 mm</span></div>
+   </div>
+   <div class="status" id="sstat">–</div>
+   <p class="sub" style="margin-top:10px;font-size:13px">Blue: camera views (elevation 90° − M2). Yellow: LED-bank light directions for photometric stereo. At mast 0° the lights are coplanar (rank 2) and normals cannot be solved.</p>
+  </div>
+ </div>
+ <p></p>
+ <img class="full" src="assets/scanner.svg" alt="Animated scanner: object spinning and tilting, view sphere filling">
+ <p class="eq">$$\lambda\,[u,v,1]^\top = K(R_{oc}p_O+t_{oc}),\quad R_{oc}=R_{wc}RP\qquad V=\bigcap_j\{p:\pi_j(p)\in S_j\}\qquad I=L\,g,\;g=\rho\hat n$$</p>
 </section>
 
 <section id="equations" class="eq">
@@ -141,6 +164,9 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
   <tr><th>ID</th><th>Source</th></tr>
   <tr><td>R1</td><td>Ansari-Asl, Barbieri, Obein, Hardeberg, <i>J. Imaging</i> 10(3):55, 2024 — <a href="https://doi.org/10.3390/jimaging10030055">doi:10.3390/jimaging10030055</a></td></tr>
   <tr><td>R2</td><td>P. Hanrahan, <i>Reflection Models I: Ideal Materials</i>, Stanford CS348b Lecture 10, 2016</td></tr>
+  <tr><td>S1–S3</td><td>COLMAP format and known-pose FAQ; Schönberger &amp; Frahm 2016 — <a href="https://colmap.github.io/faq.html">colmap.github.io</a></td></tr>
+  <tr><td>S4–S7</td><td>Woodham 1980 (photometric stereo); Laurentini 1994 (visual hull); Szeliski 1993; Kutulakos &amp; Seitz 2000</td></tr>
+  <tr><td>S9</td><td>Fitzgibbon, Cross, Zisserman, turntable reconstruction, 1998 — <a href="https://link.springer.com/chapter/10.1007/3-540-49437-5_11">doi</a></td></tr>
   <tr><td>R5</td><td>Debevec &amp; Malik, SIGGRAPH 1997 — <a href="https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf">PDF</a></td></tr>
   <tr><td>R6–R8</td><td>Walter et al. 2007 (GGX); Schlick 1994; Cook &amp; Torrance 1982</td></tr>
   <tr><td>R20–R30</td><td>FluidNC documentation — <a href="http://wiki.fluidnc.com/">wiki.fluidnc.com</a></td></tr>
@@ -299,7 +325,52 @@ function drawLobe() {
 
 document.getElementById("theme").onclick = () => { const r = document.documentElement;
   r.dataset.theme = r.dataset.theme === "light" ? "dark" : "light"; };
-draw(); drawLobe();
+// ---------- scanner view sphere ----------
+const scv = $("sphere"), g4 = scv.getContext("2d");
+const [srings, sper, sps, smast] = ["srings", "sper", "sps", "smast"].map($);
+let syaw = 30, spitch = 22, sdrag = null;
+scv.addEventListener("pointerdown", e => { sdrag = [e.clientX, e.clientY, syaw, spitch]; scv.setPointerCapture(e.pointerId); });
+scv.addEventListener("pointermove", e => { if (!sdrag) return; syaw = sdrag[2] + (e.clientX - sdrag[0]) * 0.4;
+  spitch = Math.max(-80, Math.min(80, sdrag[3] + (e.clientY - sdrag[1]) * 0.3)); drawSphere(); });
+scv.addEventListener("pointerup", () => sdrag = null);
+function SP(v) { const a = mv(Rz(syaw), v); const b = [a[0], a[1] * c(spitch) - a[2] * s(spitch), a[1] * s(spitch) + a[2] * c(spitch)];
+  return [scv.width / 2 + b[0] * 220, scv.height / 2 - b[2] * 220, b[1]]; }
+function rank3(L) {                       // numeric rank of k x 3 via Gram determinant / eigen check
+  const G = [[0,0,0],[0,0,0],[0,0,0]];
+  L.forEach(l => { for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) G[i][j] += l[i] * l[j]; });
+  const det = G[0][0]*(G[1][1]*G[2][2]-G[1][2]*G[2][1]) - G[0][1]*(G[1][0]*G[2][2]-G[1][2]*G[2][0]) + G[0][2]*(G[1][0]*G[2][1]-G[1][1]*G[2][0]);
+  const tr = G[0][0] + G[1][1] + G[2][2];
+  if (det > 1e-6 * tr ** 3) return 3;
+  return L.length > 1 && Math.abs(dot(unit(L[0]), unit(L[1]))) < 0.9999 ? 2 : 1;
+}
+function drawSphere() {
+  const nR = +srings.value, nP = +sper.value, nL = +sps.value, mast = +smast.value;
+  const elevs = [0, 20, 40, 60, 80].slice(0, nR), counts = elevs.map(e => e >= 80 ? Math.max(4, nP / 3) : e >= 60 ? Math.round(nP * 2 / 3) : nP);
+  g4.clearRect(0, 0, scv.width, scv.height);
+  g4.strokeStyle = "#30363d"; g4.lineWidth = 1;
+  for (let e = -60; e <= 80; e += 20) { g4.beginPath(); for (let a = 0; a <= 360; a += 6) { const q = SP([c(e) * c(a), c(e) * s(a), s(e)]);
+    a ? g4.lineTo(q[0], q[1]) : g4.moveTo(q[0], q[1]); } g4.stroke(); }
+  const pts = [];
+  elevs.forEach((e, i) => { for (let k = 0; k < counts[i]; k++) { const a = 360 * k / counts[i]; pts.push([[c(e) * c(a), c(e) * s(a), s(e)], "#58a6ff"]); } });
+  const L = []; for (let k = 0; k < nL; k++) { const a = 360 * k / nL + 15; const l = [c(mast) * c(a), c(mast) * s(a), s(mast)]; L.push(l); pts.push([sc_(l, 1.18), "#e3b341"]); }
+  pts.map(([v, col]) => [SP(v), col]).sort((a, b) => b[0][2] - a[0][2]).forEach(([q, col]) => {
+    g4.globalAlpha = q[2] > 0 ? 0.35 : 1; g4.fillStyle = col; g4.beginPath(); g4.arc(q[0], q[1], col === "#e3b341" ? 6 : 4, 0, 7); g4.fill(); });
+  g4.globalAlpha = 1;
+  const base = [[-0.35, -0.2, -0.05], [0.35, -0.2, -0.05], [0.35, 0.2, -0.05], [-0.35, 0.2, -0.05]].map(SP);
+  g4.fillStyle = "rgba(188,140,255,.5)"; g4.beginPath(); base.forEach((q, i) => i ? g4.lineTo(q[0], q[1]) : g4.moveTo(q[0], q[1])); g4.closePath(); g4.fill();
+  const car = [[-0.3, -0.12, 0], [0.3, -0.12, 0], [0.3, 0.12, 0], [-0.3, 0.12, 0], [-0.2, -0.1, 0.18], [0.15, -0.1, 0.18], [0.15, 0.1, 0.18], [-0.2, 0.1, 0.18]].map(SP);
+  g4.strokeStyle = "#f0883e"; g4.lineWidth = 2;
+  [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([a, b]) => { g4.beginPath(); g4.moveTo(car[a][0], car[a][1]); g4.lineTo(car[b][0], car[b][1]); g4.stroke(); });
+  const n = counts.reduce((a, b) => a + b, 0), rk = rank3(L);
+  $("snum").textContent = n; $("sspace").textContent = (360 / nP).toFixed(1) + "°"; $("srank").textContent = rk;
+  const st = $("sstat");
+  st.className = "status " + (rk < 3 ? "bad" : nP < 24 ? "warn" : "ok");
+  st.textContent = rk < 3 ? "Photometric stereo impossible: lights coplanar" : nP < 24 ? "Sparse ring: < 24 views may leave gaps in photogrammetry" : `${n} views + ${nL} PS lights: ready`;
+}
+function sc_(v, k) { return v.map(x => x * k); }
+[srings, sper, sps, smast].forEach(el => { const out = el.nextElementSibling; const upd = () => { out.textContent = el.value; drawSphere(); };
+  el.addEventListener("input", upd); out.textContent = el.value; });
+draw(); drawLobe(); drawSphere();
 </script>
 </body>
 </html>

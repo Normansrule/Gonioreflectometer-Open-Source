@@ -4,7 +4,7 @@
     python tools/roadmap.py --write-md                 # regenerate ROADMAP.md
     python tools/roadmap.py --github [--repo OWNER/NAME] [--dry-run]
         create labels, milestones and one checklist issue per roadmap item with the GitHub CLI.
-        Safe to re-run: existing milestones/issues (matched by title) are skipped.
+        Safe to re-run: milestones/issues are matched by ID (M6, M6.3); renamed ones are updated, unchanged ones untouched.
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -85,35 +85,59 @@ def gh(args: list[str], dry: bool, ok_codes: tuple[str, ...] = ()) -> str:
     return res.stdout
 
 
+def ms_key(title: str) -> str:
+    """'M6 - Phase 6: ...' -> 'M6' (milestones are matched by ID so renames update in place)."""
+    return title.split(" ", 1)[0]
+
+
+def issue_key(title: str) -> str:
+    """'[M6.3] Scan planner' -> 'M6.3'."""
+    return title[1:title.index("]")] if title.startswith("[") and "]" in title else title
+
+
 def push_github(milestones: list[dict], repo: str, dry: bool) -> None:
+    """Create or update labels, milestones and checklist issues (GitHub REST only).
+
+    Matching is by ID (M6, M6.3). Unchanged issues are left alone so ticked boxes survive;
+    an issue whose title changed in the YAML gets its title, body, milestone and labels replaced.
+    """
     base = f"repos/{repo}"
     labels = sorted({l for ms in milestones for it in ms["issues"] for l in it.get("labels", [])})
     for l in labels:
         gh(["api", "-X", "POST", f"{base}/labels", "-f", f"name={l}", "-f", f"color={LABEL_COLOURS.get(l, 'ededed')}"],
            dry, ok_codes=("already_exists", "422"))
     ms_list = json.loads(gh(["api", f"{base}/milestones?state=all&per_page=100"], dry) or "[]")
-    numbers = {m["title"]: m["number"] for m in ms_list}
-    existing = {i["title"] for i in json.loads(gh(["api", "--paginate", f"{base}/issues?state=all&per_page=100"], dry) or "[]")}
+    by_key = {ms_key(m["title"]): m for m in ms_list}
+    issues = json.loads(gh(["api", "--paginate", f"{base}/issues?state=all&per_page=100"], dry) or "[]")
+    issues_by_key = {issue_key(i["title"]): i for i in issues if "pull_request" not in i}
     due = date.today()
     for ms in milestones:
-        if ms["title"] not in numbers:
-            fields = ["-f", f"title={ms['title']}", "-f", f"description={ms['goal']}"]
-            if ms.get("due_weeks"):
-                due += timedelta(weeks=ms["due_weeks"])
-                fields += ["-f", f"due_on={due.isoformat()}T23:59:59Z"]
+        due += timedelta(weeks=ms.get("due_weeks", 0))
+        fields = ["-f", f"title={ms['title']}", "-f", f"description={ms['goal']}"]
+        if ms.get("due_weeks"):
+            fields += ["-f", f"due_on={due.isoformat()}T23:59:59Z"]
+        old = by_key.get(ms["id"])
+        if old is None:
             out = gh(["api", "-X", "POST", f"{base}/milestones", *fields], dry)
-            numbers[ms["title"]] = json.loads(out)["number"] if out and out.strip().startswith("{") else 0
-            print("milestone:", ms["title"])
+            number = json.loads(out)["number"] if out and out.strip().startswith("{") else 0
+            print("milestone +", ms["title"])
+        else:
+            number = old["number"]
+            if old["title"] != ms["title"] or (old.get("description") or "") != ms["goal"]:
+                gh(["api", "-X", "PATCH", f"{base}/milestones/{number}", *fields], dry)
+                print("milestone ~", ms["title"])
         for it in ms["issues"]:
             title = issue_title(it)
-            if title in existing:
-                continue
-            args = ["api", "-X", "POST", f"{base}/issues", "-f", f"title={title}", "-f", f"body={issue_body(ms, it)}",
-                    "-F", f"milestone={numbers[ms['title']]}"]
+            body_args = ["-f", f"title={title}", "-f", f"body={issue_body(ms, it)}", "-F", f"milestone={number}"]
             for l in it.get("labels", []):
-                args += ["-f", f"labels[]={l}"]
-            gh(args, dry)
-            print("  issue:", title)
+                body_args += ["-f", f"labels[]={l}"]
+            cur = issues_by_key.get(it["id"])
+            if cur is None:
+                gh(["api", "-X", "POST", f"{base}/issues", *body_args], dry)
+                print("  issue +", title)
+            elif cur["title"] != title:             # repurposed ID: new content, reopen
+                gh(["api", "-X", "PATCH", f"{base}/issues/{cur['number']}", *body_args, "-f", "state=open"], dry)
+                print("  issue ~", title)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -40,8 +40,9 @@ def camera_dir(elev_deg: float = 0.0) -> np.ndarray:
     return np.array([_c(elev_deg), 0.0, _s(elev_deg)])
 
 
-def light_dir(m4: float) -> np.ndarray:
-    return rot_z(m4) @ np.array([1.0, 0.0, 0.0])
+def light_dir(m4: float, elev_deg: float = 0.0) -> np.ndarray:
+    """Unit vector to a light on the arm at azimuth M4 and elevation elev (LED bank mast: 40 deg)."""
+    return rot_z(m4) @ np.array([_c(elev_deg), 0.0, _s(elev_deg)])
 
 
 def sample_rotation(m3: float = 0.0, m2: float = 0.0, m1: float = 0.0) -> np.ndarray:
@@ -77,10 +78,10 @@ def to_sample(w: np.ndarray, R: np.ndarray) -> tuple[float, float]:
     return theta, phi
 
 
-def brdf_coords(cfg: Machine, pose: dict[str, float]) -> BrdfCoords:
+def brdf_coords(cfg: Machine, pose: dict[str, float], light: str = "white") -> BrdfCoords:
     p = {**cfg.default_pose(), **pose}
     R = sample_rotation(p["M3"], p["M2"], p["M1"])
-    ti, pi = to_sample(light_dir(p["M4"]), R)
+    ti, pi = to_sample(light_dir(p["M4"], cfg.light_elevation(light)), R)
     tr, pr = to_sample(camera_dir(cfg.camera_elevation_deg), R)
     return BrdfCoords(ti, pi, tr, pr)
 
