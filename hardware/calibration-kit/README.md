@@ -1,25 +1,13 @@
-# Calibration Kit module (Phase 2, M2.2)
+# Calibration Kit · Phase 2 · M2.2
 
-Status: **planned** — full documentation is written when this module's milestone starts (one module at a time, with your approval before moving on).
+Status: planned — full 8-section docs when this milestone starts.
 
-## 1. Purpose
-PTFE white reference, first-surface mirror, two 25.4 mm chrome balls, ChArUco board on glass; printed kinematic holders for the sample stage.
+**Purpose:** PTFE white reference, mirror tile, two chrome balls, ChArUco board on glass; printed holders.
 
-## Interface spec
-Holders sit on the sample stage / turntable platter.
+**Interfaces:** Holders fit the swatch clamp / Phase 3 yoke.
 
-## What later phases attach
-Re-used for Phase 3-6 calibration; the ChArUco board seeds the Phase 5 scanning mat.
+**Later phases:** ChArUco board also used for the repeatability test and Phase 6 scanning.
 
-## 2. BOM
-[`bom/modules/calibration-kit.csv`](../../bom/modules/calibration-kit.csv) — subtotal **$84.18 spec / $50.43 budget / $50.43 with own stock** (approximate, checked 2026-10-04).
+**BOM:** [`bom/modules/calibration-kit.csv`](../../bom/modules/calibration-kit.csv) — $40.92 buy-all / $40.92 with own stock.
 
-## Deliverables still to write (tracked in issue `M2.2`)
-- [ ] 1. Purpose, interface spec, future attachments (frozen)
-- [ ] 2. BOM with confirmed STEP links and budget share
-- [ ] 3. Onshape modelling instructions (variables, features, print settings)
-- [ ] 4. Step-by-step assembly with alignment, torque and wiring notes
-- [ ] 5. Wiring diagram and connector pinout
-- [ ] 6. Firmware / software for this module
-- [ ] 7. Acceptance test with pass/fail numbers
-- [ ] 8. Safety notes
+**Checklist:** purpose · BOM + STEP · Onshape · assembly · wiring · firmware/software · acceptance test · safety (issue `M2.2`).

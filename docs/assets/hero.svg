@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" font-family="Segoe UI,Helvetica,Arial,sans-serif">
+<style>.t{fill:#f0f6fc} .m{fill:#8b949e} .b{font-weight:600} </style>
+<rect width="1200" height="460" rx="14" fill="#0d1117"/>
+<line x1="0" y1="0" x2="0" y2="460" stroke="#161b22"/><line x1="40" y1="0" x2="40" y2="460" stroke="#161b22"/><line x1="80" y1="0" x2="80" y2="460" stroke="#161b22"/><line x1="120" y1="0" x2="120" y2="460" stroke="#161b22"/><line x1="160" y1="0" x2="160" y2="460" stroke="#161b22"/><line x1="200" y1="0" x2="200" y2="460" stroke="#161b22"/><line x1="240" y1="0" x2="240" y2="460" stroke="#161b22"/><line x1="280" y1="0" x2="280" y2="460" stroke="#161b22"/><line x1="320" y1="0" x2="320" y2="460" stroke="#161b22"/><line x1="360" y1="0" x2="360" y2="460" stroke="#161b22"/><line x1="400" y1="0" x2="400" y2="460" stroke="#161b22"/><line x1="440" y1="0" x2="440" y2="460" stroke="#161b22"/><line x1="480" y1="0" x2="480" y2="460" stroke="#161b22"/><line x1="520" y1="0" x2="520" y2="460" stroke="#161b22"/><line x1="560" y1="0" x2="560" y2="460" stroke="#161b22"/><line x1="600" y1="0" x2="600" y2="460" stroke="#161b22"/><line x1="640" y1="0" x2="640" y2="460" stroke="#161b22"/><line x1="680" y1="0" x2="680" y2="460" stroke="#161b22"/><line x1="720" y1="0" x2="720" y2="460" stroke="#161b22"/><line x1="760" y1="0" x2="760" y2="460" stroke="#161b22"/><line x1="800" y1="0" x2="800" y2="460" stroke="#161b22"/><line x1="840" y1="0" x2="840" y2="460" stroke="#161b22"/><line x1="880" y1="0" x2="880" y2="460" stroke="#161b22"/><line x1="920" y1="0" x2="920" y2="460" stroke="#161b22"/><line x1="960" y1="0" x2="960" y2="460" stroke="#161b22"/><line x1="1000" y1="0" x2="1000" y2="460" stroke="#161b22"/><line x1="1040" y1="0" x2="1040" y2="460" stroke="#161b22"/><line x1="1080" y1="0" x2="1080" y2="460" stroke="#161b22"/><line x1="1120" y1="0" x2="1120" y2="460" stroke="#161b22"/><line x1="1160" y1="0" x2="1160" y2="460" stroke="#161b22"/><line x1="0" y1="0" x2="1200" y2="0" stroke="#161b22"/><line x1="0" y1="40" x2="1200" y2="40" stroke="#161b22"/><line x1="0" y1="80" x2="1200" y2="80" stroke="#161b22"/><line x1="0" y1="120" x2="1200" y2="120" stroke="#161b22"/><line x1="0" y1="160" x2="1200" y2="160" stroke="#161b22"/><line x1="0" y1="200" x2="1200" y2="200" stroke="#161b22"/><line x1="0" y1="240" x2="1200" y2="240" stroke="#161b22"/><line x1="0" y1="280" x2="1200" y2="280" stroke="#161b22"/><line x1="0" y1="320" x2="1200" y2="320" stroke="#161b22"/><line x1="0" y1="360" x2="1200" y2="360" stroke="#161b22"/><line x1="0" y1="400" x2="1200" y2="400" stroke="#161b22"/><line x1="0" y1="440" x2="1200" y2="440" stroke="#161b22"/>
+<defs>
+ <radialGradient id="glow"><stop offset="0" stop-color="#e3b341" stop-opacity="0.9"/><stop offset="1" stop-color="#e3b341" stop-opacity="0"/></radialGradient>
+ <linearGradient id="fov" x1="1" x2="0"><stop offset="0" stop-color="#58a6ff" stop-opacity="0.25"/><stop offset="1" stop-color="#58a6ff" stop-opacity="0"/></linearGradient>
+</defs>
+<text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
+<text x="56" y="196" class="t b" font-size="40">Open-Source</text>
+<text x="58" y="236" fill="#f0883e" font-size="18" class="b">OpenGonio · low-cost multispectral material appearance capture</text>
+<text x="58" y="270" class="m" font-size="15">fixed camera · 3-axis sample stage · rotating light arm · laptop-controlled</text>
+<text x="58" y="294" class="m" font-size="15">USB / WiFi / Bluetooth · physical buttons · 0.1° target repeatability</text>
+<text x="58" y="340" class="m" font-size="12">Architecture after Ansari-Asl et al., J. Imaging 10(3):55, 2024 · theory after Hanrahan, CS348b</text>
+<!-- machine, top view -->
+<circle cx="840" cy="230" r="165" fill="none" stroke="#30363d" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="840" y="422" class="m" font-size="12" text-anchor="middle">12 in ring (M4)</text>
+<polygon points="1110,208 1110,252 854,234 854,226" fill="url(#fov)"/>
+<line x1="840" y1="230" x2="1102" y2="230" stroke="#58a6ff" stroke-width="3" stroke-dasharray="10 8">
+ <animate attributeName="stroke-dashoffset" from="0" to="-36" dur="0.9s" repeatCount="indefinite"/></line>
+<rect x="1102" y="212" width="56" height="36" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+<circle cx="1102" cy="230" r="9" fill="#58a6ff"/>
+<text x="1130" y="270" fill="#58a6ff" font-size="12" text-anchor="middle">fixed camera</text>
+<g>
+ <animateTransform attributeName="transform" type="rotate" values="-30 840 230;-150 840 230;-30 840 230" dur="9s" repeatCount="indefinite"/>
+ <line x1="960" y1="230" x2="1030" y2="230" stroke="#8b949e" stroke-width="10" stroke-linecap="round"/>
+ <line x1="990" y1="230" x2="844" y2="230" stroke="#e3b341" stroke-width="3" stroke-dasharray="10 8">
+  <animate attributeName="stroke-dashoffset" from="0" to="36" dur="0.9s" repeatCount="indefinite"/></line>
+ <circle cx="1000" cy="230" r="28" fill="url(#glow)"/>
+ <circle cx="1000" cy="230" r="11" fill="#e3b341"/>
+</g>
+<circle cx="840" cy="230" r="52" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+<g>
+ <animateTransform attributeName="transform" type="rotate" values="-15 840 230;-75 840 230;-15 840 230" dur="9s" repeatCount="indefinite"/>
+ <rect x="836" y="196" width="8" height="68" rx="2" fill="#f0883e"/>
+ <line x1="840" y1="230" x2="884" y2="230" stroke="#f0883e" stroke-width="1.5" stroke-dasharray="3 3"/>
+</g>
+<circle cx="840" cy="230" r="7" fill="#e3b341"><animate attributeName="r" values="5;10;5" dur="1.8s" repeatCount="indefinite"/></circle>
+<text x="720" y="110" fill="#e3b341" font-size="12">light arm</text>
+<text x="770" y="310" fill="#f0883e" font-size="12">sample (M3 = M4 / 2 → specular)</text>
+</svg>

@@ -8,8 +8,12 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install -e "software[dev]"
-      - run: python tools/bom_check.py --check-only
+      - run: python tools/bom_check.py --check-only --strict
       - run: python tools/power_budget.py --check
       - run: cd software && python -m pytest -q
-      - name: Roadmap is in sync with milestones.yml
-        run: python tools/roadmap.py --write-md && git diff --exit-code ROADMAP.md
+      - name: Generated files are up to date
+        run: |
+          python tools/roadmap.py --write-md
+          python tools/make_assets.py
+          python tools/bom_check.py
+          git diff --exit-code

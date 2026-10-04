@@ -1,0 +1,192 @@
+# OpenGonio - FluidNC config for the FYSETC E4 (ESP32, 4 x TMC2209 on one UART)
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Units: steps_per_mm is STEPS PER DEGREE (FluidNC treats A/B/C as a universal unit [R20];
+# we use the same trick on X/Y/Z). 3200 microsteps/rev x gear ratio / 360.
+# Axis map: X = M4 light arm (ring), Y = M3 table yaw, Z = M2 tilt (Phase 3), A = M1 spin (Phase 4)
+# Pins from the FYSETC E4 README [C1]; TMC addresses from community E4 configs [R33][R35].
+# VERIFY every pin against the E4 schematic before power-up. Key names: FluidNC docs [R20][R21][R26][R27].
+
+board: FYSETC E4
+name: OpenGonio
+
+stepping:
+  engine: RMT
+  idle_ms: 255              # hold torque between poses; sleep with $MD
+  pulse_us: 4
+  dir_delay_us: 1
+  disable_delay_us: 0
+
+uart1:
+  txd_pin: gpio.22
+  rxd_pin: gpio.21
+  rts_pin: NO_PIN
+  cts_pin: NO_PIN
+  baud: 115200
+  mode: 8N1
+
+axes:
+  shared_stepper_disable_pin: gpio.25:high
+
+  x:                        # M4 light arm: 24:1 ring, range 20..340 deg
+    steps_per_mm: 213.333
+    max_rate_mm_per_min: 900
+    acceleration_mm_per_sec2: 30
+    max_travel_mm: 320
+    soft_limits: true
+    homing:
+      cycle: 0              # homed explicitly with $HX by the laptop (M4 first)
+      positive_direction: false
+      mpos_mm: 20
+      feed_mm_per_min: 30
+      seek_mm_per_min: 300
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_neg_pin: gpio.34:low     # TCST2103; flip :low/:high if '?' shows Pn:X when clear
+      hard_limits: false
+      pulloff_mm: 2
+      tmc_2209:
+        uart_num: 1
+        addr: 1
+        r_sense_ohms: 0.110
+        run_amps: 0.8
+        hold_amps: 0.4
+        microsteps: 16
+        stallguard: 0
+        stallguard_debug: false
+        toff_disable: 0
+        toff_stealthchop: 5
+        toff_coolstep: 3
+        run_mode: StealthChop
+        homing_mode: StealthChop
+        use_enable: false
+        step_pin: gpio.27
+        direction_pin: gpio.26
+        disable_pin: NO_PIN
+
+  y:                        # M3 table yaw: 5:1, range -180..180 deg
+    steps_per_mm: 44.444
+    max_rate_mm_per_min: 1800
+    acceleration_mm_per_sec2: 60
+    max_travel_mm: 360
+    soft_limits: true
+    homing:
+      cycle: 0
+      positive_direction: false
+      mpos_mm: -180
+      feed_mm_per_min: 60
+      seek_mm_per_min: 600
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_neg_pin: gpio.35:low
+      hard_limits: false
+      pulloff_mm: 2
+      tmc_2209:
+        uart_num: 1
+        addr: 3
+        r_sense_ohms: 0.110
+        run_amps: 0.8
+        hold_amps: 0.4
+        microsteps: 16
+        stallguard: 0
+        stallguard_debug: false
+        toff_disable: 0
+        toff_stealthchop: 5
+        toff_coolstep: 3
+        run_mode: StealthChop
+        homing_mode: StealthChop
+        use_enable: false
+        step_pin: gpio.33
+        direction_pin: gpio.32
+        disable_pin: NO_PIN
+
+  z:                        # M2 tilt (Phase 3): 5:1, range -90..90 deg
+    steps_per_mm: 44.444
+    max_rate_mm_per_min: 900
+    acceleration_mm_per_sec2: 40
+    max_travel_mm: 180
+    soft_limits: true
+    homing:
+      cycle: 0
+      positive_direction: false
+      mpos_mm: -90
+      feed_mm_per_min: 60
+      seek_mm_per_min: 300
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_neg_pin: gpio.15:low
+      hard_limits: false
+      pulloff_mm: 2
+      tmc_2209:
+        uart_num: 1
+        addr: 0
+        r_sense_ohms: 0.110
+        run_amps: 0.8
+        hold_amps: 0.4
+        microsteps: 16
+        stallguard: 0
+        stallguard_debug: false
+        toff_disable: 0
+        toff_stealthchop: 5
+        toff_coolstep: 3
+        run_mode: StealthChop
+        homing_mode: StealthChop
+        use_enable: false
+        step_pin: gpio.14
+        direction_pin: gpio.12
+        disable_pin: NO_PIN
+
+  a:                        # M1 spin (Phase 4): 4:1, range -180..180 deg (E0 driver)
+    steps_per_mm: 35.556
+    max_rate_mm_per_min: 1800
+    acceleration_mm_per_sec2: 60
+    max_travel_mm: 360
+    soft_limits: true
+    homing:
+      cycle: 0
+      positive_direction: false
+      mpos_mm: -180
+      feed_mm_per_min: 60
+      seek_mm_per_min: 600
+      settle_ms: 250
+      seek_scaler: 1.1
+      feed_scaler: 1.1
+    motor0:
+      limit_neg_pin: gpio.36:low     # TH0 input (input-only GPIO, board pull-up)
+      hard_limits: false
+      pulloff_mm: 2
+      tmc_2209:
+        uart_num: 1
+        addr: 2
+        r_sense_ohms: 0.110
+        run_amps: 0.7
+        hold_amps: 0.35
+        microsteps: 16
+        stallguard: 0
+        stallguard_debug: false
+        toff_disable: 0
+        toff_stealthchop: 5
+        toff_coolstep: 3
+        run_mode: StealthChop
+        homing_mode: StealthChop
+        use_enable: false
+        step_pin: gpio.16
+        direction_pin: gpio.17
+        disable_pin: NO_PIN
+
+control:
+  feed_hold_pin: gpio.39:low         # PAUSE button on TH1 (works without the laptop)
+
+user_outputs:
+  digital0_pin: gpio.2               # E0 heater MOSFET -> white COB (M62/M63 P0). GPIO2 is a boot strap pin: the COB may blink at reset
+  digital1_pin: gpio.4               # bed MOSFET -> multispectral driver (Phase 5, P1)
+  digital2_pin: gpio.13              # fan MOSFET (optional fan, P2)
+
+start:
+  must_home: false                   # the laptop homes M4 first, then the stage

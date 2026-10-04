@@ -1,25 +1,13 @@
-# Base Frame module (Phase 1, M1.3)
+# Base Frame · Phase 1 · M1.3
 
-Status: **planned** — full documentation is written when this module's milestone starts (one module at a time, with your approval before moving on).
+Status: planned — full 8-section docs when this milestone starts.
 
-## 1. Purpose
-600 x 600 mm 12 mm birch base on four levelling feet, 2020 towers and centre post, printed adapters. Owns every pre-drilled future interface.
+**Purpose:** Plywood base, feet, 2020 camera outrigger and post, printed adapters and protractor scales (visual alignment, as [R1]).
 
-## Interface spec
-Defines the OG-40 pads (centre post, light bracket at r = 140, camera tower at r = 175, power, controller), the 4-hole Phase 3 ring footprint on Ø250, cable pass-throughs. Measurement centre 150 mm above the base top.
+**Interfaces:** Defines every OG-40 pad, the ring footprint and the camera outrigger ([`docs/architecture.md`](../../docs/architecture.md#interfaces-frozen-at-m0)). Zero point 150 mm above the base.
 
-## What later phases attach
-Phase 3 ring sub-plate bolts to the ring footprint; Phase 4 turntable replaces the centre post turntable-height spacer, keeping the sample height constant.
+**Later phases:** Ring sub-plate (Phase 1) and stage axes bolt to pre-drilled holes; nothing is drilled later.
 
-## 2. BOM
-[`bom/modules/base-frame.csv`](../../bom/modules/base-frame.csv) — subtotal **$91.65 spec / $74.90 budget / $55.90 with own stock** (approximate, checked 2026-10-04).
+**BOM:** [`bom/modules/base-frame.csv`](../../bom/modules/base-frame.csv) — $64.12 buy-all / $46.17 with own stock.
 
-## Deliverables still to write (tracked in issue `M1.3`)
-- [ ] 1. Purpose, interface spec, future attachments (frozen)
-- [ ] 2. BOM with confirmed STEP links and budget share
-- [ ] 3. Onshape modelling instructions (variables, features, print settings)
-- [ ] 4. Step-by-step assembly with alignment, torque and wiring notes
-- [ ] 5. Wiring diagram and connector pinout
-- [ ] 6. Firmware / software for this module
-- [ ] 7. Acceptance test with pass/fail numbers
-- [ ] 8. Safety notes
+**Checklist:** purpose · BOM + STEP · Onshape · assembly · wiring · firmware/software · acceptance test · safety (issue `M1.3`).

@@ -3,20 +3,20 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "opengantry"
-version = "0.1.0"
-description = "Host software for OpenGantry Lite, an open-source gonioreflectometer and 3D scanner"
+name = "opengonio"
+version = "0.2.0"
+description = "Laptop software for OpenGonio, an open-source multispectral gonioreflectometer"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "pyyaml>=6"]
 
 [project.optional-dependencies]
-pi = ["gpiozero>=2.0", "smbus2>=0.4", "picamera2>=0.3"]
+hw = ["pyserial>=3.5", "opencv-python>=4.8"]
 dev = ["pytest>=7"]
 
 [project.scripts]
-opengantry = "opengantry.cli:main"
+opengonio = "opengonio.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

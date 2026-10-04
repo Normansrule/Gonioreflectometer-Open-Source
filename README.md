@@ -1,75 +1,57 @@
-# Gonioreflectometer-Open-Source — OpenGantry Lite
+<img src="docs/assets/hero.svg" width="100%" alt="OpenGonio: light arm sweeping around a rotating sample, fixed camera">
 
-A **$500, fully open-source tabletop gonioreflectometer** that measures how real materials reflect
-light and turns them into Unreal / Unity materials — then grows, phase by phase, into a photo-based
-3D scanner. A scaled-down, printable descendant of the Stanford Spherical Gantry.
+# Gonioreflectometer-Open-Source
 
-> **Status:** Phase 1 design. Power module fully specified; other modules are scoped and waiting their turn.
-> Progress lives in [GitHub milestones](../../milestones) and [`ROADMAP.md`](ROADMAP.md).
-> Onshape document: _link added at milestone M0.2_.
+**OpenGonio** — a low-cost, open-source version of the multispectral material-appearance device of Ansari-Asl et al. (*J. Imaging*, 2024) [R1]: fixed camera, 3-axis sample stage, rotating light arm. Your laptop controls it (USB, WiFi or Bluetooth) and processes the data; physical buttons run the main actions.
 
-## What it does at each phase
+| | |
+|---|---|
+| **Measures** | BRDF → isotropic → anisotropic → SVBRDF / BTF → multispectral, then 3D scans |
+| **Precision** | ≤ 0.028° per microstep on every axis, optical homing, 0.1° repeatability target |
+| **Cost** | $496.62 buy-everything, $441.94 if you own the consumables (cheapest parts by default) |
+| **Interactive site** | [`docs/index.html`](docs/index.html) — machine simulator, BRDF explorer, equations |
 
-| Phase | The machine can… | Cap | Milestone |
-|---|---|---:|---|
-| 1 | measure in-plane reflectance (camera A1 + light A2) | $300 | M1 |
-| 2 | output calibrated BRDF fits as game-engine materials | $75 | M2 |
-| 3 | measure full isotropic BRDF (light azimuth ring A3) | $45 | M3 |
-| 4 | measure anisotropic materials, rotate objects (turntable A4) | $35 | M4 |
-| 5 | 3D-scan objects (photogrammetry + photometric stereo) | $30 | M5 |
-| 6 | fit spatially varying reflectance on scanned objects | $0 | M6 |
-| Pro | stretch features from research rigs (adaptive sampling, multi-light, spectral) | — | M7 |
+## How it works
 
-## Budget at a glance (approximate, checked 2026-10-04)
+<img src="docs/assets/axes.svg" width="100%" alt="Four axes around one zero point">
 
-| Path | Total | vs $500 |
-|---|---:|---|
-| Parts exactly as briefed | $658.71 | over |
-| Budget substitutes | $517.29 | over |
-| **Budget + consumables you already own** | **$478.15** | **under, $21.85 spare** |
+<img src="docs/assets/architecture.svg" width="100%" alt="Laptop, FluidNC controller, Pico button hub, USB camera">
 
-Details and the decision you need to make: [`docs/05-budget-and-sourcing.md`](docs/05-budget-and-sourcing.md).
-Line-item BOM: [`bom/master_bom.csv`](bom/master_bom.csv) → per-module CSVs in [`bom/modules/`](bom/modules/).
+<img src="docs/assets/brdf-lobe.svg" width="100%" alt="Animated BRDF lobe">
 
-## Repository layout
+## Build plan
 
-```
-hardware/<module>/     8-section module docs, Onshape notes, STEP (cad/) and 3MF (print/) exports
-electronics/           power architecture, harness list
-firmware/klipper/      printer.cfg for the SKR Mini E3 V3 (manual_steppers, 1 unit = 1 degree)
-software/              Python package `opengantry`: gantry, camera, calib, hdr, plans, brdf, scan, svbrdf, export
-data/                  power-budget inputs
-docs/                  overview, BRDF theory, power budget, interfaces, decisions, licensing, OSHWA, Onshape, safety
-bom/                   master BOM (source of truth), generated summary and module CSVs
-tools/                 bom_check.py, power_budget.py, roadmap.py
-.github/               milestones.yml (roadmap source), CI, templates
-```
+<img src="docs/assets/phases.svg" width="100%" alt="Six phases">
 
-## Quick start (software, no hardware needed)
+Each phase is a GitHub milestone with checklist issues → [`ROADMAP.md`](ROADMAP.md).
+
+<img src="docs/assets/budget.svg" width="100%" alt="Budget per phase">
+
+## Docs
+
+| | |
+|---|---|
+| [Architecture](docs/architecture.md) | axes, frame, control paths, pin maps, drill map |
+| [Theory](docs/theory.md) | every CS348b equation [R2] + device equations [R1] |
+| [Budget](docs/budget.md) · [BOM](bom/master_bom.csv) | cheapest choices, caps, every price with a reference |
+| [Power](docs/power.md) | requirement table, 60 W budget |
+| [Modules](hardware/) | power and controller complete; others scoped |
+| [Firmware](firmware/README.md) | FluidNC (E4) + MicroPython (Pico) |
+| [Safety](docs/safety.md) · [Licensing](docs/licensing.md) · [Onshape](docs/onshape.md) | |
+| [References](REFERENCES.md) | every source used, with IDs |
+| [Publish](PUBLISH.md) | copy-paste commands for a private GitHub repo |
+
+## Quick start (no hardware)
 
 ```bash
-cd software && pip install -e ".[dev]" && python -m pytest -q
-opengantry check-pose A1=12 A2=12          # collision model: is this pose safe?
-opengantry --dry-run move A1=45 A2=45      # prints the Klipper G-code for a specular pose
-python ../tools/bom_check.py                # budget per phase
-python ../tools/power_budget.py --check     # final-machine power headroom
+cd software && python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
+python -m pytest -q
+opengonio check-pose M4=60 M3=30          # angles + collision check → specular
+opengonio --dry-run move M4=80 M3=25      # prints FluidNC G-code
 ```
 
-## Start here
+## Credits
 
-1. [`docs/00-project-overview.md`](docs/00-project-overview.md) — machine, coordinate frame, build-once layout
-2. [`docs/01-theory-brdf.md`](docs/01-theory-brdf.md) — what we measure and why the calibration works
-3. [`docs/02-power-budget.md`](docs/02-power-budget.md) — final-machine power budget
-4. [`hardware/power/README.md`](hardware/power/README.md) — the first module, complete
-5. [`docs/03-architecture-interfaces.md`](docs/03-architecture-interfaces.md) — bolt pattern, drill map, connectors, Pi pins
+Design reference: M. Ansari-Asl, M. Barbieri, G. Obein, J. Y. Hardeberg, *J. Imaging* 10(3):55, 2024, [doi:10.3390/jimaging10030055](https://doi.org/10.3390/jimaging10030055). Theory: P. Hanrahan, Stanford CS348b. Firmware: [FluidNC](http://wiki.fluidnc.com/), [MicroPython](https://docs.micropython.org/). Full list: [REFERENCES.md](REFERENCES.md). All figures are original drawings.
 
-## Licences
-
-Hardware **CERN-OHL-S-2.0** · software **GPL-3.0-or-later** · documentation **CC BY-SA 4.0**.
-Vendor CAD is linked, never redistributed. See [`docs/06-licensing.md`](docs/06-licensing.md) and
-[`LICENSE`](LICENSE). Working toward OSHWA certification ([`docs/07-oshwa-certification.md`](docs/07-oshwa-certification.md)).
-
-## Safety
-
-24 V at up to 5 A, moving arms and a bright LED. Read [`docs/09-safety.md`](docs/09-safety.md) and each
-module's section 8 before building.
+Hardware CERN-OHL-S-2.0 · software GPL-3.0-or-later · docs CC BY-SA 4.0.

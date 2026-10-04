@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenGonio</title>
+<meta name="description" content="Open-source, low-cost multispectral gonioreflectometer: interactive machine simulator, BRDF explorer, equations, build plan.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--txt:#f0f6fc;--muted:#8b949e;--or:#f0883e;--bl:#58a6ff;--gr:#3fb950;--pu:#bc8cff;--ye:#e3b341;--re:#f85149}
+:root[data-theme="light"]{--bg:#ffffff;--panel:#f6f8fa;--line:#d0d7de;--txt:#1f2328;--muted:#59636e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.55 "Segoe UI",Helvetica,Arial,sans-serif}
+a{color:var(--bl)}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav{max-width:1180px;margin:auto;display:flex;gap:18px;align-items:center;padding:10px 16px;overflow-x:auto}
+nav b{color:var(--or);margin-right:auto;white-space:nowrap}
+nav a{color:var(--muted);text-decoration:none;white-space:nowrap}
+nav a:hover{color:var(--txt)}
+main{max-width:1180px;margin:auto;padding:0 16px 60px}
+section{padding:36px 0;border-bottom:1px solid var(--line)}
+h2{margin:0 0 6px;font-size:26px}
+.sub{color:var(--muted);margin:0 0 18px}
+.hero img,.full{width:100%;border-radius:14px;display:block}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+canvas{width:100%;display:block;border-radius:10px;background:#0b0f14;touch-action:none}
+label{display:grid;grid-template-columns:110px 1fr 64px;align-items:center;gap:8px;font-size:14px;margin:6px 0}
+label output{font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--or)}
+.read{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+.read div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.read small{color:var(--muted);display:block;font-size:12px}
+.read span{font-size:20px;font-variant-numeric:tabular-nums}
+.status{margin-top:12px;padding:10px 12px;border-radius:10px;font-weight:600;border:1px solid var(--line)}
+.ok{color:var(--gr)} .warn{color:var(--ye)} .bad{color:var(--re)} .spec{color:var(--or)}
+.phase{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.phase button,.toggle{background:var(--bg);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;font:inherit;font-size:13px}
+.phase button.on{color:var(--txt);border-color:var(--or)}
+.eq{overflow-x:auto}
+.eq h3{margin:22px 0 4px;font-size:16px;color:var(--or)}
+.eq p{margin:4px 0;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left}
+th{color:var(--muted);font-weight:600}
+footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header><nav>
+ <b>OpenGonio</b>
+ <a href="#machine">Machine</a><a href="#brdf">BRDF</a><a href="#equations">Equations</a>
+ <a href="#build">Build</a><a href="#budget">Budget</a><a href="#refs">References</a>
+ <button class="toggle" id="theme" aria-label="Toggle light or dark theme">◐</button>
+</nav></header>
+<main>
+<section class="hero"><img src="assets/hero.svg" alt="Animated top view: light arm sweeping around a rotating sample, fixed camera"></section>
+
+<section id="machine">
+ <h2>Machine simulator</h2>
+ <p class="sub">Drag to orbit. Same kinematics and keep-out model as <code>software/src/opengonio/gantry</code>. Layout after Ansari-Asl et al. 2024 [R1].</p>
+ <div class="grid">
+  <div class="card"><canvas id="sim" width="900" height="560" aria-label="3D machine view"></canvas></div>
+  <div class="card">
+   <div class="phase" id="phases"></div>
+   <label>M4 light <input id="m4" type="range" min="20" max="340" step="0.5" value="60"><output></output></label>
+   <label>M3 table <input id="m3" type="range" min="-180" max="180" step="0.5" value="30"><output></output></label>
+   <label>M2 tilt <input id="m2" type="range" min="-90" max="90" step="0.5" value="0"><output></output></label>
+   <label>M1 spin <input id="m1" type="range" min="-180" max="180" step="0.5" value="0"><output></output></label>
+   <div class="read">
+    <div><small>θi incident</small><span id="ti">–</span></div><div><small>θr view</small><span id="tr">–</span></div>
+    <div><small>φi</small><span id="pi">–</span></div><div><small>|φr − φi|</small><span id="dp">–</span></div>
+   </div>
+   <div class="status" id="status">–</div>
+   <p class="sub" style="margin-top:10px;font-size:13px">Phase 1 specular: M3 = M4 / 2 (M4 ≤ 180°). Light cannot pass the camera (keep-out 30 mm + 5° buffer).</p>
+  </div>
+ </div>
+</section>
+
+<section id="brdf">
+ <h2>BRDF explorer</h2>
+ <p class="sub">In-plane slice of the fitted model (Lambert + GGX + Schlick). Radius ∝ √(f<sub>r</sub> cos θ<sub>r</sub>).</p>
+ <div class="grid">
+  <div class="card"><canvas id="lobe" width="900" height="480" aria-label="BRDF polar plot"></canvas></div>
+  <div class="card">
+   <label>θi <input id="bti" type="range" min="0" max="85" value="35"><output></output></label>
+   <label>roughness <input id="brg" type="range" min="0.05" max="1" step="0.01" value="0.3"><output></output></label>
+   <label>base colour <input id="bbc" type="range" min="0" max="1" step="0.01" value="0.5"><output></output></label>
+   <label>metallic <input id="bmt" type="range" min="0" max="1" step="0.01" value="0"><output></output></label>
+   <div class="read"><div><small>peak θr</small><span id="bpk">–</span></div><div><small>albedo (cos-weighted)</small><span id="bal">–</span></div></div>
+   <p class="eq">$$f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r}$$</p>
+  </div>
+ </div>
+</section>
+
+<section id="equations" class="eq">
+ <h2>Equations</h2>
+ <p class="sub">CS348b Lecture 10 (Hanrahan) [R2] and the device paper [R1]. Full list with notes: <code>docs/theory.md</code>.</p>
+ <h3>BRDF and reflection equation</h3>
+ $$f_r(\omega_i\to\omega_r)\equiv\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\quad[\mathrm{sr}^{-1}]\qquad L_r(x,\omega_r)=\int_{H^2}f_r(x,\omega_i\to\omega_r)L_i(x,\omega_i)\cos\theta_i\,d\omega_i$$
+ <h3>Reciprocity, isotropy, energy</h3>
+ $$f_r(\omega_r\to\omega_i)=f_r(\omega_i\to\omega_r)\qquad f_r(\theta_i,\varphi_i;\theta_r,\varphi_r)=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|)\qquad \frac{d\Phi_r}{d\Phi_i}\le 1$$
+ <h3>Mirror, Snell, total internal reflection</h3>
+ $$\hat R=\hat I-2(\hat I\cdot\hat N)\hat N\qquad f_{r,m}=\frac{\delta(\cos\theta_i-\cos\theta_r)}{\cos\theta_i}\delta(\varphi_i-\varphi_r\pm\pi)\qquad \eta_i\sin\theta_i=\eta_t\sin\theta_t\qquad 1-\mu^2\big(1-(\hat I\cdot\hat N)^2\big)<0$$
+ <h3>Fresnel, Cook-Torrance colour, Lambert</h3>
+ $$F(\theta)=F(0)+(1-F(0))(1-\cos\theta)^5\qquad R=R(0)+R(\tfrac{\pi}{2})\frac{F(\theta)-F(0)}{F(\pi/2)-F(0)}\qquad f_{r,d}=\frac{\rho_d}{\pi}$$
+ <h3>Measured quantities [R1]</h3>
+ $$Y^{\mathrm{SVBRDF}}=\mathrm{SVBRDF}(x,y,\theta_i,\varphi_i,\theta_r,\varphi_r,\lambda)\qquad Y^{\mathrm{BTF}}=\mathrm{BTF}(x,y,\theta_i,\varphi_i,\theta_r,\varphi_r,\lambda)$$
+ <h3>Kinematics (Tait-Bryan, extrinsic x-y-z) and per-pixel directions [R1]</h3>
+ $$R=R_z(M_3)R_y(-M_2)R_x(M_1)\qquad \omega^s=R^\top\omega^w\qquad \omega_i(p)=\frac{P_L-p}{\|P_L-p\|},\;\omega_r(p)=\frac{P_C-p}{\|P_C-p\|}$$
+ <h3>Fixed-camera optics [R1]</h3>
+ $$\frac{1}{p'}-\frac{1}{p}=\frac{1}{f}\qquad m=\frac{p'}{p}\qquad d_{\mathrm{Airy}}=2.44\lambda N\qquad \mathrm{DOF}\approx\frac{2Nc(1+m)}{m^2}$$
+ <h3>HDR response (Debevec & Malik) [R5]</h3>
+ $$g(Z_{ij})=\ln E_i+\ln\Delta t_j$$
+</section>
+
+<section id="build">
+ <h2>Build plan</h2>
+ <p class="sub">Each phase ends with a working instrument and reuses everything before it.</p>
+ <img class="full" src="assets/phases.svg" alt="Six build phases">
+ <p></p>
+ <img class="full" src="assets/architecture.svg" alt="Control architecture: laptop, FluidNC E4, Pico hub, camera">
+ <p></p>
+ <img class="full" src="assets/axes.svg" alt="Four axes around one zero point">
+</section>
+
+<section id="budget">
+ <h2>Budget</h2>
+ <p class="sub">Cheapest parts by default; prices approximate (checked 2026-10-04). Source: <code>bom/master_bom.csv</code>.</p>
+ <img class="full" src="assets/budget.svg" alt="Budget per phase">
+</section>
+
+<section id="refs">
+ <h2>References</h2>
+ <p class="sub">Every source is listed with an ID in <code>REFERENCES.md</code>. Key ones:</p>
+ <table>
+  <tr><th>ID</th><th>Source</th></tr>
+  <tr><td>R1</td><td>Ansari-Asl, Barbieri, Obein, Hardeberg, <i>J. Imaging</i> 10(3):55, 2024 — <a href="https://doi.org/10.3390/jimaging10030055">doi:10.3390/jimaging10030055</a></td></tr>
+  <tr><td>R2</td><td>P. Hanrahan, <i>Reflection Models I: Ideal Materials</i>, Stanford CS348b Lecture 10, 2016</td></tr>
+  <tr><td>R5</td><td>Debevec &amp; Malik, SIGGRAPH 1997 — <a href="https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf">PDF</a></td></tr>
+  <tr><td>R6–R8</td><td>Walter et al. 2007 (GGX); Schlick 1994; Cook &amp; Torrance 1982</td></tr>
+  <tr><td>R20–R30</td><td>FluidNC documentation — <a href="http://wiki.fluidnc.com/">wiki.fluidnc.com</a></td></tr>
+  <tr><td>R73</td><td>KaTeX (equation rendering) — <a href="https://katex.org/">katex.org</a></td></tr>
+ </table>
+</section>
+</main>
+<footer>Hardware CERN-OHL-S-2.0 · software GPL-3.0-or-later · docs CC BY-SA 4.0. Figures are original drawings.</footer>
+
+<script>
+// ---------- shared math ----------
+const $ = id => document.getElementById(id);
+const [m4, m3, m2, m1, ti, tr, pi, dp, bti, brg, bbc, bmt, bpk, bal] =
+  ["m4", "m3", "m2", "m1", "ti", "tr", "pi", "dp", "bti", "brg", "bbc", "bmt", "bpk", "bal"].map($);
+const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+const c = d => Math.cos(d * D2R), s = d => Math.sin(d * D2R);
+const mul = (A, B) => A.map((r, i) => B[0].map((_, j) => r.reduce((t, _, k) => t + A[i][k] * B[k][j], 0)));
+const mv = (A, v) => A.map(r => r[0] * v[0] + r[1] * v[1] + r[2] * v[2]);
+const T = A => A[0].map((_, j) => A.map(r => r[j]));
+const Rx = d => [[1, 0, 0], [0, c(d), -s(d)], [0, s(d), c(d)]];
+const Ry = d => [[c(d), 0, s(d)], [0, 1, 0], [-s(d), 0, c(d)]];
+const Rz = d => [[c(d), -s(d), 0], [s(d), c(d), 0], [0, 0, 1]];
+const add = (a, b) => a.map((x, i) => x + b[i]), sub = (a, b) => a.map((x, i) => x - b[i]);
+const sc = (a, k) => a.map(x => x * k), dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const norm = a => Math.hypot(...a), unit = a => sc(a, 1 / norm(a));
+const M = {Dc: 350, Dl: 300, ring: 140, rc: 30, rl: 30, ra: 15, keep: 30, minA: 5};
+
+function segDist(p1, q1, p2, q2) {          // Ericson 5.1.9 [R9]
+  const d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2);
+  const a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r);
+  let s_ = 0, t = 0;
+  if (a < 1e-12 && e < 1e-12) return norm(r);
+  if (a < 1e-12) { t = Math.min(Math.max(f / e, 0), 1); }
+  else { const cc = dot(d1, r);
+    if (e < 1e-12) { s_ = Math.min(Math.max(-cc / a, 0), 1); }
+    else { const b = dot(d1, d2), den = a * e - b * b;
+      s_ = den > 1e-12 ? Math.min(Math.max((b * f - cc * e) / den, 0), 1) : 0;
+      t = (b * s_ + f) / e;
+      if (t < 0) { t = 0; s_ = Math.min(Math.max(-cc / a, 0), 1); }
+      else if (t > 1) { t = 1; s_ = Math.min(Math.max((b - cc) / a, 0), 1); } } }
+  return norm(sub(add(p1, sc(d1, s_)), add(p2, sc(d2, t))));
+}
+function clearance(m4) {
+  const cd = [1, 0, 0], l = mv(Rz(m4), [1, 0, 0]);
+  const cam = [[sc(cd, M.Dc), sc(cd, M.Dc + 60), M.rc], [[M.Dc + 30, 0, -150], [M.Dc + 30, 0, 0], M.ra]];
+  const lit = [[sc(l, M.ring), sc(l, M.Dl + 40), M.ra], [sc(l, M.Dl), sc(l, M.Dl), M.rl]];
+  let g = 1e9;
+  for (const a of cam) for (const b of lit) g = Math.min(g, segDist(a[0], a[1], b[0], b[1]) - a[2] - b[2]);
+  return g;
+}
+function state(p) {
+  const R = mul(mul(Rz(p.m3), Ry(-p.m2)), Rx(p.m1)), Rt = T(R);
+  const l = mv(Rz(p.m4), [1, 0, 0]), cd = [1, 0, 0];
+  const ang = w => { const q = mv(Rt, w); return [Math.acos(Math.max(-1, Math.min(1, q[0]))) * R2D, Math.atan2(q[2], q[1]) * R2D]; };
+  const [ti, pi] = ang(l), [tr, pr] = ang(cd);
+  let dp = Math.abs(((pr - pi + 180) % 360 + 360) % 360 - 180);
+  const a = p.m4 % 360, phase = Math.min(a, 360 - a);
+  return {R, l, ti, pi, tr, dp, gap: clearance(p.m4), phase};
+}
+
+// ---------- 3D view ----------
+const cv = document.getElementById("sim"), g2 = cv.getContext("2d");
+let yaw = -35, pitch = 28, drag = null;
+cv.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY, yaw, pitch]; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", e => { if (!drag) return; yaw = drag[2] + (e.clientX - drag[0]) * 0.4;
+  pitch = Math.max(-5, Math.min(85, drag[3] + (e.clientY - drag[1]) * 0.3)); draw(); });
+cv.addEventListener("pointerup", () => drag = null);
+function P(v) { const a = mv(Rz(yaw), v); const b = [a[0], a[1] * c(pitch) - a[2] * s(pitch), a[1] * s(pitch) + a[2] * c(pitch)];
+  return [cv.width / 2 - 40 + b[0] * 1.15, cv.height * 0.6 - b[2] * 1.15, b[1]]; }
+function line(a, b, col, w = 2, dash = []) { const A = P(a), B = P(b); g2.strokeStyle = col; g2.lineWidth = w; g2.setLineDash(dash);
+  g2.beginPath(); g2.moveTo(A[0], A[1]); g2.lineTo(B[0], B[1]); g2.stroke(); g2.setLineDash([]); }
+function poly(pts, fill, stroke) { g2.beginPath(); pts.map(P).forEach((q, i) => i ? g2.lineTo(q[0], q[1]) : g2.moveTo(q[0], q[1]));
+  g2.closePath(); if (fill) { g2.fillStyle = fill; g2.fill(); } if (stroke) { g2.strokeStyle = stroke; g2.lineWidth = 2; g2.stroke(); } }
+function dotp(v, r, col) { const q = P(v); g2.fillStyle = col; g2.beginPath(); g2.arc(q[0], q[1], r, 0, 7); g2.fill(); }
+let phase = 1;
+function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 3 ? +m2.value : 0, m1: phase >= 4 ? +m1.value : 0}; }
+function draw() {
+  const p = pose(), st = state(p);
+  g2.clearRect(0, 0, cv.width, cv.height);
+  const ring = [], base = [];
+  for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([152 * c(a), 152 * s(a), -150]); }
+  poly([[-260, -260, -160], [420, -260, -160], [420, 260, -160], [-260, 260, -160]], "#11161d", "#30363d");
+  poly(ring, null, "#57606a");
+  line([0, 0, -150], [0, 0, -40], "#57606a", 6);
+  // sample
+  const u = mv(st.R, [0, 1, 0]), v = mv(st.R, [0, 0, 1]), n = mv(st.R, [1, 0, 0]);
+  const corner = (a, b) => add(sc(u, a * 28), sc(v, b * 28));
+  poly([corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)], "rgba(240,136,62,.85)", "#f0883e");
+  line([0, 0, 0], sc(n, 70), "#f0883e", 2, [4, 4]);
+  line(corner(0, 0), add(corner(0, 0), sc(u, 40)), "#bc8cff", 2);
+  // camera
+  line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, 0], "#57606a", 6);
+  poly([[M.Dc, -22, -18], [M.Dc, 22, -18], [M.Dc, 22, 18], [M.Dc, -22, 18]], "#161b22", "#58a6ff");
+  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]);
+  // light
+  const L = sc(st.l, M.Dl);
+  line(sc(st.l, M.ring), sc(st.l, M.Dl + 40), "#8b949e", 7);
+  line(L, [0, 0, 0], "#e3b341", 2.5, [8, 6]);
+  dotp(L, 11, "#e3b341");
+  dotp([0, 0, 0], 4, "#f0f6fc");
+  // readouts
+  const fmt = x => x.toFixed(1) + "°";
+  ti.textContent = fmt(st.ti); tr.textContent = fmt(st.tr); pi.textContent = fmt(st.pi); dp.textContent = fmt(st.dp);
+  const S = document.getElementById("status");
+  const unsafe = st.gap < M.keep || st.phase < M.minA;
+  const meas = st.ti < 90 && st.tr < 90;
+  const spec = meas && Math.abs(st.ti - st.tr) < 0.6 && Math.abs(st.dp - 180) < 0.6;
+  S.className = "status " + (unsafe ? "bad" : !meas ? "warn" : spec ? "spec" : "ok");
+  S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance (< 30 mm)` :
+    !meas ? "Not measurable: light or camera behind the sample" :
+    spec ? "Specular geometry ✓  (mirror peak here)" : `OK · clearance ${st.gap.toFixed(0)} mm`;
+}
+const ids = ["m4", "m3", "m2", "m1"];
+ids.forEach(id => { const el = document.getElementById(id); const out = el.nextElementSibling;
+  const upd = () => { out.textContent = (+el.value).toFixed(1) + "°"; draw(); }; el.addEventListener("input", upd); out.textContent = el.value + "°"; });
+const ph = document.getElementById("phases");
+[1, 3, 4].forEach(k => { const b = document.createElement("button"); b.textContent = `Phase ${k}${k === 1 ? " (M4+M3)" : k === 3 ? " +M2" : " +M1"}`;
+  b.onclick = () => { phase = k; [...ph.children].forEach(x => x.classList.toggle("on", x === b));
+    m2.disabled = phase < 3; m1.disabled = phase < 4; draw(); }; ph.appendChild(b); });
+ph.children[0].classList.add("on"); m2.disabled = true; m1.disabled = true;
+
+// ---------- BRDF explorer ----------
+const lc = document.getElementById("lobe"), g3 = lc.getContext("2d");
+function sph(t, p) { return [s(t) * c(p), s(t) * s(p), c(t)]; }
+function ggx(wi, wo, base, rough, metal) {
+  if (wi[2] <= 0 || wo[2] <= 0) return 0;
+  const h = unit(add(wi, wo)), a = Math.max(rough * rough, 1e-4), a2 = a * a, ch = h[2];
+  const D = a2 / (Math.PI * (ch * ch * (a2 - 1) + 1) ** 2);
+  const ci = wi[2], co = wo[2];
+  const G = 2 * ci * co / (co * Math.sqrt(ci * ci * (1 - a2) + a2) + ci * Math.sqrt(co * co * (1 - a2) + a2));
+  const f0 = 0.04 * (1 - metal) + base * metal, F = f0 + (1 - f0) * (1 - dot(wi, h)) ** 5;
+  return (1 - metal) * (1 - F) * base / Math.PI + D * G * F / (4 * ci * co);
+}
+function drawLobe() {
+  const tI = +bti.value, r = +brg.value, b = +bbc.value, m = +bmt.value;
+  const W = lc.width, H = lc.height, cx = W / 2, cy = H - 40, RR = Math.min(W / 2, H) - 60;
+  g3.clearRect(0, 0, W, H);
+  g3.strokeStyle = "#30363d"; g3.lineWidth = 1;
+  for (let k = 1; k <= 3; k++) { g3.beginPath(); g3.arc(cx, cy, RR * k / 3, Math.PI, 0); g3.stroke(); }
+  for (let a = -90; a <= 90; a += 30) { g3.beginPath(); g3.moveTo(cx, cy); g3.lineTo(cx + RR * s(a), cy - RR * c(a)); g3.stroke(); }
+  const wi = sph(tI, 180); const vals = []; let fmax = 0, peak = 0, alb = 0;
+  for (let k = 0; k <= 180; k++) { const t = -90 + k; const wo = sph(Math.abs(t), t >= 0 ? 0 : 180);
+    const f = ggx(wi, wo, b, r, m) * Math.max(wo[2], 0); vals.push([t, f]); if (f > fmax) { fmax = f; peak = t; } }
+  for (let it = 0; it < 32; it++) for (let jp = 0; jp < 64; jp++) { const t = (it + .5) * 90 / 32, pp = (jp + .5) * 360 / 64;
+    alb += ggx(wi, sph(t, pp), b, r, m) * c(t) * s(t) * (Math.PI / 2 / 32) * (2 * Math.PI / 64); }
+  g3.beginPath(); vals.forEach(([t, f], i) => { const rr = RR * Math.sqrt(f / fmax); const x = cx + rr * s(t), y = cy - rr * c(t);
+    i ? g3.lineTo(x, y) : g3.moveTo(x, y); }); g3.closePath();
+  g3.fillStyle = "rgba(240,136,62,.25)"; g3.fill(); g3.strokeStyle = "#f0883e"; g3.lineWidth = 2.5; g3.stroke();
+  g3.strokeStyle = "#e3b341"; g3.lineWidth = 3; g3.beginPath(); g3.moveTo(cx, cy); g3.lineTo(cx - RR * s(tI), cy - RR * c(tI)); g3.stroke();
+  g3.strokeStyle = "#8b949e"; g3.lineWidth = 2; g3.beginPath(); g3.moveTo(cx - RR - 10, cy); g3.lineTo(cx + RR + 10, cy); g3.stroke();
+  g3.fillStyle = "#8b949e"; g3.font = "14px Segoe UI, sans-serif"; g3.fillText("light side", cx - RR, cy + 24); g3.fillText("view side", cx + RR - 64, cy + 24);
+  bpk.textContent = peak + "°"; bal.textContent = alb.toFixed(3);
+}
+["bti", "brg", "bbc", "bmt"].forEach(id => { const el = document.getElementById(id), out = el.nextElementSibling;
+  const upd = () => { out.textContent = el.value; drawLobe(); }; el.addEventListener("input", upd); out.textContent = el.value; });
+
+document.getElementById("theme").onclick = () => { const r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === "light" ? "dark" : "light"; };
+draw(); drawLobe();
+</script>
+</body>
+</html>

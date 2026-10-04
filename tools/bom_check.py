@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
-"""Validate the master Bill of Materials (BOM) and track every phase against its cap.
+"""Validate bom/master_bom.csv and track phases against caps.
 
-Single source of truth: bom/master_bom.csv. This script
-  * checks columns, line types and Qty x Unit = Extended,
-  * totals three purchase paths per phase:
-      spec    - the parts named in the project brief,
-      budget  - cheaper substitutes from the "Budget path unit cost" column,
-      stock   - budget path with consumables you already own set to $0
-                (rows marked Stock candidate = Y),
-  * writes bom/summary.md and one CSV per module in bom/modules/.
+Two totals per phase (cheapest parts are already the default):
+  buy_all    - every Purchase line bought new
+  with_stock - Stock candidate = Y lines (wire, screws, cords...) at $0
 
-Usage:
-    python tools/bom_check.py                # validate + write outputs
-    python tools/bom_check.py --check-only   # validate, write nothing
-    python tools/bom_check.py --strict stock # fail if that path breaks a cap
+    python tools/bom_check.py               # validate, write bom/summary.md, bom/modules/*.csv, assets/budget.svg
+    python tools/bom_check.py --check-only  # validate only
+    python tools/bom_check.py --strict      # exit 1 if buy_all breaks a cap or the hard cap
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -21,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import sys
 from collections import OrderedDict, defaultdict
 from pathlib import Path
@@ -29,19 +24,19 @@ ROOT = Path(__file__).resolve().parents[1]
 MASTER = ROOT / "bom" / "master_bom.csv"
 SUMMARY = ROOT / "bom" / "summary.md"
 MODULE_DIR = ROOT / "bom" / "modules"
+SVG = ROOT / "docs" / "assets" / "budget.svg"
+REFS = ROOT / "REFERENCES.md"
 
-COLUMNS = [
-    "ID", "Type", "Phase", "Module", "Part name", "Function", "Qty",
-    "Manufacturer", "Mfr part number", "Supplier", "Supplier link",
-    "Unit cost (USD approx)", "Extended cost", "STEP file link", "CAD license",
-    "Notes or cheaper alternative", "Budget path unit cost (USD)",
-    "Stock candidate", "Price checked",
-]
+COLUMNS = ["ID", "Type", "Phase", "Module", "Part name", "Function", "Qty", "Manufacturer",
+           "Mfr part number", "Supplier", "Supplier link", "Unit cost (USD approx)", "Extended cost",
+           "STEP file link", "CAD license", "Notes or cheaper alternative", "Stock candidate",
+           "Price status", "Refs"]
 TYPES = {"Purchase", "Print", "Owned", "Optional"}
-PHASE_CAPS = OrderedDict([(1, 300.0), (2, 75.0), (3, 45.0), (4, 35.0), (5, 30.0), (6, 0.0)])
-CONTINGENCY = 15.0
+BRIEF_CAPS = OrderedDict([(1, 300.0), (2, 75.0), (3, 45.0), (4, 35.0), (5, 30.0), (6, 0.0)])
+# Rebalanced for the fixed-camera architecture: Phase 1 now carries the ring and the table.
+PROPOSED_CAPS = OrderedDict([(1, 350.0), (2, 74.0), (3, 23.0), (4, 23.0), (5, 30.0), (6, 0.0)])
 HARD_CAP = 500.0
-PATHS = ("spec", "budget", "stock")
+PATHS = ("buy_all", "with_stock")
 
 
 def money(x: float) -> str:
@@ -50,165 +45,161 @@ def money(x: float) -> str:
 
 def load(path: Path = MASTER) -> list[dict]:
     with path.open(newline="", encoding="utf-8") as fh:
-        reader = csv.DictReader(fh)
-        if reader.fieldnames != COLUMNS:
-            raise ValueError(f"Header mismatch.\n expected {COLUMNS}\n got      {reader.fieldnames}")
-        return list(reader)
+        rd = csv.DictReader(fh)
+        if rd.fieldnames != COLUMNS:
+            raise ValueError(f"header mismatch: {rd.fieldnames}")
+        return list(rd)
 
 
-def validate(rows: list[dict]) -> list[str]:
-    errors: list[str] = []
-    seen: set[str] = set()
+def ref_ids() -> set[str]:
+    if not REFS.exists():
+        return set()
+    return set(re.findall(r"^\|\s*\*\*([A-Z]\d+)\*\*", REFS.read_text(encoding="utf-8"), flags=re.M))
+
+
+def validate(rows: list[dict], check_refs: bool = True) -> list[str]:
+    errs, seen, known = [], set(), ref_ids()
     for r in rows:
-        rid = r["ID"]
-        if rid in seen:
-            errors.append(f"{rid}: duplicate ID")
-        seen.add(rid)
+        i = r["ID"]
+        if i in seen:
+            errs.append(f"{i}: duplicate")
+        seen.add(i)
         if r["Type"] not in TYPES:
-            errors.append(f"{rid}: Type '{r['Type']}' not in {sorted(TYPES)}")
+            errs.append(f"{i}: bad Type")
         try:
-            phase = int(r["Phase"])
-            if phase not in PHASE_CAPS:
-                errors.append(f"{rid}: unknown phase {phase}")
-            qty = float(r["Qty"])
-            unit = float(r["Unit cost (USD approx)"])
-            ext = float(r["Extended cost"])
-            budget = float(r["Budget path unit cost (USD)"])
+            q, u, e = float(r["Qty"]), float(r["Unit cost (USD approx)"]), float(r["Extended cost"])
+            int(r["Phase"])
         except ValueError as exc:
-            errors.append(f"{rid}: non-numeric field ({exc})")
+            errs.append(f"{i}: {exc}")
             continue
-        if abs(qty * unit - ext) > 0.011:
-            errors.append(f"{rid}: Qty x Unit = {qty * unit:.2f} but Extended = {ext:.2f}")
-        if r["Type"] in {"Print", "Owned"} and (unit != 0 or budget != 0):
-            errors.append(f"{rid}: {r['Type']} lines must cost $0")
-        if budget > unit + 0.001:
-            errors.append(f"{rid}: budget unit cost is higher than spec unit cost")
+        if abs(q * u - e) > 0.011:
+            errs.append(f"{i}: Qty x Unit != Extended")
+        if r["Type"] in {"Print", "Owned"} and u:
+            errs.append(f"{i}: {r['Type']} must be $0")
         if r["Stock candidate"] not in {"Y", "N"}:
-            errors.append(f"{rid}: Stock candidate must be Y or N")
-        if r["Type"] == "Purchase" and not r["Price checked"]:
-            errors.append(f"{rid}: missing Price checked date")
-    return errors
+            errs.append(f"{i}: Stock candidate must be Y/N")
+        if r["Type"] == "Purchase" and not r["Price status"].startswith(("checked", "estimate")):
+            errs.append(f"{i}: Price status must say checked/estimate")
+        if check_refs and known:
+            for ref in filter(None, (x.strip() for x in r["Refs"].split(","))):
+                if ref != "-" and ref not in known:
+                    errs.append(f"{i}: reference {ref} missing from REFERENCES.md")
+    return errs
 
 
-def line_cost(r: dict, path: str) -> float:
-    """Cost a line contributes to a path. Optional/Print/Owned lines count $0."""
+def cost(r: dict, path: str) -> float:
     if r["Type"] != "Purchase":
         return 0.0
-    qty = float(r["Qty"])
-    if path == "spec":
-        return qty * float(r["Unit cost (USD approx)"])
-    if path == "stock" and r["Stock candidate"] == "Y":
+    if path == "with_stock" and r["Stock candidate"] == "Y":
         return 0.0
-    return qty * float(r["Budget path unit cost (USD)"])
+    return float(r["Extended cost"])
 
 
 def totals(rows: list[dict]) -> dict:
-    by_phase = {p: {k: 0.0 for k in PATHS} for p in PHASE_CAPS}
-    by_module: dict[tuple[int, str], dict] = defaultdict(lambda: {k: 0.0 for k in PATHS})
+    ph = {p: {k: 0.0 for k in PATHS} for p in BRIEF_CAPS}
+    mod: dict = defaultdict(lambda: {k: 0.0 for k in PATHS})
+    est = {p: 0.0 for p in BRIEF_CAPS}
     for r in rows:
         p = int(r["Phase"])
         for k in PATHS:
-            c = line_cost(r, k)
-            by_phase[p][k] += c
-            by_module[(p, r["Module"])][k] += c
-    grand = {k: sum(v[k] for v in by_phase.values()) for k in PATHS}
-    return {"phase": by_phase, "module": dict(by_module), "grand": grand}
+            ph[p][k] += cost(r, k)
+            mod[(p, r["Module"])][k] += cost(r, k)
+        if r["Type"] == "Purchase" and r["Price status"].startswith("estimate"):
+            est[p] += float(r["Extended cost"])
+    return {"phase": ph, "module": dict(mod), "estimated": est,
+            "grand": {k: sum(v[k] for v in ph.values()) for k in PATHS}}
 
 
-def summary_md(rows: list[dict], t: dict) -> str:
-    checked = sorted({r["Price checked"] for r in rows if r["Price checked"]})
-    out = [
-        "# BOM summary (generated - do not edit)",
-        "",
-        f"Generated by `tools/bom_check.py` from `bom/master_bom.csv`. Prices are approximate, "
-        f"checked {', '.join(checked)}, USD, excluding tax and shipping.",
-        "",
-        "Paths: **spec** = parts named in the brief; **budget** = cheaper substitutes; "
-        "**stock** = budget path with consumables you already own at $0.",
-        "",
-        "## Phases against caps",
-        "",
-        "| Phase | Cap | Spec | Budget | Budget + own stock | Stock path vs cap |",
-        "|---|---:|---:|---:|---:|---|",
-    ]
-    for p, cap in PHASE_CAPS.items():
-        v = t["phase"][p]
-        delta = v["stock"] - cap
-        flag = "OK" if delta <= 0.005 else f"OVER by {money(delta)}"
-        out.append(f"| {p} | {money(cap)} | {money(v['spec'])} | {money(v['budget'])} | {money(v['stock'])} | {flag} |")
+def summary_md(t: dict) -> str:
     g = t["grand"]
-    caps_sum = sum(PHASE_CAPS.values())
-    out += [
-        f"| **All** | **{money(caps_sum)}** | **{money(g['spec'])}** | **{money(g['budget'])}** | **{money(g['stock'])}** | |",
-        "",
-        f"Hard cap {money(HARD_CAP)} = phase caps {money(caps_sum)} + contingency {money(CONTINGENCY)}.",
-        "",
-    ]
-    for k, label in (("spec", "Spec"), ("budget", "Budget"), ("stock", "Budget + own stock")):
-        room = HARD_CAP - g[k]
-        state = f"{money(room)} under the hard cap" if room >= 0 else f"{money(-room)} OVER the hard cap"
-        out.append(f"- {label}: {money(g[k])} - {state}.")
-    out += ["", "## Modules", "", "| Phase | Module | Spec | Budget | Budget + own stock |", "|---|---|---:|---:|---:|"]
+    out = ["# BOM summary (generated)", "",
+           "From `tools/bom_check.py`. USD, approximate, before tax/shipping. Cheapest parts are the default.", "",
+           "| Phase | Brief cap | Proposed cap | Buy all | With own stock | Of which estimated |",
+           "|---|---:|---:|---:|---:|---:|"]
+    for p in BRIEF_CAPS:
+        v = t["phase"][p]
+        out.append(f"| {p} | {money(BRIEF_CAPS[p])} | {money(PROPOSED_CAPS[p])} | {money(v['buy_all'])} | "
+                   f"{money(v['with_stock'])} | {money(t['estimated'][p])} |")
+    out += [f"| **Total** | **{money(sum(BRIEF_CAPS.values()))}** | **{money(sum(PROPOSED_CAPS.values()))}** | "
+            f"**{money(g['buy_all'])}** | **{money(g['with_stock'])}** | {money(sum(t['estimated'].values()))} |", "",
+            f"Hard cap {money(HARD_CAP)}: buy all leaves {money(HARD_CAP - g['buy_all'])}, "
+            f"with own stock {money(HARD_CAP - g['with_stock'])}.", "",
+            "## Modules", "", "| Phase | Module | Buy all | With own stock |", "|---|---|---:|---:|"]
     for (p, m), v in sorted(t["module"].items()):
-        out.append(f"| {p} | {m} | {money(v['spec'])} | {money(v['budget'])} | {money(v['stock'])} |")
-    out += ["", "## Lines that differ between paths", "", "| ID | Part | Spec ext. | Budget ext. | Stock candidate |", "|---|---|---:|---:|---|"]
-    for r in rows:
-        s, b = line_cost(r, "spec"), line_cost(r, "budget")
-        if r["Type"] == "Purchase" and (abs(s - b) > 0.005 or r["Stock candidate"] == "Y"):
-            out.append(f"| {r['ID']} | {r['Part name']} | {money(s)} | {money(b)} | {r['Stock candidate']} |")
-    out += ["", "Optional lines (borrow or skip) are listed in the CSV but never counted."]
+        out.append(f"| {p} | {m} | {money(v['buy_all'])} | {money(v['with_stock'])} |")
     return "\n".join(out) + "\n"
 
 
-def write_modules(rows: list[dict], t: dict) -> None:
-    MODULE_DIR.mkdir(parents=True, exist_ok=True)
-    groups: dict[str, list[dict]] = OrderedDict()
-    for r in rows:
-        groups.setdefault(r["Module"], []).append(r)
-    for module, items in groups.items():
-        path = MODULE_DIR / f"{module}.csv"
-        with path.open("w", newline="", encoding="utf-8") as fh:
-            w = csv.DictWriter(fh, fieldnames=COLUMNS, quoting=csv.QUOTE_ALL)
-            w.writeheader()
-            w.writerows(items)
-            phase = int(items[0]["Phase"])
-            v = t["module"][(phase, module)]
-            sub = {c: "" for c in COLUMNS}
-            sub.update({"ID": "SUBTOTAL", "Phase": str(phase), "Module": module,
-                        "Part name": "Module subtotal (Purchase lines, spec path)",
-                        "Extended cost": f"{v['spec']:.2f}",
-                        "Budget path unit cost (USD)": f"budget {v['budget']:.2f} / stock {v['stock']:.2f}"})
-            w.writerow(sub)
+def budget_svg(t: dict) -> str:
+    """Grouped bars: cap vs buy-all per phase, animated on load."""
+    w, h, left, bottom, top = 720, 330, 60, 270, 78
+    vmax = 360.0
+    bw, gap = 34, 110
+    bars = []
+    for i, p in enumerate(BRIEF_CAPS):
+        x0 = left + 20 + i * gap
+        for j, (val, cls, label) in enumerate(((PROPOSED_CAPS[p], "cap", "cap"),
+                                               (t["phase"][p]["buy_all"], "buy", "buy"))):
+            hh = (bottom - top) * val / vmax
+            x = x0 + j * (bw + 6)
+            y = bottom - hh
+            bars.append(
+                f'<rect class="{cls}" x="{x}" y="{y:.1f}" width="{bw}" height="{hh:.1f}" rx="4">'
+                f'<animate attributeName="height" from="0" to="{hh:.1f}" dur="1.2s" fill="freeze"/>'
+                f'<animate attributeName="y" from="{bottom}" to="{y:.1f}" dur="1.2s" fill="freeze"/></rect>'
+                f'<text class="v" x="{x + bw / 2}" y="{y - 6:.1f}">{val:.0f}</text>')
+        bars.append(f'<text class="l" x="{x0 + bw + 3}" y="{bottom + 22}">Phase {p}</text>')
+    g = t["grand"]["buy_all"]
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" font-family="Segoe UI,Helvetica,Arial,sans-serif">
+<style>
+.bg{{fill:#0d1117}} .cap{{fill:#30363d}} .buy{{fill:#f0883e}} .v{{fill:#c9d1d9;font-size:12px;text-anchor:middle}}
+.l{{fill:#8b949e;font-size:13px;text-anchor:middle}} .t{{fill:#f0f6fc;font-size:16px;font-weight:600}} .s{{fill:#8b949e;font-size:12px}}
+</style>
+<rect class="bg" width="{w}" height="{h}" rx="12"/>
+<text class="t" x="24" y="28">Budget by phase (USD, cheapest parts)</text>
+<text class="s" x="{w - 24}" y="28" text-anchor="end">total ${g:.0f} of $500</text>
+<rect class="cap" x="430" y="{h - 22}" width="12" height="12" rx="2"/><text class="s" x="448" y="{h - 12}">proposed cap</text>
+<rect class="buy" x="560" y="{h - 22}" width="12" height="12" rx="2"/><text class="s" x="578" y="{h - 12}">buy all</text>
+<line x1="{left}" y1="{bottom}" x2="{w - 20}" y2="{bottom}" stroke="#30363d"/>
+{''.join(bars)}
+</svg>
+'''
 
 
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser()
     ap.add_argument("--check-only", action="store_true")
-    ap.add_argument("--strict", choices=PATHS, help="exit 1 if this path breaks any phase cap or the hard cap")
-    args = ap.parse_args(argv)
-
+    ap.add_argument("--strict", action="store_true")
+    a = ap.parse_args(argv)
     rows = load()
-    errors = validate(rows)
-    if errors:
-        print("BOM validation FAILED:")
-        for e in errors:
-            print("  -", e)
+    errs = validate(rows)
+    if errs:
+        print("BOM validation FAILED:\n  - " + "\n  - ".join(errs))
         return 1
     t = totals(rows)
-    for p, cap in PHASE_CAPS.items():
+    for p in BRIEF_CAPS:
         v = t["phase"][p]
-        print(f"Phase {p}: cap {money(cap):>9}  spec {money(v['spec']):>9}  budget {money(v['budget']):>9}  stock {money(v['stock']):>9}")
-    g = t["grand"]
-    print(f"TOTAL   : hard cap {money(HARD_CAP)}  spec {money(g['spec'])}  budget {money(g['budget'])}  stock {money(g['stock'])}")
-    if not args.check_only:
-        SUMMARY.write_text(summary_md(rows, t), encoding="utf-8")
-        write_modules(rows, t)
-        print(f"wrote {SUMMARY.relative_to(ROOT)} and {MODULE_DIR.relative_to(ROOT)}/*.csv")
-    if args.strict:
-        k = args.strict
-        bad = [p for p, cap in PHASE_CAPS.items() if t["phase"][p][k] > cap + 0.005]
-        if bad or g[k] > HARD_CAP:
-            print(f"STRICT ({k}): over cap in phases {bad}, total {money(g[k])}")
+        print(f"Phase {p}: cap {money(PROPOSED_CAPS[p]):>8}  buy_all {money(v['buy_all']):>8}  with_stock {money(v['with_stock']):>8}")
+    print(f"TOTAL : buy_all {money(t['grand']['buy_all'])}  with_stock {money(t['grand']['with_stock'])}  (hard cap {money(HARD_CAP)})")
+    if not a.check_only:
+        SUMMARY.write_text(summary_md(t), encoding="utf-8")
+        MODULE_DIR.mkdir(parents=True, exist_ok=True)
+        for old in MODULE_DIR.glob("*.csv"):
+            old.unlink()
+        groups: dict = OrderedDict()
+        for r in rows:
+            groups.setdefault(r["Module"], []).append(r)
+        for m, items in groups.items():
+            with (MODULE_DIR / f"{m}.csv").open("w", newline="", encoding="utf-8") as fh:
+                wr = csv.DictWriter(fh, fieldnames=COLUMNS, quoting=csv.QUOTE_ALL)
+                wr.writeheader()
+                wr.writerows(items)
+        SVG.parent.mkdir(exist_ok=True)
+        SVG.write_text(budget_svg(t), encoding="utf-8")
+    if a.strict:
+        bad = [p for p in PROPOSED_CAPS if t["phase"][p]["buy_all"] > PROPOSED_CAPS[p] + 0.005]
+        if bad or t["grand"]["buy_all"] > HARD_CAP:
+            print(f"STRICT: over cap in phases {bad}")
             return 1
     return 0
 

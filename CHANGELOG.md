@@ -1,13 +1,13 @@
 # Changelog
 
-## [0.1.0] - 2026-10-04
+## [0.2.0] - 2026-10-04
+### Changed
+- Architecture now follows Ansari-Asl et al. 2024 [R1]: fixed camera, 3-axis sample stage (M3, M2, M1), light arm (M4).
+- Laptop is the host (no Raspberry Pi): FYSETC E4 + FluidNC over USB / WiFi / Bluetooth; Pico hub for buttons and sensors.
+- Cheapest parts by default: $496.62 buy-all, $441.94 with own consumables. 60 W adapter, no 5 V buck.
 ### Added
-- Repository structure, licences (CERN-OHL-S-2.0, GPL-3.0-or-later, CC BY-SA 4.0).
-- Final-machine power budget (`data/power_loads.yaml`, `tools/power_budget.py`).
-- Master BOM for all six phases with spec / budget / own-stock paths (`tools/bom_check.py`).
-- Phase 1 Power module: complete 8-section documentation and acceptance log.
-- Interface standards: coordinate frame, OG-40 bolt pattern, base drill map, connector registry, Pi pin map.
-- Klipper `printer.cfg` (A1/A2 active, A3/A4 ready), idle sleep macros.
-- Python package `opengantry`: config-driven axes, kinematics, collision model, Moonraker client,
-  power manager, AS5600 reader, BRDF models; 31 tests.
-- Goal-oriented roadmap: 8 milestones, 39 checklist issues (`.github/milestones.yml`).
+- Animated SVG figures, interactive Pages site (simulator, BRDF explorer, equations), full equation set, REFERENCES.md with every source.
+- Controller module (8 sections), fastener schedule, FluidNC config, Pico hub firmware, optics calculator, publish script.
+
+## [0.1.0] - 2026-10-04
+- Initial Stanford-gantry-style design with Raspberry Pi + Klipper (superseded).

@@ -1,79 +1,75 @@
-# OpenGantry Lite machine description.
-# Adding an axis in a later phase = raise `installed_phase` and (if needed) edit that
-# axis block. No Python changes. Klipper names must match firmware/klipper/printer.cfg.
-# Angles in degrees. Lengths in mm. Origin = measurement center (sample surface),
-# +Z up, camera elevation axis = Y axis, camera on the -X side, light on +X at A3 = 0.
-# SPDX-License-Identifier: GPL-3.0-or-later
+# OpenGonio machine description. New axis in a later phase = raise installed_phase.
+# Geometry follows the fixed-camera / rotating-sample / light-arm layout of [R1].
+# Origin = zero point (sample surface centre). +Z up. Camera fixed on +X.
+# Angles in degrees, lengths in mm.  SPDX-License-Identifier: GPL-3.0-or-later
 
 machine:
-  name: OpenGantry Lite
-  installed_phase: 1            # 1 = A1 + A2, 3 adds A3, 4 adds A4
-  working_radius_mm: 300.0      # center to camera / lamp
-  center_tolerance_mm: 0.5
-  keep_out_mm: 30.0             # minimum surface gap between moving assemblies
-  sample_height_mm: 150.0       # measurement center above base top
-  camera_tower_offset_mm: 175.0 # |y| of camera pivot hub (outside the 12 in ring)
-  light_tower_offset_mm: 140.0  # |y| of light pivot hub (rides on the ring from Phase 3)
-  arm_radius_mm: 15.0           # capsule radius of 2020 spar + brackets
+  name: OpenGonio
+  installed_phase: 1
+  camera_distance_mm: 350.0
+  camera_elevation_deg: 0.0     # fixed L-arm; set to the value you lock it at
+  light_distance_mm: 300.0
+  ring_radius_mm: 140.0         # light arm root on the 12 in ring
   camera_head_radius_mm: 30.0
   lamp_head_radius_mm: 30.0
+  arm_radius_mm: 15.0
+  keep_out_mm: 30.0
+  min_phase_angle_deg: 5.0      # extra angular buffer between light and camera, as in [R1]
   repeatability_target_deg: 0.1
 
-moonraker:
-  url: http://localhost:7125
-  timeout_s: 120
+controller:                     # FYSETC E4 running FluidNC
+  transport: serial             # serial (USB or Bluetooth COM port) | tcp (WiFi)
+  port: auto                    # COM5, /dev/ttyUSB0, /dev/rfcomm0 ... auto = first CH340
+  baud: 115200
+  host: fluidnc.local           # tcp only
+  tcp_port: 23
+  feed_deg_per_min: 600
 
-host_io:                        # Raspberry Pi GPIO (BCM numbering)
-  estop_sense_gpio: 17          # high = 24 V MOTION present (e-stop released)
-  buck_pg_gpio: 27              # high = 5 V rail in regulation
-  shutdown_button_gpio: 26
+hub:                            # Raspberry Pi Pico panel + sensor hub
+  port: auto
+  baud: 115200
 
-lights:
-  main: {klipper_pin: main_light, phase: 1}
-  fill: {klipper_pin: fill_light, phase: 5}
+camera:
+  index: 0
+  width: 3840
+  height: 3032
+  focal_length_mm: 16.0
+  pixel_um: 1.55
+
+lights:                         # FluidNC user digital outputs (M62/M63 P<n>)
+  white: {output: 0, phase: 1}
+  multispectral: {output: 1, phase: 5}
 
 axes:
-  A1:
-    name: camera_elevation
-    klipper_stepper: a1_camera_el
+  M4:
+    name: light_arm             # angle from camera to light, about +Z (through the back at 180)
+    fluidnc_axis: X
     phase: 1
-    min_deg: 0.0
-    max_deg: 85.0
-    home_deg: 85.0              # endstop sits at the grazing end, arms far apart
-    home_direction: 1
-    speed_deg_s: 20.0
-    gear_ratio: 5.0             # 20T -> printed 100T
-    encoder: {bus: 1, offset_deg: 0.0, sign: 1}
-  A2:
-    name: light_elevation
-    klipper_stepper: a2_light_el
+    min_deg: 20.0
+    max_deg: 340.0
+    home_deg: 20.0              # switch at the near-camera end; roller-lever safety switch just beyond
+    gear_ratio: 24.0            # ring rim pitch diameter / 20T pulley (set from CAD)
+  M3:
+    name: table_yaw             # whole stage about +Z; 0 = sample normal faces the camera
+    fluidnc_axis: Y
     phase: 1
-    min_deg: 0.0
-    max_deg: 85.0
-    home_deg: 85.0
-    home_direction: 1
-    speed_deg_s: 20.0
+    min_deg: -180.0
+    max_deg: 180.0
+    home_deg: -180.0
     gear_ratio: 5.0
-    encoder: {bus: 2, offset_deg: 0.0, sign: 1}
-  A3:
-    name: light_azimuth
-    klipper_stepper: a3_light_az
+  M2:
+    name: sample_tilt           # about the stage's horizontal axis; + tilts the normal up
+    fluidnc_axis: Z
     phase: 3
-    min_deg: -170.0
-    max_deg: 170.0
-    home_deg: 0.0
-    home_direction: -1
-    speed_deg_s: 10.0
-    gear_ratio: 24.0            # ring rim pitch diameter / 20T pitch diameter, set from CAD
-    encoder: {bus: 3, offset_deg: 0.0, sign: 1, on_motor_shaft: true}
-  A4:
-    name: turntable
-    klipper_stepper: a4_turntable
+    min_deg: -90.0
+    max_deg: 90.0
+    home_deg: -90.0
+    gear_ratio: 5.0
+  M1:
+    name: sample_spin           # about the sample normal
+    fluidnc_axis: A
     phase: 4
     min_deg: -180.0
     max_deg: 180.0
-    home_deg: 0.0
-    home_direction: -1
-    speed_deg_s: 30.0
-    gear_ratio: 4.0             # 20T -> printed 80T
-    encoder: {bus: 0, offset_deg: 0.0, sign: 1}
+    home_deg: -180.0
+    gear_ratio: 4.0

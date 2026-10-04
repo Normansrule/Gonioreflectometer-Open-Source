@@ -7,7 +7,7 @@ build/
 dist/
 # vendor CAD is linked, never committed
 hardware/*/cad/vendor/
-# raw captures stay on the PC
+# raw captures stay on the laptop
 captures/
 *.dng
 *.exr
