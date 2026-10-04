@@ -1,0 +1,83 @@
+# Final-machine power budget inputs (all six phases installed).
+# Consumed by tools/power_budget.py -> docs/generated/power_budget.md
+# Every number is an engineering estimate unless "source" says otherwise.
+# Re-run the tool after changing anything here; CI fails if headroom < 25 %.
+# SPDX-License-Identifier: CC-BY-SA-4.0
+
+supply:
+  name: MEAN WELL GST120A24-P1M
+  volts: 24.0
+  rated_watts: 120.0
+  # Datasheet: 90.5-91 % typical at full load; DOE Level VI average >= 88 %.
+  # Light-load figures are estimates (efficiency falls at low load).
+  efficiency_typical_load: 0.88
+  efficiency_peak_load: 0.905
+  efficiency_idle_load: 0.75
+  no_load_watts: 0.15        # TRC listing: < 0.15 W
+
+buck:
+  name: Pololu D42V55F5
+  volts_out: 5.0
+  rated_amps: 5.5            # 6 A typical at low input; derated at 24 V in until bench-verified
+  # Pololu publishes "80-95 %"; the 24 V curve could not be read on 2026-10-04.
+  # These are design estimates and are VERIFIED in the Power module acceptance test.
+  efficiency_typical: 0.90
+  efficiency_peak: 0.87
+  efficiency_idle: 0.82
+
+required_headroom: 0.25
+
+# rail: 5V (through the buck) or 24V (direct)
+# phase: first phase that adds the load
+loads:
+  - name: Raspberry Pi 5 + HQ camera (allocation)
+    rail: 5V
+    phase: 1
+    typical_w: 6.0           # capture + light processing
+    peak_w: 25.5             # brief's allocation: 5.1 V x 5 A (Pi 4: 15.3 W)
+    idle_w: 2.8
+    note: Realistic stress peak without USB loads is about 13 W; 25.5 W is the sizing allocation.
+  - name: Micro servo SG90 (polarizer)
+    rail: 5V
+    phase: 5
+    typical_w: 0.25
+    peak_w: 3.75             # 0.75 A stall at 5 V
+    idle_w: 0.0
+  - name: SKR Mini E3 V3 logic + TMC2209 standby
+    rail: 24V
+    phase: 1
+    typical_w: 1.0
+    peak_w: 1.5
+    idle_w: 0.8
+  - name: Steppers A1-A4 (TMC2209, 17HS19-2004S1, 1.6 ohm)
+    rail: 24V
+    phase: 1
+    # typical: two axes moving at 0.8 A RMS (~3.0 W each) + two holding at 0.4 A (~0.5 W each)
+    typical_w: 7.0
+    # peak: all four accelerating at 1.0 A RMS: 2 x 1.0^2 x 1.6 = 3.2 W copper + ~0.6 W driver + ~1.5 W mechanical
+    peak_w: 21.2
+    idle_w: 0.0              # drivers disabled by idle_timeout / sleep
+  - name: Main light - CXM-4 18 V class at 350 mA via NLDD-350H
+    rail: 24V
+    phase: 1
+    typical_w: 6.4           # ~17.4 V x 0.35 A / 0.95
+    peak_w: 9.5              # allows a later NLDD-500H upgrade
+    idle_w: 0.0
+  - name: Fill light - second CXM-4 + NLDD-350H
+    rail: 24V
+    phase: 5
+    typical_w: 0.0           # never on at the same time as the main light during BRDF capture
+    peak_w: 6.4
+    idle_w: 0.0
+  - name: Controller fan 40 mm 24 V
+    rail: 24V
+    phase: 1
+    typical_w: 1.2
+    peak_w: 1.2
+    idle_w: 0.0              # controller_fan stops with the steppers
+  - name: Wiring, fuse, reverse-polarity MOSFET losses
+    rail: 24V
+    phase: 1
+    typical_w: 0.2
+    peak_w: 1.0
+    idle_w: 0.05

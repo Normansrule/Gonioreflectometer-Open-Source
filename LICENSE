@@ -1,0 +1,18 @@
+Gonioreflectometer-Open-Source (OpenGantry Lite) is licensed in three parts:
+
+  Hardware design files (hardware/, electronics/, bom/, Onshape document)
+      CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S-2.0)
+      LICENSES/CERN-OHL-S-2.0.txt
+
+  Software and firmware configuration (software/, firmware/, tools/)
+      GNU General Public License v3.0 or later (GPL-3.0-or-later)
+      LICENSES/GPL-3.0-only.txt (the GPL version 3 text)
+
+  Documentation, images and data (docs/, data/, *.md)
+      Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA-4.0)
+      LICENSES/CC-BY-SA-4.0.txt
+
+Third-party vendor CAD files are not included; they are linked from bom/master_bom.csv
+under their owners' terms.
+
+Copyright (c) 2026 Aleksander Norman and contributors.

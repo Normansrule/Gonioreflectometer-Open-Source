@@ -1,0 +1,79 @@
+# OpenGantry Lite machine description.
+# Adding an axis in a later phase = raise `installed_phase` and (if needed) edit that
+# axis block. No Python changes. Klipper names must match firmware/klipper/printer.cfg.
+# Angles in degrees. Lengths in mm. Origin = measurement center (sample surface),
+# +Z up, camera elevation axis = Y axis, camera on the -X side, light on +X at A3 = 0.
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+machine:
+  name: OpenGantry Lite
+  installed_phase: 1            # 1 = A1 + A2, 3 adds A3, 4 adds A4
+  working_radius_mm: 300.0      # center to camera / lamp
+  center_tolerance_mm: 0.5
+  keep_out_mm: 30.0             # minimum surface gap between moving assemblies
+  sample_height_mm: 150.0       # measurement center above base top
+  camera_tower_offset_mm: 175.0 # |y| of camera pivot hub (outside the 12 in ring)
+  light_tower_offset_mm: 140.0  # |y| of light pivot hub (rides on the ring from Phase 3)
+  arm_radius_mm: 15.0           # capsule radius of 2020 spar + brackets
+  camera_head_radius_mm: 30.0
+  lamp_head_radius_mm: 30.0
+  repeatability_target_deg: 0.1
+
+moonraker:
+  url: http://localhost:7125
+  timeout_s: 120
+
+host_io:                        # Raspberry Pi GPIO (BCM numbering)
+  estop_sense_gpio: 17          # high = 24 V MOTION present (e-stop released)
+  buck_pg_gpio: 27              # high = 5 V rail in regulation
+  shutdown_button_gpio: 26
+
+lights:
+  main: {klipper_pin: main_light, phase: 1}
+  fill: {klipper_pin: fill_light, phase: 5}
+
+axes:
+  A1:
+    name: camera_elevation
+    klipper_stepper: a1_camera_el
+    phase: 1
+    min_deg: 0.0
+    max_deg: 85.0
+    home_deg: 85.0              # endstop sits at the grazing end, arms far apart
+    home_direction: 1
+    speed_deg_s: 20.0
+    gear_ratio: 5.0             # 20T -> printed 100T
+    encoder: {bus: 1, offset_deg: 0.0, sign: 1}
+  A2:
+    name: light_elevation
+    klipper_stepper: a2_light_el
+    phase: 1
+    min_deg: 0.0
+    max_deg: 85.0
+    home_deg: 85.0
+    home_direction: 1
+    speed_deg_s: 20.0
+    gear_ratio: 5.0
+    encoder: {bus: 2, offset_deg: 0.0, sign: 1}
+  A3:
+    name: light_azimuth
+    klipper_stepper: a3_light_az
+    phase: 3
+    min_deg: -170.0
+    max_deg: 170.0
+    home_deg: 0.0
+    home_direction: -1
+    speed_deg_s: 10.0
+    gear_ratio: 24.0            # ring rim pitch diameter / 20T pitch diameter, set from CAD
+    encoder: {bus: 3, offset_deg: 0.0, sign: 1, on_motor_shaft: true}
+  A4:
+    name: turntable
+    klipper_stepper: a4_turntable
+    phase: 4
+    min_deg: -180.0
+    max_deg: 180.0
+    home_deg: 0.0
+    home_direction: -1
+    speed_deg_s: 30.0
+    gear_ratio: 4.0             # 20T -> printed 80T
+    encoder: {bus: 0, offset_deg: 0.0, sign: 1}

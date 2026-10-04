@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opengantry"
+version = "0.1.0"
+description = "Host software for OpenGantry Lite, an open-source gonioreflectometer and 3D scanner"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "pyyaml>=6"]
+
+[project.optional-dependencies]
+pi = ["gpiozero>=2.0", "smbus2>=0.4", "picamera2>=0.3"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+opengantry = "opengantry.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
