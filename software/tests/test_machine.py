@@ -27,8 +27,11 @@ def gantry(cfg):
 # ---- config ----
 def test_phase_gating(cfg):
     assert list(cfg.active_axes) == ["M4", "M3"]
-    assert list(cfg.with_phase(3).active_axes) == ["M4", "M3", "M2"]
-    assert list(cfg.with_phase(4).active_axes) == ["M4", "M3", "M2", "M1"]
+    assert list(cfg.with_phase(4).active_axes) == ["M4"]
+    assert list(cfg.with_phase(8).active_axes) == ["M4", "M3", "M2"]
+    assert list(cfg.with_phase(9).active_axes) == ["M4", "M3", "M2", "M1"]
+    assert list(cfg.active_lights) == ["white"]
+    assert list(cfg.with_phase(10).active_lights) == ["white", "multispectral"]
 
 
 def test_resolution_beats_target(cfg):
@@ -61,8 +64,8 @@ def test_specular_condition(cfg, m4):
 def test_tilt_moves_normal_up_and_spin_keeps_normal(cfg):
     assert sample_normal(0, 30, 0)[2] == pytest.approx(math.sin(math.radians(30)))
     assert np.allclose(sample_normal(20, 10, 0), sample_normal(20, 10, 77))
-    a = brdf_coords(cfg.with_phase(4), {"M4": 60, "M3": 30, "M2": 10, "M1": 0})
-    b = brdf_coords(cfg.with_phase(4), {"M4": 60, "M3": 30, "M2": 10, "M1": 25})
+    a = brdf_coords(cfg.with_phase(9), {"M4": 60, "M3": 30, "M2": 10, "M1": 0})
+    b = brdf_coords(cfg.with_phase(9), {"M4": 60, "M3": 30, "M2": 10, "M1": 25})
     assert a.theta_i == pytest.approx(b.theta_i) and a.delta_phi == pytest.approx(b.delta_phi)
     assert (a.phi_i - b.phi_i) % 360 == pytest.approx(25)
 

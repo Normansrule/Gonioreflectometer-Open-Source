@@ -5,7 +5,7 @@
 <ellipse cx="450" cy="325" rx="230" ry="62" fill="none" stroke="#30363d" stroke-width="3"/>
 <ellipse cx="450" cy="325" rx="230" ry="62" fill="none" stroke="#e3b341" stroke-width="3" stroke-dasharray="20 340">
  <animate attributeName="stroke-dashoffset" from="0" to="-360" dur="5s" repeatCount="indefinite"/></ellipse>
-<text x="690" y="375" fill="#e3b341" font-size="14" class="b">M4 light arm (Phase 1)</text>
+<text x="690" y="375" fill="#e3b341" font-size="14" class="b">M4 light arm (Phase 4)</text>
 <line x1="270" y1="355" x2="200" y2="215" stroke="#8b949e" stroke-width="10" stroke-linecap="round"/>
 <circle cx="200" cy="210" r="16" fill="#e3b341"/>
 <line x1="214" y1="215" x2="440" y2="250" stroke="#e3b341" stroke-width="2" stroke-dasharray="8 6">
@@ -13,7 +13,7 @@
 <rect x="410" y="295" width="80" height="40" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
 <text x="450" y="321" class="m" font-size="12" text-anchor="middle">table</text>
 <path d="M380 285 A70 18 0 0 0 520 285" fill="none" stroke="#3fb950" stroke-width="3" marker-end="url(#ag)"/>
-<text x="530" y="289" fill="#3fb950" font-size="14" class="b">M3 table yaw (Phase 1)</text>
+<text x="530" y="289" fill="#3fb950" font-size="14" class="b">M3 table yaw (Phase 5)</text>
 <path d="M420 295 L420 195 M480 295 L480 195" stroke="#8b949e" stroke-width="6"/>
 <g>
  <animateTransform attributeName="transform" type="rotate" values="-20 450 225;20 450 225;-20 450 225" dur="6s" repeatCount="indefinite"/>
@@ -22,8 +22,8 @@
  <line x1="450" y1="225" x2="450" y2="203" stroke="#0d1117" stroke-width="3">
   <animateTransform attributeName="transform" type="rotate" from="0 450 225" to="360 450 225" dur="4s" repeatCount="indefinite"/></line>
 </g>
-<text x="490" y="175" fill="#bc8cff" font-size="14" class="b">M2 tilt (Phase 3)</text>
-<text x="490" y="195" fill="#f0883e" font-size="14" class="b">M1 spin (Phase 4)</text>
+<text x="490" y="175" fill="#bc8cff" font-size="14" class="b">M2 tilt (Phase 8)</text>
+<text x="490" y="195" fill="#f0883e" font-size="14" class="b">M1 spin (Phase 9)</text>
 <line x1="780" y1="225" x2="474" y2="225" stroke="#58a6ff" stroke-width="2" stroke-dasharray="8 6">
  <animate attributeName="stroke-dashoffset" from="0" to="28" dur="0.8s" repeatCount="indefinite"/></line>
 <rect x="780" y="203" width="70" height="44" rx="6" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>

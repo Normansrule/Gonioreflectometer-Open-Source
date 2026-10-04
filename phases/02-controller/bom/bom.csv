@@ -1,0 +1,11 @@
+ID,Type,Part,Use,Qty,Maker,Part number,Supplier,Link,Unit USD,Total USD,STEP,CAD license,Notes,Own,Price,Refs
+CTL-01,Purchase,"FYSETC E4 (ESP32, 4x TMC2209, WiFi + Bluetooth)",Motion controller running FluidNC; USB / WiFi / BT to the laptop,1,FYSETC,E4 V1.0,FYSETC store,https://www.fysetc.com/products/fysetc-e4-board-with-built-in-wi-fi-and-bluetooth-4-pcs-tmc2209-240mhz-16m-flash-3d-printer-control-board-based-for-3d-printer,32.00,32.00,Not confirmed (hardware folder: https://github.com/FYSETC/FYSETC-E4/tree/main/hardware). Board 90 x 67 mm,Vendor CAD - link only,"12–24 V, CH340 USB. Alts: SKR Pico $39.85, DIY ~$36.",N,checked 2026-10-04,"C1,C2,C3,C4"
+CTL-02,Purchase,Raspberry Pi Pico,"Buttons, e-stop sense, LED bank",1,Raspberry Pi,SC0915,raspberrypi.com,https://www.raspberrypi.com/products/raspberry-pi-pico/,4.00,4.00,Confirmed: https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip,Vendor CAD - link only,USB-powered.,N,checked 2026-10-04,"C5,C6"
+CTL-03,Purchase,USB cable for the E4 (match its port),Laptop to E4 (or use WiFi/BT),1,generic,1 m data cable,any,n/a,3.00,3.00,n/a,n/a,Match the E4 USB port.,Y,estimate,-
+CTL-04,Purchase,USB-A to micro-B data cable 1 m,Laptop to Pico,1,generic,1 m data cable,any,n/a,3.00,3.00,n/a,n/a,,Y,estimate,C7
+CTL-05,Purchase,Momentary pushbutton 12 mm,HOME START STOP LIGHT NEXT PAUSE,6,generic,12 mm panel momentary,any,n/a,0.50,3.00,n/a,n/a,,N,estimate,-
+CTL-06,Purchase,JST-XH pre-crimped lead kit,Keyed connectors,1,Keszoox,JST-XH 114 pcs,Amazon,https://www.amazon.com/Keszoox-Connector-Pre-Crimped-Housing-Socket%EF%BC%8810/dp/B09SX4LC13,9.99,9.99,JST XH models in KiCad / Onshape libraries,n/a,Price not confirmed.,Y,estimate,P22
+CTL-07,Purchase,Pin headers 2.54 mm (for Pico),Solder to Pico,1,generic,40-pin male strip x2,any,n/a,1.00,1.00,n/a,n/a,,Y,estimate,-
+CTL-08,Optional,Fan 40 mm 24 V,Only if T6 driver temperature fails,1,generic,4010 24 V,any,n/a,4.00,4.00,n/a,n/a,Only if drivers overheat.,N,estimate,-
+CTL-09,Owned,Laptop (Windows or Linux),Control and processing,1,-,-,owned,n/a,0.00,0.00,n/a,n/a,No Raspberry Pi needed.,N,n/a,-
+CTL-10,Print,Controller case + button panel,"Holds E4 and Pico, panel labels",1,OpenGonio,OG-CTL-*,Self-printed (PETG),n/a,0.00,0.00,Project Onshape document,CERN-OHL-S-2.0,,N,n/a,-

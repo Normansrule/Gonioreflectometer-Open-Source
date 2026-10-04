@@ -1,11 +1,11 @@
-# OpenGonio machine description. New axis in a later phase = raise installed_phase.
+# OpenGonio machine description. installed_phase = the phase you finished (4 M4 · 5 M3 · 6 light · 8 M2 · 9 M1 · 10 LED bank).
 # Geometry follows the fixed-camera / rotating-sample / light-arm layout of [R1].
 # Origin = zero point (sample surface centre). +Z up. Camera fixed on +X.
 # Angles in degrees, lengths in mm.  SPDX-License-Identifier: GPL-3.0-or-later
 
 machine:
   name: OpenGonio
-  installed_phase: 1
+  installed_phase: 6
   camera_distance_mm: 350.0
   camera_elevation_deg: 0.0     # fixed L-arm; set to the value you lock it at
   light_distance_mm: 300.0
@@ -37,11 +37,11 @@ camera:
   pixel_um: 1.55
 
 lights:                         # FluidNC user digital outputs (M62/M63 P<n>)
-  white: {output: 0, phase: 1, elevation_deg: 0.0}
-  multispectral: {output: 1, phase: 5, elevation_deg: 40.0}   # LED bank on a 40 deg mast: non-coplanar lights for photometric stereo
+  white: {output: 0, phase: 6, elevation_deg: 0.0}
+  multispectral: {output: 1, phase: 10, elevation_deg: 40.0}   # LED bank on a 40 deg mast: non-coplanar lights for photometric stereo
 
 scan:                           # Phase 6 photo scanner (camera slid to the far end of the outrigger)
-  camera_distance_mm: 650.0     # f/8: see docs/generated/optics.md (field, DOF, resolution)
+  camera_distance_mm: 650.0     # f/8: see phases/06-camera-light/design/optics.md (field, DOF, resolution)
   aperture_f: 8
   object_max_radius_mm: 55.0    # bounding sphere of the object about its centre (2r <= DOF)
   platter_offset_mm: 0.0        # delta: support surface below the zero point = 60 - riser height (mm)
@@ -60,7 +60,7 @@ axes:
   M4:
     name: light_arm             # angle from camera to light, about +Z (through the back at 180)
     fluidnc_axis: X
-    phase: 1
+    phase: 4
     min_deg: 20.0
     max_deg: 340.0
     home_deg: 20.0              # switch at the near-camera end; roller-lever safety switch just beyond
@@ -68,7 +68,7 @@ axes:
   M3:
     name: table_yaw             # whole stage about +Z; 0 = sample normal faces the camera
     fluidnc_axis: Y
-    phase: 1
+    phase: 5
     min_deg: -180.0
     max_deg: 180.0
     home_deg: -180.0
@@ -76,7 +76,7 @@ axes:
   M2:
     name: sample_tilt           # about the stage's horizontal axis; + tilts the normal up
     fluidnc_axis: Z
-    phase: 3
+    phase: 8
     min_deg: -90.0
     max_deg: 90.0
     home_deg: -90.0
@@ -84,7 +84,7 @@ axes:
   M1:
     name: sample_spin           # about the sample normal
     fluidnc_axis: A
-    phase: 4
+    phase: 9
     min_deg: -180.0
     max_deg: 180.0
     home_deg: -180.0

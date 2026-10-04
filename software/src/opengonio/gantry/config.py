@@ -73,7 +73,7 @@ class Machine:
         return float(self.lights.get(name, {}).get("elevation_deg", 0.0))
 
     def for_scan(self) -> "Machine":
-        """Camera slid to the scan position on the outrigger (Phase 6)."""
+        """Camera slid to the scan position on the outrigger (phase 11)."""
         return replace(self, camera_distance_mm=float(self.scan["camera_distance_mm"]))
 
     def with_phase(self, phase: int) -> "Machine":

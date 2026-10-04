@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Roadmap tooling from .github/milestones.yml (single source of truth).
+"""Phases from .github/phases.yml.
 
-    python tools/roadmap.py --write-md                 # regenerate ROADMAP.md
-    python tools/roadmap.py --github [--repo OWNER/NAME] [--dry-run]
-        create labels, milestones and one checklist issue per roadmap item with the GitHub CLI.
-        Safe to re-run: milestones/issues are matched by ID (M6, M6.3); renamed ones are updated, unchanged ones untouched.
+    python tools/roadmap.py                                  # write phases/*/README.md + README table
+    python tools/roadmap.py --github --repo OWNER/NAME [--dry-run]
+        one milestone per phase, one checklist issue per step (REST only; safe to re-run).
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -19,57 +18,82 @@ from pathlib import Path
 
 import yaml
 
-ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / ".github" / "milestones.yml"
-ROADMAP = ROOT / "ROADMAP.md"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bom_check  # noqa: E402
 
-LABEL_COLOURS = {
-    "planning": "c5def5", "design": "bfdadc", "hardware": "fbca04", "firmware": "0e8a16",
-    "software": "1d76db", "power": "b60205", "milestone-test": "5319e7", "release": "000000",
-    "stretch": "d4c5f9", "validation": "006b75", "calibration": "f9d0c4",
-}
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / ".github" / "phases.yml"
+README = ROOT / "README.md"
+START, END = "<!-- phases:start -->", "<!-- phases:end -->"
+SUBFOLDERS = [("research", "Research"), ("design", "Design"), ("3d", "3D files"), ("bom", "Bill of materials"),
+              ("test", "Tests")]
 
 
 def load() -> list[dict]:
-    return yaml.safe_load(SOURCE.read_text())["milestones"]
+    return yaml.safe_load(SOURCE.read_text(encoding="utf-8"))["phases"]
 
 
-def issue_title(item: dict) -> str:
-    return f"[{item['id']}] {item['title']}"
+def costs() -> dict[str, float]:
+    return {p: v["buy"] for p, v in bom_check.totals(bom_check.load()).items()}
 
 
-def issue_body(ms: dict, item: dict) -> str:
-    tasks = "\n".join(f"- [ ] {t}" for t in item["tasks"])
-    return (
-        f"**Milestone goal:** {ms['goal']}\n\n"
-        f"### Tasks\n{tasks}\n\n"
-        f"### Acceptance\n- [ ] {item['acceptance']}\n\n"
-        f"_Generated from `.github/milestones.yml` — edit the checklist here as you work; "
-        f"close the issue when the acceptance box is ticked._"
-    )
+def ms_title(p: dict) -> str:
+    return f"{p['id']} · {p['title']}"
 
 
-def write_md(milestones: list[dict]) -> str:
-    out = [
-        "# Roadmap",
-        "",
-        "Goal-oriented milestones. Each item is a GitHub issue with a checklist; each phase is a GitHub",
-        "milestone whose progress bar fills as issues close. Generated from `.github/milestones.yml` by",
-        "`python tools/roadmap.py --write-md` — edit the YAML, not this file.",
-        "",
-        "| Milestone | Goal | Cap | Items |",
-        "|---|---|---:|---:|",
-    ]
-    for ms in milestones:
-        cap = f"${ms['cap_usd']}" if "cap_usd" in ms else "—"
-        out.append(f"| {ms['title']} | {ms['goal']} | {cap} | {len(ms['issues'])} |")
-    for ms in milestones:
-        out += ["", f"## {ms['title']}", "", f"**Goal:** {ms['goal']}", ""]
-        for it in ms["issues"]:
-            out += [f"### {it['id']} — {it['title']}", ""]
-            out += [f"- [ ] {t}" for t in it["tasks"]]
-            out += [f"- [ ] **Acceptance:** {it['acceptance']}", ""]
-    return "\n".join(out) + "\n"
+def issue_title(s: dict) -> str:
+    return f"[{s['id']}] {s['title']}"
+
+
+def issue_body(p: dict, s: dict) -> str:
+    tasks = "\n".join(f"- [ ] {t}" for t in s["tasks"])
+    return f"**Goal:** {p['goal']}\n\n{tasks}\n- [ ] **Done:** {s['done']}\n\n`phases/{p['folder']}/`"
+
+
+def phase_md(p: dict, cost: float, running: float) -> str:
+    d = ROOT / "phases" / p["folder"]
+    n = int(p["id"][1:])
+    out = [f"# {n:02d} · {p['title']}", "", f"**Goal:** {p['goal']}", ""]
+    if p.get("image"):
+        out += [f'<img src="../../docs/assets/{p['image']}.svg" width="100%" alt="{p['title']}">', ""]
+    if cost:
+        out += [f"**Cost:** ${cost:.2f} · running total ${running:.2f} of $500", ""]
+    links = [f"[{name}]({sub}/)" for sub, name in SUBFOLDERS if (d / sub).is_dir()]
+    if links:
+        out += [" · ".join(links), ""]
+    for s in p["steps"]:
+        out += [f"## {s['id'][1:]} {s['title']}", ""]
+        out += [f"- [ ] {t}" for t in s["tasks"]]
+        out += [f"- [ ] **Done:** {s['done']}", ""]
+    if p.get("safety"):
+        out += [f"> **Safety:** {p['safety']}", ""]
+    out += [f"<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>", ""]
+    return "\n".join(out)
+
+
+def table(phases: list[dict], c: dict[str, float]) -> str:
+    rows = ["| # | Phase | Goal | Cost |", "|---:|---|---|---:|"]
+    for p in phases:
+        cost = c.get(p["folder"], 0.0)
+        rows.append(f"| {p['id'][1:]} | [{p['title']}](phases/{p['folder']}/) | {p['goal']} | "
+                    f"{f'${cost:.0f}' if cost else '—'} |")
+    return "\n".join(rows)
+
+
+def write_docs(phases: list[dict]) -> None:
+    c, run = costs(), 0.0
+    for p in phases:
+        cost = c.get(p["folder"], 0.0)
+        run += cost
+        d = ROOT / "phases" / p["folder"]
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "README.md").write_text(phase_md(p, cost, run), encoding="utf-8")
+    text = README.read_text(encoding="utf-8")
+    if START in text and END in text:
+        head, rest = text.split(START, 1)
+        tail = rest.split(END, 1)[1]
+        README.write_text(f"{head}{START}\n{table(phases, c)}\n{END}{tail}", encoding="utf-8")
+    print(f"wrote {len(phases)} phase READMEs, {sum(len(p['steps']) for p in phases)} steps")
 
 
 def gh(args: list[str], dry: bool, ok_codes: tuple[str, ...] = ()) -> str:
@@ -86,77 +110,67 @@ def gh(args: list[str], dry: bool, ok_codes: tuple[str, ...] = ()) -> str:
 
 
 def ms_key(title: str) -> str:
-    """'M6 - Phase 6: ...' -> 'M6' (milestones are matched by ID so renames update in place)."""
+    """'P04 · Light arm' -> 'P04'."""
     return title.split(" ", 1)[0]
 
 
 def issue_key(title: str) -> str:
-    """'[M6.3] Scan planner' -> 'M6.3'."""
+    """'[P04.1] Build' -> 'P04.1'."""
     return title[1:title.index("]")] if title.startswith("[") and "]" in title else title
 
 
-def push_github(milestones: list[dict], repo: str, dry: bool) -> None:
-    """Create or update labels, milestones and checklist issues (GitHub REST only).
-
-    Matching is by ID (M6, M6.3). Unchanged issues are left alone so ticked boxes survive;
-    an issue whose title changed in the YAML gets its title, body, milestone and labels replaced.
-    """
+def push_github(phases: list[dict], repo: str, dry: bool) -> None:
+    """Create or update milestones and issues, matched by ID. Unchanged issues keep their ticks;
+    an ID whose title changed gets new title, body, milestone, label and is reopened."""
     base = f"repos/{repo}"
-    labels = sorted({l for ms in milestones for it in ms["issues"] for l in it.get("labels", [])})
-    for l in labels:
-        gh(["api", "-X", "POST", f"{base}/labels", "-f", f"name={l}", "-f", f"color={LABEL_COLOURS.get(l, 'ededed')}"],
+    for p in phases:
+        gh(["api", "-X", "POST", f"{base}/labels", "-f", f"name=phase-{p['id'][1:]}", "-f", "color=f0883e"],
            dry, ok_codes=("already_exists", "422"))
-    ms_list = json.loads(gh(["api", f"{base}/milestones?state=all&per_page=100"], dry) or "[]")
-    by_key = {ms_key(m["title"]): m for m in ms_list}
+    by_key = {ms_key(m["title"]): m for m in json.loads(gh(["api", f"{base}/milestones?state=all&per_page=100"], dry) or "[]")}
     issues = json.loads(gh(["api", "--paginate", f"{base}/issues?state=all&per_page=100"], dry) or "[]")
     issues_by_key = {issue_key(i["title"]): i for i in issues if "pull_request" not in i}
     due = date.today()
-    for ms in milestones:
-        due += timedelta(weeks=ms.get("due_weeks", 0))
-        fields = ["-f", f"title={ms['title']}", "-f", f"description={ms['goal']}"]
-        if ms.get("due_weeks"):
+    for p in phases:
+        due += timedelta(weeks=p.get("weeks", 0))
+        fields = ["-f", f"title={ms_title(p)}", "-f", f"description={p['goal']}"]
+        if p.get("weeks"):
             fields += ["-f", f"due_on={due.isoformat()}T23:59:59Z"]
-        old = by_key.get(ms["id"])
+        old = by_key.get(p["id"])
         if old is None:
             out = gh(["api", "-X", "POST", f"{base}/milestones", *fields], dry)
             number = json.loads(out)["number"] if out and out.strip().startswith("{") else 0
-            print("milestone +", ms["title"])
+            print("milestone +", ms_title(p))
         else:
             number = old["number"]
-            if old["title"] != ms["title"] or (old.get("description") or "") != ms["goal"]:
+            if old["title"] != ms_title(p) or (old.get("description") or "") != p["goal"]:
                 gh(["api", "-X", "PATCH", f"{base}/milestones/{number}", *fields], dry)
-                print("milestone ~", ms["title"])
-        for it in ms["issues"]:
-            title = issue_title(it)
-            body_args = ["-f", f"title={title}", "-f", f"body={issue_body(ms, it)}", "-F", f"milestone={number}"]
-            for l in it.get("labels", []):
-                body_args += ["-f", f"labels[]={l}"]
-            cur = issues_by_key.get(it["id"])
+                print("milestone ~", ms_title(p))
+        for s in p["steps"]:
+            title = issue_title(s)
+            args = ["-f", f"title={title}", "-f", f"body={issue_body(p, s)}", "-F", f"milestone={number}",
+                    "-f", f"labels[]=phase-{p['id'][1:]}"]
+            cur = issues_by_key.get(s["id"])
             if cur is None:
-                gh(["api", "-X", "POST", f"{base}/issues", *body_args], dry)
+                gh(["api", "-X", "POST", f"{base}/issues", *args], dry)
                 print("  issue +", title)
-            elif cur["title"] != title:             # repurposed ID: new content, reopen
-                gh(["api", "-X", "PATCH", f"{base}/issues/{cur['number']}", *body_args, "-f", "state=open"], dry)
+            elif cur["title"] != title:
+                gh(["api", "-X", "PATCH", f"{base}/issues/{cur['number']}", *args, "-f", "state=open"], dry)
                 print("  issue ~", title)
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--write-md", action="store_true")
     ap.add_argument("--github", action="store_true")
-    ap.add_argument("--repo", help="OWNER/NAME (required with --github)")
+    ap.add_argument("--repo", help="OWNER/NAME")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
-    ms = load()
-    if a.write_md:
-        ROADMAP.write_text(write_md(ms), encoding="utf-8")
-        print(f"wrote {ROADMAP.name}: {len(ms)} milestones, {sum(len(m['issues']) for m in ms)} issues")
+    phases = load()
     if a.github:
         if not a.repo:
             ap.error("--github needs --repo OWNER/NAME")
-        push_github(ms, a.repo, a.dry_run)
-    if not (a.write_md or a.github):
-        ap.print_help()
+        push_github(phases, a.repo, a.dry_run)
+    else:
+        write_docs(phases)
     return 0
 
 

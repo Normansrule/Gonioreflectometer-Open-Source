@@ -48,11 +48,11 @@ def test_ggx_reciprocity_and_energy(r):
 
 
 def test_bom_valid_and_under_hard_cap():
-    rows = bom_check.load()
-    assert bom_check.validate(rows) == []
-    t = bom_check.totals(rows)
-    assert t["grand"]["buy_all"] <= bom_check.HARD_CAP
-    assert sum(bom_check.PROPOSED_CAPS.values()) <= bom_check.HARD_CAP
+    boms = bom_check.load()
+    assert bom_check.validate(boms) == []
+    t = bom_check.totals(boms)
+    assert sum(v["buy"] for v in t.values()) <= bom_check.HARD_CAP
+    assert all(v["own"] <= v["buy"] for v in t.values())
 
 
 def test_power_headroom():
@@ -65,3 +65,14 @@ def test_optics_basics():
     assert m == pytest.approx(16 / 334, rel=1e-6)
     assert optics.airy_um(8) == pytest.approx(2.44 * 0.55 * 8)
     assert optics.dof_mm(16, 350, 8) > optics.dof_mm(16, 350, 2)
+
+
+def test_phases_match_folders():
+    import roadmap
+    phases = roadmap.load()
+    assert [int(p["id"][1:]) for p in phases] == list(range(len(phases)))
+    folders = {p["folder"] for p in phases}
+    assert set(bom_check.load()) <= folders
+    for p in phases:
+        assert p["folder"].startswith(p["id"][1:] + "-")
+        assert all(s["id"].startswith(p["id"] + ".") and s["tasks"] and s["done"] for s in p["steps"])

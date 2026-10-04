@@ -52,8 +52,8 @@ def check_object(cfg: Machine, radius_mm: float | None = None) -> None:
 
 
 def rings_plan(cfg: Machine, rings: list[dict] | None = None, lamp_m4: float | None = None) -> list[ScanPose]:
-    if cfg.installed_phase < 4:
-        raise PlanError("scanning needs M2 (Phase 3) and M1 (Phase 4)")
+    if not {"M1", "M2"} <= set(cfg.active_axes):
+        raise PlanError("scanning needs M2 (phase 8) and M1 (phase 9)")
     rings = rings or cfg.scan["rings"]
     m4 = float(lamp_m4 if lamp_m4 is not None else cfg.scan["lamp_m4_deg"])
     a2, a1 = cfg.axes["M2"], cfg.axes["M1"]

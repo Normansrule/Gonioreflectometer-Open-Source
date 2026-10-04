@@ -1,4 +1,4 @@
-"""Phase 1 in-plane plans: (theta_i, theta_r) grid -> (M3, M4) poses.
+"""In-plane plans: (theta_i, theta_r) grid -> (M3, M4) poses.
 
 In-plane (M2 = 0, camera elevation 0) with the camera at 0 deg and the light at M4:
 theta_r = |M3|, theta_i = |M4 - M3|, light and camera on opposite sides of the normal.
@@ -29,7 +29,7 @@ def grid(cfg: Machine, step_deg: float = 5.0, max_deg: float = 80.0) -> list[dic
 
 
 def mirror_sweep(theta_i: float, span: float = 4.0, step: float = 0.1) -> list[dict[str, float]]:
-    """Phase 1 milestone: hold the light, sweep the table through the specular angle."""
+    """Phase 6 mirror test: hold the light, sweep the table through the specular angle."""
     n = int(2 * span / step)
     m4 = 2 * theta_i
     return [{"M4": m4, "M3": theta_i - span + k * step} for k in range(n + 1)]

@@ -1,0 +1,4 @@
+"Test","Date","Measured","Pass criterion","Pass/Fail","Notes"
+"S1 Intrinsics at 650 mm","","","Reprojection RMS <= 0.5 px","",""
+"S2 Camera pose fit (12 poses)","","","<= 0.2 deg and <= 0.3 mm","",""
+"S3 Putty hold, 80 deg, 3 turns","","","Mat corners move <= 1 px","",""

@@ -6,7 +6,7 @@ __pycache__/
 build/
 dist/
 # vendor CAD is linked, never committed
-hardware/*/cad/vendor/
+phases/*/3d/vendor/
 # raw captures stay on the laptop
 captures/
 *.dng

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create the PRIVATE repo, push, load milestones/issues, try Pages, run tests. Safe to re-run.
+# Private repo + push + one milestone per phase, one issue per step. Safe to re-run.
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -euo pipefail
 cd "$(dirname "$0")/.."

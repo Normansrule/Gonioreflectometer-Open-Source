@@ -97,7 +97,7 @@ def architecture() -> str:
     b += box(450, 90, 280, 90, "FYSETC E4 · FluidNC", "ESP32 · 4 × TMC2209 · WebUI", PURPLE)
     b += box(450, 300, 280, 90, "Pico hub · MicroPython", "buttons · e-stop sense · LED bank", PURPLE)
     b += box(900, 30, 270, 62, "M1 – M4 steppers", "homing barriers · safety switches", BLUE)
-    b += box(900, 110, 270, 62, "Lights", "white COB · (Ph 5) 8-band LEDs", YELLOW)
+    b += box(900, 110, 270, 62, "Lights", "white COB · (Ph 10) 8-band LEDs", YELLOW)
     b += box(900, 190, 270, 52, "PAUSE button", "feed hold, no laptop needed", ORANGE)
     b += box(900, 270, 270, 62, "Panel buttons", "HOME · START · STOP · LIGHT · NEXT", ORANGE)
     b += box(900, 350, 270, 62, "Sensors", "e-stop sense · optional AS5600", GREEN)
@@ -120,7 +120,7 @@ def axes() -> str:
 <ellipse cx="{cx}" cy="{cy + 70}" rx="230" ry="62" fill="none" stroke="{LINE}" stroke-width="3"/>
 <ellipse cx="{cx}" cy="{cy + 70}" rx="230" ry="62" fill="none" stroke="{YELLOW}" stroke-width="3" stroke-dasharray="20 340">
  <animate attributeName="stroke-dashoffset" from="0" to="-360" dur="5s" repeatCount="indefinite"/></ellipse>
-<text x="{cx + 240}" y="{cy + 120}" fill="{YELLOW}" font-size="14" class="b">M4 light arm (Phase 1)</text>
+<text x="{cx + 240}" y="{cy + 120}" fill="{YELLOW}" font-size="14" class="b">M4 light arm (Phase 4)</text>
 <line x1="{cx - 180}" y1="{cy + 100}" x2="{cx - 250}" y2="{cy - 40}" stroke="{MUTED}" stroke-width="10" stroke-linecap="round"/>
 <circle cx="{cx - 250}" cy="{cy - 45}" r="16" fill="{YELLOW}"/>
 <line x1="{cx - 236}" y1="{cy - 40}" x2="{cx - 10}" y2="{cy - 5}" stroke="{YELLOW}" stroke-width="2" stroke-dasharray="8 6">
@@ -128,7 +128,7 @@ def axes() -> str:
 <rect x="{cx - 40}" y="{cy + 40}" width="80" height="40" rx="6" fill="{PANEL}" stroke="{LINE}" stroke-width="2"/>
 <text x="{cx}" y="{cy + 66}" class="m" font-size="12" text-anchor="middle">table</text>
 <path d="M{cx - 70} {cy + 30} A70 18 0 0 0 {cx + 70} {cy + 30}" fill="none" stroke="{GREEN}" stroke-width="3" marker-end="url(#ag)"/>
-<text x="{cx + 80}" y="{cy + 34}" fill="{GREEN}" font-size="14" class="b">M3 table yaw (Phase 1)</text>
+<text x="{cx + 80}" y="{cy + 34}" fill="{GREEN}" font-size="14" class="b">M3 table yaw (Phase 5)</text>
 <path d="M{cx - 30} {cy + 40} L{cx - 30} {cy - 60} M{cx + 30} {cy + 40} L{cx + 30} {cy - 60}" stroke="{MUTED}" stroke-width="6"/>
 <g>
  <animateTransform attributeName="transform" type="rotate" values="-20 {cx} {cy - 30};20 {cx} {cy - 30};-20 {cx} {cy - 30}" dur="6s" repeatCount="indefinite"/>
@@ -137,8 +137,8 @@ def axes() -> str:
  <line x1="{cx}" y1="{cy - 30}" x2="{cx}" y2="{cy - 52}" stroke="{BG}" stroke-width="3">
   <animateTransform attributeName="transform" type="rotate" from="0 {cx} {cy - 30}" to="360 {cx} {cy - 30}" dur="4s" repeatCount="indefinite"/></line>
 </g>
-<text x="{cx + 40}" y="{cy - 80}" fill="{PURPLE}" font-size="14" class="b">M2 tilt (Phase 3)</text>
-<text x="{cx + 40}" y="{cy - 60}" fill="{ORANGE}" font-size="14" class="b">M1 spin (Phase 4)</text>
+<text x="{cx + 40}" y="{cy - 80}" fill="{PURPLE}" font-size="14" class="b">M2 tilt (Phase 8)</text>
+<text x="{cx + 40}" y="{cy - 60}" fill="{ORANGE}" font-size="14" class="b">M1 spin (Phase 9)</text>
 <line x1="{cx + 330}" y1="{cy - 30}" x2="{cx + 24}" y2="{cy - 30}" stroke="{BLUE}" stroke-width="2" stroke-dasharray="8 6">
  <animate attributeName="stroke-dashoffset" from="0" to="28" dur="0.8s" repeatCount="indefinite"/></line>
 <rect x="{cx + 330}" y="{cy - 52}" width="70" height="44" rx="6" fill="{PANEL}" stroke="{BLUE}" stroke-width="2"/>
@@ -203,37 +203,32 @@ def brdf() -> str:
 
 
 def phases() -> str:
-    import sys as _s
-    _s.path.insert(0, str(ROOT / "tools"))
-    from bom_check import PROPOSED_CAPS
-    cap = {k: f"${v:g}" for k, v in PROPOSED_CAPS.items()}
-    data = [("1", "In-plane BRDF", "M4 + M3 · camera", cap[1]), ("2", "Calibrated", "HDR · GGX · engine", cap[2]),
-            ("3", "Isotropic BRDF", "+ M2 tilt", cap[3]), ("4", "Anisotropic", "+ M1 spin · SVBRDF", cap[4]),
-            ("5", "Multispectral", "8 bands · polarizer", cap[5]), ("6", "3D photo scanner", "SfM · carving · PS", cap[6]),
-            ("7", "On-object looks", "SVBRDF maps on mesh", cap[7])]
-    w, gap, y = 154, 13, 60
-    b = f'<line x1="60" y1="{y + 60}" x2="1140" y2="{y + 60}" stroke="{LINE}" stroke-width="3"/>'
-    b += f'<circle cx="60" cy="{y + 60}" r="6" fill="{ORANGE}"><animate attributeName="cx" from="60" to="1140" dur="7s" repeatCount="indefinite"/></circle>'
-    for i, (n, t, sub, c) in enumerate(data):
-        x = 20 + i * (w + gap)
-        hot = i in (0, 5)
-        col = ORANGE if i == 0 else (BLUE if i == 5 else LINE)
-        b += f'<rect x="{x}" y="{y}" width="{w}" height="120" rx="12" fill="{PANEL}" stroke="{col}" stroke-width="2">'
-        if hot:
-            b += '<animate attributeName="stroke-opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>'
-        b += "</rect>"
-        b += f'<text x="{x + 12}" y="{y + 32}" fill="{col if hot else MUTED}" font-size="13" class="b">PHASE {n}</text>'
-        b += f'<text x="{x + 12}" y="{y + 58}" class="t b" font-size="14">{t}</text>'
-        b += f'<text x="{x + 12}" y="{y + 80}" class="m" font-size="12">{sub}</text>'
-        b += f'<text x="{x + 12}" y="{y + 104}" fill="{GREEN}" font-size="13">cap {c}</text>'
-    b += '<text x="24" y="36" class="t b" font-size="18">Build once, extend each phase</text>'
-    return svg(1200, 210, b)
+    import yaml
+    data = yaml.safe_load((ROOT / ".github" / "phases.yml").read_text(encoding="utf-8"))["phases"]
+    group = lambda n: LINE if n <= 3 else ORANGE if n <= 10 else BLUE if n <= 13 else GREEN
+    per_row, w, h, gx, gy, x0, y0 = 6, 182, 76, 14, 14, 24, 56
+    b = '<text x="24" y="36" class="t b" font-size="18">17 small phases · each one works on its own</text>'
+    for i, (name, col) in enumerate((("setup", LINE), ("measure", ORANGE), ("3D scan", BLUE), ("app + release", GREEN))):
+        b += f'<rect x="{700 + i * 120}" y="24" width="12" height="12" rx="2" fill="{col}"/><text x="{718 + i * 120}" y="35" class="m" font-size="12">{name}</text>'
+    for i, p in enumerate(data):
+        n = int(p["id"][1:])
+        x, y = x0 + (i % per_row) * (w + gx), y0 + (i // per_row) * (h + gy)
+        col = group(n)
+        b += f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{PANEL}" stroke="{col}" stroke-width="2" opacity="0">'
+        b += f'<animate attributeName="opacity" from="0" to="1" begin="{i * 0.12:.2f}s" dur="0.4s" fill="freeze"/></rect>'
+        b += f'<text x="{x + 12}" y="{y + 22}" fill="{col if col != LINE else MUTED}" font-size="12" class="b">{n:02d}</text>'
+        words, lines = p["title"].split(), [""]
+        for wd in words:
+            lines[-1:] = [f"{lines[-1]} {wd}".strip()] if len(f"{lines[-1]} {wd}") <= 23 else [lines[-1], wd]
+        for k, ln in enumerate(lines[:2]):
+            b += f'<text x="{x + 12}" y="{y + 42 + 16 * k}" class="t" font-size="13">{ln}</text>'
+    return svg(1200, y0 + 3 * (h + gy) + 6, b)
 
 
 def scanner() -> str:
     """Fixed camera, object on the tilted platter spinning (M1), elevation stepping (M2), view sphere filling in."""
     cx, cy = 330, 230
-    b = '<text x="40" y="44" class="t b" font-size="20">3D photo scanner (Phase 6)</text>'
+    b = '<text x="40" y="44" class="t b" font-size="20">3D photo scanner (Phases 11–12)</text>'
     b += f'<text x="40" y="70" class="m" font-size="13">camera fixed · M1 spins the object · M2 tilts it · poses known from the axes [R1][S9]</text>'
     # platter + object, tilt animation
     b += f'''<g>

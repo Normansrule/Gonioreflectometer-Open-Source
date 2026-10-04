@@ -76,7 +76,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
     <div><small>φi</small><span id="pi">–</span></div><div><small>|φr − φi|</small><span id="dp">–</span></div>
    </div>
    <div class="status" id="status">–</div>
-   <p class="sub" style="margin-top:10px;font-size:13px">Phase 1 specular: M3 = M4 / 2 (M4 ≤ 180°). Light cannot pass the camera (keep-out 30 mm + 5° buffer).</p>
+   <p class="sub" style="margin-top:10px;font-size:13px">Specular: M3 = M4 / 2 (M4 ≤ 180°). Keep-out 30 mm + 5° from the camera.</p>
   </div>
  </div>
 </section>
@@ -99,7 +99,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="scanner">
  <h2>3D photo scanner</h2>
- <p class="sub">Phase 6. Camera fixed at 650 mm; M1 spins and M2 tilts the object, so every view's pose is known [S9]. Drag to orbit the view sphere.</p>
+ <p class="sub">Phases 11–12. Camera fixed at 650 mm; M1 spins and M2 tilts the object, so every pose is known [S9]. Drag to orbit.</p>
  <div class="grid">
   <div class="card"><canvas id="sphere" width="900" height="560" aria-label="View sphere of the scan plan"></canvas></div>
   <div class="card">
@@ -122,7 +122,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="equations" class="eq">
  <h2>Equations</h2>
- <p class="sub">CS348b Lecture 10 (Hanrahan) [R2] and the device paper [R1]. Full list with notes: <code>docs/theory.md</code>.</p>
+ <p class="sub">CS348b Lecture 10 (Hanrahan) [R2] and the device paper [R1]. Notes: <code>phases/00-plan/research/theory.md</code>.</p>
  <h3>BRDF and reflection equation</h3>
  $$f_r(\omega_i\to\omega_r)\equiv\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\quad[\mathrm{sr}^{-1}]\qquad L_r(x,\omega_r)=\int_{H^2}f_r(x,\omega_i\to\omega_r)L_i(x,\omega_i)\cos\theta_i\,d\omega_i$$
  <h3>Reciprocity, isotropy, energy</h3>
@@ -143,8 +143,8 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="build">
  <h2>Build plan</h2>
- <p class="sub">Each phase ends with a working instrument and reuses everything before it.</p>
- <img class="full" src="assets/phases.svg" alt="Six build phases">
+ <p class="sub">17 small phases. Each ends with something that works. Checklists: <code>phases/NN/README.md</code>.</p>
+ <img class="full" src="assets/phases.svg" alt="17 build phases">
  <p></p>
  <img class="full" src="assets/architecture.svg" alt="Control architecture: laptop, FluidNC E4, Pico hub, camera">
  <p></p>
@@ -153,7 +153,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="budget">
  <h2>Budget</h2>
- <p class="sub">Cheapest parts by default; prices approximate (checked 2026-10-04). Source: <code>bom/master_bom.csv</code>.</p>
+ <p class="sub">Cheapest parts. Prices checked 2026-10-04. Source: <code>phases/*/bom/bom.csv</code>.</p>
  <img class="full" src="assets/budget.svg" alt="Budget per phase">
 </section>
 
@@ -241,8 +241,8 @@ function line(a, b, col, w = 2, dash = []) { const A = P(a), B = P(b); g2.stroke
 function poly(pts, fill, stroke) { g2.beginPath(); pts.map(P).forEach((q, i) => i ? g2.lineTo(q[0], q[1]) : g2.moveTo(q[0], q[1]));
   g2.closePath(); if (fill) { g2.fillStyle = fill; g2.fill(); } if (stroke) { g2.strokeStyle = stroke; g2.lineWidth = 2; g2.stroke(); } }
 function dotp(v, r, col) { const q = P(v); g2.fillStyle = col; g2.beginPath(); g2.arc(q[0], q[1], r, 0, 7); g2.fill(); }
-let phase = 1;
-function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 3 ? +m2.value : 0, m1: phase >= 4 ? +m1.value : 0}; }
+let phase = 6;
+function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 8 ? +m2.value : 0, m1: phase >= 9 ? +m1.value : 0}; }
 function draw() {
   const p = pose(), st = state(p);
   g2.clearRect(0, 0, cv.width, cv.height);
@@ -283,9 +283,9 @@ const ids = ["m4", "m3", "m2", "m1"];
 ids.forEach(id => { const el = document.getElementById(id); const out = el.nextElementSibling;
   const upd = () => { out.textContent = (+el.value).toFixed(1) + "°"; draw(); }; el.addEventListener("input", upd); out.textContent = el.value + "°"; });
 const ph = document.getElementById("phases");
-[1, 3, 4].forEach(k => { const b = document.createElement("button"); b.textContent = `Phase ${k}${k === 1 ? " (M4+M3)" : k === 3 ? " +M2" : " +M1"}`;
+[6, 8, 9].forEach(k => { const b = document.createElement("button"); b.textContent = `Phase ${k}${k === 6 ? " (M4+M3)" : k === 8 ? " +M2" : " +M1"}`;
   b.onclick = () => { phase = k; [...ph.children].forEach(x => x.classList.toggle("on", x === b));
-    m2.disabled = phase < 3; m1.disabled = phase < 4; draw(); }; ph.appendChild(b); });
+    m2.disabled = phase < 8; m1.disabled = phase < 9; draw(); }; ph.appendChild(b); });
 ph.children[0].classList.add("on"); m2.disabled = true; m1.disabled = true;
 
 // ---------- BRDF explorer ----------

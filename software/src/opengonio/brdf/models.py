@@ -1,4 +1,4 @@
-"""Analytic BRDF models used for fitting (Phase 2+).
+"""Analytic BRDF models used for fitting (phase 7+).
 
 Notation follows Hanrahan, CS348b Lecture 10 [R2]:
   f_r(w_i -> w_r) = dL_r / dE_i  [1/sr]

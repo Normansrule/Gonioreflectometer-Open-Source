@@ -21,7 +21,7 @@ from opengonio.scan.plan import PlanError, check_object, rings_plan
 
 @pytest.fixture
 def cfg():
-    return load_config().with_phase(5)
+    return load_config().with_phase(10)
 
 
 def test_plan_has_144_views_and_needs_m1_m2(cfg):
@@ -29,7 +29,7 @@ def test_plan_has_144_views_and_needs_m1_m2(cfg):
     assert len(plan) == 144 and len({sp.name for sp in plan}) == 144
     assert all(cfg.axes[k].in_range(v) for sp in plan for k, v in sp.pose.items())
     with pytest.raises(PlanError):
-        rings_plan(cfg.with_phase(3))
+        rings_plan(cfg.with_phase(8))
 
 
 @pytest.mark.parametrize("elev", [0, 20, 40, 60, 80])

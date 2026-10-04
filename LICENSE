@@ -1,13 +1,13 @@
 Gonioreflectometer-Open-Source (OpenGonio) is licensed in three parts:
 
-  Hardware design files (hardware/, electronics/, bom/, Onshape document)
+  Hardware (phases/*/3d, phases/*/bom, phases/*/design netlists and drill maps, Onshape document)
       CERN-OHL-S-2.0                 LICENSES/CERN-OHL-S-2.0.txt
-  Software, firmware configuration and tools (software/, firmware/, tools/, scripts/)
+  Software, firmware and tools (software/, firmware/, tools/, scripts/)
       GPL-3.0-or-later               LICENSES/GPL-3.0-only.txt (GPL v3 text)
-  Documentation, figures and data (docs/, data/, *.md)
+  Documentation and figures (docs/, *.md)
       CC-BY-SA-4.0                   LICENSES/CC-BY-SA-4.0.txt
 
-Vendor CAD is not included; it is linked from bom/master_bom.csv under its owners' terms.
-Licence texts from SPDX license-list-data (see REFERENCES.md, R71).
+Vendor CAD is not included; each BOM links it under its owner's terms.
+Licence texts from SPDX license-list-data (REFERENCES.md, R71).
 
 Copyright (c) 2026 Aleksander Norman and contributors.

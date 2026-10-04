@@ -1,0 +1,280 @@
+# Single source for phases. `python tools/roadmap.py` writes phases/*/README.md and the README table;
+# `--github --repo OWNER/NAME` creates one milestone per phase and one checklist issue per step.
+phases:
+  - id: P00
+    folder: 00-plan
+    title: Plan
+    image: architecture
+    goal: Agree the design and budget before buying anything.
+    weeks: 1
+    steps:
+      - id: P00.1
+        title: Check the budget
+        tasks: ["Mark parts you already own (column Own = Y) in each phases/*/bom/bom.csv", "python tools/bom_check.py --strict"]
+        done: Total ≤ $500.
+      - id: P00.2
+        title: Set up computer-aided design (CAD)
+        tasks: ["Create the Onshape document (design/onshape.md)", "Print the tolerance coupon, set #clear", "Link the Onshape document in README"]
+        done: Onshape globals match design/architecture.md.
+
+  - id: P01
+    folder: 01-power
+    title: Power box
+    image: power-flow
+    goal: One wall plug gives safe, fused 24 V with an e-stop.
+    weeks: 1
+    steps:
+      - id: P01.1
+        title: Buy and print
+        tasks: ["Order bom/bom.csv", "Print box and lid (3d/parts.md)"]
+        done: All parts on the bench.
+      - id: P01.2
+        title: Build
+        tasks: ["Solder the protection board (design/netlist.md)", "Wire 18 AWG, heat-shrink every joint"]
+        done: Box closed, labels on.
+      - id: P01.3
+        title: Test
+        tasks: ["Run T1–T10, fill test/log.csv"]
+        done: All tests pass.
+    safety: Mains stays inside the adapter. Plug in with the rocker off.
+
+  - id: P02
+    folder: 02-controller
+    title: Controller and buttons
+    goal: The laptop and the buttons can talk to the machine.
+    weeks: 1
+    steps:
+      - id: P02.1
+        title: Flash boards
+        tasks: ["FluidNC on the E4 (design/firmware.md)", "MicroPython + hub on the Pico"]
+        done: "`?` returns status; Pico answers PING."
+      - id: P02.2
+        title: Wire and box
+        tasks: ["Print case and button panel", "Wire buttons, home flags, J4 (design/wiring.md)"]
+        done: Every button prints the right BTN line.
+      - id: P02.3
+        title: Test links
+        tasks: ["USB, WiFi and Bluetooth", "Run C1–C8, fill test/log.csv"]
+        done: All tests pass.
+    safety: Never plug or unplug motors with 24 V on.
+
+  - id: P03
+    folder: 03-frame
+    title: Frame
+    image: axes
+    goal: A flat, level base with every future hole already drilled.
+    weeks: 1
+    steps:
+      - id: P03.1
+        title: Cut and drill
+        tasks: ["Cut 600 × 600 plywood", "Drill the full map (design/drill-map.md)"]
+        done: All holes match the map ±0.5 mm.
+      - id: P03.2
+        title: Assemble
+        tasks: ["Tee nuts, feet, level the base", "Camera outrigger, post and scale marks"]
+        done: Base level; ring holes concentric with the centre ±0.5 mm.
+
+  - id: P04
+    folder: 04-light-arm
+    title: Light arm moves (M4)
+    goal: The light circles the sample and comes back to the same spot.
+    weeks: 1
+    steps:
+      - id: P04.1
+        title: Build the ring drive
+        tasks: ["Measure the lazy Susan, model plates and belt rim", "Belt, idlers, motor", "Home flag at 20°, over-travel switch beyond it", "machine.yaml: installed_phase 4"]
+        done: Arm turns 20–340° by hand-commanded moves.
+      - id: P04.2
+        title: Tune
+        tasks: ["Set gear_ratio from the measured rim", "opengonio home; 20 return moves"]
+        done: Returns within 0.1°.
+
+  - id: P05
+    folder: 05-table
+    title: Table turns (M3)
+    goal: The sample turns to any angle and comes back to the same spot.
+    weeks: 1
+    steps:
+      - id: P05.1
+        title: Build
+        tasks: ["Centre post with two 608 bearings", "100T pulley, belt, motor", "Home flag at −180°, swatch clamp", "machine.yaml: installed_phase 5"]
+        done: Table turns ±180°.
+      - id: P05.2
+        title: Tune
+        tasks: ["20 return moves"]
+        done: Returns within 0.1°.
+
+  - id: P06
+    folder: 06-camera-light
+    title: First measurement
+    image: brdf-lobe
+    goal: Camera and light see a mirror's shine at the right angle.
+    weeks: 1
+    steps:
+      - id: P06.1
+        title: Mount camera and light
+        tasks: ["Camera at 350 mm, 16 mm lens, f/8 stop", "Lamp on the arm, NLDD driver on E4 HE0", "Lock exposure, gain, white balance", "machine.yaml: installed_phase 6"]
+        done: Centre of the table lands at image centre ±0.5 mm.
+      - id: P06.2
+        title: Mirror test
+        tasks: ["opengonio plan mirror --theta 20, 40, 60", "Record peak positions"]
+        done: Peak within 0.5° of M3 = M4 / 2.
+      - id: P06.3
+        title: First curves
+        tasks: ["In-plane scan of paper and plastic"]
+        done: Two reflectance curves saved.
+    safety: Don't stare into the lamp.
+
+  - id: P07
+    folder: 07-calibrate
+    title: Calibrate → game material
+    goal: A measured swatch looks right in Unreal or Unity.
+    weeks: 3
+    steps:
+      - id: P07.1
+        title: Dark box and targets
+        tasks: ["Blackout drape, felt backdrop", "Print holders for PTFE, mirror, balls, ChArUco"]
+        done: Stray light < 0.1 % of the PTFE signal.
+      - id: P07.2
+        title: Calibrate
+        tasks: ["High dynamic range (HDR) from exposure brackets", "Angles from the mirror, light from the balls", "Brightness from the PTFE (polytetrafluoroethylene) white target"]
+        done: Angle error ≤ 0.2°; swapping light and camera changes values ≤ 5 %.
+      - id: P07.3
+        title: Fit and export
+        tasks: ["Fit Lambert + GGX", "Export Unreal / Unity material"]
+        done: Render matches a photo at 3 light angles.
+
+  - id: P08
+    folder: 08-tilt
+    title: Tilt (M2) → full reflectance (BRDF)
+    goal: The sample tilts, so the light can come from any direction.
+    weeks: 2
+    steps:
+      - id: P08.1
+        title: Build the tilt yoke
+        tasks: ["Yoke on the table flange", "Motor, home flag at −90°", "machine.yaml: installed_phase 8"]
+        done: Returns within 0.1°; sample centre unchanged.
+      - id: P08.2
+        title: Full scan
+        tasks: ["Plan angles, skip unsafe poses", "Unattended run"]
+        done: Full scan finishes alone with no collisions.
+
+  - id: P09
+    folder: 09-spin
+    title: Spin (M1) → brushed metal and textures
+    goal: The sample spins, so direction-dependent shine and textures are measured.
+    weeks: 2
+    steps:
+      - id: P09.1
+        title: Build the spin platter
+        tasks: ["Platter on the yoke, hub takes scan risers", "Home flag on TH0", "machine.yaml: installed_phase 9"]
+        done: Returns within 0.1°.
+      - id: P09.2
+        title: Measure
+        tasks: ["Brushed metal at 8 spin angles", "Per-pixel fit of a textured swatch"]
+        done: Highlight follows M1; brushing direction within 5°.
+
+  - id: P10
+    folder: 10-color
+    title: Colour bands and polarizers
+    goal: Measure 8 colour bands and separate shine from colour.
+    weeks: 2
+    steps:
+      - id: P10.1
+        title: LED bank
+        tasks: ["8 LEDs on a 40° mast on the light arm", "ULN2803A from Pico GP8–15", "Mast in the collision model", "machine.yaml: installed_phase 10"]
+        done: Each band switches from laptop and buttons.
+      - id: P10.2
+        title: Polarizers and calibration
+        tasks: ["Film on the lamp, disc on the lens", "Per-band PTFE reference"]
+        done: Crossed polarizers cut the mirror shine ≥ 20×; bands repeat within 3 %.
+
+  - id: P11
+    folder: 11-scan-capture
+    title: "3D scan: capture"
+    image: scanner
+    goal: Photograph an object from 144 known positions.
+    weeks: 2
+    steps:
+      - id: P11.1
+        title: Scan setup
+        tasks: ["Print risers, nest, 650 mm camera stop", "Slide camera to 650 mm, refocus"]
+        done: Putty holds a 100 g object at 80° for 3 turns.
+      - id: P11.2
+        title: Calibrate camera position
+        tasks: ["opengonio scan calibrate", "Set scan.calibration in machine.yaml"]
+        done: Fit ≤ 0.2° and ≤ 0.3 mm (test S1–S2).
+      - id: P11.3
+        title: Capture
+        tasks: ["opengonio scan run --background", "opengonio scan run"]
+        done: 144 sharp photos + photometric-stereo set, unattended.
+
+  - id: P12
+    folder: 12-scan-mesh
+    title: "3D scan: mesh"
+    goal: Turn the photos into an accurate 3D model.
+    weeks: 2
+    steps:
+      - id: P12.1
+        title: Quick preview
+        tasks: ["Silhouettes from the background pass", "Visual hull PLY"]
+        done: 40 mm cube hull within ±1 mm.
+      - id: P12.2
+        title: Full mesh
+        tasks: ["bash run_colmap.sh (or Meshroom without CUDA)", "Add photometric-stereo normals"]
+        done: Cube 40.0 ± 0.5 mm; model car opens in Blender.
+
+  - id: P13
+    folder: 13-object-material
+    title: Material on the 3D model
+    goal: The scanned object looks real in a game engine.
+    weeks: 4
+    steps:
+      - id: P13.1
+        title: Fit textures
+        tasks: ["UV-unwrap the mesh", "Fit colour, roughness, metal, normal per texel"]
+        done: Held-out photos reproduced within 10 %.
+      - id: P13.2
+        title: Export
+        tasks: ["glTF with physically based rendering (PBR) textures", "Check in Unreal and Unity"]
+        done: Render matches a gantry photo.
+
+  - id: P14
+    folder: 14-laptop-app
+    title: Laptop app
+    goal: Every workflow runs from one app or the buttons — no terminal.
+    weeks: 3
+    steps:
+      - id: P14.1
+        title: Control user interface (UI)
+        tasks: ["Connect USB / WiFi / Bluetooth", "Live camera, jog, home, light"]
+        done: Phase 6 test runs from the browser.
+      - id: P14.2
+        title: One-button workflows
+        tasks: ["Presets: swatch, colour, 3D scan", "Resume after STOP or e-stop"]
+        done: Each preset runs from START.
+
+  - id: P15
+    folder: 15-release
+    title: Release
+    goal: Public, certified open hardware.
+    weeks: 2
+    steps:
+      - id: P15.1
+        title: Finish docs
+        tasks: ["STEP + 3MF for every printed part", "Photo or GIF per phase"]
+        done: A new builder finishes Phase 6 from the docs alone.
+      - id: P15.2
+        title: Publish
+        tasks: ["Make repo and Onshape public", "Apply for Open Source Hardware Association (OSHWA) certification", "Tag v1.0"]
+        done: OSHWA ID in README.
+
+  - id: P16
+    folder: 16-upgrades
+    title: Upgrades (optional)
+    goal: Research-grade extras that keep the cheap build working.
+    weeks: 0
+    steps:
+      - {id: P16.1, title: Adaptive sampling, tasks: ["Measure where the BRDF changes most [R15]"], done: "Same fit with ≥ 3× fewer photos."}
+      - {id: P16.2, title: Space carving, tasks: ["Hull + photo-consistency [S7]"], done: "Concave test bowl recovered."}
+      - {id: P16.3, title: Compare with MERL / RGL data, tasks: ["Measure a shared material [R13][R16]"], done: "Comparison published."}

@@ -103,7 +103,7 @@ Note: [R1] (Ansari-Asl et al. 2024) covers flat samples only; the scanner phase 
 | **R52** | Arducam, minimum exposure time — [link](https://docs.arducam.com/UVC-Camera/Adjust-the-minimum-exposure-time/) | Exposure units |
 | **R53** | DirectShow exposure table — [link](https://www.principiaprogramatica.com/2017/06/11/setting-manual-exposure-in-opencv/) | Windows exposure values |
 | **R54** | SpellSight PR (V4L2 control names) — [link](https://github.com/mtaylor45/-SpellSight/pull/14) | Control names by kernel |
-| **R70** | GitHub CLI Linux install — [link](https://github.com/cli/cli/blob/trunk/docs/install_linux.md) | PUBLISH.md commands |
+| **R70** | GitHub CLI Linux install — [link](https://github.com/cli/cli/blob/trunk/docs/install_linux.md) | README publish commands |
 | **R73** | KaTeX — [katex.org](https://katex.org/) (loaded from cdn.jsdelivr.net) | Equations on the Pages site |
 | **R81** | FluidNC web installer — [installer.fluidnc.com](https://installer.fluidnc.com/); install walkthrough — [Hackaday.io log](https://hackaday.io/project/194302-convert-a-mach3-cnc-controller-to-grbl-or-fluidnc/log/226954-installing-fluidnc) | Flashing steps |
 

@@ -3,7 +3,7 @@
 #
 # Units: steps_per_mm is STEPS PER DEGREE (FluidNC treats A/B/C as a universal unit [R20];
 # we use the same trick on X/Y/Z). 3200 microsteps/rev x gear ratio / 360.
-# Axis map: X = M4 light arm (ring), Y = M3 table yaw, Z = M2 tilt (Phase 3), A = M1 spin (Phase 4)
+# Axis map: X = M4 light arm (ring), Y = M3 table yaw, Z = M2 tilt (phase 8), A = M1 spin (phase 9)
 # Pins from the FYSETC E4 README [C1]; TMC addresses from community E4 configs [R33][R35].
 # VERIFY every pin against the E4 schematic before power-up. Key names: FluidNC docs [R20][R21][R26][R27].
 
@@ -104,7 +104,7 @@ axes:
         direction_pin: gpio.32
         disable_pin: NO_PIN
 
-  z:                        # M2 tilt (Phase 3): 5:1, range -90..90 deg
+  z:                        # M2 tilt (phase 8): 5:1, range -90..90 deg
     steps_per_mm: 44.444
     max_rate_mm_per_min: 900
     acceleration_mm_per_sec2: 40
@@ -142,7 +142,7 @@ axes:
         direction_pin: gpio.12
         disable_pin: NO_PIN
 
-  a:                        # M1 spin (Phase 4): 4:1, range -180..180 deg (E0 driver)
+  a:                        # M1 spin (phase 9): 4:1, range -180..180 deg (E0 driver)
     steps_per_mm: 35.556
     max_rate_mm_per_min: 1800
     acceleration_mm_per_sec2: 60
@@ -185,7 +185,7 @@ control:
 
 user_outputs:
   digital0_pin: gpio.2               # E0 heater MOSFET -> white COB (M62/M63 P0). GPIO2 is a boot strap pin: the COB may blink at reset
-  digital1_pin: gpio.4               # bed MOSFET -> multispectral driver (Phase 5, P1)
+  digital1_pin: gpio.4               # bed MOSFET -> multispectral driver (phase 10, P1)
   digital2_pin: gpio.13              # fan MOSFET (optional fan, P2)
 
 start:

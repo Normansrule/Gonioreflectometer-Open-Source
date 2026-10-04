@@ -1,7 +1,7 @@
 """opengonio command line.
 
     opengonio check-pose M4=40 M3=20         offline: BRDF angles + collision check
-    opengonio plan inplane --step 10         offline: list Phase 1 poses
+    opengonio plan inplane --step 10         offline: list in-plane poses
     opengonio --dry-run move M4=60 M3=30     print the G-code instead of sending it
     opengonio home | move ... | light on|off | sleep | wake | status
     opengonio panel                          run the button panel (Pico hub) loop
@@ -40,7 +40,7 @@ def _scan_offline(cfg, a) -> int:
     from .scan.colmap import write_model
     from .scan.geometry import intrinsics
     from .scan.plan import check_object, rings_plan
-    cfg4 = cfg.with_phase(max(cfg.installed_phase, 4))
+    cfg4 = cfg.with_phase(max(cfg.installed_phase, 10))
     if a.action == "plan":
         check_object(cfg4)
         plan = rings_plan(cfg4)
@@ -76,7 +76,7 @@ def main(argv: list[str] | None = None) -> int:
     mv = sub.add_parser("move"); mv.add_argument("pose", nargs="+")
     li = sub.add_parser("light"); li.add_argument("state", choices=["on", "off"]); li.add_argument("--name", default="white")
     sub.add_parser("panel")
-    sc = sub.add_parser("scan", help="Phase 6 photo scanner")
+    sc = sub.add_parser("scan", help="3D photo scanner (phases 11-12)")
     sc.add_argument("action", choices=["plan", "export-colmap", "demo", "run", "calibrate", "sync-ids"])
     sc.add_argument("--db", default="database.db")
     sc.add_argument("--model", default="sparse_known")

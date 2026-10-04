@@ -7,7 +7,7 @@ Depth of field (thin lens, m small):  DOF ~ 2 N c (1 + m) / m^2   (c = allowed b
   BRDF mode: c = 2 pixels (texture detail on a flat swatch).
   Scan mode: c = diffraction blur 1.03 lambda N (geometric blur never dominates).
 Sensor size = camera width/height x pixel pitch from software/config/machine.yaml.
-Writes docs/generated/optics.md.
+Writes phases/06-camera-light/design/optics.md.
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "docs" / "generated" / "optics.md"
+OUT = ROOT / "phases" / "06-camera-light" / "design" / "optics.md"
 CFG = yaml.safe_load((ROOT / "software" / "config" / "machine.yaml").read_text())
 CAM = CFG["camera"]
 PIXEL_UM = float(CAM["pixel_um"])

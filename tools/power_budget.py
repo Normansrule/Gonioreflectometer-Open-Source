@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Final-machine power budget from data/power_loads.yaml -> docs/generated/power_budget.md.
+"""Final-machine power budget: phases/01-power/design/power_loads.yaml -> power_budget.md beside it.
 
     python tools/power_budget.py           # print + write
     python tools/power_budget.py --check   # exit 1 if headroom < required
@@ -15,8 +15,8 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-INPUT = ROOT / "data" / "power_loads.yaml"
-OUTPUT = ROOT / "docs" / "generated" / "power_budget.md"
+INPUT = ROOT / "phases" / "01-power" / "design" / "power_loads.yaml"
+OUTPUT = INPUT.with_name("power_budget.md")
 MODES = ("typical", "peak", "idle")
 
 

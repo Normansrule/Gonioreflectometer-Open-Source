@@ -1,0 +1,5 @@
+"Test","Date","Measured","Pass criterion","Pass/Fail","Notes"
+"S4 Visual hull, 40 mm cube (faces at M1 = 0/90 deg, 0.25 mm voxels)","","","Edges 40 +/- 1 mm (plane fits)","",""
+"S5 COLMAP mesh, 40 mm cube","","","Edges 40.0 +/- 0.5 mm","",""
+"S6 Photometric stereo, matte sphere","","","Median normal error <= 5 deg","",""
+"S7 1:43 car","","","Opens in Blender without repair","",""
