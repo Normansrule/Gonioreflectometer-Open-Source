@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # Private repo + push + one milestone per phase, one issue per step. Safe to re-run.
+# Optional: OWNER=<github user>  REMOTE=<git URL, e.g. an SSH host alias>  bash scripts/publish.sh
 # SPDX-License-Identifier: GPL-3.0-or-later
 set -euo pipefail
+gh auth status >/dev/null || { echo "Run: gh auth login --web --scopes workflow"; exit 1; }
 cd "$(dirname "$0")/.."
 NAME=Gonioreflectometer-Open-Source
-OWNER=$(gh api user --jq .login)
+OWNER=${OWNER:-$(gh api user --jq .login)}
+REMOTE=${REMOTE:-https://github.com/$OWNER/$NAME.git}
 
 [ -d .git ] || git init -q
 git config user.name  >/dev/null || git config user.name  "$(gh api user --jq '.name // .login')"
@@ -18,7 +21,7 @@ if ! gh repo view "$OWNER/$NAME" >/dev/null 2>&1; then
     --description "OpenGonio: low-cost open-source multispectral gonioreflectometer (laptop-controlled)"
 fi
 git remote remove origin 2>/dev/null || true
-git remote add origin "https://github.com/$OWNER/$NAME.git"
+git remote add origin "$REMOTE"
 git push -u origin main
 
 python3 -m venv .venv

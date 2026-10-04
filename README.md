@@ -55,18 +55,30 @@ opengonio scan demo --out demo          # synthetic 3D scan
 ## Publish as a private GitHub repo (fresh Ubuntu)
 
 ```bash
+# 1. Tools
 sudo apt update && sudo apt install -y git python3-venv unzip curl
 sudo mkdir -p -m 755 /etc/apt/keyrings
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
 sudo apt update && sudo apt install -y gh
+
+# 2. Log in (browser). workflow scope is needed to push .github/workflows
 gh auth login --hostname github.com --git-protocol https --web --scopes workflow
 gh auth setup-git
-mkdir -p ~/projects && unzip ~/Downloads/Gonioreflectometer-Open-Source.zip -d ~/projects
-cd ~/projects/Gonioreflectometer-Open-Source && bash scripts/publish.sh
+
+# 3. Unzip (WSL: the zip is in /mnt/c/Users/<you>/Downloads)
+mkdir -p ~/projects && cd ~/projects
+unzip -q ~/Downloads/Gonioreflectometer-Open-Source.zip
+cd Gonioreflectometer-Open-Source
+
+# 4. Private repo + push + milestones + issues
+bash scripts/publish.sh
+
+# 5. Check
+gh repo view --web
 ```
 
-`publish.sh` creates the private repo, pushes, and adds the milestones and issues. Re-run after edits [R70].
+Second GitHub account over SSH: `OWNER=<user> REMOTE=git@<ssh-host-alias>:<user>/Gonioreflectometer-Open-Source.git bash scripts/publish.sh`. Re-run `publish.sh` after edits [R70].
 
 ## Credits
 
