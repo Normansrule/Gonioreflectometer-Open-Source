@@ -72,39 +72,46 @@ def write_md(milestones: list[dict]) -> str:
     return "\n".join(out) + "\n"
 
 
-def gh(args: list[str], dry: bool, capture: bool = True) -> str:
+def gh(args: list[str], dry: bool, ok_codes: tuple[str, ...] = ()) -> str:
+    """Run `gh` (REST only, so it also works where GraphQL is blocked)."""
     if dry:
-        print("DRY:", " ".join(args[:6]), "...")
+        print("DRY: gh", " ".join(a if len(a) < 60 else a[:57] + "..." for a in args[:8]))
         return "[]"
-    res = subprocess.run(["gh", *args], check=True, text=True, capture_output=capture)
+    res = subprocess.run(["gh", *args], text=True, capture_output=True)
+    if res.returncode != 0:
+        if any(c in (res.stdout + res.stderr) for c in ok_codes):
+            return ""
+        raise RuntimeError(f"gh {' '.join(args[:3])} failed: {res.stderr.strip() or res.stdout.strip()}")
     return res.stdout
 
 
-def push_github(milestones: list[dict], repo: str | None, dry: bool) -> None:
-    r = ["--repo", repo] if repo else []
-    repo_path = repo or json.loads(gh(["repo", "view", "--json", "nameWithOwner"], dry) or "{}").get("nameWithOwner", "OWNER/REPO")
+def push_github(milestones: list[dict], repo: str, dry: bool) -> None:
+    base = f"repos/{repo}"
     labels = sorted({l for ms in milestones for it in ms["issues"] for l in it.get("labels", [])})
     for l in labels:
-        colour = LABEL_COLOURS.get(l, "ededed")
-        gh(["label", "create", l, "--color", colour, "--force", *r], dry)
-    existing_ms = {m["title"]: m["number"] for m in json.loads(gh(["api", f"repos/{repo_path}/milestones?state=all&per_page=100"], dry) or "[]")}
-    existing_issues = {i["title"] for i in json.loads(gh(["issue", "list", "--state", "all", "--limit", "500", "--json", "title", *r], dry) or "[]")}
-    start = date.today()
+        gh(["api", "-X", "POST", f"{base}/labels", "-f", f"name={l}", "-f", f"color={LABEL_COLOURS.get(l, 'ededed')}"],
+           dry, ok_codes=("already_exists", "422"))
+    ms_list = json.loads(gh(["api", f"{base}/milestones?state=all&per_page=100"], dry) or "[]")
+    numbers = {m["title"]: m["number"] for m in ms_list}
+    existing = {i["title"] for i in json.loads(gh(["api", "--paginate", f"{base}/issues?state=all&per_page=100"], dry) or "[]")}
+    due = date.today()
     for ms in milestones:
-        if ms["title"] not in existing_ms:
+        if ms["title"] not in numbers:
             fields = ["-f", f"title={ms['title']}", "-f", f"description={ms['goal']}"]
             if ms.get("due_weeks"):
-                start += timedelta(weeks=ms["due_weeks"])
-                fields += ["-f", f"due_on={start.isoformat()}T23:59:59Z"]
-            gh(["api", f"repos/{repo_path}/milestones", "-X", "POST", *fields], dry)
+                due += timedelta(weeks=ms["due_weeks"])
+                fields += ["-f", f"due_on={due.isoformat()}T23:59:59Z"]
+            out = gh(["api", "-X", "POST", f"{base}/milestones", *fields], dry)
+            numbers[ms["title"]] = json.loads(out)["number"] if out and out.strip().startswith("{") else 0
             print("milestone:", ms["title"])
         for it in ms["issues"]:
             title = issue_title(it)
-            if title in existing_issues:
+            if title in existing:
                 continue
-            args = ["issue", "create", "--title", title, "--body", issue_body(ms, it), "--milestone", ms["title"], *r]
+            args = ["api", "-X", "POST", f"{base}/issues", "-f", f"title={title}", "-f", f"body={issue_body(ms, it)}",
+                    "-F", f"milestone={numbers[ms['title']]}"]
             for l in it.get("labels", []):
-                args += ["--label", l]
+                args += ["-f", f"labels[]={l}"]
             gh(args, dry)
             print("  issue:", title)
 
@@ -113,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--write-md", action="store_true")
     ap.add_argument("--github", action="store_true")
-    ap.add_argument("--repo")
+    ap.add_argument("--repo", help="OWNER/NAME (required with --github)")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
     ms = load()
@@ -121,6 +128,8 @@ def main(argv: list[str] | None = None) -> int:
         ROADMAP.write_text(write_md(ms), encoding="utf-8")
         print(f"wrote {ROADMAP.name}: {len(ms)} milestones, {sum(len(m['issues']) for m in ms)} issues")
     if a.github:
+        if not a.repo:
+            ap.error("--github needs --repo OWNER/NAME")
         push_github(ms, a.repo, a.dry_run)
     if not (a.write_md or a.github):
         ap.print_help()
