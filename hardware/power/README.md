@@ -20,7 +20,7 @@ motion board only, and two status signals for the Pi.
 |---|---:|---:|---:|
 | Adapter DC output | 22.7 W (0.95 A) | 74.4 W (3.10 A) | 4.3 W |
 | Wall plug | 25.8 W | 82.2 W | 5.8 W |
-| Headroom on the 120 W adapter | | **61 %** (≥ 25 % required) | |
+| Headroom on the 120 W adapter | | **61 %** above peak (120 / 74.4 − 1; 38 % of capacity unused) — ≥ 25 % required | |
 
 ### Block diagram
 
@@ -31,7 +31,7 @@ flowchart LR
   J1 --> F1[F1 6.3 A T fuse] --> S1[S1 master rocker] --> Q1[Q1 IRF4905<br/>reverse polarity]
   Q1 --> BUS((+24 V bus<br/>TVS D2, C1 100 µF))
   BUS --> ES[S2 E-stop NC<br/>latching] --> J2[J2 XT30<br/>24 V MOTION]
-  BUS --> U1[U1 Pololu D42V55F5<br/>24 → 5 V 6 A] --> J3[J3 XT30<br/>5 V HOST]
+  BUS --> U1[U1 Pololu D42V55F5<br/>24 → 5 V, 5.5 A derated] --> J3[J3 XT30<br/>5 V HOST]
   J2 -. divider 100k/12k .-> J4[J4 JST-XH 4p<br/>PWR-SIG]
   U1 -. PG open drain .-> J4
   J2 --> SKR[Controller: SKR VIN<br/>motors, LED, fans]
@@ -45,7 +45,7 @@ flowchart LR
 | J1 | PJ-005B panel jack (2.5 mm pin) | centre / sleeve | +24 V in / GND | adapter cord | 5 A |
 | J2 | XT30U **female** | + / − | 24 V MOTION (after e-stop) / GND | 18 AWG | 5 A (fuse 6.3 A) |
 | J3 | XT30U **female** | + / − | 5 V HOST / GND | 18 AWG | 5.5 A |
-| J4 | JST-XH 4-pin header | 1 | MOTION_SENSE: 0 V or 2.57 V (24 V × 12k/112k, 1 k series) | 24 AWG | 3.3 V logic |
+| J4 | JST-XH 4-pin header | 1 | MOTION_SENSE: 0 V or 2.57 V (24 V × 12k/112k, 10 k series, BAT85 clamps) | 24 AWG | 3.3 V logic |
 | | | 2 | BUCK_PG: open drain, high = 5 V in regulation | | |
 | | | 3 | +3V3 from the Pi (pull-up supply only) | | < 1 mA |
 | | | 4 | GND | | |
@@ -71,8 +71,8 @@ Everything above is already counted in the power budget.
 ## 2. Bill of materials
 
 Source of truth: [`bom/modules/power.csv`](../../bom/modules/power.csv) (generated from
-`bom/master_bom.csv`). Module subtotal: **$127.77 spec / $115.69 budget / $106.39 with own
-stock** — 42 % / 39 % / 35 % of the $300 Phase 1 cap.
+`bom/master_bom.csv`). Module subtotal: **$128.07 spec / $115.99 budget / $106.39 with own
+stock** — 43 % / 39 % / 35 % of the $300 Phase 1 cap.
 
 | ID | Part | Qty | Unit (USD) | Supplier | STEP / model |
 |---|---|---:|---:|---|---|
@@ -86,11 +86,11 @@ stock** — 42 % / 39 % / 35 % of the $300 Phase 1 cap.
 | PWR-08 | P6KE30A TVS | 1 | 0.60 est. | Digi-Key | standard |
 | PWR-09 | Bulgin C1353ABNAB rocker (10 A DC) | 1 | 3.00 est. | [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) | Not confirmed — measure the snap-in cutout from its datasheet |
 | PWR-10 | IDEC YW1B-V4E01R e-stop | 1 | 9.96 | [TME](https://www.tme.com/us/en-us/details/yw1b-v4e01r/panel-mount-switches-standard-22mm/idec/) | Not confirmed. 22.3 mm hole, 40 mm head. [Datasheet](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/6163/D004450YWapem.pdf) |
-| PWR-11 | Resistors 100k, 12k, 1k, 100k | 1 set | 0.30 est. | Digi-Key | standard |
+| PWR-11 | Resistors 100k, 12k, 10k, 100k, 1k + 2 × BAT85 Schottky | 1 set | 0.60 est. | Digi-Key | standard |
 | PWR-12 | AMASS XT30U pairs (5) | 1 | 2.19 | [rcbattery](https://rcbattery.com/genuine-amass-xt30u-male-female-pair-plugs-5-pairs.html) | Community STEP (PCB version, no licence stated, link only): [realthunder](https://github.com/realthunder/Connectors_Amass.3dshapes) |
 | PWR-13 | 18 AWG silicone wire, red + black | 1 | 8.00 est. | any | — |
 | PWR-14 | Perfboard 50 × 70 mm | 1 | 1.00 est. | any | plate model |
-| PWR-15 | USB-C power plug pigtail | 1 | 3.00 est. | any | envelope only |
+| PWR-15 | USB-C power plug pigtail, **≥ 20 AWG, rated 5 A** (cheap 24–28 AWG pigtails overheat) | 1 | 3.00 est. | any | envelope only |
 | PWR-18 | 100 µF 50 V electrolytic | 1 | 0.40 est. | Digi-Key | standard |
 | PWR-16 | Printed enclosure (PETG, ~90 g) | 1 | 0 | print | this project |
 | PWR-17 | Plug-in wattmeter | — | borrow | — | optional |
@@ -106,9 +106,12 @@ stock** — 42 % / 39 % / 35 % of the $300 Phase 1 cap.
   but the 24 V curve could not be read on the check date, so **efficiency is a test item (T5), not
   an assumption.** D42V55F5 over D36V50F5: same price, ±3 % instead of ±4 %, 6 A, built-in
   reverse-voltage protection and a power-good pin. No 5.1 V version exists in this class; 5.0 V ±3 %
-  feeds the Pi through 25 cm of 18 AWG (≈ 25 mV drop at 3 A), which T4 verifies.
-- **E-stop.** Rated 8 A resistive / 4 A inductive at 24 V DC; worst-case current through it is about
-  2.5 A (four motors + light), so it switches the load directly — the simplest fail-safe.
+  feeds the Pi through 25 cm of 18 AWG (≈ 32 mV drop at 3 A, both conductors), which T4 verifies.
+  The D24V50F5 budget option has **no PG pin**: on that path tie J4 pin 2 high through R5 so
+  `rail_5v_good` always reads true (the software keeps working, the check is lost).
+- **E-stop.** Rated 8 A resistive / 4 A inductive at 24 V DC; the final machine's 24 V direct peak is
+  40.8 W ≈ 1.7 A (power budget), so it switches the load directly — the simplest fail-safe.
+  Confirm the 8 A / 4 A DC figures in the YW datasheet when you order.
 
 ---
 
@@ -186,8 +189,12 @@ wire strippers, insert tip for the iron.
      input side, **source** to the +24 V bus.
    - Zener: **cathode (band) to source**, anode to gate. 10 k from gate to GND.
    - P6KE30A: band to +24 V bus, other end to GND. 100 µF: + to bus, − to GND, close to the buck input.
-   - Divider: 100 k from the J2 + pin to node, 12 k node to GND, 1 k from node to J4 pin 1.
-   - 100 k pull-up from buck PG to J4 pin 3.
+   - Divider: 100 k (R2) from the J2 + pin to the SENSE node, 12 k (R3) from SENSE to GND,
+     10 k (R4) from SENSE to J4 pin 1. Clamp J4 pin 1 with two BAT85: one from pin 1 to J4 pin 3
+     (band toward pin 3), one from GND to pin 1 (band toward pin 1). Even with R2/R3 swapped the Pi pin
+     then sees ≤ 3.6 V and < 2 mA.
+   - R5 100 k: **one end on the buck PG pin, the other end on J4 pin 3** (a pull-up, not in series);
+     PG also wires straight to J4 pin 2.
 4. **Main path in 18 AWG:** J1 centre → F1 → S1 → Q1 drain. Q1 source → bus. Bus → e-stop NC terminal
    → J2 +. Bus → buck VIN. Buck VOUT → J3 +. All GNDs to one star point on the perfboard. Keep the
    e-stop leads long enough to lift the lid (service loop, 120 mm).
@@ -206,20 +213,22 @@ wire strippers, insert tip for the iron.
 
 The block diagram in §1 shows the flow; wire from this netlist (every connection appears once).
 
-| Net | Connects | Wire |
+| Net | Members (every pin on the net) | Wire |
 |---|---|---|
-| `VIN_RAW` | J1 centre pin → F1 terminal A | 18 AWG red |
-| `VIN_FUSED` | F1 terminal B → S1 common | 18 AWG red |
-| `VIN_SW` | S1 output → Q1 **drain** (middle leg) | 18 AWG red |
-| `BUS_24V` | Q1 **source** (right leg) → DZ1 cathode (band) → D2 cathode (band) → C1 + → U1 VIN → S2 terminal 1 | 18 AWG red |
-| `GATE` | Q1 **gate** (left leg) → DZ1 anode → R1 (10 k) | perfboard |
-| `MOTION_24V` | S2 terminal 2 (NC contact) → J2 + → R2 (100 k) | 18 AWG red |
-| `SENSE` | R2 → R3 (12 k) → R4 (1 k) | perfboard |
-| `SENSE_OUT` | R4 → J4 pin 1 | 24 AWG yellow |
-| `5V_HOST` | U1 VOUT → J3 + | 18 AWG orange |
-| `PG` | U1 PG → R5 (100 k) → J4 pin 2 | 24 AWG yellow |
-| `3V3_PI` | J4 pin 3 → R5 other end | 24 AWG yellow |
-| `GND` (star) | J1 sleeve, R1, R3, D2 anode, C1 −, U1 GND, J2 −, J3 −, J4 pin 4 | 18 AWG black (24 AWG for J4) |
+| `VIN_RAW` | J1 centre pin, F1 terminal A | 18 AWG red |
+| `VIN_FUSED` | F1 terminal B, S1 common | 18 AWG red |
+| `VIN_SW` | S1 output, Q1 drain (middle leg) | 18 AWG red |
+| `BUS_24V` | Q1 source (right leg), DZ1 cathode (band), D2 cathode (band), C1 +, U1 VIN, S2 terminal 1 | 18 AWG red |
+| `GATE` | Q1 gate (left leg), DZ1 anode, R1 pin 1 | perfboard |
+| `MOTION_24V` | S2 terminal 2 (NC contact), J2 +, R2 pin 1 | 18 AWG red |
+| `SENSE` | R2 pin 2, R3 pin 1, R4 pin 1 | perfboard |
+| `SENSE_OUT` | R4 pin 2, J4 pin 1, D3 anode, D4 cathode (band) | 24 AWG yellow |
+| `5V_HOST` | U1 VOUT, J3 + | 18 AWG orange |
+| `PG` | U1 PG, R5 pin 1, J4 pin 2 | 24 AWG yellow |
+| `3V3_PI` | J4 pin 3, R5 pin 2, D3 cathode (band) | 24 AWG yellow |
+| `GND` (star) | J1 sleeve, R1 pin 2, R3 pin 2, D2 anode, D4 anode, C1 −, U1 GND, J2 −, J3 −, J4 pin 4 | 18 AWG black (24 AWG for J4) |
+
+R1 10 k, R2 100 k, R3 12 k, R4 10 k, R5 100 k; D3/D4 BAT85 clamp the Pi input to the 3V3/GND rails.
 
 Not connected: U1 EN (internal pull-up keeps it on), U1 VRP.
 
@@ -232,7 +241,7 @@ if the first reads open and the second reads 0.5 V, Q1 is in backwards.
 
 | J4 pin | Signal | Pi physical pin | BCM | Pi config |
 |---|---|---|---|---|
-| 1 | MOTION_SENSE (0 / 2.57 V) | 11 | GPIO17 | input, no pull |
+| 1 | MOTION_SENSE (0 / 2.57 V, 10 k series, clamped) | 11 | GPIO17 | input, no pull |
 | 2 | BUCK_PG (open drain) | 13 | GPIO27 | input, pulled up on the power board |
 | 3 | +3V3 | 1 | 3V3 | — |
 | 4 | GND | 9 | GND | — |
@@ -247,7 +256,8 @@ Wire colours: red = +24 V, orange = 5 V, black = GND, yellow = signals.
 
 - `[idle_timeout] timeout: 300` → runs `OG_SLEEP` (light off, `M84` drivers off, controller fan off)
   even if no host script is running.
-- `OG_WAKE` turns the fan back on; steppers re-enable on the next move.
+- The controller fan is a Klipper `[controller_fan]`: it runs whenever any stepper is enabled and
+  stops 30 s after `M84`, so it follows sleep and wake on its own.
 - The SKR is powered **only** through J2, so pressing the e-stop drops the MCU and Klipper shuts down.
   After release: `FIRMWARE_RESTART`, then re-home. This is deliberate — motor position is unknown
   after power loss.
@@ -256,11 +266,12 @@ Wire colours: red = +24 V, orange = 5 V, black = GND, yellow = signals.
 [`docs/03-architecture-interfaces.md`](../../docs/03-architecture-interfaces.md#raspberry-pi-configtxt)):
 
 ```ini
-usb_max_current_enable=1          # 5 V comes from a non-PD source; tell the Pi it is good for 5 A
 dtoverlay=gpio-shutdown,gpio_pin=26,active_low=1,gpio_pull=up   # safe-shutdown button
 ```
 
-On a Pi 5 you can instead set `PSU_MAX_CURRENT=5000` with `sudo rpi-eeprom-config --edit`.
+Leave `usb_max_current_enable` **off**: nothing draws power from the Pi's USB ports (the SKR is on
+UART), and leaving the Pi 5's USB budget at its default keeps the 5 V rail well inside the buck's rating.
+The Pi 5 may note a non-PD supply at boot; that is expected.
 
 **Python** ([`software/src/opengantry/gantry/power.py`](../../software/src/opengantry/gantry/power.py)):
 
@@ -290,14 +301,14 @@ module is connected. Tools: multimeter (10 A range), the Pi, optional plug-in wa
 | T1 | No shorts | Adapter unplugged, outputs open: resistance +24 V bus–GND and 5 V–GND | > 10 kΩ (rising as C1 charges) |
 | T2 | Polarity hardware | Diode test across Q1 drain→source (body diode) | 0.4–0.8 V forward, open reverse |
 | T3 | No-load rails | Plug adapter (switch off), switch on, measure J2 and J3 | J2 23.5–24.5 V; J3 4.85–5.15 V |
-| T4 | Pi under load | Pi on J3, `stress-ng --cpu 4 --timeout 600`; Pi 5: `vcgencmd pmic_read_adc EXT5V_V` (Pi 4: meter at the USB-C pigtail) | ≥ 4.90 V at the Pi; `vcgencmd get_throttled` = `0x0` |
+| T4 | Pi under load | Pi on J3, `stress-ng --cpu 4 --timeout 600`; Pi 5: `vcgencmd pmic_read_adc EXT5V_V` (Pi 4: meter at the USB-C pigtail) | ≥ 4.80 V at the Pi; `vcgencmd get_throttled` = `0x0` |
 | T5 | Buck efficiency at our operating point | During T4, meter in series on buck VIN and on J3: η = Vout·Iout / (Vin·Iin) | **≥ 0.90** pass · 0.87–0.90 record as deviation, open an issue · < 0.87 fail |
 | T6 | Thermal | 30 min of T4 with lid on | Buck board ≤ 70 °C; box air ≤ 50 °C |
 | T7 | E-stop | Press while Pi runs | J2 < 1 V within 1 s; Pi keeps running; GPIO17 reads 0; Klipper reports MCU lost; release + `FIRMWARE_RESTART` recovers |
 | T8 | Master switch | Switch off | Both rails < 0.5 V within 2 s |
 | T9 | Fuse | Visual | 6.3 A time-lag fitted; spare in the box |
-| T10 | Sleep draw | Phase 1 machine idle → `OG_SLEEP` | Wall ≤ 7 W (or 24 V input ≤ 0.25 A) |
-| T11 | Phase 1 peak | Both arms moving + light on + Pi stress | 24 V input ≤ 2.5 A; J2 ≥ 23.5 V |
+| T10 | Sleep draw | Phase 1 machine idle → `OG_SLEEP` | Wall ≤ 7 W (no wattmeter: 24 V input ≤ 0.22 A, the same limit at 75 % adapter efficiency) |
+| T11 | Phase 1 peak | Both arms moving + light on + Pi stress | 24 V input ≤ 2.5 A; J2 ≥ 23.0 V |
 | T12 | Ripple (optional, needs a scope) | 5 V at the Pi, 20 MHz bandwidth | ≤ 50 mV peak-to-peak |
 
 After T5, put the measured efficiency into `data/power_loads.yaml` (`buck.efficiency_typical`) and

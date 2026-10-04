@@ -24,8 +24,8 @@ light and turns them into Unreal / Unity materials — then grows, phase by phas
 
 | Path | Total | vs $500 |
 |---|---:|---|
-| Parts exactly as briefed | $658.36 | over |
-| Budget substitutes | $516.94 | over |
+| Parts exactly as briefed | $658.71 | over |
+| Budget substitutes | $517.29 | over |
 | **Budget + consumables you already own** | **$478.15** | **under, $21.85 spare** |
 
 Details and the decision you need to make: [`docs/05-budget-and-sourcing.md`](docs/05-budget-and-sourcing.md).

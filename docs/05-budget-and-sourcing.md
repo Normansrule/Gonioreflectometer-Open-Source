@@ -7,8 +7,8 @@ Prices approximate, checked 2026-10-04, USD, before tax and shipping.
 
 | Path | What it is | Phase 1 | All phases | vs $500 hard cap |
 |---|---|---:|---:|---|
-| **Spec** | exactly the parts in the brief, at today's prices | $427.97 | $658.36 | $158 over |
-| **Budget** | cheaper substitutes (below) | $338.54 | $516.94 | $17 over |
+| **Spec** | exactly the parts in the brief, at today's prices | $428.32 | $658.71 | $158 over |
+| **Budget** | cheaper substitutes (below) | $338.89 | $517.29 | $17 over |
 | **Budget + own stock** | budget path, consumables you already own at $0 | $299.75 | $478.15 | **$21.85 under** |
 
 Only the third path meets every phase cap and the hard cap. 2026 prices for the Raspberry Pi camera,
@@ -20,7 +20,7 @@ the SKR board and certified power parts are well above what the brief assumed.
 |---|---|---|---:|---|
 | HED-01/02 | HQ Camera M12 + 16 mm lens | Camera Module 3, focus locked | $41.75 | see `04-component-decisions.md` |
 | CTL-01 | SKR Mini E3 V3 | Pi Pico + 4 TMC2209 modules | $18.85 | more wiring, add MOSFETs |
-| PWR-02 | D42V55F5 | D24V50F5 | $7.00 | ±4 %, 38 V max, stock rationed |
+| PWR-02 | D42V55F5 | D24V50F5 | $7.00 | ±4 %, 38 V max, stock rationed, **no PG pin** (5 V status check lost) |
 | PWR-04/05 | panel 5 × 20 fuse holder | inline blade fuse holder | $5.08 | less tidy |
 | FRM-03 | levelling feet | M8 bolts in the tee nuts | $8.80 | adjust with a wrench |
 | FRM-05 | 100 T-nuts | 20 T-nuts | $7.95 | — |
@@ -31,7 +31,7 @@ the SKR board and certified power parts are well above what the brief assumed.
 ## "Own stock" lines (count $0 if you have them)
 
 18 AWG silicone wire, perfboard, JST-XH pre-crimped kit, metric screw assortment, M3 heat-set
-inserts, a resistor or two, a 12 mm pushbutton — $38.79 together. Buy only what's missing.
+inserts, a resistor or two, a 12 mm pushbutton — $39.14 together. Buy only what's missing.
 
 ## Ways to restore the HQ camera within $500
 

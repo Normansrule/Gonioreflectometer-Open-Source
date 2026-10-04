@@ -65,7 +65,7 @@ with a multimeter (≈ 1.6 Ω) before plugging in.
 
 | Function | Pi 4 | Pi 5 |
 |---|---|---|
-| UART to SKR (TX/RX) | GPIO14 / GPIO15 | GPIO14 / GPIO15 |
+| UART to SKR (TX via 1 kΩ / RX) | GPIO14 / GPIO15 | GPIO14 / GPIO15 |
 | I-A1 encoder | i2c1: GPIO2 / GPIO3 | i2c1: GPIO2 / GPIO3 |
 | I-A2 encoder | i2c3: GPIO4 / GPIO5 | i2c2-pi5: GPIO4 / GPIO5 |
 | I-A3 encoder (Phase 3) | i2c6: GPIO22 / GPIO23 | i2c3-pi5: GPIO22 / GPIO23 |
@@ -79,6 +79,9 @@ The AS5600's address is fixed (0x36), so each encoder gets its own hardware I2C 
 `machine.yaml` must match `ls /dev/i2c-*` after reboot — **check them on your Pi**.
 
 ## Raspberry Pi config.txt
+
+First disable the serial login console (`sudo raspi-config` → Interface Options → Serial Port →
+login shell **No**, hardware **Yes**), otherwise a getty fights Klipper on `/dev/ttyAMA0`.
 
 ```ini
 # --- OpenGantry Lite ---
@@ -97,7 +100,7 @@ dtoverlay=i2c4,pins_8_9                # A4
 # dtoverlay=i2c3-pi5,pins_22_23
 # dtoverlay=i2c0-pi5,pins_8_9
 
-usb_max_current_enable=1               # 5 V comes from the buck, not a USB-PD supply
+# usb_max_current_enable stays OFF: nothing is powered from the Pi's USB ports
 dtoverlay=gpio-shutdown,gpio_pin=26,active_low=1,gpio_pull=up
 dtoverlay=disable-wifi                 # optional: wired Ethernet to the PC is faster for RAW copies
 ```

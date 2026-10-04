@@ -8,18 +8,18 @@ Paths: **spec** = parts named in the brief; **budget** = cheaper substitutes; **
 
 | Phase | Cap | Spec | Budget | Budget + own stock | Stock path vs cap |
 |---|---:|---:|---:|---:|---|
-| 1 | $300.00 | $427.97 | $338.54 | $299.75 | OK |
+| 1 | $300.00 | $428.32 | $338.89 | $299.75 | OK |
 | 2 | $75.00 | $114.67 | $72.67 | $72.67 | OK |
 | 3 | $45.00 | $44.40 | $44.40 | $44.40 | OK |
 | 4 | $35.00 | $31.38 | $31.38 | $31.38 | OK |
 | 5 | $30.00 | $39.94 | $29.95 | $29.95 | OK |
 | 6 | $0.00 | $0.00 | $0.00 | $0.00 | OK |
-| **All** | **$485.00** | **$658.36** | **$516.94** | **$478.15** | |
+| **All** | **$485.00** | **$658.71** | **$517.29** | **$478.15** | |
 
 Hard cap $500.00 = phase caps $485.00 + contingency $15.00.
 
-- Spec: $658.36 - $158.36 OVER the hard cap.
-- Budget: $516.94 - $16.94 OVER the hard cap.
+- Spec: $658.71 - $158.71 OVER the hard cap.
+- Budget: $517.29 - $17.29 OVER the hard cap.
 - Budget + own stock: $478.15 - $21.85 under the hard cap.
 
 ## Modules
@@ -29,10 +29,10 @@ Hard cap $500.00 = phase caps $485.00 + contingency $15.00.
 | 1 | base-frame | $91.65 | $74.90 | $55.90 |
 | 1 | camera-arm | $22.88 | $22.88 | $22.88 |
 | 1 | camera-head | $71.00 | $29.25 | $29.25 |
-| 1 | controller | $68.29 | $49.44 | $38.95 |
+| 1 | controller | $68.34 | $49.49 | $38.95 |
 | 1 | light-arm | $22.88 | $22.88 | $22.88 |
 | 1 | light-source | $23.50 | $23.50 | $23.50 |
-| 1 | power | $127.77 | $115.69 | $106.39 |
+| 1 | power | $128.07 | $115.99 | $106.39 |
 | 2 | calibration-kit | $84.18 | $50.43 | $50.43 |
 | 2 | enclosure | $30.49 | $22.24 | $22.24 |
 | 3 | light-ring | $44.40 | $44.40 | $44.40 |
@@ -46,12 +46,12 @@ Hard cap $500.00 = phase caps $485.00 + contingency $15.00.
 | PWR-02 | Synchronous buck 24 V to 5 V 6 A | $39.95 | $32.95 | N |
 | PWR-04 | Panel fuse holder 5 x 20 mm | $6.44 | $3.00 | N |
 | PWR-05 | Fuse 6.3 A time-lag 5 x 20 mm | $1.64 | $0.00 | N |
-| PWR-11 | Resistor set 100k, 12k, 1k, 100k | $0.30 | $0.30 | Y |
+| PWR-11 | Resistor set 100k, 12k, 10k, 100k, 10k + 2x BAT85 | $0.60 | $0.60 | Y |
 | PWR-13 | Silicone wire 18 AWG red + black | $8.00 | $8.00 | Y |
 | PWR-14 | Perfboard 50 x 70 mm | $1.00 | $1.00 | Y |
 | CTL-01 | Motion board, 4x TMC2209, 12/24 V | $49.85 | $31.00 | N |
 | CTL-04 | JST-XH housings + pre-crimped leads kit | $9.99 | $9.99 | Y |
-| CTL-05 | Momentary pushbutton 12 mm | $0.50 | $0.50 | Y |
+| CTL-05 | Momentary pushbutton 12 mm + 1 kOhm resistor | $0.55 | $0.55 | Y |
 | FRM-03 | Leveling foot M8 x 35 | $11.80 | $3.00 | N |
 | FRM-05 | M5 spring T-nuts for 2020 (100) | $12.95 | $5.00 | N |
 | FRM-06 | Metric screw/nut assortment M3/M4/M5 | $12.00 | $12.00 | Y |

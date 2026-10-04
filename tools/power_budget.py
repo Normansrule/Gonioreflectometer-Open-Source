@@ -103,15 +103,20 @@ def render(cfg: dict, res: dict[str, Result]) -> str:
     row("**Wall plug**", lambda r: f"**{r.wall_w:.1f} W**")
     row("Wall-plug efficiency (load W / wall W)", lambda r: f"{100 * r.wall_efficiency:.0f} %")
     verdict = "PASS" if hr >= req else "FAIL"
+    buck_warn = p.amps_5v > buck["rated_amps"]
     lines += [
         "",
         f"**Headroom at peak:** adapter rated {sup['rated_watts']:.0f} W vs peak {p.dc_total_w:.1f} W "
-        f"-> {100 * hr:.0f} % headroom (required >= {100 * req:.0f} %): **{verdict}**.",
+        f"-> {100 * hr:.0f} % headroom above peak, {100 * (1 - p.dc_total_w / sup['rated_watts']):.0f} % of capacity unused "
+        f"(required >= {100 * req:.0f} % headroom): **{verdict}**.",
         f"Peak current {p.amps_24v:.2f} A of 5.00 A available.",
         "",
-        f"**Buck check:** 5 V allocation peak {p.amps_5v:.2f} A against a {buck['rated_amps']} A rating. "
+        ("**Buck check - WARNING:** " if buck_warn else "**Buck check:** ")
+        + f"5 V allocation peak {p.amps_5v:.2f} A against a {buck['rated_amps']} A rating"
+        + (" - the allocation exceeds the rating. " if buck_warn else ". ") +
         "The allocation assumes the Pi drawing its full 5 A USB budget at the same moment the servo stalls; "
-        "with no USB peripherals the realistic peak is about 13 W + 3.75 W = 16.8 W (3.4 A).",
+        "with no USB peripherals and `usb_max_current_enable` left off, the realistic peak is about "
+        "13 W + 3.75 W = 16.8 W (3.4 A), 38 % below the rating. Keep USB loads off the Pi.",
         "",
         "Buck and adapter efficiencies are design estimates (see the YAML) and are replaced with bench numbers "
         "in the Power module acceptance test.",
