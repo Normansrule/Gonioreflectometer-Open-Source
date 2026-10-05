@@ -1,16 +1,16 @@
 # 3D scan methods
 
-[R1] covers flat samples only; scanning extends it. Turntable reconstruction: [S9].
+Turntable reconstruction [S9].
 
 ## Methods
 
 | Method | Uses | Gives | Code |
 |---|---|---|---|
-| Visual hull [S5][S6] | silhouettes + known poses | fast preview, no concavities | `scan/carve.py` |
-| Photogrammetry, known poses (COLMAP) [S1][S2][S3] | 144 photos + poses | full mesh in mm | `scan/colmap.py` |
-| Photometric stereo [S4] | still object, 6 LED-bank positions | fine surface detail | `scan/photometric.py` |
+| Visual hull [S5][S6][V41] | silhouettes + known poses | fast preview, no concavities | `scan/carve.py` |
+| Photogrammetry, known poses (COLMAP) [S1][S2][S3][V37] | 144 photos + poses | full mesh in mm | `scan/colmap.py` |
+| Photometric stereo [S4][V25] | still object, 6 LED-bank positions | fine surface detail | `scan/photometric.py` |
 
-Alternatives: Meshroom [S10], OpenMVS [S17], RealityScan [S18].
+Meshing: screened Poisson [V45][V46], marching cubes [V43]. Alternatives: Meshroom [S10], OpenMVS [S17], RealityScan [S18].
 
 ## Equations
 
@@ -24,7 +24,7 @@ $$R_{oc} = R_{wc}\,R\,P,\qquad t_{oc} = -R_{wc}\,(C + \delta\,R\hat e_x)$$
 
 **View elevation** seen from the object: $\epsilon = 90^\circ - M_2 + e_{cam}$.
 
-**Camera calibration** ($A_i$ board pose from solvePnP [S11], $B_i$ platter pose from the axes):
+**Camera calibration** [V10][V11][V15] ($A_i$ board pose from solvePnP [S11], $B_i$ platter pose from the axes):
 
 $$A_i = X\,B_i\,Y \;\Rightarrow\; \min_{X,Y}\sum_i \big\lVert \log\!\left(A_i^{-1} X B_i Y\right)\big\rVert^2$$
 
@@ -44,7 +44,7 @@ $$I_j = \rho\,\max(0,\ \hat n\cdot\hat l_j)\;\Rightarrow\; I = L\,g,\quad g = L^
 
 Horizontal lamp only → rank$(L)=2$; the 40° LED mast fixes it: $\hat l = R_z(M_4)(\cos 40^\circ, 0, \sin 40^\circ)^\top$.
 
-**Near-light photometric stereo** [S14]:
+**Near-light photometric stereo** [S14][V29][V30]:
 
 $$\hat l_j(X) = \frac{S_j - X}{\lVert S_j - X\rVert},\qquad I_j' = I_j\,\frac{\lVert S_j - X\rVert^2}{r_0^2}$$
 

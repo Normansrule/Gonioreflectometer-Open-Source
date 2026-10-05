@@ -5,6 +5,7 @@
     opengonio --dry-run move M4=60 M3=30     print the G-code instead of sending it
     opengonio home | move ... | light on|off | sleep | wake | status
     opengonio panel                          run the button panel (Pico hub) loop
+    opengonio send '$I' '?'                  raw FluidNC lines; prints the replies
 """
 from __future__ import annotations
 
@@ -76,6 +77,7 @@ def main(argv: list[str] | None = None) -> int:
     mv = sub.add_parser("move"); mv.add_argument("pose", nargs="+")
     li = sub.add_parser("light"); li.add_argument("state", choices=["on", "off"]); li.add_argument("--name", default="white")
     sub.add_parser("panel")
+    se = sub.add_parser("send", help="raw FluidNC lines"); se.add_argument("lines", nargs="+")
     sc = sub.add_parser("scan", help="3D photo scanner (phases 11-12)")
     sc.add_argument("action", choices=["plan", "export-colmap", "demo", "run", "calibrate", "sync-ids"])
     sc.add_argument("--db", default="database.db")
@@ -119,6 +121,12 @@ def main(argv: list[str] | None = None) -> int:
         g.sleep()
     elif a.cmd == "wake":
         g.wake()
+    elif a.cmd == "send":
+        for line in a.lines:
+            if line == "?":
+                print(g.nc.status())
+            else:
+                print("\n".join(g.nc.command(line)) or "ok")
     elif a.cmd == "status":
         print(g.nc.status())
     elif a.cmd == "panel":  # pragma: no cover - hardware loop

@@ -1,10 +1,10 @@
 # 03 · Frame
 
-**Goal:** A flat, level base with every future hole already drilled.
+Flat, level base with every hole drilled.
 
 <img src="../../docs/assets/axes.svg" width="100%" alt="Frame">
 
-**Cost:** $62.76 · running total $185.58 of $500
+$62.76 · total so far $185.58 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
@@ -20,4 +20,4 @@
 - [ ] Camera outrigger, post and scale marks
 - [ ] **Done:** Base level; ring holes concentric with the centre ±0.5 mm.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): R1 · G10 · G38 · H30 · H38 · F1 · F2 · F3 · F4 · F5 · F6 · F7

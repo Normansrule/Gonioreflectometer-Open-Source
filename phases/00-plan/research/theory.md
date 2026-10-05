@@ -1,10 +1,10 @@
 # Equations
 
-Sources: [R2] [R1] [R5] [R6] [R7] [R8]. $\theta$ from the surface normal, $\varphi$ azimuth; $\omega_i$ toward the light, $\omega_r$ toward the camera.
+Sources: [R2] [R1] [G1] [R5] [R6] [R7] [R8] [T11] [T17] [T35] [T40]. $\theta$ from the surface normal, $\varphi$ azimuth; $\omega_i$ toward the light, $\omega_r$ toward the camera.
 
 ## 1. Reflectance (CS348b [R2])
 
-**BRDF**
+**BRDF** [G1]
 
 $$f_r(\omega_i \to \omega_r) \equiv \frac{dL_r(\omega_i \to \omega_r)}{dE_i} \qquad [\mathrm{sr}^{-1}]$$
 
@@ -60,7 +60,7 @@ $$L_{r,d} = f_{r,d}\,E_i, \qquad M = \int L_r\cos\theta_r\,d\omega_r = \pi L_r, 
 
 $$f_r = (1-m)(1-F)\frac{\rho}{\pi} + \frac{D(h)\,G_2(\omega_i,\omega_r)\,F(\omega_i\cdot h)}{4\cos\theta_i\cos\theta_r}, \qquad D(h) = \frac{\alpha^2}{\pi\left((h\cdot n)^2(\alpha^2-1)+1\right)^2}, \quad \alpha = r^2$$
 
-$h = (\omega_i+\omega_r)/\|\omega_i+\omega_r\|$, $G_2$ height-correlated Smith [R6], $F$ Schlick with $F(0) = 0.04(1-m) + \rho\,m$.
+$h = (\omega_i+\omega_r)/\|\omega_i+\omega_r\|$, $D$ GGX [R6][T11], $G_2$ height-correlated Smith [T17], $F$ Schlick with $F(0) = 0.04(1-m) + \rho\,m$; metallic-roughness as in [T35][T40].
 
 ## 3. Measured quantities ([R1])
 
@@ -88,7 +88,7 @@ $$\frac{1}{p'} - \frac{1}{p} = \frac{1}{f}, \qquad m = \frac{p'}{p}, \qquad d_{\
 
 Numbers: [optics.md](../../06-camera-light/design/optics.md).
 
-## 6. HDR [R5]
+## 6. HDR [R5][V19][V20]
 
 $$g(Z_{ij}) = \ln E_i + \ln\Delta t_j$$
 

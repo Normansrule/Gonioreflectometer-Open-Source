@@ -1,8 +1,8 @@
 # 09 · Spin (M1) → brushed metal and textures
 
-**Goal:** The sample spins, so direction-dependent shine and textures are measured.
+Sample spins: brushed metal and textures.
 
-**Cost:** $22.38 · running total $464.90 of $500
+$22.38 · total so far $464.90 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
@@ -19,4 +19,4 @@
 - [ ] Per-pixel fit of a textured swatch
 - [ ] **Done:** Highlight follows M1; brushing direction within 5°.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): G5 · G9 · G11 · G14 · G16 · G18 · G27 · G40 · G43 · G44 · G49 · G50 · T4 · T15 · T26 · T34 · T37 · T41 · T42 · T44 · V9 · V48 · N8 · H3 · H37 · P40 · P41 · P42 · P43

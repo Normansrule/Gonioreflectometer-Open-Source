@@ -1,6 +1,6 @@
 # 14 · Laptop app
 
-**Goal:** Every workflow runs from one app or the buttons — no terminal.
+Every workflow from one app or the buttons.
 
 ## 14.1 Control user interface (UI)
 
@@ -14,4 +14,4 @@
 - [ ] Resume after STOP or e-stop
 - [ ] **Done:** Each preset runs from START.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): G52 · T18 · T19 · T20 · T39 · T55 · V47 · V55 · H15 · H27 · H46 · H50

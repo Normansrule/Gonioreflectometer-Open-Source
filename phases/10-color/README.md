@@ -1,8 +1,8 @@
 # 10 · Colour bands and polarizers
 
-**Goal:** Measure 8 colour bands and separate shine from colour.
+8 colour bands; polarizers split shine from colour.
 
-**Cost:** $29.56 · running total $494.46 of $500
+$29.56 · total so far $494.46 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
@@ -20,4 +20,4 @@
 - [ ] Per-band PTFE reference
 - [ ] **Done:** Crossed polarizers cut the mirror shine ≥ 20×; bands repeat within 3 %.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): R1 · G17 · G28 · G37 · G41 · G42 · G45 · T30 · T52 · T53 · T54 · T55 · V9 · V49 · V50 · V51 · V52 · N9 · N13 · N15 · N16 · N17 · N18 · N19 · N20 · N21 · N22 · N23 · N27 · N37 · N38 · N39 · N40 · N41 · N42 · N43 · N44 · N47 · H10 · H40 · H42 · L4 · L7 · E8

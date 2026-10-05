@@ -12,3 +12,5 @@ captures/
 *.dng
 *.exr
 .DS_Store
+.fluidnc/
+papers/personal/

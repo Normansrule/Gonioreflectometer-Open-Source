@@ -1,6 +1,6 @@
 # 13 · Material on the 3D model
 
-**Goal:** The scanned object looks real in a game engine.
+The scanned object looks real in a game engine.
 
 ## 13.1 Fit textures
 
@@ -14,4 +14,4 @@
 - [ ] Check in Unreal and Unity
 - [ ] **Done:** Render matches a gantry photo.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): S15 · G4 · T40 · T44 · T45 · T46 · T47 · T48 · T51 · V9 · V47 · V56 · V57 · V58 · N22 · N28 · N29

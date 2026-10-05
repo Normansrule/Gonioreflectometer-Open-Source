@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" font-family="Segoe UI,Helvetica,Arial,sans-serif">
 <style>.t{fill:#f0f6fc} .m{fill:#8b949e} .b{font-weight:600} </style>
 <rect width="1200" height="470" rx="14" fill="#0d1117"/>
-<text x="40" y="44" class="t b" font-size="20">3D photo scanner (Phases 11–12)</text><text x="40" y="70" class="m" font-size="13">camera fixed · M1 spins the object · M2 tilts it · poses known from the axes [R1][S9]</text><g>
+<text x="40" y="44" class="t b" font-size="20">3D photo scanner (Phases 11–12)</text><text x="40" y="70" class="m" font-size="13">M1 spins, M2 tilts, camera fixed: every pose known [S9]</text><g>
  <animateTransform attributeName="transform" type="rotate" values="0 330 230;-20 330 230;-40 330 230;-60 330 230;0 330 230" keyTimes="0;0.25;0.5;0.75;1" dur="12s" repeatCount="indefinite" calcMode="discrete"/>
  <rect x="260" y="270" width="140" height="12" rx="4" fill="#bc8cff"/>
  <rect x="318" y="282" width="24" height="40" fill="#8b949e"/>

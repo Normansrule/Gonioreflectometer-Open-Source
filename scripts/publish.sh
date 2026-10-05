@@ -38,5 +38,5 @@ fi
 
 gh repo edit "$OWNER/$NAME" --add-topic gonioreflectometer --add-topic brdf --add-topic open-hardware \
   --add-topic fluidnc --add-topic multispectral >/dev/null
-pip install -q -e "software[dev]" && python -m pytest -q software
+pip install -q -e "./software[dev]" && python -m pytest -q software
 echo "Done: https://github.com/$OWNER/$NAME  (milestones: /milestones)"

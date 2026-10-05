@@ -13,8 +13,8 @@ Camera fixed; M1 spins and M2 tilts the object, so every pose is known [S9].
 
 - Riser sets δ = 60 − riser height (mm) → `scan.platter_offset_mm`; pick δ ≈ object height / 2.
 - View elevation = 90° − M2. Plan: rings at 0/20/40/60/80° → 144 photos.
-- `opengonio scan calibrate` measures the real camera pose (ChArUco + joint fit), needed for ±0.5 mm.
-- Photogrammetry light: lamp at M4 = 30°, crossed polarizers. Photometric stereo: LED bank at 6 arm positions.
+- `opengonio scan calibrate` measures the real camera pose (ChArUco [V7] + AX = YB fit [V15]), needed for ±0.5 mm.
+- Photogrammetry light: lamp at M4 = 30°, crossed polarizers [V51]. Photometric stereo: LED bank at 6 arm positions.
 - Background pass (empty platter, same poses) → clean silhouettes, even for black parts.
 
 Fasteners: M3 × 8 × 2, M5 × 10 + T-nut × 1. Optics: [optics.md](../../06-camera-light/design/optics.md).

@@ -1,10 +1,10 @@
 # 11 · 3D scan: capture
 
-**Goal:** Photograph an object from 144 known positions.
+Photograph an object from 144 known positions.
 
 <img src="../../docs/assets/scanner.svg" width="100%" alt="3D scan: capture">
 
-**Cost:** $4.49 · running total $498.95 of $500
+$4.49 · total so far $498.95 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/) · [Tests](test/)
 
@@ -26,4 +26,4 @@
 - [ ] opengonio scan run
 - [ ] **Done:** 144 sharp photos + photometric-stereo set, unattended.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): S9 · S12 · S14 · S20 · G4 · G39 · V7 · V8 · V9 · V10 · V11 · V12 · V13 · V14 · V15 · V16 · V17 · V18 · V25 · V27 · V30 · V48 · V50 · V51 · V53 · V54 · V55 · H49

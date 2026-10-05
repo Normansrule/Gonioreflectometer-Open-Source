@@ -17,6 +17,8 @@ OUT = ROOT / "docs" / "assets"
 sys.path.insert(0, str(ROOT / "software" / "src"))
 
 from opengonio.brdf.models import ggx_brdf, sph_to_vec  # noqa: E402
+sys.path.insert(0, str(ROOT / "tools"))
+import machine3d as m3d  # noqa: E402
 
 FONT = "Segoe UI,Helvetica,Arial,sans-serif"
 BG, PANEL, LINE, TXT, MUTED = "#0d1117", "#161b22", "#30363d", "#f0f6fc", "#8b949e"
@@ -30,46 +32,13 @@ def svg(w: int, h: int, body: str, extra_style: str = "") -> str:
 
 
 def hero() -> str:
-    cx, cy = 840, 230
-    grid = "".join(f'<line x1="{x}" y1="0" x2="{x}" y2="460" stroke="#161b22"/>' for x in range(0, 1200, 40))
-    grid += "".join(f'<line x1="0" y1="{y}" x2="1200" y2="{y}" stroke="#161b22"/>' for y in range(0, 460, 40))
-    body = f'''{grid}
-<defs>
- <radialGradient id="glow"><stop offset="0" stop-color="{YELLOW}" stop-opacity="0.9"/><stop offset="1" stop-color="{YELLOW}" stop-opacity="0"/></radialGradient>
- <linearGradient id="fov" x1="1" x2="0"><stop offset="0" stop-color="{BLUE}" stop-opacity="0.25"/><stop offset="1" stop-color="{BLUE}" stop-opacity="0"/></linearGradient>
-</defs>
-<text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
+    poses, active = m3d.demo_poses()
+    body = f"""<text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
 <text x="56" y="196" class="t b" font-size="40">Open-Source</text>
-<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">OpenGonio · low-cost multispectral material capture + 3D scanner</text>
-<text x="58" y="270" class="m" font-size="15">fixed camera · 3-axis sample stage · rotating light arm · laptop-controlled</text>
-<text x="58" y="294" class="m" font-size="15">USB / WiFi / Bluetooth · physical buttons · 0.1° target repeatability</text>
-<text x="58" y="340" class="m" font-size="12">Architecture after Ansari-Asl et al., J. Imaging 10(3):55, 2024 · theory after Hanrahan, CS348b</text>
-<!-- machine, top view -->
-<circle cx="{cx}" cy="{cy}" r="165" fill="none" stroke="{LINE}" stroke-width="2" stroke-dasharray="6 6"/>
-<text x="{cx}" y="{cy + 192}" class="m" font-size="12" text-anchor="middle">12 in ring (M4)</text>
-<polygon points="{cx + 270},{cy - 22} {cx + 270},{cy + 22} {cx + 14},{cy + 4} {cx + 14},{cy - 4}" fill="url(#fov)"/>
-<line x1="{cx}" y1="{cy}" x2="{cx + 262}" y2="{cy}" stroke="{BLUE}" stroke-width="3" stroke-dasharray="10 8">
- <animate attributeName="stroke-dashoffset" from="0" to="-36" dur="0.9s" repeatCount="indefinite"/></line>
-<rect x="{cx + 262}" y="{cy - 18}" width="56" height="36" rx="6" fill="{PANEL}" stroke="{BLUE}" stroke-width="2"/>
-<circle cx="{cx + 262}" cy="{cy}" r="9" fill="{BLUE}"/>
-<text x="{cx + 290}" y="{cy + 40}" fill="{BLUE}" font-size="12" text-anchor="middle">fixed camera</text>
-<g>
- <animateTransform attributeName="transform" type="rotate" values="-30 {cx} {cy};-150 {cx} {cy};-30 {cx} {cy}" dur="9s" repeatCount="indefinite"/>
- <line x1="{cx + 120}" y1="{cy}" x2="{cx + 190}" y2="{cy}" stroke="{MUTED}" stroke-width="10" stroke-linecap="round"/>
- <line x1="{cx + 150}" y1="{cy}" x2="{cx + 4}" y2="{cy}" stroke="{YELLOW}" stroke-width="3" stroke-dasharray="10 8">
-  <animate attributeName="stroke-dashoffset" from="0" to="36" dur="0.9s" repeatCount="indefinite"/></line>
- <circle cx="{cx + 160}" cy="{cy}" r="28" fill="url(#glow)"/>
- <circle cx="{cx + 160}" cy="{cy}" r="11" fill="{YELLOW}"/>
-</g>
-<circle cx="{cx}" cy="{cy}" r="52" fill="{PANEL}" stroke="{LINE}" stroke-width="2"/>
-<g>
- <animateTransform attributeName="transform" type="rotate" values="-15 {cx} {cy};-75 {cx} {cy};-15 {cx} {cy}" dur="9s" repeatCount="indefinite"/>
- <rect x="{cx - 4}" y="{cy - 34}" width="8" height="68" rx="2" fill="{ORANGE}"/>
- <line x1="{cx}" y1="{cy}" x2="{cx + 44}" y2="{cy}" stroke="{ORANGE}" stroke-width="1.5" stroke-dasharray="3 3"/>
-</g>
-<circle cx="{cx}" cy="{cy}" r="7" fill="{YELLOW}"><animate attributeName="r" values="5;10;5" dur="1.8s" repeatCount="indefinite"/></circle>
-<text x="{cx - 120}" y="{cy - 120}" fill="{YELLOW}" font-size="12">light arm</text>
-<text x="{cx - 70}" y="{cy + 80}" fill="{ORANGE}" font-size="12">sample (M3 = M4 / 2 → specular)</text>'''
+<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">material capture + 3D scanner · under $500</text>
+<text x="58" y="266" class="m" font-size="15">sample turns, tilts, spins · light circles · camera fixed</text>
+<text x="58" y="340" class="m" font-size="12">after Ansari-Asl et al. 2024 [R1]</text>
+{m3d.machine(m3d.View(720, 250, 0.72), poses, active, labels=(1010, 60))}"""
     return svg(1200, 460, body)
 
 
@@ -115,39 +84,13 @@ def architecture() -> str:
 
 
 def axes() -> str:
-    cx, cy = 450, 255
-    b = f'''
-<ellipse cx="{cx}" cy="{cy + 70}" rx="230" ry="62" fill="none" stroke="{LINE}" stroke-width="3"/>
-<ellipse cx="{cx}" cy="{cy + 70}" rx="230" ry="62" fill="none" stroke="{YELLOW}" stroke-width="3" stroke-dasharray="20 340">
- <animate attributeName="stroke-dashoffset" from="0" to="-360" dur="5s" repeatCount="indefinite"/></ellipse>
-<text x="{cx + 240}" y="{cy + 120}" fill="{YELLOW}" font-size="14" class="b">M4 light arm (Phase 4)</text>
-<line x1="{cx - 180}" y1="{cy + 100}" x2="{cx - 250}" y2="{cy - 40}" stroke="{MUTED}" stroke-width="10" stroke-linecap="round"/>
-<circle cx="{cx - 250}" cy="{cy - 45}" r="16" fill="{YELLOW}"/>
-<line x1="{cx - 236}" y1="{cy - 40}" x2="{cx - 10}" y2="{cy - 5}" stroke="{YELLOW}" stroke-width="2" stroke-dasharray="8 6">
- <animate attributeName="stroke-dashoffset" from="0" to="-28" dur="0.8s" repeatCount="indefinite"/></line>
-<rect x="{cx - 40}" y="{cy + 40}" width="80" height="40" rx="6" fill="{PANEL}" stroke="{LINE}" stroke-width="2"/>
-<text x="{cx}" y="{cy + 66}" class="m" font-size="12" text-anchor="middle">table</text>
-<path d="M{cx - 70} {cy + 30} A70 18 0 0 0 {cx + 70} {cy + 30}" fill="none" stroke="{GREEN}" stroke-width="3" marker-end="url(#ag)"/>
-<text x="{cx + 80}" y="{cy + 34}" fill="{GREEN}" font-size="14" class="b">M3 table yaw (Phase 5)</text>
-<path d="M{cx - 30} {cy + 40} L{cx - 30} {cy - 60} M{cx + 30} {cy + 40} L{cx + 30} {cy - 60}" stroke="{MUTED}" stroke-width="6"/>
-<g>
- <animateTransform attributeName="transform" type="rotate" values="-20 {cx} {cy - 30};20 {cx} {cy - 30};-20 {cx} {cy - 30}" dur="6s" repeatCount="indefinite"/>
- <rect x="{cx - 26}" y="{cy - 75}" width="52" height="90" rx="6" fill="{PANEL}" stroke="{PURPLE}" stroke-width="2"/>
- <circle cx="{cx}" cy="{cy - 30}" r="22" fill="{ORANGE}" opacity="0.9"/>
- <line x1="{cx}" y1="{cy - 30}" x2="{cx}" y2="{cy - 52}" stroke="{BG}" stroke-width="3">
-  <animateTransform attributeName="transform" type="rotate" from="0 {cx} {cy - 30}" to="360 {cx} {cy - 30}" dur="4s" repeatCount="indefinite"/></line>
-</g>
-<text x="{cx + 40}" y="{cy - 80}" fill="{PURPLE}" font-size="14" class="b">M2 tilt (Phase 8)</text>
-<text x="{cx + 40}" y="{cy - 60}" fill="{ORANGE}" font-size="14" class="b">M1 spin (Phase 9)</text>
-<line x1="{cx + 330}" y1="{cy - 30}" x2="{cx + 24}" y2="{cy - 30}" stroke="{BLUE}" stroke-width="2" stroke-dasharray="8 6">
- <animate attributeName="stroke-dashoffset" from="0" to="28" dur="0.8s" repeatCount="indefinite"/></line>
-<rect x="{cx + 330}" y="{cy - 52}" width="70" height="44" rx="6" fill="{PANEL}" stroke="{BLUE}" stroke-width="2"/>
-<path d="M{cx + 400} {cy - 30} h40 v150" stroke="{MUTED}" stroke-width="6" fill="none"/>
-<text x="{cx + 320}" y="{cy - 64}" fill="{BLUE}" font-size="14" class="b">fixed camera on L-arm</text>
-<text x="40" y="44" class="t b" font-size="20">Four axes, one zero point</text>
-<text x="40" y="70" class="m" font-size="13">sample orientation (M3, M2, M1) + light direction (M4) = full 4-D BRDF; camera never moves [R1]</text>
-<defs><marker id="ag" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="{GREEN}"/></marker></defs>'''
-    return svg(1000, 420, b)
+    poses, active = m3d.demo_poses()
+    body = f"""<text x="40" y="44" class="t b" font-size="20">Four axes, one zero point</text>
+<text x="40" y="70" class="m" font-size="13">each axis moves in turn [R1]</text>
+<text x="40" y="330" class="m" font-size="12">M4 ring 12 in · M3, M2 5:1 · M1 4:1</text>
+<text x="40" y="350" class="m" font-size="12">orange square = sample · blue = fixed camera</text>
+{m3d.machine(m3d.View(560, 225, 0.68), poses, active, labels=(40, 120))}"""
+    return svg(1000, 420, body)
 
 
 def brdf() -> str:
@@ -198,7 +141,7 @@ def brdf() -> str:
 <text x="720" y="205" class="t" font-size="15">f_r = ρ/π + D·G·F / (4 cos θi cos θr)</text>
 <text x="720" y="232" class="m" font-size="13">F(θ) = F0 + (1 − F0)(1 − cos θ)^5   [R2][R7]</text>
 <text x="720" y="258" class="m" font-size="13">peak sits at θr = θi: what M3 = M4 / 2 measures</text>
-<text x="720" y="300" class="m" font-size="12">computed by software/src/opengonio/brdf/models.py</text>'''
+<text x="720" y="300" class="m" font-size="12">from software/src/opengonio/brdf/models.py</text>'''
     return svg(1100, 380, b)
 
 
@@ -207,7 +150,7 @@ def phases() -> str:
     data = yaml.safe_load((ROOT / ".github" / "phases.yml").read_text(encoding="utf-8"))["phases"]
     group = lambda n: LINE if n <= 3 else ORANGE if n <= 10 else BLUE if n <= 13 else GREEN
     per_row, w, h, gx, gy, x0, y0 = 6, 182, 76, 14, 14, 24, 56
-    b = '<text x="24" y="36" class="t b" font-size="18">17 small phases · each one works on its own</text>'
+    b = '<text x="24" y="36" class="t b" font-size="18">17 phases</text>'
     for i, (name, col) in enumerate((("setup", LINE), ("measure", ORANGE), ("3D scan", BLUE), ("app + release", GREEN))):
         b += f'<rect x="{700 + i * 120}" y="24" width="12" height="12" rx="2" fill="{col}"/><text x="{718 + i * 120}" y="35" class="m" font-size="12">{name}</text>'
     for i, p in enumerate(data):
@@ -229,7 +172,7 @@ def scanner() -> str:
     """Fixed camera, object on the tilted platter spinning (M1), elevation stepping (M2), view sphere filling in."""
     cx, cy = 330, 230
     b = '<text x="40" y="44" class="t b" font-size="20">3D photo scanner (Phases 11–12)</text>'
-    b += f'<text x="40" y="70" class="m" font-size="13">camera fixed · M1 spins the object · M2 tilts it · poses known from the axes [R1][S9]</text>'
+    b += f'<text x="40" y="70" class="m" font-size="13">M1 spins, M2 tilts, camera fixed: every pose known [S9]</text>'
     # platter + object, tilt animation
     b += f'''<g>
  <animateTransform attributeName="transform" type="rotate" values="0 {cx} {cy};-20 {cx} {cy};-40 {cx} {cy};-60 {cx} {cy};0 {cx} {cy}" keyTimes="0;0.25;0.5;0.75;1" dur="12s" repeatCount="indefinite" calcMode="discrete"/>
@@ -292,7 +235,7 @@ def power_flow() -> str:
             b += f'<line x1="{x - gap}" y1="{y + 24}" x2="{x}" y2="{y + 24}" stroke="{YELLOW}" stroke-width="2"/>'
     b += (f'<circle cy="{y + 24}" r="5" fill="{YELLOW}"><animate attributeName="cx" from="20" to="{20 + 8 * (w + gap) - gap}" '
           f'dur="3s" repeatCount="indefinite"/></circle>')
-    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">Mains never leaves the certified adapter. E-STOP removes 24 V from the motion board; the laptop keeps running.</text>'
+    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">Mains stays in the adapter. E-STOP cuts 24 V to the motors; the laptop keeps running.</text>'
     return svg(1200, 150, b)
 
 

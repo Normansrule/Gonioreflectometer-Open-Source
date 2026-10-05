@@ -10,7 +10,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import re
 import subprocess
 import sys
 from datetime import date, timedelta
@@ -37,6 +39,36 @@ def costs() -> dict[str, float]:
     return {p: v["buy"] for p, v in bom_check.totals(bom_check.load()).items()}
 
 
+ORDER = "RSGTVNHPCKLMFE"
+
+
+def sources() -> dict[int, set[str]]:
+    """Phase number -> reference IDs: rows tagged '(phase NN)', BOM Refs, and [ID] cites in the phase folder."""
+    out: dict[int, set[str]] = {}
+    for line in (ROOT / "REFERENCES.md").read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\|\s*\*\*([A-Z]\d+)\*\*.*\(phases? ([\d, ]+)\) \|\s*$", line)
+        if m:
+            for n in re.findall(r"\d+", m.group(2)):
+                out.setdefault(int(n), set()).add(m.group(1))
+    known = set(re.findall(r"^\|\s*\*\*([A-Z]\d+)\*\*", (ROOT / "REFERENCES.md").read_text(encoding="utf-8"), re.M))
+    for d in (ROOT / "phases").iterdir():
+        if not d.is_dir():
+            continue
+        ids = out.setdefault(int(d.name[:2]), set())
+        for f in d.rglob("*.md"):
+            if f.name != "README.md":
+                ids.update(i for i in re.findall(r"\[([A-Z]\d{1,3})\]", f.read_text(encoding="utf-8")) if i in known)
+        bom = d / "bom" / "bom.csv"
+        if bom.exists():
+            for r in csv.DictReader(bom.open(encoding="utf-8")):
+                ids.update(i.strip() for i in r["Refs"].split(",") if i.strip() in known)
+    return out
+
+
+def sort_ids(ids: set[str]) -> list[str]:
+    return sorted(ids, key=lambda i: (ORDER.index(i[0]) if i[0] in ORDER else 99, int(i[1:])))
+
+
 def ms_title(p: dict) -> str:
     return f"{p['id']} · {p['title']}"
 
@@ -50,14 +82,14 @@ def issue_body(p: dict, s: dict) -> str:
     return f"**Goal:** {p['goal']}\n\n{tasks}\n- [ ] **Done:** {s['done']}\n\n`phases/{p['folder']}/`"
 
 
-def phase_md(p: dict, cost: float, running: float) -> str:
+def phase_md(p: dict, cost: float, running: float, refs: list[str]) -> str:
     d = ROOT / "phases" / p["folder"]
     n = int(p["id"][1:])
-    out = [f"# {n:02d} · {p['title']}", "", f"**Goal:** {p['goal']}", ""]
+    out = [f"# {n:02d} · {p['title']}", "", p["goal"], ""]
     if p.get("image"):
         out += [f'<img src="../../docs/assets/{p['image']}.svg" width="100%" alt="{p['title']}">', ""]
     if cost:
-        out += [f"**Cost:** ${cost:.2f} · running total ${running:.2f} of $500", ""]
+        out += [f"${cost:.2f} · total so far ${running:.2f} / $500", ""]
     links = [f"[{name}]({sub}/)" for sub, name in SUBFOLDERS if (d / sub).is_dir()]
     if links:
         out += [" · ".join(links), ""]
@@ -67,7 +99,8 @@ def phase_md(p: dict, cost: float, running: float) -> str:
         out += [f"- [ ] **Done:** {s['done']}", ""]
     if p.get("safety"):
         out += [f"> **Safety:** {p['safety']}", ""]
-    out += [f"<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>", ""]
+    if refs:
+        out += [f"[Sources](../../REFERENCES.md): {' · '.join(refs)}", ""]
     return "\n".join(out)
 
 
@@ -81,14 +114,23 @@ def table(phases: list[dict], c: dict[str, float]) -> str:
 
 
 def write_docs(phases: list[dict]) -> None:
-    c, run = costs(), 0.0
+    c, run, src = costs(), 0.0, sources()
     for p in phases:
         cost = c.get(p["folder"], 0.0)
         run += cost
         d = ROOT / "phases" / p["folder"]
         d.mkdir(parents=True, exist_ok=True)
-        (d / "README.md").write_text(phase_md(p, cost, run), encoding="utf-8")
+        (d / "README.md").write_text(phase_md(p, cost, run, sort_ids(src.get(int(p["id"][1:]), set()))), encoding="utf-8")
     text = README.read_text(encoding="utf-8")
+    nref = len(re.findall(r"^\|\s*\*\*[A-Z]\d+\*\*", (ROOT / "REFERENCES.md").read_text(encoding="utf-8"), re.M))
+    text = re.sub(r"\[References \(\d+\)\]", f"[References ({nref})]", text)
+    if "<!-- issues:start -->" in text:
+        head, rest = text.split("<!-- issues:start -->", 1)
+        tail = rest.split("<!-- issues:end -->", 1)[1]
+        lines = []
+        for p in phases:
+            lines.append(f"- **{ms_title(p)}** — " + " · ".join(f"[{s['id']}] {s['title']}" for s in p["steps"]))
+        text = f"{head}<!-- issues:start -->\n{chr(10).join(lines)}\n<!-- issues:end -->{tail}"
     if START in text and END in text:
         head, rest = text.split(START, 1)
         tail = rest.split(END, 1)[1]

@@ -1,6 +1,6 @@
 # 15 · Release
 
-**Goal:** Public, certified open hardware.
+Public, certified open hardware.
 
 ## 15.1 Finish docs
 
@@ -15,4 +15,4 @@
 - [ ] Tag v1.0
 - [ ] **Done:** OSHWA ID in README.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): T50 · T51 · N50 · H31 · H32 · H33 · H34 · H35 · H36 · H45

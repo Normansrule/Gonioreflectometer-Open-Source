@@ -5,12 +5,12 @@ phases:
     folder: 00-plan
     title: Plan
     image: architecture
-    goal: Agree the design and budget before buying anything.
+    goal: Fix the design and budget before buying.
     weeks: 1
     steps:
       - id: P00.1
         title: Check the budget
-        tasks: ["Mark parts you already own (column Own = Y) in each phases/*/bom/bom.csv", "python tools/bom_check.py --strict"]
+        tasks: ["bash scripts/get_papers.sh; read R1 (papers/open)", "Mark parts you already own (column Own = Y) in each phases/*/bom/bom.csv", "python tools/bom_check.py --strict"]
         done: Total ≤ $500.
       - id: P00.2
         title: Set up computer-aided design (CAD)
@@ -21,7 +21,7 @@ phases:
     folder: 01-power
     title: Power box
     image: power-flow
-    goal: One wall plug gives safe, fused 24 V with an e-stop.
+    goal: Safe, fused 24 V from one wall plug, with an e-stop.
     weeks: 1
     steps:
       - id: P01.1
@@ -41,12 +41,12 @@ phases:
   - id: P02
     folder: 02-controller
     title: Controller and buttons
-    goal: The laptop and the buttons can talk to the machine.
+    goal: Laptop and buttons talk to the machine.
     weeks: 1
     steps:
       - id: P02.1
         title: Flash boards
-        tasks: ["FluidNC on the E4 (design/firmware.md)", "MicroPython + hub on the Pico"]
+        tasks: ["bash scripts/e4.sh flash, then wifi and config (design/firmware.md)", "bash scripts/pico.sh"]
         done: "`?` returns status; Pico answers PING."
       - id: P02.2
         title: Wire and box
@@ -62,7 +62,7 @@ phases:
     folder: 03-frame
     title: Frame
     image: axes
-    goal: A flat, level base with every future hole already drilled.
+    goal: Flat, level base with every hole drilled.
     weeks: 1
     steps:
       - id: P03.1
@@ -77,7 +77,7 @@ phases:
   - id: P04
     folder: 04-light-arm
     title: Light arm moves (M4)
-    goal: The light circles the sample and comes back to the same spot.
+    goal: Light circles the sample and returns to the same spot.
     weeks: 1
     steps:
       - id: P04.1
@@ -86,13 +86,13 @@ phases:
         done: Arm turns 20–340° by hand-commanded moves.
       - id: P04.2
         title: Tune
-        tasks: ["Set gear_ratio from the measured rim", "opengonio home; 20 return moves"]
+        tasks: ["Set gear_ratio from the measured rim", "bash scripts/e4.sh test; 20 return moves"]
         done: Returns within 0.1°.
 
   - id: P05
     folder: 05-table
     title: Table turns (M3)
-    goal: The sample turns to any angle and comes back to the same spot.
+    goal: Sample turns to any angle and returns to the same spot.
     weeks: 1
     steps:
       - id: P05.1
@@ -108,7 +108,7 @@ phases:
     folder: 06-camera-light
     title: First measurement
     image: brdf-lobe
-    goal: Camera and light see a mirror's shine at the right angle.
+    goal: Camera sees a mirror's shine at the right angle.
     weeks: 1
     steps:
       - id: P06.1
@@ -147,7 +147,7 @@ phases:
   - id: P08
     folder: 08-tilt
     title: Tilt (M2) → full reflectance (BRDF)
-    goal: The sample tilts, so the light can come from any direction.
+    goal: Sample tilts, so light can come from any direction.
     weeks: 2
     steps:
       - id: P08.1
@@ -162,7 +162,7 @@ phases:
   - id: P09
     folder: 09-spin
     title: Spin (M1) → brushed metal and textures
-    goal: The sample spins, so direction-dependent shine and textures are measured.
+    goal: "Sample spins: brushed metal and textures."
     weeks: 2
     steps:
       - id: P09.1
@@ -177,7 +177,7 @@ phases:
   - id: P10
     folder: 10-color
     title: Colour bands and polarizers
-    goal: Measure 8 colour bands and separate shine from colour.
+    goal: 8 colour bands; polarizers split shine from colour.
     weeks: 2
     steps:
       - id: P10.1
@@ -242,7 +242,7 @@ phases:
   - id: P14
     folder: 14-laptop-app
     title: Laptop app
-    goal: Every workflow runs from one app or the buttons — no terminal.
+    goal: Every workflow from one app or the buttons.
     weeks: 3
     steps:
       - id: P14.1
@@ -272,7 +272,7 @@ phases:
   - id: P16
     folder: 16-upgrades
     title: Upgrades (optional)
-    goal: Research-grade extras that keep the cheap build working.
+    goal: Research extras; the cheap build keeps working.
     weeks: 0
     steps:
       - {id: P16.1, title: Adaptive sampling, tasks: ["Measure where the BRDF changes most [R15]"], done: "Same fit with ≥ 3× fewer photos."}

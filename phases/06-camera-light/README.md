@@ -1,10 +1,10 @@
 # 06 · First measurement
 
-**Goal:** Camera and light see a mirror's shine at the right angle.
+Camera sees a mirror's shine at the right angle.
 
 <img src="../../docs/assets/brdf-lobe.svg" width="100%" alt="First measurement">
 
-**Cost:** $93.46 · running total $346.82 of $500
+$93.46 · total so far $346.82 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
@@ -29,4 +29,4 @@
 
 > **Safety:** Don't stare into the lamp.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): R1 · G12 · T32 · V1 · V2 · V3 · V4 · V5 · V7 · V8 · V9 · N3 · N11 · N24 · N25 · N45 · N46 · N47 · H13 · H14 · H15 · H49 · K1 · K2 · K3 · K4 · K5 · K6 · L1 · L2 · L3 · L4 · L5 · L6 · L7

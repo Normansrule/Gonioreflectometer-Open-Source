@@ -29,6 +29,7 @@ h2{margin:0 0 6px;font-size:26px}
 @media(max-width:860px){.grid{grid-template-columns:1fr}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
 canvas{width:100%;display:block;border-radius:10px;background:#0b0f14;touch-action:none}
+select{background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:5px;font:inherit;font-size:14px}
 label{display:grid;grid-template-columns:110px 1fr 64px;align-items:center;gap:8px;font-size:14px;margin:6px 0}
 label output{font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
 input[type=range]{width:100%;accent-color:var(--or)}
@@ -41,6 +42,7 @@ input[type=range]{width:100%;accent-color:var(--or)}
 .phase{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
 .phase button,.toggle{background:var(--bg);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;font:inherit;font-size:13px}
 .phase button.on{color:var(--txt);border-color:var(--or)}
+.phase button:hover{color:var(--txt)}
 .eq{overflow-x:auto}
 .eq h3{margin:22px 0 4px;font-size:16px;color:var(--or)}
 .eq p{margin:4px 0;color:var(--muted)}
@@ -58,32 +60,37 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
  <button class="toggle" id="theme" aria-label="Toggle light or dark theme">◐</button>
 </nav></header>
 <main>
-<section class="hero"><img src="assets/hero.svg" alt="Animated top view: light arm sweeping around a rotating sample, fixed camera"></section>
+<section class="hero"><img src="assets/hero.svg" alt="Four-axis machine: sample turns, tilts and spins; light arm circles; camera fixed"></section>
 
 <section id="machine">
  <h2>Machine simulator</h2>
- <p class="sub">Drag to orbit. Same kinematics and keep-out model as <code>software/src/opengonio/gantry</code>. Layout after Ansari-Asl et al. 2024 [R1].</p>
+ <p class="sub">Drag to look around · scroll to zoom · double-click to reset · click a part to see it move.</p>
+ <div class="phase" id="modes"><button data-mode="gonio" class="on">Gonioreflectometer</button><button data-mode="scan">+ 3D scanner add-on</button></div>
  <div class="grid">
-  <div class="card"><canvas id="sim" width="900" height="560" aria-label="3D machine view"></canvas></div>
+  <div class="card"><canvas id="sim" width="900" height="560" aria-label="3D machine view: drag to orbit"></canvas>
+   <div class="phase" style="margin-top:10px"><button id="play">▶ Demo</button><button id="bspec">Specular pose</button><button id="bzero">Reset</button></div>
+  </div>
   <div class="card">
+   <label>Material <select id="mat"></select><span></span></label>
+   <p class="sub" id="matnote" style="font-size:13px;margin:4px 0 8px">–</p>
    <div class="phase" id="phases"></div>
    <label>M4 light <input id="m4" type="range" min="20" max="340" step="0.5" value="60"><output></output></label>
    <label>M3 table <input id="m3" type="range" min="-180" max="180" step="0.5" value="30"><output></output></label>
    <label>M2 tilt <input id="m2" type="range" min="-90" max="90" step="0.5" value="0"><output></output></label>
    <label>M1 spin <input id="m1" type="range" min="-180" max="180" step="0.5" value="0"><output></output></label>
    <div class="read">
-    <div><small>θi incident</small><span id="ti">–</span></div><div><small>θr view</small><span id="tr">–</span></div>
-    <div><small>φi</small><span id="pi">–</span></div><div><small>|φr − φi|</small><span id="dp">–</span></div>
+    <div><small>θi incident</small><span id="ti">–</span></div><div><small>θr reflected (camera)</small><span id="tr">–</span></div>
+    <div><small>φi light azimuth</small><span id="pi">–</span></div><div><small>φr camera azimuth</small><span id="prr">–</span></div>
    </div>
    <div class="status" id="status">–</div>
-   <p class="sub" style="margin-top:10px;font-size:13px">Specular: M3 = M4 / 2 (M4 ≤ 180°). Keep-out 30 mm + 5° from the camera.</p>
+   <p class="sub" id="isonote" style="margin-top:10px;font-size:13px">–</p>
   </div>
  </div>
 </section>
 
 <section id="brdf">
  <h2>BRDF explorer</h2>
- <p class="sub">In-plane slice of the fitted model (Lambert + GGX + Schlick). Radius ∝ √(f<sub>r</sub> cos θ<sub>r</sub>).</p>
+ <p class="sub">Lambert + GGX + Schlick, in-plane. Radius ∝ √(f<sub>r</sub> cos θ<sub>r</sub>).</p>
  <div class="grid">
   <div class="card"><canvas id="lobe" width="900" height="480" aria-label="BRDF polar plot"></canvas></div>
   <div class="card">
@@ -99,7 +106,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="scanner">
  <h2>3D photo scanner</h2>
- <p class="sub">Phases 11–12. Camera fixed at 650 mm; M1 spins and M2 tilts the object, so every pose is known [S9]. Drag to orbit.</p>
+ <p class="sub">Phases 11–12. Fixed camera; M1 spins and M2 tilts the object, so every pose is known [S9].</p>
  <div class="grid">
   <div class="card"><canvas id="sphere" width="900" height="560" aria-label="View sphere of the scan plan"></canvas></div>
   <div class="card">
@@ -112,7 +119,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
     <div><small>light rank</small><span id="srank">–</span></div><div><small>pose error @ 55 mm</small><span>≈ 0.1 mm</span></div>
    </div>
    <div class="status" id="sstat">–</div>
-   <p class="sub" style="margin-top:10px;font-size:13px">Blue: camera views (elevation 90° − M2). Yellow: LED-bank light directions for photometric stereo. At mast 0° the lights are coplanar (rank 2) and normals cannot be solved.</p>
+   <p class="sub" style="margin-top:10px;font-size:13px">Blue: views. Yellow: photometric-stereo lights. Mast 0° = coplanar lights, no normals.</p>
   </div>
  </div>
  <p></p>
@@ -122,7 +129,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="equations" class="eq">
  <h2>Equations</h2>
- <p class="sub">CS348b Lecture 10 (Hanrahan) [R2] and the device paper [R1]. Notes: <code>phases/00-plan/research/theory.md</code>.</p>
+ <p class="sub">Hanrahan CS348b [R2]; Ansari-Asl et al. [R1].</p>
  <h3>BRDF and reflection equation</h3>
  $$f_r(\omega_i\to\omega_r)\equiv\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\quad[\mathrm{sr}^{-1}]\qquad L_r(x,\omega_r)=\int_{H^2}f_r(x,\omega_i\to\omega_r)L_i(x,\omega_i)\cos\theta_i\,d\omega_i$$
  <h3>Reciprocity, isotropy, energy</h3>
@@ -131,6 +138,8 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
  $$\hat R=\hat I-2(\hat I\cdot\hat N)\hat N\qquad f_{r,m}=\frac{\delta(\cos\theta_i-\cos\theta_r)}{\cos\theta_i}\delta(\varphi_i-\varphi_r\pm\pi)\qquad \eta_i\sin\theta_i=\eta_t\sin\theta_t\qquad 1-\mu^2\big(1-(\hat I\cdot\hat N)^2\big)<0$$
  <h3>Fresnel, Cook-Torrance colour, Lambert</h3>
  $$F(\theta)=F(0)+(1-F(0))(1-\cos\theta)^5\qquad R=R(0)+R(\tfrac{\pi}{2})\frac{F(\theta)-F(0)}{F(\pi/2)-F(0)}\qquad f_{r,d}=\frac{\rho_d}{\pi}$$
+ <h3>Isotropic vs anisotropic; in-plane angles [R1][G9]</h3>
+ $$f_r^{\mathrm{iso}}=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|)\qquad f_r^{\mathrm{aniso}}=f_r(\theta_i,\varphi_i,\theta_r,\varphi_r)\qquad \theta_r=M_3,\;\theta_i=M_4-M_3,\;\text{specular } M_3=M_4/2$$
  <h3>Measured quantities [R1]</h3>
  $$Y^{\mathrm{SVBRDF}}=\mathrm{SVBRDF}(x,y,\theta_i,\varphi_i,\theta_r,\varphi_r,\lambda)\qquad Y^{\mathrm{BTF}}=\mathrm{BTF}(x,y,\theta_i,\varphi_i,\theta_r,\varphi_r,\lambda)$$
  <h3>Kinematics (Tait-Bryan, extrinsic x-y-z) and per-pixel directions [R1]</h3>
@@ -143,7 +152,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="build">
  <h2>Build plan</h2>
- <p class="sub">17 small phases. Each ends with something that works. Checklists: <code>phases/NN/README.md</code>.</p>
+ <p class="sub">17 phases; each ends with something that works.</p>
  <img class="full" src="assets/phases.svg" alt="17 build phases">
  <p></p>
  <img class="full" src="assets/architecture.svg" alt="Control architecture: laptop, FluidNC E4, Pico hub, camera">
@@ -153,13 +162,13 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="budget">
  <h2>Budget</h2>
- <p class="sub">Cheapest parts. Prices checked 2026-10-04. Source: <code>phases/*/bom/bom.csv</code>.</p>
+ <p class="sub">Cheapest parts, prices checked 2026-10-04.</p>
  <img class="full" src="assets/budget.svg" alt="Budget per phase">
 </section>
 
 <section id="refs">
  <h2>References</h2>
- <p class="sub">Every source is listed with an ID in <code>REFERENCES.md</code>. Key ones:</p>
+ <p class="sub">Key sources. Full list (478): <code>REFERENCES.md</code>.</p>
  <table>
   <tr><th>ID</th><th>Source</th></tr>
   <tr><td>R1</td><td>Ansari-Asl, Barbieri, Obein, Hardeberg, <i>J. Imaging</i> 10(3):55, 2024 — <a href="https://doi.org/10.3390/jimaging10030055">doi:10.3390/jimaging10030055</a></td></tr>
@@ -224,70 +233,167 @@ function state(p) {
   const [ti, pi] = ang(l), [tr, pr] = ang(cd);
   let dp = Math.abs(((pr - pi + 180) % 360 + 360) % 360 - 180);
   const a = p.m4 % 360, phase = Math.min(a, 360 - a);
-  return {R, l, ti, pi, tr, dp, gap: clearance(p.m4), phase};
+  return {R, l, ti, pi, tr, pr, dp, gap: clearance(p.m4), phase};
 }
 
 // ---------- 3D view ----------
-const cv = document.getElementById("sim"), g2 = cv.getContext("2d");
-let yaw = -35, pitch = 28, drag = null;
-cv.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY, yaw, pitch]; cv.setPointerCapture(e.pointerId); });
-cv.addEventListener("pointermove", e => { if (!drag) return; yaw = drag[2] + (e.clientX - drag[0]) * 0.4;
-  pitch = Math.max(-5, Math.min(85, drag[3] + (e.clientY - drag[1]) * 0.3)); draw(); });
-cv.addEventListener("pointerup", () => drag = null);
-function P(v) { const a = mv(Rz(yaw), v); const b = [a[0], a[1] * c(pitch) - a[2] * s(pitch), a[1] * s(pitch) + a[2] * c(pitch)];
-  return [cv.width / 2 - 40 + b[0] * 1.15, cv.height * 0.6 - b[2] * 1.15, b[1]]; }
+const cv = $("sim"), g2 = cv.getContext("2d");
+const VIEW0 = {yaw: -70, pitch: 24, zoom: 1};
+let view = {...VIEW0}, drag = null, mode = "gonio", phase = 6, anim = null, flash = null, picks = [];
+cv.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY, view.yaw, view.pitch, false]; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag[0], dy = e.clientY - drag[1];
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag[4] = true;
+  view.yaw = drag[2] + dx * 0.4; view.pitch = Math.max(-5, Math.min(85, drag[3] + dy * 0.3)); draw(); });
+cv.addEventListener("pointerup", e => { if (drag && !drag[4]) pick(e); drag = null; });
+cv.addEventListener("wheel", e => { e.preventDefault(); view.zoom = Math.max(0.5, Math.min(2.5, view.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); draw(); }, {passive: false});
+cv.addEventListener("dblclick", () => { view = {...VIEW0}; draw(); });
+function P(v) { const k = 1.15 * view.zoom * (mode === "scan" ? 0.75 : 1);
+  const a = mv(Rz(view.yaw), v); const b = [a[0], a[1] * c(view.pitch) - a[2] * s(view.pitch), a[1] * s(view.pitch) + a[2] * c(view.pitch)];
+  return [cv.width / 2 - 40 + b[0] * k, cv.height * 0.58 - b[2] * k, b[1]]; }
 function line(a, b, col, w = 2, dash = []) { const A = P(a), B = P(b); g2.strokeStyle = col; g2.lineWidth = w; g2.setLineDash(dash);
   g2.beginPath(); g2.moveTo(A[0], A[1]); g2.lineTo(B[0], B[1]); g2.stroke(); g2.setLineDash([]); }
+const path = (pts, col, w) => pts.reduce((a, b) => (line(a, b, col, w), b));
 function poly(pts, fill, stroke) { g2.beginPath(); pts.map(P).forEach((q, i) => i ? g2.lineTo(q[0], q[1]) : g2.moveTo(q[0], q[1]));
   g2.closePath(); if (fill) { g2.fillStyle = fill; g2.fill(); } if (stroke) { g2.strokeStyle = stroke; g2.lineWidth = 2; g2.stroke(); } }
 function dotp(v, r, col) { const q = P(v); g2.fillStyle = col; g2.beginPath(); g2.arc(q[0], q[1], r, 0, 7); g2.fill(); }
-let phase = 6;
+function text(v, t, col, dx = 6, dy = -6) { const q = P(v); g2.fillStyle = col; g2.font = "600 15px Segoe UI, sans-serif"; g2.fillText(t, q[0] + dx, q[1] + dy); }
+function arc(a, b, r, col, label, dy = -6) {           // angle arc between unit vectors a and b
+  const pts = []; for (let k = 0; k <= 16; k++) { const t = k / 16; pts.push(sc(unit(add(sc(a, 1 - t), sc(b, t))), r)); }
+  path(pts, col, 2); text(pts[8], label, col, 6, dy);
+}
+const glow = ax => flash && flash.ax === ax ? "#ffffff" : null;
 function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 8 ? +m2.value : 0, m1: phase >= 9 ? +m1.value : 0}; }
 function draw() {
-  const p = pose(), st = state(p);
+  const p = pose(), st = state(p), scan = mode === "scan";
   g2.clearRect(0, 0, cv.width, cv.height);
-  const ring = [], base = [];
-  for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([152 * c(a), 152 * s(a), -150]); }
-  poly([[-260, -260, -160], [420, -260, -160], [420, 260, -160], [-260, 260, -160]], "#11161d", "#30363d");
-  poly(ring, null, "#57606a");
-  line([0, 0, -150], [0, 0, -40], "#57606a", 6);
-  // sample
+  const ring = []; for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([150 * c(a), 150 * s(a), -144]); }
+  poly([[-220, -220, -150], [M.Dc + 70, -220, -150], [M.Dc + 70, 220, -150], [-220, 220, -150]], "#11161d", "#30363d");
+  poly(ring, null, glow("M4") || "#57606a");
+  line([0, 0, -150], [0, 0, -70], glow("M3") || "#6e7681", 8);
+  // yoke: turns with M3; plate tilts inside it with M2
+  const ay = mv(Rz(p.m3), [0, 1, 0]), Y = 58;
+  path([sc(ay, Y), add(sc(ay, Y), [0, 0, -70]), add(sc(ay, -Y), [0, 0, -70]), sc(ay, -Y)], glow("M2") || "#bc8cff", 5);
+  // platter (M1) + sample or object
   const u = mv(st.R, [0, 1, 0]), v = mv(st.R, [0, 0, 1]), n = mv(st.R, [1, 0, 0]);
-  const corner = (a, b) => add(sc(u, a * 28), sc(v, b * 28));
-  poly([corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)], "rgba(240,136,62,.85)", "#f0883e");
-  line([0, 0, 0], sc(n, 70), "#f0883e", 2, [4, 4]);
-  line(corner(0, 0), add(corner(0, 0), sc(u, 40)), "#bc8cff", 2);
-  // camera
-  line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, 0], "#57606a", 6);
+  const disk = []; for (let k = 0; k < 28; k++) { const a = k * 360 / 28; disk.push(add(sc(n, -6), add(sc(u, 50 * c(a)), sc(v, 50 * s(a))))); }
+  poly(disk, "#2d333b", glow("M1") || "#3fb950");
+  if (scan) {                                  // 50 mm object on the platter
+    const q = (a, b, h) => add(add(sc(u, a * 25), sc(v, b * 25)), sc(n, h));
+    const F = [[[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0]], [[-1,-1,50],[1,-1,50],[1,1,50],[-1,1,50]],
+      [[-1,-1,0],[1,-1,0],[1,-1,50],[-1,-1,50]], [[1,-1,0],[1,1,0],[1,1,50],[1,-1,50]],
+      [[1,1,0],[-1,1,0],[-1,1,50],[1,1,50]], [[-1,1,0],[-1,-1,0],[-1,-1,50],[-1,1,50]]]
+      .map(f => f.map(x => q(...x))).sort((A, B) => P(A[2])[2] - P(B[2])[2] < 0 ? 1 : -1);
+    F.forEach(f => poly(f, "rgba(240,136,62,.55)", "#f0883e"));
+  } else {
+    const corner = (a, b) => add(sc(u, a * 40), sc(v, b * 40));
+    poly([corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)], "rgba(240,136,62,.88)", glow("M1") || "#f0883e");
+    line(sc(u, -36), sc(u, 36), "#7a3a10", 4);
+  }
+  line([0, 0, 0], sc(n, 80), "#f0f6fc", 1.5, [3, 4]); text(sc(n, 84), "n", "#f0f6fc");
+  // camera (fixed)
+  line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, -20], "#57606a", 6);
   poly([[M.Dc, -22, -18], [M.Dc, 22, -18], [M.Dc, 22, 18], [M.Dc, -22, 18]], "#161b22", "#58a6ff");
-  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]);
-  // light
+  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]); text([M.Dc, 0, 22], scan ? "camera 650 mm" : "camera", "#58a6ff");
+  // light arm (M4) on the ring
   const L = sc(st.l, M.Dl);
-  line(sc(st.l, M.ring), sc(st.l, M.Dl + 40), "#8b949e", 7);
+  path([add(sc(st.l, 150), [0, 0, -138]), add(sc(st.l, M.Dl + 30), [0, 0, -138]), sc(st.l, M.Dl + 30), L], glow("M4") || "#8b949e", 6);
   line(L, [0, 0, 0], "#e3b341", 2.5, [8, 6]);
-  dotp(L, 11, "#e3b341");
+  dotp(L, 11, glow("M4") || "#e3b341"); text(L, "light", "#e3b341", 12, -10);
+  // incident / reflected angles
+  if (!scan) { arc(n, st.l, 55, "#e3b341", `θi ${st.ti.toFixed(0)}°`); arc(n, [1, 0, 0], 85, "#58a6ff", `θr ${st.tr.toFixed(0)}°`, 16); }
   dotp([0, 0, 0], 4, "#f0f6fc");
+  picks = [["M4", L], ["M1", [0, 0, 0]], ["M2", sc(ay, Y)], ["M2", sc(ay, -Y)], ["M3", [0, 0, -110]]];
   // readouts
   const fmt = x => x.toFixed(1) + "°";
-  ti.textContent = fmt(st.ti); tr.textContent = fmt(st.tr); pi.textContent = fmt(st.pi); dp.textContent = fmt(st.dp);
-  const S = document.getElementById("status");
+  ti.textContent = fmt(st.ti); tr.textContent = fmt(st.tr); pi.textContent = fmt(st.pi); $("prr").textContent = fmt(st.pr);
+  const S = $("status");
   const unsafe = st.gap < M.keep || st.phase < M.minA;
   const meas = st.ti < 90 && st.tr < 90;
   const spec = meas && Math.abs(st.ti - st.tr) < 0.6 && Math.abs(st.dp - 180) < 0.6;
+  if (scan) { S.className = "status " + (unsafe ? "bad" : "ok");
+    S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance` : `Scan view: elevation ${(90 - p.m2).toFixed(0)}°, around ${p.m1.toFixed(0)}°`; return; }
   S.className = "status " + (unsafe ? "bad" : !meas ? "warn" : spec ? "spec" : "ok");
   S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance (< 30 mm)` :
     !meas ? "Not measurable: light or camera behind the sample" :
-    spec ? "Specular geometry ✓  (mirror peak here)" : `OK · clearance ${st.gap.toFixed(0)} mm`;
+    spec ? "Specular geometry ✓  (mirror peak here)" : `OK · clearance ${st.gap.toFixed(0)} mm · |φr − φi| ${fmt(st.dp)}`;
 }
-const ids = ["m4", "m3", "m2", "m1"];
-ids.forEach(id => { const el = document.getElementById(id); const out = el.nextElementSibling;
-  const upd = () => { out.textContent = (+el.value).toFixed(1) + "°"; draw(); }; el.addEventListener("input", upd); out.textContent = el.value + "°"; });
-const ph = document.getElementById("phases");
-[6, 8, 9].forEach(k => { const b = document.createElement("button"); b.textContent = `Phase ${k}${k === 6 ? " (M4+M3)" : k === 8 ? " +M2" : " +M1"}`;
-  b.onclick = () => { phase = k; [...ph.children].forEach(x => x.classList.toggle("on", x === b));
-    m2.disabled = phase < 8; m1.disabled = phase < 9; draw(); }; ph.appendChild(b); });
-ph.children[0].classList.add("on"); m2.disabled = true; m1.disabled = true;
-
+// ---------- motion: tweens, demo, click a part ----------
+const sliders = {M4: m4, M3: m3, M2: m2, M1: m1};
+function setAx(ax, val) { const el = sliders[ax]; el.value = val; el.nextElementSibling.textContent = (+val).toFixed(1) + "°"; }
+function tween(target, ms = 900, done) {      // smooth move of several axes
+  const from = Object.fromEntries(Object.keys(target).map(k => [k, +sliders[k].value])), t0 = performance.now();
+  cancelAnimationFrame(anim?.raf); anim = {raf: 0};
+  const step = now => { const t = Math.min(1, (now - t0) / ms), e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    for (const k in target) setAx(k, from[k] + (target[k] - from[k]) * e);
+    draw(); if (t < 1) anim.raf = requestAnimationFrame(step); else { anim = null; done && done(); } };
+  anim.raf = requestAnimationFrame(step);
+}
+function needPhase(ax) { const need = {M2: 8, M1: 9}[ax] || 0; if (phase < need) setPhase(9); }
+function wiggle(ax) { needPhase(ax); const v0 = +sliders[ax].value, d = {M4: 40, M3: 30, M2: 30, M1: 90}[ax];
+  flash = {ax}; tween({[ax]: v0 + d}, 700, () => tween({[ax]: v0}, 700, () => { flash = null; draw(); })); }
+function pick(e) { const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * cv.width / r.width, y = (e.clientY - r.top) * cv.height / r.height;
+  let best = null, bd = 40; for (const [ax, v] of picks) { const q = P(v), d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = ax; } }
+  if (best) wiggle(best); }
+let demo = false;
+function demoLoop() {
+  if (!demo) return;
+  const seq = mode === "scan"
+    ? [{M2: 90, M1: -180}, {M1: 180}, {M2: 70, M1: -180}, {M1: 180}, {M2: 50, M1: -180}, {M1: 180}, {M2: 30}]
+    : [{M4: 120}, {M3: 60}, {M4: 60, M3: 30}, {M2: 30}, {M2: -20}, {M2: 0}, {M1: 120}, {M1: -60}, {M1: 0}];
+  let i = 0; const next = () => { if (!demo) return; if (i >= seq.length) { i = 0; } const tgt = seq[i++];
+    Object.keys(tgt).forEach(needPhase); flash = {ax: Object.keys(tgt).pop()}; tween(tgt, 1100, () => setTimeout(next, 250)); };
+  next();
+}
+$("play").onclick = () => { demo = !demo; $("play").textContent = demo ? "■ Stop" : "▶ Demo"; if (demo) demoLoop(); else { flash = null; draw(); } };
+$("bspec").onclick = () => tween({M3: +m4.value / 2, M2: 0});
+$("bzero").onclick = () => tween(mode === "scan" ? {M4: 30, M3: 0, M2: 90, M1: 0} : {M4: 60, M3: 30, M2: 0, M1: 0});
+// ---------- materials: what to test and where to put the light and camera ----------
+const MATS = [
+  {n: "PTFE white reference", iso: true, pose: {M4: 45, M3: 0, M2: 0, M1: 0}, b: [0.95, 1, 0],
+   t: "Diffuse calibration. Light 45°, camera along the normal (45°:0°, CIE). Reading should not change with θr."},
+  {n: "Matte paper", iso: true, pose: {M4: 60, M3: 20, M2: 0, M1: 0}, b: [0.8, 0.95, 0],
+   t: "Near-Lambertian first test. Sweep M3 at fixed light: curve ≈ cos θr."},
+  {n: "First-surface mirror", iso: true, pose: {M4: 60, M3: 30, M2: 0, M1: 0}, b: [0.95, 0.05, 1],
+   t: "Angle calibration. Peak must sit at M3 = M4 / 2 (θi = θr)."},
+  {n: "Glossy plastic (acrylic, LEGO)", iso: true, pose: {M4: 80, M3: 40, M2: 0, M1: 0}, b: [0.5, 0.2, 0],
+   t: "Isotropic gloss. Specular pose at θ = 20/40/60°, then step M3 ±10° around it."},
+  {n: "Metallic car paint", iso: true, pose: {M4: 90, M3: 35, M2: 0, M1: 0}, b: [0.6, 0.35, 0.8],
+   t: "Near-specular + flake sparkle: measure 15° off specular (ASTM E2194 style)."},
+  {n: "Brushed aluminium", iso: false, pose: {M4: 60, M3: 30, M2: 0, M1: 0}, b: [0.9, 0.25, 1],
+   t: "Anisotropic. Hold the specular pose and spin M1: the highlight stretches across the brushing."},
+  {n: "Satin ribbon / brushed fabric", iso: false, pose: {M4: 70, M3: 35, M2: 15, M1: 45}, b: [0.6, 0.45, 0],
+   t: "Anisotropic. Needs M2 + M1: tilt 15°, spin in 15° steps."},
+  {n: "Velvet / retroreflective tape", iso: true, pose: {M4: 20, M3: 10, M2: 0, M1: 0}, b: [0.3, 0.9, 0],
+   t: "Back-scatter: light as close to the camera as allowed (M4 = 20°, ≥ 5° + 30 mm keep-out)."},
+];
+const SCAN_MATS = [
+  {n: "Matte 3D print / plaster figure", t: "Ideal: matte, textured. Rings at M2 = 90…10°, 36 views each."},
+  {n: "Painted wood toy", t: "Good. Lamp at M4 = 30° with crossed polarizers to kill glare."},
+  {n: "Shiny or clear object", t: "Spray with matte scanning spray first; glass and chrome do not scan."},
+];
+function fillMats() { const sel = $("mat"); sel.innerHTML = "";
+  (mode === "scan" ? SCAN_MATS : MATS).forEach((m, i) => sel.add(new Option(m.n + (m.iso === false ? " (anisotropic)" : ""), i))); applyMat(); }
+function applyMat() { const m = (mode === "scan" ? SCAN_MATS : MATS)[+$("mat").value];
+  $("matnote").textContent = m.t;
+  $("isonote").innerHTML = mode === "scan" ? "Scan: view elevation = 90° − M2; M1 gives the views around each ring."
+    : m.iso ? "<b>Isotropic</b>: only θi, θr and |φr − φi| matter (3 angles) → M4, M3, M2 are enough."
+            : "<b>Anisotropic</b>: φi and φr matter separately (4 angles) → needs M1 spin (phase 09).";
+  if (m.pose) { Object.keys(m.pose).forEach(needPhase); tween(m.pose);
+    [brg.value, bbc.value, bmt.value] = [m.b[1], m.b[0], m.b[2]]; bti.value = (m.pose.M4 - m.pose.M3).toFixed(0);
+    ["bti", "brg", "bbc", "bmt"].forEach(id => $(id).dispatchEvent(new Event("input"))); }
+  else tween({M4: 30, M3: 0, M2: 90, M1: 0}); }
+$("mat").onchange = applyMat;
+document.querySelectorAll("#modes button").forEach(b => b.onclick = () => {
+  mode = b.dataset.mode; document.querySelectorAll("#modes button").forEach(x => x.classList.toggle("on", x === b));
+  M.Dc = mode === "scan" ? 650 : 350; if (mode === "scan") setPhase(9); fillMats(); });
+// ---------- sliders and phase buttons ----------
+["m4", "m3", "m2", "m1"].forEach(id => { const el = $(id); const out = el.nextElementSibling;
+  el.addEventListener("input", () => { out.textContent = (+el.value).toFixed(1) + "°"; draw(); }); out.textContent = el.value + "°"; });
+const ph = $("phases");
+function setPhase(k) { phase = k; [...ph.children].forEach(x => x.classList.toggle("on", +x.dataset.k === k));
+  m2.disabled = phase < 8; m1.disabled = phase < 9; draw(); }
+[6, 8, 9].forEach(k => { const b = document.createElement("button"); b.dataset.k = k;
+  b.textContent = `Phase ${k}${k === 6 ? " (M4+M3)" : k === 8 ? " +M2 tilt" : " +M1 spin"}`; b.onclick = () => setPhase(k); ph.appendChild(b); });
 // ---------- BRDF explorer ----------
 const lc = document.getElementById("lobe"), g3 = lc.getContext("2d");
 function sph(t, p) { return [s(t) * c(p), s(t) * s(p), c(t)]; }
@@ -370,7 +476,7 @@ function drawSphere() {
 function sc_(v, k) { return v.map(x => x * k); }
 [srings, sper, sps, smast].forEach(el => { const out = el.nextElementSibling; const upd = () => { out.textContent = el.value; drawSphere(); };
   el.addEventListener("input", upd); out.textContent = el.value; });
-draw(); drawLobe(); drawSphere();
+setPhase(6); fillMats(); drawLobe(); drawSphere();
 </script>
 </body>
 </html>

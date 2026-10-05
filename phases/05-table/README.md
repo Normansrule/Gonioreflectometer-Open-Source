@@ -1,8 +1,8 @@
 # 05 · Table turns (M3)
 
-**Goal:** The sample turns to any angle and comes back to the same spot.
+Sample turns to any angle and returns to the same spot.
 
-**Cost:** $22.38 · running total $253.36 of $500
+$22.38 · total so far $253.36 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
@@ -19,4 +19,4 @@
 - [ ] 20 return moves
 - [ ] **Done:** Returns within 0.1°.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): G33 · H11 · H16 · H17 · H26 · H37 · H41 · P40 · P41 · P42 · P43

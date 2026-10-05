@@ -1,15 +1,15 @@
 # 02 · Controller and buttons
 
-**Goal:** The laptop and the buttons can talk to the machine.
+Laptop and buttons talk to the machine.
 
-**Cost:** $55.99 · running total $122.82 of $500
+$55.99 · total so far $122.82 / $500
 
-[Research](research/) · [Design](design/) · [3D files](3d/) · [Bill of materials](bom/) · [Tests](test/)
+[Design](design/) · [3D files](3d/) · [Bill of materials](bom/) · [Tests](test/)
 
 ## 02.1 Flash boards
 
-- [ ] FluidNC on the E4 (design/firmware.md)
-- [ ] MicroPython + hub on the Pico
+- [ ] bash scripts/e4.sh flash, then wifi and config (design/firmware.md)
+- [ ] bash scripts/pico.sh
 - [ ] **Done:** `?` returns status; Pico answers PING.
 
 ## 02.2 Wire and box
@@ -26,4 +26,4 @@
 
 > **Safety:** Never plug or unplug motors with 24 V on.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): R24 · R25 · R42 · R81 · N48 · H1 · H2 · H4 · H5 · H6 · H7 · H8 · H23 · H24 · H25 · H43 · P22 · C1 · C2 · C3 · C4 · C5 · C6 · C7

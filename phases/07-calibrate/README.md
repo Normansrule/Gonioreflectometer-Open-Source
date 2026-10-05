@@ -1,8 +1,8 @@
 # 07 · Calibrate → game material
 
-**Goal:** A measured swatch looks right in Unreal or Unity.
+A measured swatch looks right in Unreal or Unity.
 
-**Cost:** $73.32 · running total $420.14 of $500
+$73.32 · total so far $420.14 / $500
 
 [Research](research/) · [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
@@ -25,4 +25,4 @@
 - [ ] Export Unreal / Unity material
 - [ ] **Done:** Render matches a photo at 3 light angles.
 
-<sub>Generated from `.github/phases.yml` by `tools/roadmap.py`.</sub>
+[Sources](../../REFERENCES.md): R1 · R2 · R5 · R6 · R7 · R49 · S12 · S13 · G1 · G12 · G16 · G19 · G20 · G21 · G22 · G24 · G26 · G29 · G34 · T1 · T2 · T5 · T8 · T9 · T11 · T12 · T13 · T17 · T22 · T25 · T27 · T30 · T31 · T32 · T33 · T35 · T36 · T37 · T38 · T39 · T40 · T43 · T45 · T46 · T47 · T48 · T49 · T50 · V1 · V7 · V9 · V19 · V20 · V21 · V22 · V23 · V24 · N1 · N2 · N4 · N10 · N24 · N26 · N28 · N30 · N31 · N32 · N33 · N34 · N35 · N36 · H19 · H22 · H39 · H47 · H48 · E1 · E2 · E3 · E4 · E5 · E6 · E7
