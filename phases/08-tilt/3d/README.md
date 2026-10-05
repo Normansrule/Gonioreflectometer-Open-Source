@@ -4,16 +4,18 @@
 
 PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
 
-| ID | Part | STEP (edit / Onshape) | STL (slice) |
+**STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
+
+| ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| TLT-07a | Tilt yoke | [TLT-07a_tilt_yoke.step](print/TLT-07a_tilt_yoke.step) | [TLT-07a_tilt_yoke.stl](print/TLT-07a_tilt_yoke.stl) |
-| TLT-07b | GT2 100T pulley (5:1) | [TLT-07b_pulley_100T.step](print/TLT-07b_pulley_100T.step) | [TLT-07b_pulley_100T.stl](print/TLT-07b_pulley_100T.stl) |
+| TLT-07a | Tilt yoke | [TLT-07a_tilt_yoke.step](TLT-07a_tilt_yoke.step) | [TLT-07a_tilt_yoke.stl](TLT-07a_tilt_yoke.stl) |
+| TLT-07b | GT2 100T pulley (5:1) | [TLT-07b_pulley_100T.step](TLT-07b_pulley_100T.step) | [TLT-07b_pulley_100T.stl](TLT-07b_pulley_100T.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves downloadable vendor models into `vendor/` (git-ignored: vendor licences).
+`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
 
 | ID | Part | 3D model |
 |---|---|---|
@@ -24,9 +26,4 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 | TLT-05 | 8 mm steel shaft 100 mm | Model as 8 x 100 mm rod |
 | TLT-06 | Axis fasteners (M3/M5 set) | Onshape Standard Content |
 
-## Design notes
-
-| Part | Source |
-|---|---|
-| Hub, pulley, motor mount, home flag (TLT-07) | Onshape `TLT` |
-| NEMA 17 | [STEP](https://www.omc-stepperonline.com/index.php?route=product/product/get_file&file=110/17HS19-2004S1.STEP) [P40] |
+Design notes: [../design.md](../design.md).

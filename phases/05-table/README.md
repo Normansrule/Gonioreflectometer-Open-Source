@@ -2,7 +2,7 @@
 
 $22.38 · total so far $253.36 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M15 · Table axis built
 
@@ -10,7 +10,7 @@ Sample table turns on its post without wobble. · ~1 wk
 
 **M15.1 Build**
 
-- [ ] Order phases/05-table/bom/bom.csv
+- [ ] Order phases/05-table/bom.csv
 - [ ] Post with two 608s, 100T pulley, belt, motor
 - [ ] **Done:** Turns ±180°, no visible wobble.
 

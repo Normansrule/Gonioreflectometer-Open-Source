@@ -2,7 +2,7 @@
 
 $29.56 · total so far $494.46 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M29 · LED bank
 
@@ -10,7 +10,7 @@ $29.56 · total so far $494.46 / $500
 
 **M29.1 Build**
 
-- [ ] Order phases/10-color/bom/bom.csv
+- [ ] Order phases/10-color/bom.csv
 - [ ] 8 LEDs on the 40° mast, ULN2803A from Pico GP8–15
 - [ ] Mast in the collision model; machine.yaml: installed_phase 10
 - [ ] **Done:** Each band switches.

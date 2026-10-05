@@ -2,7 +2,7 @@
 
 $55.99 · total so far $122.82 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/) · [Tests](test/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
 ## M07 · Order controller parts
 
@@ -10,7 +10,7 @@ E4, Pico, buttons and one motor on the bench. · ~2 wk
 
 **M07.1 Order**
 
-- [ ] Order phases/02-controller/bom/bom.csv and one NEMA 17 (LAR-02)
+- [ ] Order phases/02-controller/bom.csv and one NEMA 17 (LAR-02)
 - [ ] **Done:** Parts arrived.
 
 ## M08 · One motor turns from the laptop
@@ -19,7 +19,7 @@ Laptop → E4 → motor works on the bench. · ~1 wk
 
 **M08.1 Flash the E4**
 
-- [ ] WSL only: usbipd bind/attach (design/firmware.md)
+- [ ] WSL only: usbipd bind/attach (design.md)
 - [ ] bash scripts/e4.sh flash
 - [ ] bash scripts/e4.sh wifi "SSID" "PASS"
 - [ ] bash scripts/e4.sh config fluidnc.local
@@ -54,7 +54,7 @@ Boards boxed, links tested. · ~1 wk
 **M10.1 Box and test**
 
 - [ ] Print case + panel, mount boards
-- [ ] Run C1–C8 (USB, WiFi, Bluetooth), fill test/log.csv
+- [ ] Run C1–C8 (USB, WiFi, Bluetooth), fill test.csv
 - [ ] **Done:** C1–C8 pass.
 
 > **Safety:** Never plug or unplug motors with 24 V on.

@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/architecture.svg" width="100%" alt="Plan">
 
-[Research](research/) · [Design](design/) · [3D files](3d/)
+[Design](design.md) · [Research](research.md) · [3D files](3d/)
 
 ## M01 · Read and decide
 
@@ -17,7 +17,7 @@ Know what you are building and what to buy. · ~1 wk
 
 **M01.2 Shopping list**
 
-- [ ] Set Own = Y for parts you have, in phases/*/bom/bom.csv
+- [ ] Set Own = Y for parts you have, in phases/*/bom.csv
 - [ ] python3 tools/bom_check.py --strict
 - [ ] **Done:** Total ≤ $500.
 
@@ -44,12 +44,12 @@ Printed parts will fit first time. · ~1 wk
 
 **M03.1 Onshape**
 
-- [ ] Create the document and OG globals (design/onshape.md)
-- [ ] **Done:** Globals match design/architecture.md.
+- [ ] Create the document and OG globals (design.md)
+- [ ] **Done:** Globals match design.md.
 
 **M03.2 Tolerance coupon**
 
-- [ ] Print phases/00-plan/3d/print/PLAN-01_tolerance_coupon.stl in PETG
+- [ ] Print phases/00-plan/3d/PLAN-01_tolerance_coupon.stl in PETG
 - [ ] Set CLEAR and INSERT in tools/cad/parts.py from the hole that fits; python tools/cad/parts.py
 - [ ] **Done:** Coupon fits.
 

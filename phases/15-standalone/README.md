@@ -2,7 +2,7 @@
 
 Optional kit $32.00 (not in the $500 total)
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M40 · Panel screen
 
@@ -10,7 +10,7 @@ OLED shows menu and progress (works in both modes). · ~1 wk
 
 **M40.1 OLED**
 
-- [ ] Order phases/15-standalone/bom/bom.csv
+- [ ] Order phases/15-standalone/bom.csv
 - [ ] OLED on Pico GP16/GP17, bash scripts/pico.sh
 - [ ] **Done:** Screen shows 'OpenGonio ready'.
 
@@ -21,7 +21,7 @@ Pi drives the E4 over WiFi and grabs camera frames. · ~1 wk
 **M41.1 Install**
 
 - [ ] Imager: Pi OS Lite, hostname opengonio, SSH, WiFi
-- [ ] Wire UART + buck (design/notes.md)
+- [ ] Wire UART + buck (design.md)
 - [ ] bash scripts/station.sh USER@opengonio.local; reboot
 - [ ] **Done:** journalctl shows 'station ready'.
 

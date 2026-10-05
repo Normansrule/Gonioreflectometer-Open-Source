@@ -4,17 +4,19 @@
 
 PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
 
-| ID | Part | STEP (edit / Onshape) | STL (slice) |
+**STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
+
+| ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| FRM-09a | OG-40 adapter plate | [FRM-09a_og40_adapter.step](print/FRM-09a_og40_adapter.step) | [FRM-09a_og40_adapter.stl](print/FRM-09a_og40_adapter.stl) |
-| FRM-09b | Foot cup (print 4) | [FRM-09b_foot.step](print/FRM-09b_foot.step) | [FRM-09b_foot.stl](print/FRM-09b_foot.stl) |
-| FRM-09c | Ring scale, 90 deg (print 4) | [FRM-09c_protractor_segment.step](print/FRM-09c_protractor_segment.step) | [FRM-09c_protractor_segment.stl](print/FRM-09c_protractor_segment.stl) |
+| FRM-09a | OG-40 adapter plate | [FRM-09a_og40_adapter.step](FRM-09a_og40_adapter.step) | [FRM-09a_og40_adapter.stl](FRM-09a_og40_adapter.stl) |
+| FRM-09b | Foot cup (print 4) | [FRM-09b_foot.step](FRM-09b_foot.step) | [FRM-09b_foot.stl](FRM-09b_foot.stl) |
+| FRM-09c | Ring scale, 90 deg (print 4) | [FRM-09c_protractor_segment.step](FRM-09c_protractor_segment.step) | [FRM-09c_protractor_segment.stl](FRM-09c_protractor_segment.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves downloadable vendor models into `vendor/` (git-ignored: vendor licences).
+`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
 
 | ID | Part | 3D model |
 |---|---|---|
@@ -29,10 +31,4 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 | FRM-10 | M4 tee nut, 4-prong | Onshape Standard Content |
 | FRM-11 | M5 tee nut, 4-prong | Onshape Standard Content |
 
-## Design notes
-
-| Part | Source |
-|---|---|
-| Post feet, OG-40 adapters, camera L-arm, protractor scales (FRM-09) | Onshape `FRM` |
-| 2020 extrusion | Onshape Standard Content |
-| 608 bearings | Onshape bearing generator |
+Design notes: [../design.md](../design.md).

@@ -28,8 +28,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / ".github" / "phases.yml"
 README = ROOT / "README.md"
 START, END = "<!-- phases:start -->", "<!-- phases:end -->"
-SUBFOLDERS = [("research", "Research"), ("design", "Design"), ("3d", "3D files"), ("bom", "Bill of materials"),
-              ("test", "Tests")]
+SUBFOLDERS = [("design.md", "Design"), ("research.md", "Research"), ("bom.csv", "Parts list"), ("3d", "3D files"),
+              ("test.csv", "Tests")]
 
 
 IMAGES = {"00-plan": "architecture", "01-power": "power-flow", "03-frame": "axes", "06-camera-light": "brdf-lobe",
@@ -64,7 +64,7 @@ def sources() -> dict[int, set[str]]:
         for f in d.rglob("*.md"):
             if f.name != "README.md":
                 ids.update(i for i in re.findall(r"\[([A-Z]\d{1,3})\]", f.read_text(encoding="utf-8")) if i in known)
-        bom = d / "bom" / "bom.csv"
+        bom = d / "bom.csv"
         if bom.exists():
             for r in csv.DictReader(bom.open(encoding="utf-8")):
                 ids.update(i.strip() for i in r["Refs"].split(",") if i.strip() in known)
@@ -97,7 +97,7 @@ def stage_md(st: dict, ms: list[dict], cost: float, running: float, opt: float, 
         out += [f"${cost:.2f} · total so far ${running:.2f} / $500", ""]
     if opt:
         out += [f"Optional kit ${opt:.2f} (not in the $500 total)", ""]
-    links = [f"[{name}]({sub}/)" for sub, name in SUBFOLDERS if (d / sub).is_dir()]
+    links = [f"[{name}]({sub}{'/' if (d / sub).is_dir() else ''})" for sub, name in SUBFOLDERS if (d / sub).exists()]
     if links:
         out += [" · ".join(links), ""]
     for m in ms:
@@ -126,10 +126,10 @@ def table(stages: list[dict], ms: list[dict], c: dict[str, float]) -> str:
 def parts_rows(stages: list[dict]) -> str:
     rows = ["| Stage | Printed parts (STL) |", "|---|---|"]
     for st in stages:
-        d = ROOT / "phases" / st["folder"] / "3d" / "print"
+        d = ROOT / "phases" / st["folder"] / "3d"
         files = sorted(d.glob("*.stl")) if d.is_dir() else []
         if files:
-            items = " · ".join(f"[{f.stem.split('_', 1)[0]}](phases/{st['folder']}/3d/print/{f.name}) {f.stem.split('_', 1)[1].replace('_', ' ')}"
+            items = " · ".join(f"[{f.stem.split('_', 1)[0]}](phases/{st['folder']}/3d/{f.name}) {f.stem.split('_', 1)[1].replace('_', ' ')}"
                               for f in files)
             rows.append(f"| [{st['folder'][:2]} {st['title']}](phases/{st['folder']}/3d/) | {items} |")
     return "\n".join(rows)

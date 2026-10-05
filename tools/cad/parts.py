@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Starter geometry for every printed part (CadQuery). Writes STEP + STL into phases/NN/3d/print/.
+"""Starter geometry for every printed part (CadQuery). Writes STEP (edit in Onshape) + STL (slice) into phases/NN/3d/.
 
     pip install cadquery          # once
     python tools/cad/parts.py     # all parts;  --only CAL-06a  for one
@@ -89,9 +89,9 @@ def button_panel():
 
 
 def controller_tray():
-    """Base for E4 + Pico. E4 hole positions: verify on the FYSETC drawing [C1] before printing."""
+    """Base for E4 + Pico. E4 holes from FYSETC "E4 V1.0B.step" [C1]: 4 x 3.2 mm on 83.6 x 60.6 mm."""
     t = cq.Workplane("XY").box(170, 110, 3, centered=(True, True, False))
-    e4 = [(-35 + x, y) for x in (-41, 41) for y in (-29.5, 29.5)]                                      # ~90 x 67 board, 4 mm inset
+    e4 = [(-35 + x, y) for x in (-41.8, 41.8) for y in (-30.3, 30.3)]                                  # measured from the vendor STEP
     pico = [(55 + x, y) for x in (-23.5, 23.5) for y in (-5.7, 5.7)]                                  # 47 x 11.4 [C6]
     for x, y in e4:
         t = t.union(cq.Workplane("XY").circle(3.5).extrude(9).translate((x, y, 0)))
@@ -343,7 +343,7 @@ def build(only: str | None = None) -> list[Path]:
     for pid, (stage, stem, fn, _) in PARTS.items():
         if only and pid != only:
             continue
-        d = ROOT / "phases" / stage / "3d" / "print"
+        d = ROOT / "phases" / stage / "3d"
         d.mkdir(parents=True, exist_ok=True)
         shape = fn()
         for ext in ("step", "stl"):

@@ -4,7 +4,7 @@
 
 $66.83 · total so far $66.83 / $500
 
-[Research](research/) · [Design](design/) · [3D files](3d/) · [Bill of materials](bom/) · [Tests](test/)
+[Design](design.md) · [Research](research.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
 ## M04 · Order power parts
 
@@ -12,7 +12,7 @@ Everything for the power box on the bench. · ~2 wk
 
 **M04.1 Order and print**
 
-- [ ] Order phases/01-power/bom/bom.csv
+- [ ] Order phases/01-power/bom.csv
 - [ ] Print PWR-18a box and PWR-18b lid (3d/README.md)
 - [ ] **Done:** Parts arrived, checked against the BOM.
 
@@ -22,14 +22,14 @@ Fuse, reverse-polarity MOSFET and e-stop wired, not yet powered. · ~1 wk
 
 **M05.1 Solder**
 
-- [ ] Solder per design/netlist.md
+- [ ] Solder per design.md
 - [ ] Heat-shrink every joint
 - [ ] **Done:** Board matches the netlist.
 
 **M05.2 Checks with power off**
 
 - [ ] Run T1–T3 (continuity, no shorts)
-- [ ] Fill test/log.csv
+- [ ] Fill test.csv
 - [ ] **Done:** T1–T3 pass.
 
 ## M06 · First power-on

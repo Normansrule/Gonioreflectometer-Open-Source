@@ -47,7 +47,7 @@ lights:                         # FluidNC user digital outputs (M62/M63 P<n>)
   multispectral: {output: 1, phase: 10, elevation_deg: 40.0}   # LED bank on a 40 deg mast: non-coplanar lights for photometric stereo
 
 scan:                           # Phase 6 photo scanner (camera slid to the far end of the outrigger)
-  camera_distance_mm: 650.0     # f/8: see phases/06-camera-light/design/optics.md (field, DOF, resolution)
+  camera_distance_mm: 650.0     # f/8: see phases/06-camera-light/optics.md (field, DOF, resolution)
   aperture_f: 8
   object_max_radius_mm: 55.0    # bounding sphere of the object about its centre (2r <= DOF)
   platter_offset_mm: 0.0        # delta: support surface below the zero point = 60 - riser height (mm)

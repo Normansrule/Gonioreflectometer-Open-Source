@@ -2,7 +2,7 @@
 
 $45.40 · total so far $230.98 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M13 · Ring drive built
 

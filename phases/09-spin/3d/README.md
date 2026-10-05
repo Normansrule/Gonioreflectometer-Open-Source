@@ -4,16 +4,18 @@
 
 PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
 
-| ID | Part | STEP (edit / Onshape) | STL (slice) |
+**STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
+
+| ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| SPN-07a | Spin platter | [SPN-07a_spin_platter.step](print/SPN-07a_spin_platter.step) | [SPN-07a_spin_platter.stl](print/SPN-07a_spin_platter.stl) |
-| SPN-07b | GT2 80T pulley (4:1) | [SPN-07b_pulley_80T.step](print/SPN-07b_pulley_80T.step) | [SPN-07b_pulley_80T.stl](print/SPN-07b_pulley_80T.stl) |
+| SPN-07a | Spin platter | [SPN-07a_spin_platter.step](SPN-07a_spin_platter.step) | [SPN-07a_spin_platter.stl](SPN-07a_spin_platter.stl) |
+| SPN-07b | GT2 80T pulley (4:1) | [SPN-07b_pulley_80T.step](SPN-07b_pulley_80T.step) | [SPN-07b_pulley_80T.stl](SPN-07b_pulley_80T.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves downloadable vendor models into `vendor/` (git-ignored: vendor licences).
+`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
 
 | ID | Part | 3D model |
 |---|---|---|
@@ -24,9 +26,4 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 | SPN-05 | 8 mm steel shaft 100 mm | Model as 8 x 100 mm rod |
 | SPN-06 | Axis fasteners (M3/M5 set) | Onshape Standard Content |
 
-## Design notes
-
-| Part | Source |
-|---|---|
-| Hub, pulley, motor mount, home flag (SPN-07) | Onshape `SPN` |
-| NEMA 17 | [STEP](https://www.omc-stepperonline.com/index.php?route=product/product/get_file&file=110/17HS19-2004S1.STEP) [P40] |
+Design notes: [../design.md](../design.md).

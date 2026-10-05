@@ -2,7 +2,7 @@
 
 $22.38 · total so far $442.52 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M25 · Tilt yoke built and homed
 
@@ -10,7 +10,7 @@ Sample tilts without moving off the zero point. · ~2 wk
 
 **M25.1 Build**
 
-- [ ] Order phases/08-tilt/bom/bom.csv
+- [ ] Order phases/08-tilt/bom.csv
 - [ ] Yoke on the table flange, motor, home flag at −90°
 - [ ] machine.yaml: installed_phase 8
 - [ ] **Done:** Returns within 0.1°; sample centre unchanged.

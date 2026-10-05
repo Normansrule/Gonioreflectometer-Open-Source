@@ -4,7 +4,7 @@
 
 $4.49 · total so far $498.95 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/) · [Tests](test/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
 ## M31 · Scan hardware
 

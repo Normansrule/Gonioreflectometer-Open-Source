@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""1:1 drill template for the 600 x 600 mm base -> phases/03-frame/design/drill-template.svg.
+"""1:1 drill template for the 600 x 600 mm base -> phases/03-frame/drill-template.svg.
 Print at 100 % (poster / tile mode), check the 100 mm bar, tape to the plywood, centre-punch each cross.
 SPDX-License-Identifier: CERN-OHL-S-2.0
 """
@@ -7,7 +7,7 @@ import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "phases/03-frame/design/drill-template.svg"
+OUT = ROOT / "phases/03-frame/drill-template.svg"
 S, HALF = 600, 300                       # plate size; origin (0, 0) under the zero point = plate centre
 DRILL = {"M4 tee": 6.0, "M5 tee": 7.0, "M8 tee": 10.0, "M5": 5.5}
 

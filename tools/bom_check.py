@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check every phases/*/bom/bom.csv and the $500 total; draw docs/assets/budget.svg.
+"""Check every phases/*/bom.csv and the $500 total; draw docs/assets/budget.svg.
 
     python tools/bom_check.py            # check + chart
     python tools/bom_check.py --strict   # also fail if the total > $500
@@ -26,12 +26,12 @@ HARD_CAP = 500.0
 
 def load() -> dict[str, list[dict]]:
     out = {}
-    for f in sorted(PHASES.glob("*/bom/bom.csv")):
+    for f in sorted(PHASES.glob("*/bom.csv")):
         with f.open(newline="", encoding="utf-8") as fh:
             rd = csv.DictReader(fh)
             if rd.fieldnames != COLUMNS:
                 raise ValueError(f"{f}: header must be {COLUMNS}")
-            out[f.parts[-3]] = list(rd)
+            out[f.parts[-2]] = list(rd)
     return out
 
 

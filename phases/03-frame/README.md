@@ -4,7 +4,7 @@
 
 $62.76 · total so far $185.58 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M11 · Cut and drill the base
 
@@ -12,8 +12,8 @@ Every hole for every later stage, drilled once. · ~1 wk
 
 **M11.1 Cut and drill**
 
-- [ ] Order phases/03-frame/bom/bom.csv
-- [ ] Print design/drill-template.svg at 100 % (check the 100 mm bar), tape on
+- [ ] Order phases/03-frame/bom.csv
+- [ ] Print drill-template.svg at 100 % (check the 100 mm bar), tape on
 - [ ] Cut 600 × 600 plywood, centre-punch and drill
 - [ ] **Done:** Holes within ±0.5 mm.
 

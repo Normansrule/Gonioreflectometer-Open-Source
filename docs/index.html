@@ -285,7 +285,7 @@ const PARTS = {   // what you click -> where its files are (relative to docs/)
 };
 function showPart(k) { const q = PARTS[k]; if (!q) return;
   $("partinfo").innerHTML = `<b>${q.n}</b> · stage ${q.st.slice(0, 2)} · BOM ${q.bom} · ` +
-    `<a href="../phases/${q.st}/3d/">3D files</a> · <a href="../phases/${q.st}/bom/bom.csv">parts list</a> · <a href="../phases/${q.st}/">checklist</a>`; }
+    `<a href="../phases/${q.st}/3d/">3D files</a> · <a href="../phases/${q.st}/bom.csv">parts list</a> · <a href="../phases/${q.st}/">checklist</a>`; }
 function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 8 ? +m2.value : 0, m1: phase >= 9 ? +m1.value : 0}; }
 function draw() {
   const p = pose(), st = state(p), scan = mode === "scan", B = +$("build").value;

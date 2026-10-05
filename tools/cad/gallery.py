@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render every printed part (phases/*/3d/print/*.stl) into docs/assets/parts.png.  pip install numpy-stl matplotlib
+"""Render every printed part (phases/*/3d/*.stl) into docs/assets/parts.png.  pip install numpy-stl matplotlib
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 import glob
@@ -15,7 +15,7 @@ from stl import mesh  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 files, seen = [], set()
-for f in sorted(glob.glob(str(ROOT / "phases/*/3d/print/*.stl"))):
+for f in sorted(glob.glob(str(ROOT / "phases/*/3d/*.stl"))):
     stem = Path(f).stem.split("_", 1)[1]
     if stem not in seen:
         seen.add(stem)

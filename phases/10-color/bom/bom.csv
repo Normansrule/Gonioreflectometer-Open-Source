@@ -1,7 +1,0 @@
-ID,Type,Part,Use,Qty,Maker,Part number,Supplier,Link,Unit USD,Total USD,STEP,CAD license,Notes,Own,Price,Refs
-MSK-01,Purchase,"Narrow-band star LEDs (8 bands, ~420-660 nm)",Colour bands,8,generic,"1-3 W star LED, one per band",any,n/a,1.50,12.00,n/a,n/a,One band on at a time.,N,estimate,R1
-MSK-02,Purchase,Constant-current driver 350 mA,"One driver, one LED on at a time",1,MEAN WELL,NLDD-350H,Power Supply Mall,https://powersupplymall.com/products/mean-well-nldd-350h-dc-dc-led-driver-cc-350ma-step-down,4.81,4.81,Mean Well 3D OUTLINE (not downloaded),Vendor CAD - link only,,N,checked 2026-10-04,L4
-MSK-03,Purchase,Darlington array 8-ch,Pico selects the band (low-side),1,TI / ST,ULN2803A,any,n/a,0.80,0.80,DIP-18 model,n/a,,N,estimate,-
-MSK-04,Purchase,Heatsink 40 mm (from LSR-03 pack),LED bank cooling,1,Easycargo,40x40x11 mm,Amazon,https://www.amazon.com/Easycargo-40x40x11mm-TEC1-12706-Thermoelectric-40mmx40mmx11mm/dp/B07WR7MPB1,3.00,3.00,Block model,n/a,,N,estimate,L7
-MSK-05,Purchase,Linear polarizer film 10 x 10 cm (10),Polarized capture (specular/diffuse separation),1,generic,linear polarizer film,Walmart,https://www.walmart.com/ip/5466199163,8.95,8.95,n/a,n/a,,N,checked 2026-10-04,E8
-MSK-06,Print,"LED bank ring on a 40 deg mast, polarizer holders",40° mast: 2nd light height,1,OpenGonio,OG-MSK-*,Self-printed (black PETG),n/a,0.00,0.00,3d/print/MSK-06a_led_ring.step; 3d/print/MSK-06b_led_mast.step,CERN-OHL-S-2.0,,N,n/a,-

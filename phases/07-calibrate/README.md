@@ -2,7 +2,7 @@
 
 $73.32 · total so far $420.14 / $500
 
-[Research](research/) · [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Research](research.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M21 · Dark box
 
@@ -10,7 +10,7 @@ Only the lamp lights the sample. · ~1 wk
 
 **M21.1 Drape**
 
-- [ ] Order phases/07-calibrate/bom/bom.csv
+- [ ] Order phases/07-calibrate/bom.csv
 - [ ] Dowels, blackout drape, felt backdrop
 - [ ] **Done:** Stray light < 0.1 % of the PTFE signal.
 

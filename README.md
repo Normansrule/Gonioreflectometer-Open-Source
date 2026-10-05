@@ -34,7 +34,9 @@ Camera fixed on +X at 350 mm (650 mm for 3D scans). Light 300 mm from the zero p
 
 ## Stages and milestones
 
-18 stages (folders under `phases/`), 48 small milestones. Each step is a GitHub issue with a checklist. Start at M01.
+18 stages, 48 small milestones; each step is a GitHub issue with a checklist. Start at M01.
+
+Each stage folder: `README.md` (checklist) · `design.md` · `research.md` · `bom.csv` · `test.csv` · `3d/` (only the ones it needs).
 
 <img src="docs/assets/phases.svg" width="100%" alt="Stages">
 
@@ -118,37 +120,37 @@ Camera fixed on +X at 350 mm (650 mm for 3D scans). Light 300 mm from the zero p
 
 <img src="docs/assets/budget.svg" width="100%" alt="Cost per stage">
 
-$498.95 with every part bought (cheapest options, prices checked 2026-10-04); $443.27 if you own the consumables; +$32 optional standalone kit. Per-stage lists: `phases/NN/bom/bom.csv` · check: `python3 tools/bom_check.py --strict`.
+$498.95 with every part bought (cheapest options, prices checked 2026-10-04); $443.27 if you own the consumables; +$32 optional standalone kit. Per-stage lists: `phases/NN/bom.csv` · check: `python3 tools/bom_check.py --strict`.
 
 ## 3D files and making parts
 
 <img src="docs/assets/parts.png" width="100%" alt="All printed parts">
 
-Every stage has `3d/README.md`: printed parts (STEP to edit, STL to slice) and bought parts (vendor model links).
+Every stage has `3d/`: each printed part as **STEP** (imports into Onshape as an editable solid: Insert → Import) and **STL** (for the slicer), plus `3d/README.md` listing bought parts and their vendor models.
 
 <!-- parts:start -->
 | Stage | Printed parts (STL) |
 |---|---|
-| [00 Plan](phases/00-plan/3d/) | [PLAN-01](phases/00-plan/3d/print/PLAN-01_tolerance_coupon.stl) tolerance coupon |
-| [01 Power box](phases/01-power/3d/) | [PWR-18a](phases/01-power/3d/print/PWR-18a_power_box.stl) power box · [PWR-18b](phases/01-power/3d/print/PWR-18b_power_lid.stl) power lid |
-| [02 Controller and buttons](phases/02-controller/3d/) | [CTL-10a](phases/02-controller/3d/print/CTL-10a_button_panel.stl) button panel · [CTL-10b](phases/02-controller/3d/print/CTL-10b_controller_tray.stl) controller tray |
-| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/print/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/print/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/print/FRM-09c_protractor_segment.stl) protractor segment |
-| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/print/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/print/LAR-08b_nema17_mount.stl) nema17 mount · [LAR-08c](phases/04-light-arm/3d/print/LAR-08c_arm_bracket.stl) arm bracket |
-| [05 Table (M3)](phases/05-table/3d/) | [TBL-07a](phases/05-table/3d/print/TBL-07a_pulley_100T.stl) pulley 100T · [TBL-07b](phases/05-table/3d/print/TBL-07b_home_flag.stl) home flag · [TBL-07c](phases/05-table/3d/print/TBL-07c_nema17_mount.stl) nema17 mount |
-| [06 Camera and light](phases/06-camera-light/3d/) | [CAM-03a](phases/06-camera-light/3d/print/CAM-03a_aperture_stop_f8.stl) aperture stop f8 · [CAM-03b](phases/06-camera-light/3d/print/CAM-03b_camera_plate.stl) camera plate · [LSR-05a](phases/06-camera-light/3d/print/LSR-05a_lamp_tube.stl) lamp tube |
-| [07 Calibrate → game material](phases/07-calibrate/3d/) | [CAL-06a](phases/07-calibrate/3d/print/CAL-06a_ptfe_holder.stl) ptfe holder · [CAL-06b](phases/07-calibrate/3d/print/CAL-06b_mirror_holder.stl) mirror holder · [CAL-06c](phases/07-calibrate/3d/print/CAL-06c_ball_holder.stl) ball holder · [ENC-04a](phases/07-calibrate/3d/print/ENC-04a_dowel_socket.stl) dowel socket |
-| [08 Tilt (M2)](phases/08-tilt/3d/) | [TLT-07a](phases/08-tilt/3d/print/TLT-07a_tilt_yoke.stl) tilt yoke · [TLT-07b](phases/08-tilt/3d/print/TLT-07b_pulley_100T.stl) pulley 100T |
-| [09 Spin (M1)](phases/09-spin/3d/) | [SPN-07a](phases/09-spin/3d/print/SPN-07a_spin_platter.stl) spin platter · [SPN-07b](phases/09-spin/3d/print/SPN-07b_pulley_80T.stl) pulley 80T |
-| [10 Colour bands and polarizers](phases/10-color/3d/) | [MSK-06a](phases/10-color/3d/print/MSK-06a_led_ring.stl) led ring · [MSK-06b](phases/10-color/3d/print/MSK-06b_led_mast.stl) led mast |
-| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/print/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/print/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/print/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/print/SCN-03d_camera_stop_650.stl) camera stop 650 |
-| [15 Standalone (no laptop)](phases/15-standalone/3d/) | [STA-07a](phases/15-standalone/3d/print/STA-07a_pi_zero_mount.stl) pi zero mount |
+| [00 Plan](phases/00-plan/3d/) | [PLAN-01](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) tolerance coupon |
+| [01 Power box](phases/01-power/3d/) | [PWR-18a](phases/01-power/3d/PWR-18a_power_box.stl) power box · [PWR-18b](phases/01-power/3d/PWR-18b_power_lid.stl) power lid |
+| [02 Controller and buttons](phases/02-controller/3d/) | [CTL-10a](phases/02-controller/3d/CTL-10a_button_panel.stl) button panel · [CTL-10b](phases/02-controller/3d/CTL-10b_controller_tray.stl) controller tray |
+| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/FRM-09c_protractor_segment.stl) protractor segment |
+| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/LAR-08b_nema17_mount.stl) nema17 mount · [LAR-08c](phases/04-light-arm/3d/LAR-08c_arm_bracket.stl) arm bracket |
+| [05 Table (M3)](phases/05-table/3d/) | [TBL-07a](phases/05-table/3d/TBL-07a_pulley_100T.stl) pulley 100T · [TBL-07b](phases/05-table/3d/TBL-07b_home_flag.stl) home flag · [TBL-07c](phases/05-table/3d/TBL-07c_nema17_mount.stl) nema17 mount |
+| [06 Camera and light](phases/06-camera-light/3d/) | [CAM-03a](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) aperture stop f8 · [CAM-03b](phases/06-camera-light/3d/CAM-03b_camera_plate.stl) camera plate · [LSR-05a](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) lamp tube |
+| [07 Calibrate → game material](phases/07-calibrate/3d/) | [CAL-06a](phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl) ptfe holder · [CAL-06b](phases/07-calibrate/3d/CAL-06b_mirror_holder.stl) mirror holder · [CAL-06c](phases/07-calibrate/3d/CAL-06c_ball_holder.stl) ball holder · [ENC-04a](phases/07-calibrate/3d/ENC-04a_dowel_socket.stl) dowel socket |
+| [08 Tilt (M2)](phases/08-tilt/3d/) | [TLT-07a](phases/08-tilt/3d/TLT-07a_tilt_yoke.stl) tilt yoke · [TLT-07b](phases/08-tilt/3d/TLT-07b_pulley_100T.stl) pulley 100T |
+| [09 Spin (M1)](phases/09-spin/3d/) | [SPN-07a](phases/09-spin/3d/SPN-07a_spin_platter.stl) spin platter · [SPN-07b](phases/09-spin/3d/SPN-07b_pulley_80T.stl) pulley 80T |
+| [10 Colour bands and polarizers](phases/10-color/3d/) | [MSK-06a](phases/10-color/3d/MSK-06a_led_ring.stl) led ring · [MSK-06b](phases/10-color/3d/MSK-06b_led_mast.stl) led mast |
+| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/SCN-03d_camera_stop_650.stl) camera stop 650 |
+| [15 Standalone (no laptop)](phases/15-standalone/3d/) | [STA-07a](phases/15-standalone/3d/STA-07a_pi_zero_mount.stl) pi zero mount |
 <!-- parts:end -->
 
-- **Starter geometry, generated:** `python tools/cad/parts.py` (CadQuery; parameters at the top). Print the [tolerance coupon](phases/00-plan/3d/print/PLAN-01_tolerance_coupon.stl) first and set `CLEAR` / `INSERT`.
+- **Starter geometry, generated:** `python tools/cad/parts.py` (CadQuery; parameters at the top). Print the [tolerance coupon](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) first and set `CLEAR` / `INSERT`.
 - **Vendor models:** `bash scripts/get_cad.sh` → `phases/NN/3d/vendor/` (not committed).
-- **Base:** [1:1 drill template](phases/03-frame/design/drill-template.svg) (print at 100 %, check the 100 mm bar) · [drill map](phases/03-frame/design/drill-map.md).
-- **Wiring:** [power netlist](phases/01-power/design/netlist.md) · [controller pins](phases/02-controller/design/wiring.md) · [standalone wiring](phases/15-standalone/design/notes.md).
-- **Onshape:** import the STEP files into the document from [onshape.md](phases/00-plan/design/onshape.md); keep shared sizes in `OG globals`.
+- **Base:** [1:1 drill template](phases/03-frame/drill-template.svg) (print at 100 %, check the 100 mm bar) · [drill map](phases/03-frame/design.md).
+- **Wiring:** [power netlist](phases/01-power/design.md) · [controller pins](phases/02-controller/design.md) · [standalone wiring](phases/15-standalone/design.md).
+- **Onshape:** [set-up steps](phases/00-plan/design.md#onshape-set-up) — import the STEP files, edit, export STEP + STL back.
 
 ## Test materials
 
@@ -270,7 +272,7 @@ g(Z_{ij})=\ln E_i+\ln\Delta t_j
 V=\bigcap_j\{p:\pi_j(p)\in S_j\},\qquad I=L\,g,\;g=L^{+}I,\;\rho=\lVert g\rVert,\;\hat n=g/\rho
 ```
 
-Full notes: [theory.md](phases/00-plan/research/theory.md) · [scan methods](phases/12-scan-mesh/research/methods.md).
+Full notes: [theory.md](phases/00-plan/research.md) · [scan methods](phases/12-scan-mesh/research.md).
 
 ## Commands
 
@@ -285,7 +287,7 @@ opengonio scan demo --out demo
 
 ### Flash and move the motors
 
-Full steps (incl. WSL USB): [firmware.md](phases/02-controller/design/firmware.md).
+Full steps (incl. WSL USB): [firmware.md](phases/02-controller/design.md).
 
 ```bash
 bash scripts/e4.sh flash                  # FluidNC onto the E4 over USB
@@ -297,7 +299,7 @@ bash scripts/pico.sh                      # button hub
 
 ### Standalone mode (no laptop)
 
-[Wiring and setup](phases/15-standalone/design/notes.md).
+[Wiring and setup](phases/15-standalone/design.md).
 
 ```bash
 bash scripts/station.sh aleks@opengonio.local     # once: installs the station on the Pi Zero 2 W

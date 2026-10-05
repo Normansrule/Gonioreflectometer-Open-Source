@@ -4,7 +4,7 @@
 
 $93.46 · total so far $346.82 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M17 · Camera sees the zero point
 
@@ -12,7 +12,7 @@ Sharp, fixed-exposure image centred on the sample. · ~2 wk
 
 **M17.1 Mount**
 
-- [ ] Order phases/06-camera-light/bom/bom.csv
+- [ ] Order phases/06-camera-light/bom.csv
 - [ ] Camera at 350 mm, 16 mm lens, f/8 stop
 - [ ] **Done:** Table centre at image centre ±0.5 mm.
 

@@ -30,7 +30,7 @@ milestones:
     weeks: 1
     steps:
       - {id: M01.1, title: Read, tasks: ["bash scripts/get_papers.sh", "Read R1 sections 2–4 (papers/open)", "Try the simulator: docs/index.html"], done: "You can explain M1–M4 and θi/θr."}
-      - {id: M01.2, title: Shopping list, tasks: ["Set Own = Y for parts you have, in phases/*/bom/bom.csv", "python3 tools/bom_check.py --strict"], done: "Total ≤ $500."}
+      - {id: M01.2, title: Shopping list, tasks: ["Set Own = Y for parts you have, in phases/*/bom.csv", "python3 tools/bom_check.py --strict"], done: "Total ≤ $500."}
   - id: M02
     stage: 00-plan
     title: Software runs on the laptop
@@ -45,8 +45,8 @@ milestones:
     goal: Printed parts will fit first time.
     weeks: 1
     steps:
-      - {id: M03.1, title: Onshape, tasks: ["Create the document and OG globals (design/onshape.md)"], done: "Globals match design/architecture.md."}
-      - {id: M03.2, title: Tolerance coupon, tasks: ["Print phases/00-plan/3d/print/PLAN-01_tolerance_coupon.stl in PETG", "Set CLEAR and INSERT in tools/cad/parts.py from the hole that fits; python tools/cad/parts.py"], done: "Coupon fits."}
+      - {id: M03.1, title: Onshape, tasks: ["Create the document and OG globals (design.md)"], done: "Globals match design.md."}
+      - {id: M03.2, title: Tolerance coupon, tasks: ["Print phases/00-plan/3d/PLAN-01_tolerance_coupon.stl in PETG", "Set CLEAR and INSERT in tools/cad/parts.py from the hole that fits; python tools/cad/parts.py"], done: "Coupon fits."}
 
   # ---- 01 Power ----
   - id: M04
@@ -55,15 +55,15 @@ milestones:
     goal: Everything for the power box on the bench.
     weeks: 2
     steps:
-      - {id: M04.1, title: Order and print, tasks: ["Order phases/01-power/bom/bom.csv", "Print PWR-18a box and PWR-18b lid (3d/README.md)"], done: "Parts arrived, checked against the BOM."}
+      - {id: M04.1, title: Order and print, tasks: ["Order phases/01-power/bom.csv", "Print PWR-18a box and PWR-18b lid (3d/README.md)"], done: "Parts arrived, checked against the BOM."}
   - id: M05
     stage: 01-power
     title: Build the protection board
     goal: Fuse, reverse-polarity MOSFET and e-stop wired, not yet powered.
     weeks: 1
     steps:
-      - {id: M05.1, title: Solder, tasks: ["Solder per design/netlist.md", "Heat-shrink every joint"], done: "Board matches the netlist."}
-      - {id: M05.2, title: Checks with power off, tasks: ["Run T1–T3 (continuity, no shorts)", "Fill test/log.csv"], done: "T1–T3 pass."}
+      - {id: M05.1, title: Solder, tasks: ["Solder per design.md", "Heat-shrink every joint"], done: "Board matches the netlist."}
+      - {id: M05.2, title: Checks with power off, tasks: ["Run T1–T3 (continuity, no shorts)", "Fill test.csv"], done: "T1–T3 pass."}
   - id: M06
     stage: 01-power
     title: First power-on
@@ -79,14 +79,14 @@ milestones:
     goal: E4, Pico, buttons and one motor on the bench.
     weeks: 2
     steps:
-      - {id: M07.1, title: Order, tasks: ["Order phases/02-controller/bom/bom.csv and one NEMA 17 (LAR-02)"], done: "Parts arrived."}
+      - {id: M07.1, title: Order, tasks: ["Order phases/02-controller/bom.csv and one NEMA 17 (LAR-02)"], done: "Parts arrived."}
   - id: M08
     stage: 02-controller
     title: One motor turns from the laptop
     goal: Laptop → E4 → motor works on the bench.
     weeks: 1
     steps:
-      - {id: M08.1, title: Flash the E4, tasks: ["WSL only: usbipd bind/attach (design/firmware.md)", "bash scripts/e4.sh flash", "bash scripts/e4.sh wifi \"SSID\" \"PASS\"", "bash scripts/e4.sh config fluidnc.local"], done: "opengonio send '?' prints <Idle|…>."}
+      - {id: M08.1, title: Flash the E4, tasks: ["WSL only: usbipd bind/attach (design.md)", "bash scripts/e4.sh flash", "bash scripts/e4.sh wifi \"SSID\" \"PASS\"", "bash scripts/e4.sh config fluidnc.local"], done: "opengonio send '?' prints <Idle|…>."}
       - {id: M08.2, title: Bench motor, tasks: ["Motor on X, 24 V on", "opengonio send 'G91 G1 X10 F600' 'G1 X-10'"], done: "Motor turns both ways; e-stop stops it."}
   - id: M09
     stage: 02-controller
@@ -102,7 +102,7 @@ milestones:
     goal: Boards boxed, links tested.
     weeks: 1
     steps:
-      - {id: M10.1, title: Box and test, tasks: ["Print case + panel, mount boards", "Run C1–C8 (USB, WiFi, Bluetooth), fill test/log.csv"], done: "C1–C8 pass."}
+      - {id: M10.1, title: Box and test, tasks: ["Print case + panel, mount boards", "Run C1–C8 (USB, WiFi, Bluetooth), fill test.csv"], done: "C1–C8 pass."}
 
   # ---- 03 Frame ----
   - id: M11
@@ -111,7 +111,7 @@ milestones:
     goal: Every hole for every later stage, drilled once.
     weeks: 1
     steps:
-      - {id: M11.1, title: Cut and drill, tasks: ["Order phases/03-frame/bom/bom.csv", "Print design/drill-template.svg at 100 % (check the 100 mm bar), tape on", "Cut 600 × 600 plywood, centre-punch and drill"], done: "Holes within ±0.5 mm."}
+      - {id: M11.1, title: Cut and drill, tasks: ["Order phases/03-frame/bom.csv", "Print drill-template.svg at 100 % (check the 100 mm bar), tape on", "Cut 600 × 600 plywood, centre-punch and drill"], done: "Holes within ±0.5 mm."}
   - id: M12
     stage: 03-frame
     title: Assemble the frame
@@ -144,7 +144,7 @@ milestones:
     goal: Sample table turns on its post without wobble.
     weeks: 1
     steps:
-      - {id: M15.1, title: Build, tasks: ["Order phases/05-table/bom/bom.csv", "Post with two 608s, 100T pulley, belt, motor"], done: "Turns ±180°, no visible wobble."}
+      - {id: M15.1, title: Build, tasks: ["Order phases/05-table/bom.csv", "Post with two 608s, 100T pulley, belt, motor"], done: "Turns ±180°, no visible wobble."}
   - id: M16
     stage: 05-table
     title: Table homes and repeats
@@ -160,7 +160,7 @@ milestones:
     goal: Sharp, fixed-exposure image centred on the sample.
     weeks: 2
     steps:
-      - {id: M17.1, title: Mount, tasks: ["Order phases/06-camera-light/bom/bom.csv", "Camera at 350 mm, 16 mm lens, f/8 stop"], done: "Table centre at image centre ±0.5 mm."}
+      - {id: M17.1, title: Mount, tasks: ["Order phases/06-camera-light/bom.csv", "Camera at 350 mm, 16 mm lens, f/8 stop"], done: "Table centre at image centre ±0.5 mm."}
       - {id: M17.2, title: Lock settings, tasks: ["Lock exposure, gain, white balance", "Two frames 1 min apart differ < 1 %"], done: "Stable images."}
   - id: M18
     stage: 06-camera-light
@@ -191,7 +191,7 @@ milestones:
     goal: Only the lamp lights the sample.
     weeks: 1
     steps:
-      - {id: M21.1, title: Drape, tasks: ["Order phases/07-calibrate/bom/bom.csv", "Dowels, blackout drape, felt backdrop"], done: "Stray light < 0.1 % of the PTFE signal."}
+      - {id: M21.1, title: Drape, tasks: ["Order phases/07-calibrate/bom.csv", "Dowels, blackout drape, felt backdrop"], done: "Stray light < 0.1 % of the PTFE signal."}
   - id: M22
     stage: 07-calibrate
     title: HDR and angle calibration
@@ -222,7 +222,7 @@ milestones:
     goal: Sample tilts without moving off the zero point.
     weeks: 2
     steps:
-      - {id: M25.1, title: Build, tasks: ["Order phases/08-tilt/bom/bom.csv", "Yoke on the table flange, motor, home flag at −90°", "machine.yaml: installed_phase 8"], done: "Returns within 0.1°; sample centre unchanged."}
+      - {id: M25.1, title: Build, tasks: ["Order phases/08-tilt/bom.csv", "Yoke on the table flange, motor, home flag at −90°", "machine.yaml: installed_phase 8"], done: "Returns within 0.1°; sample centre unchanged."}
   - id: M26
     stage: 08-tilt
     title: Full isotropic scan
@@ -238,7 +238,7 @@ milestones:
     goal: Sample spins on its own axis.
     weeks: 2
     steps:
-      - {id: M27.1, title: Build, tasks: ["Order phases/09-spin/bom/bom.csv", "Platter on the yoke, home flag on TH0", "machine.yaml: installed_phase 9"], done: "Returns within 0.1°."}
+      - {id: M27.1, title: Build, tasks: ["Order phases/09-spin/bom.csv", "Platter on the yoke, home flag on TH0", "machine.yaml: installed_phase 9"], done: "Returns within 0.1°."}
   - id: M28
     stage: 09-spin
     title: Anisotropic material measured
@@ -255,7 +255,7 @@ milestones:
     goal: 8 colour bands switch from laptop and buttons.
     weeks: 2
     steps:
-      - {id: M29.1, title: Build, tasks: ["Order phases/10-color/bom/bom.csv", "8 LEDs on the 40° mast, ULN2803A from Pico GP8–15", "Mast in the collision model; machine.yaml: installed_phase 10"], done: "Each band switches."}
+      - {id: M29.1, title: Build, tasks: ["Order phases/10-color/bom.csv", "8 LEDs on the 40° mast, ULN2803A from Pico GP8–15", "Mast in the collision model; machine.yaml: installed_phase 10"], done: "Each band switches."}
   - id: M30
     stage: 10-color
     title: Polarizers and band calibration
@@ -342,14 +342,14 @@ milestones:
     goal: OLED shows menu and progress (works in both modes).
     weeks: 1
     steps:
-      - {id: M40.1, title: OLED, tasks: ["Order phases/15-standalone/bom/bom.csv", "OLED on Pico GP16/GP17, bash scripts/pico.sh"], done: "Screen shows 'OpenGonio ready'."}
+      - {id: M40.1, title: OLED, tasks: ["Order phases/15-standalone/bom.csv", "OLED on Pico GP16/GP17, bash scripts/pico.sh"], done: "Screen shows 'OpenGonio ready'."}
   - id: M41
     stage: 15-standalone
     title: Pi Zero station set up
     goal: Pi drives the E4 over WiFi and grabs camera frames.
     weeks: 1
     steps:
-      - {id: M41.1, title: Install, tasks: ["Imager: Pi OS Lite, hostname opengonio, SSH, WiFi", "Wire UART + buck (design/notes.md)", "bash scripts/station.sh USER@opengonio.local; reboot"], done: "journalctl shows 'station ready'."}
+      - {id: M41.1, title: Install, tasks: ["Imager: Pi OS Lite, hostname opengonio, SSH, WiFi", "Wire UART + buck (design.md)", "bash scripts/station.sh USER@opengonio.local; reboot"], done: "journalctl shows 'station ready'."}
   - id: M42
     stage: 15-standalone
     title: Job with no laptop

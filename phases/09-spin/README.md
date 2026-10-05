@@ -2,7 +2,7 @@
 
 $22.38 · total so far $464.90 / $500
 
-[Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
+[Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M27 · Spin platter built and homed
 
@@ -10,7 +10,7 @@ Sample spins on its own axis. · ~2 wk
 
 **M27.1 Build**
 
-- [ ] Order phases/09-spin/bom/bom.csv
+- [ ] Order phases/09-spin/bom.csv
 - [ ] Platter on the yoke, home flag on TH0
 - [ ] machine.yaml: installed_phase 9
 - [ ] **Done:** Returns within 0.1°.

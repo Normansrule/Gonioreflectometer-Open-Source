@@ -1,6 +1,6 @@
 # 12 · 3D scan: mesh
 
-[Research](research/) · [Design](design/) · [Tests](test/)
+[Design](design.md) · [Research](research.md) · [Tests](test.csv)
 
 ## M34 · Quick 3D preview
 

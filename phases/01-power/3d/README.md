@@ -4,16 +4,18 @@
 
 PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
 
-| ID | Part | STEP (edit / Onshape) | STL (slice) |
+**STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
+
+| ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| PWR-18a | Power box | [PWR-18a_power_box.step](print/PWR-18a_power_box.step) | [PWR-18a_power_box.stl](print/PWR-18a_power_box.stl) |
-| PWR-18b | Power box lid (e-stop) | [PWR-18b_power_lid.step](print/PWR-18b_power_lid.step) | [PWR-18b_power_lid.stl](print/PWR-18b_power_lid.stl) |
+| PWR-18a | Power box | [PWR-18a_power_box.step](PWR-18a_power_box.step) | [PWR-18a_power_box.stl](PWR-18a_power_box.stl) |
+| PWR-18b | Power box lid (e-stop) | [PWR-18b_power_lid.step](PWR-18b_power_lid.step) | [PWR-18b_power_lid.stl](PWR-18b_power_lid.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves downloadable vendor models into `vendor/` (git-ignored: vendor licences).
+`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
 
 | ID | Part | 3D model |
 |---|---|---|
@@ -35,12 +37,4 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 | PWR-16 | Perfboard 2 x 8 cm (3-pack) | Plate model |
 | PWR-17 | Heat-shrink assortment | n/a |
 
-## Design notes
-
-| Part | Source |
-|---|---|
-| Box 120 × 80 × 50, lid (PWR-18) | Onshape `PWR`: shell 3.2 mm, M3 insert posts, OG-40 floor, rocker / jack / XT30 / J3 / J4 cut-outs, Ø22.3 e-stop hole in lid |
-| Adapter GST60A24 | STEP on [Mouser](https://www.mouser.com/ProductDetail/MEAN-WELL/GST60A24-P1J?qs=odmYgEirbwyH6XaEPxnETQ%3D%3D) [P1] |
-| XT30 | [realthunder](https://github.com/realthunder/Connectors_Amass.3dshapes) [P19] |
-| IRF4905 | TO-220 library model |
-| Jack, rocker, e-stop | model from datasheets [P4][P13][P16] |
+Design notes: [../design.md](../design.md).
