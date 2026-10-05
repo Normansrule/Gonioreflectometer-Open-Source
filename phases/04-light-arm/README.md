@@ -1,20 +1,30 @@
-# 04 · Light arm moves (M4)
-
-Light circles the sample and returns to the same spot.
+# 04 · Light arm (M4)
 
 $45.40 · total so far $230.98 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
-## 04.1 Build the ring drive
+## M13 · Ring drive built
 
-- [ ] Measure the lazy Susan, model plates and belt rim
-- [ ] Belt, idlers, motor
+Light arm turns smoothly on the ring. · ~1 wk
+
+**M13.1 Build**
+
+- [ ] Measure the lazy Susan, model the belt rim
+- [ ] Fit belt, idlers, motor, arm
+- [ ] **Done:** Arm turns 20–340° by hand, no binding.
+
+## M14 · Light arm homes and repeats
+
+M4 returns to the same spot every time. · ~1 wk
+
+**M14.1 Home**
+
 - [ ] Home flag at 20°, over-travel switch beyond it
 - [ ] machine.yaml: installed_phase 4
-- [ ] **Done:** Arm turns 20–340° by hand-commanded moves.
+- [ ] **Done:** opengonio home finds the flag 10/10 times.
 
-## 04.2 Tune
+**M14.2 Tune**
 
 - [ ] Set gear_ratio from the measured rim
 - [ ] bash scripts/e4.sh test; 20 return moves

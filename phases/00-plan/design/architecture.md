@@ -28,7 +28,7 @@ Origin = sample surface. +Z up. Camera on +X (350 mm; 650 mm for scans). Light a
 | Laptop → motors | FluidNC on FYSETC E4: USB, WiFi (telnet :23) or Bluetooth [R24][R30] |
 | Laptop → camera | USB, locked exposure / gain / white balance [R47][R50] |
 | Buttons | HOME START STOP LIGHT NEXT → Pico → `opengonio panel` |
-| No laptop | PAUSE on E4 feed hold [R27]; phone WebUI |
+| No laptop | Pi Zero 2 W runs `opengonio station`: buttons + OLED pick jobs, images saved on the Pi ([15-standalone](../../15-standalone/design/notes.md)); phone WebUI; PAUSE on E4 feed hold [R27] |
 | Stop | E-stop cuts 24 V; software re-inits drivers (`$MI`) and forces re-home |
 
 ## Interfaces (frozen)

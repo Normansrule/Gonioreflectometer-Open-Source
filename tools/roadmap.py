@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Phases from .github/phases.yml.
+"""Stages and milestones from .github/phases.yml.
 
-    python tools/roadmap.py                                  # write phases/*/README.md + README table
-    python tools/roadmap.py --github --repo OWNER/NAME [--dry-run]
-        one milestone per phase, one checklist issue per step (REST only; safe to re-run).
+    python tools/roadmap.py                                  # write phases/*/README.md + README tables
+    python tools/roadmap.py --github --repo OWNER/NAME [--dry-run] [--prune]
+        one GitHub milestone per milestone, one checklist issue per step (REST only; safe to re-run).
+        --prune closes milestones/issues whose ID is no longer in the YAML (never deletes).
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -31,8 +32,13 @@ SUBFOLDERS = [("research", "Research"), ("design", "Design"), ("3d", "3D files")
               ("test", "Tests")]
 
 
-def load() -> list[dict]:
-    return yaml.safe_load(SOURCE.read_text(encoding="utf-8"))["phases"]
+IMAGES = {"00-plan": "architecture", "01-power": "power-flow", "03-frame": "axes", "06-camera-light": "brdf-lobe",
+          "11-scan-capture": "scanner"}
+
+
+def load() -> tuple[list[dict], list[dict]]:
+    y = yaml.safe_load(SOURCE.read_text(encoding="utf-8"))
+    return y["stages"], y["milestones"]
 
 
 def costs() -> dict[str, float]:
@@ -69,73 +75,109 @@ def sort_ids(ids: set[str]) -> list[str]:
     return sorted(ids, key=lambda i: (ORDER.index(i[0]) if i[0] in ORDER else 99, int(i[1:])))
 
 
-def ms_title(p: dict) -> str:
-    return f"{p['id']} · {p['title']}"
+def ms_title(m: dict) -> str:
+    return f"{m['id']} · {m['title']}"
 
 
 def issue_title(s: dict) -> str:
     return f"[{s['id']}] {s['title']}"
 
 
-def issue_body(p: dict, s: dict) -> str:
+def issue_body(m: dict, s: dict) -> str:
     tasks = "\n".join(f"- [ ] {t}" for t in s["tasks"])
-    return f"**Goal:** {p['goal']}\n\n{tasks}\n- [ ] **Done:** {s['done']}\n\n`phases/{p['folder']}/`"
+    return f"**Goal:** {m['goal']}\n\n{tasks}\n- [ ] **Done:** {s['done']}\n\n`phases/{m['stage']}/`"
 
 
-def phase_md(p: dict, cost: float, running: float, refs: list[str]) -> str:
-    d = ROOT / "phases" / p["folder"]
-    n = int(p["id"][1:])
-    out = [f"# {n:02d} · {p['title']}", "", p["goal"], ""]
-    if p.get("image"):
-        out += [f'<img src="../../docs/assets/{p['image']}.svg" width="100%" alt="{p['title']}">', ""]
+def stage_md(st: dict, ms: list[dict], cost: float, running: float, opt: float, refs: list[str]) -> str:
+    d = ROOT / "phases" / st["folder"]
+    out = [f"# {st['folder'][:2]} · {st['title']}", ""]
+    if st["folder"] in IMAGES:
+        out += [f'<img src="../../docs/assets/{IMAGES[st["folder"]]}.svg" width="100%" alt="{st["title"]}">', ""]
     if cost:
         out += [f"${cost:.2f} · total so far ${running:.2f} / $500", ""]
+    if opt:
+        out += [f"Optional kit ${opt:.2f} (not in the $500 total)", ""]
     links = [f"[{name}]({sub}/)" for sub, name in SUBFOLDERS if (d / sub).is_dir()]
     if links:
         out += [" · ".join(links), ""]
-    for s in p["steps"]:
-        out += [f"## {s['id'][1:]} {s['title']}", ""]
-        out += [f"- [ ] {t}" for t in s["tasks"]]
-        out += [f"- [ ] **Done:** {s['done']}", ""]
-    if p.get("safety"):
-        out += [f"> **Safety:** {p['safety']}", ""]
+    for m in ms:
+        out += [f"## {ms_title(m)}", "", f"{m['goal']}" + (f" · ~{m['weeks']} wk" if m.get("weeks") else ""), ""]
+        for s in m["steps"]:
+            out += [f"**{s['id']} {s['title']}**", ""]
+            out += [f"- [ ] {t}" for t in s["tasks"]]
+            out += [f"- [ ] **Done:** {s['done']}", ""]
+    if st.get("safety"):
+        out += [f"> **Safety:** {st['safety']}", ""]
     if refs:
         out += [f"[Sources](../../REFERENCES.md): {' · '.join(refs)}", ""]
     return "\n".join(out)
 
 
-def table(phases: list[dict], c: dict[str, float]) -> str:
-    rows = ["| # | Phase | Goal | Cost |", "|---:|---|---|---:|"]
-    for p in phases:
-        cost = c.get(p["folder"], 0.0)
-        rows.append(f"| {p['id'][1:]} | [{p['title']}](phases/{p['folder']}/) | {p['goal']} | "
-                    f"{f'${cost:.0f}' if cost else '—'} |")
+def table(stages: list[dict], ms: list[dict], c: dict[str, float]) -> str:
+    rows = ["| # | Stage | Milestones | Cost |", "|---:|---|---|---:|"]
+    for st in stages:
+        cost = c.get(st["folder"], 0.0)
+        mine = [m for m in ms if m["stage"] == st["folder"]]
+        rows.append(f"| {st['folder'][:2]} | [{st['title']}](phases/{st['folder']}/) | "
+                    + ", ".join(f"{m['id']} {m['title']}" for m in mine) + f" | {f'${cost:.0f}' if cost else '—'} |")
     return "\n".join(rows)
 
 
-def write_docs(phases: list[dict]) -> None:
-    c, run, src = costs(), 0.0, sources()
-    for p in phases:
-        cost = c.get(p["folder"], 0.0)
-        run += cost
-        d = ROOT / "phases" / p["folder"]
+def parts_rows(stages: list[dict]) -> str:
+    rows = ["| Stage | Printed parts (STL) |", "|---|---|"]
+    for st in stages:
+        d = ROOT / "phases" / st["folder"] / "3d" / "print"
+        files = sorted(d.glob("*.stl")) if d.is_dir() else []
+        if files:
+            items = " · ".join(f"[{f.stem.split('_', 1)[0]}](phases/{st['folder']}/3d/print/{f.name}) {f.stem.split('_', 1)[1].replace('_', ' ')}"
+                              for f in files)
+            rows.append(f"| [{st['folder'][:2]} {st['title']}](phases/{st['folder']}/3d/) | {items} |")
+    return "\n".join(rows)
+
+
+def ref_bullets() -> str:
+    """Every row of REFERENCES.md as a bullet, under its section heading."""
+    out = []
+    for line in (ROOT / "REFERENCES.md").read_text(encoding="utf-8").splitlines():
+        h = re.match(r"^(##+) (.+)$", line)
+        if h and not line.startswith("# "):
+            out += ["", f"{'###' if len(h.group(1)) == 2 else '####'} {h.group(2)}", ""]
+            continue
+        m = re.match(r"^\|\s*\*\*([A-Z]\d+)\*\*\s*\|(.*)\|(.*)\|\s*$", line)
+        if m:
+            out.append(f"- **{m.group(1)}** {m.group(2).strip()} — *{m.group(3).strip()}*")
+    return "\n".join(out).strip("\n")
+
+
+def _replace(text: str, start: str, end: str, body: str) -> str:
+    if start not in text or end not in text:
+        return text
+    head, rest = text.split(start, 1)
+    return f"{head}{start}\n{body}\n{end}{rest.split(end, 1)[1]}"
+
+
+def write_docs(stages: list[dict], ms: list[dict]) -> None:
+    t = bom_check.totals(bom_check.load())
+    run, src = 0.0, sources()
+    for st in stages:
+        v = t.get(st["folder"], {"buy": 0.0, "opt": 0.0})
+        run += v["buy"]
+        d = ROOT / "phases" / st["folder"]
         d.mkdir(parents=True, exist_ok=True)
-        (d / "README.md").write_text(phase_md(p, cost, run, sort_ids(src.get(int(p["id"][1:]), set()))), encoding="utf-8")
+        mine = [m for m in ms if m["stage"] == st["folder"]]
+        (d / "README.md").write_text(stage_md(st, mine, v["buy"], run, v.get("opt", 0.0) if st["folder"] == "15-standalone" else 0.0,
+                                              sort_ids(src.get(int(st["folder"][:2]), set()))), encoding="utf-8")
     text = README.read_text(encoding="utf-8")
     nref = len(re.findall(r"^\|\s*\*\*[A-Z]\d+\*\*", (ROOT / "REFERENCES.md").read_text(encoding="utf-8"), re.M))
     text = re.sub(r"\[References \(\d+\)\]", f"[References ({nref})]", text)
-    if "<!-- issues:start -->" in text:
-        head, rest = text.split("<!-- issues:start -->", 1)
-        tail = rest.split("<!-- issues:end -->", 1)[1]
-        lines = []
-        for p in phases:
-            lines.append(f"- **{ms_title(p)}** — " + " · ".join(f"[{s['id']}] {s['title']}" for s in p["steps"]))
-        text = f"{head}<!-- issues:start -->\n{chr(10).join(lines)}\n<!-- issues:end -->{tail}"
-    if START in text and END in text:
-        head, rest = text.split(START, 1)
-        tail = rest.split(END, 1)[1]
-        README.write_text(f"{head}{START}\n{table(phases, c)}\n{END}{tail}", encoding="utf-8")
-    print(f"wrote {len(phases)} phase READMEs, {sum(len(p['steps']) for p in phases)} steps")
+    issues = "\n".join(f"- **{ms_title(m)}** — " + " · ".join(f"[{s['id']}] {s['title']}" for s in m["steps"]) for m in ms)
+    text = _replace(text, "<!-- issues:start -->", "<!-- issues:end -->", issues)
+    text = _replace(text, START, END, table(stages, ms, {k: v["buy"] for k, v in t.items()}))
+    text = _replace(text, "<!-- parts:start -->", "<!-- parts:end -->", parts_rows(stages))
+    text = _replace(text, "<!-- refs:start -->", "<!-- refs:end -->", ref_bullets())
+    text = re.sub(r"^\d+ sources, grouped by ID prefix", f"{nref} sources, grouped by ID prefix", text, flags=re.M)
+    README.write_text(text, encoding="utf-8")
+    print(f"wrote {len(stages)} stage READMEs, {len(ms)} milestones, {sum(len(m['steps']) for m in ms)} issues")
 
 
 def gh(args: list[str], dry: bool, ok_codes: tuple[str, ...] = ()) -> str:
@@ -152,45 +194,46 @@ def gh(args: list[str], dry: bool, ok_codes: tuple[str, ...] = ()) -> str:
 
 
 def ms_key(title: str) -> str:
-    """'P04 · Light arm' -> 'P04'."""
+    """'M04 · Order power parts' -> 'M04'."""
     return title.split(" ", 1)[0]
 
 
 def issue_key(title: str) -> str:
-    """'[P04.1] Build' -> 'P04.1'."""
+    """'[M04.1] Order' -> 'M04.1'."""
     return title[1:title.index("]")] if title.startswith("[") and "]" in title else title
 
 
-def push_github(phases: list[dict], repo: str, dry: bool) -> None:
+def push_github(stages: list[dict], ms: list[dict], repo: str, dry: bool, prune: bool = False) -> None:
     """Create or update milestones and issues, matched by ID. Unchanged issues keep their ticks;
     an ID whose title changed gets new title, body, milestone, label and is reopened."""
     base = f"repos/{repo}"
-    for p in phases:
-        gh(["api", "-X", "POST", f"{base}/labels", "-f", f"name=phase-{p['id'][1:]}", "-f", "color=f0883e"],
+    for st in stages:
+        gh(["api", "-X", "POST", f"{base}/labels", "-f", f"name=stage-{st['folder'][:2]}", "-f", "color=f0883e"],
            dry, ok_codes=("already_exists", "422"))
-    by_key = {ms_key(m["title"]): m for m in json.loads(gh(["api", f"{base}/milestones?state=all&per_page=100"], dry) or "[]")}
+    gh_ms = json.loads(gh(["api", f"{base}/milestones?state=all&per_page=100"], dry) or "[]")
+    by_key = {ms_key(m["title"]): m for m in gh_ms}
     issues = json.loads(gh(["api", "--paginate", f"{base}/issues?state=all&per_page=100"], dry) or "[]")
     issues_by_key = {issue_key(i["title"]): i for i in issues if "pull_request" not in i}
     due = date.today()
-    for p in phases:
-        due += timedelta(weeks=p.get("weeks", 0))
-        fields = ["-f", f"title={ms_title(p)}", "-f", f"description={p['goal']}"]
-        if p.get("weeks"):
+    for m in ms:
+        due += timedelta(weeks=m.get("weeks", 0))
+        fields = ["-f", f"title={ms_title(m)}", "-f", f"description={m['goal']}"]
+        if m.get("weeks"):
             fields += ["-f", f"due_on={due.isoformat()}T23:59:59Z"]
-        old = by_key.get(p["id"])
+        old = by_key.get(m["id"])
         if old is None:
             out = gh(["api", "-X", "POST", f"{base}/milestones", *fields], dry)
             number = json.loads(out)["number"] if out and out.strip().startswith("{") else 0
-            print("milestone +", ms_title(p))
+            print("milestone +", ms_title(m))
         else:
             number = old["number"]
-            if old["title"] != ms_title(p) or (old.get("description") or "") != p["goal"]:
-                gh(["api", "-X", "PATCH", f"{base}/milestones/{number}", *fields], dry)
-                print("milestone ~", ms_title(p))
-        for s in p["steps"]:
+            if old["title"] != ms_title(m) or (old.get("description") or "") != m["goal"] or old["state"] != "open":
+                gh(["api", "-X", "PATCH", f"{base}/milestones/{number}", *fields, "-f", "state=open"], dry)
+                print("milestone ~", ms_title(m))
+        for s in m["steps"]:
             title = issue_title(s)
-            args = ["-f", f"title={title}", "-f", f"body={issue_body(p, s)}", "-F", f"milestone={number}",
-                    "-f", f"labels[]=phase-{p['id'][1:]}"]
+            args = ["-f", f"title={title}", "-f", f"body={issue_body(m, s)}", "-F", f"milestone={number}",
+                    "-f", f"labels[]=stage-{m['stage'][:2]}"]
             cur = issues_by_key.get(s["id"])
             if cur is None:
                 gh(["api", "-X", "POST", f"{base}/issues", *args], dry)
@@ -198,6 +241,18 @@ def push_github(phases: list[dict], repo: str, dry: bool) -> None:
             elif cur["title"] != title:
                 gh(["api", "-X", "PATCH", f"{base}/issues/{cur['number']}", *args, "-f", "state=open"], dry)
                 print("  issue ~", title)
+    if prune:
+        keep_ms = {m["id"] for m in ms}
+        keep_is = {s["id"] for m in ms for s in m["steps"]}
+        for k, old in by_key.items():
+            if k not in keep_ms and old["state"] == "open":
+                gh(["api", "-X", "PATCH", f"{base}/milestones/{old['number']}", "-f", "state=closed"], dry)
+                print("milestone closed (no longer planned):", old["title"])
+        for k, cur in issues_by_key.items():
+            if k not in keep_is and cur["state"] == "open" and cur["title"].startswith("["):
+                gh(["api", "-X", "PATCH", f"{base}/issues/{cur['number']}", "-f", "state=closed",
+                    "-f", "state_reason=not_planned"], dry)
+                print("  issue closed (no longer planned):", cur["title"])
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -205,14 +260,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--github", action="store_true")
     ap.add_argument("--repo", help="OWNER/NAME")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--prune", action="store_true")
     a = ap.parse_args(argv)
-    phases = load()
+    stages, ms = load()
     if a.github:
         if not a.repo:
             ap.error("--github needs --repo OWNER/NAME")
-        push_github(phases, a.repo, a.dry_run)
+        push_github(stages, ms, a.repo, a.dry_run, a.prune)
     else:
-        write_docs(phases)
+        write_docs(stages, ms)
     return 0
 
 

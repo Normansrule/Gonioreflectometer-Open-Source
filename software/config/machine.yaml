@@ -29,6 +29,12 @@ hub:                            # Raspberry Pi Pico panel + sensor hub
   port: auto
   baud: 115200
 
+station:                        # standalone mode: Pi Zero 2 W runs `opengonio station` (no laptop)
+  controller: {transport: tcp, host: fluidnc.local, tcp_port: 23}   # E4 over WiFi
+  hub_port: /dev/serial0        # Pico panel on the Pi UART (Pi GPIO14 TX -> Pico GP1, GPIO15 RX <- Pico GP0)
+  data_dir: ~/opengonio-data    # one folder per job: images + manifest.json
+  exposure_ms: 20
+
 camera:
   index: 0
   width: 3840

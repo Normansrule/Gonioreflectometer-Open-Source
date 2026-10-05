@@ -16,4 +16,4 @@ PWR-14,Purchase,XT30U pairs (5),Locking connectors between modules,1,AMASS,XT30U
 PWR-15,Purchase,"18 AWG silicone wire red/black, 1 m pair",Power wiring,1,generic,2-conductor parallel 18 AWG,Walmart,https://www.walmart.com/ip/2-Conductor-Parallel-Silicone-Wire-18AWG-18-Gauge-Red-Black-Electrical-Wire-Tinned-Copper-1m-3-3ft/2401235173,8.09,8.09,n/a,n/a,,Y,checked 2026-10-04,P20
 PWR-16,Purchase,Perfboard 2 x 8 cm (3-pack),Protection circuit carrier,1,Adafruit,4783,Adafruit,https://www.adafruit.com/product/4783,2.25,2.25,Plate model,n/a,,Y,checked 2026-10-04,P21
 PWR-17,Purchase,Heat-shrink assortment,Insulate every joint,1,generic,assorted,any,n/a,4.00,4.00,n/a,n/a,,Y,estimate,-
-PWR-18,Print,Power box + lid,Houses power parts; OG-40 mount,1,OpenGonio,OG-PWR-ENC,Self-printed (PETG),n/a,0.00,0.00,Project Onshape document,CERN-OHL-S-2.0,~80 g PETG.,N,n/a,-
+PWR-18,Print,Power box + lid,Houses power parts; OG-40 mount,1,OpenGonio,OG-PWR-ENC,Self-printed (PETG),n/a,0.00,0.00,3d/print/PWR-18a_power_box.step; 3d/print/PWR-18b_power_lid.step,CERN-OHL-S-2.0,~80 g PETG.,N,n/a,-

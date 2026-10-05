@@ -1,22 +1,32 @@
-# 09 · Spin (M1) → brushed metal and textures
-
-Sample spins: brushed metal and textures.
+# 09 · Spin (M1)
 
 $22.38 · total so far $464.90 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
-## 09.1 Build the spin platter
+## M27 · Spin platter built and homed
 
-- [ ] Platter on the yoke, hub takes scan risers
-- [ ] Home flag on TH0
+Sample spins on its own axis. · ~2 wk
+
+**M27.1 Build**
+
+- [ ] Order phases/09-spin/bom/bom.csv
+- [ ] Platter on the yoke, home flag on TH0
 - [ ] machine.yaml: installed_phase 9
 - [ ] **Done:** Returns within 0.1°.
 
-## 09.2 Measure
+## M28 · Anisotropic material measured
 
-- [ ] Brushed metal at 8 spin angles
+Brushed metal and a textured swatch. · ~1 wk
+
+**M28.1 Brushed aluminium**
+
+- [ ] Specular pose, spin M1 0–180° in 15° steps
+- [ ] **Done:** Brushing direction found within 5°.
+
+**M28.2 Texture**
+
 - [ ] Per-pixel fit of a textured swatch
-- [ ] **Done:** Highlight follows M1; brushing direction within 5°.
+- [ ] **Done:** Maps look right in a renderer.
 
 [Sources](../../REFERENCES.md): G5 · G9 · G11 · G14 · G16 · G18 · G27 · G40 · G43 · G44 · G49 · G50 · T4 · T15 · T26 · T34 · T37 · T41 · T42 · T44 · V9 · V48 · N8 · H3 · H37 · P40 · P41 · P42 · P43

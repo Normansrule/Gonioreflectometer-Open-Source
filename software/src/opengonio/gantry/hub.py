@@ -1,7 +1,8 @@
 """Client for the Pico panel + sensor hub (firmware/pico-hub/main.py).
 
 Lines from the hub:  "BTN <HOME|START|STOP|LIGHT|NEXT>", "POWER <0|1>", "ENC a b c d", "PONG ...", "ERR ..."
-Lines to the hub:    "BAND <0-7>", "BAND OFF", "ENC?", "POWER?", "PING"
+Lines to the hub:    "BAND <0-7>", "BAND OFF", "ENC?", "POWER?", "PING", "SHOW a|b|c" (OLED)
+Port: USB (laptop) or the Pi UART /dev/serial0 (standalone station).
 """
 from __future__ import annotations
 
@@ -46,6 +47,9 @@ class Hub:  # pragma: no cover - needs hardware
     def band(self, n: int | None) -> None:
         self.send("BAND OFF" if n is None else f"BAND {int(n)}")
 
+    def show(self, *lines: str) -> None:
+        self.send("SHOW " + "|".join(str(x).replace("|", "/") for x in lines))
+
 
 @dataclass
 class FakeHub:
@@ -61,3 +65,6 @@ class FakeHub:
 
     def band(self, n: int | None) -> None:
         self.send("BAND OFF" if n is None else f"BAND {int(n)}")
+
+    def show(self, *lines: str) -> None:
+        self.send("SHOW " + "|".join(str(x).replace("|", "/") for x in lines))

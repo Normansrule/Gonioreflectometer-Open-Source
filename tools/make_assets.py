@@ -60,27 +60,29 @@ def flow(x1, y1, x2, y2, color, label="", dur="1s"):
 
 def architecture() -> str:
     b = ""
-    b += box(30, 30, 250, 70, "Power", "60 W adapter · fuse · rocker · E-STOP", ORANGE)
-    b += box(30, 170, 250, 90, "Laptop", "opengonio · capture · processing", GREEN)
-    b += box(30, 330, 250, 70, "USB camera (fixed)", "IMX477, 16 mm M12, f/8 stop", BLUE)
-    b += box(450, 90, 280, 90, "FYSETC E4 · FluidNC", "ESP32 · 4 × TMC2209 · WebUI", PURPLE)
-    b += box(450, 300, 280, 90, "Pico hub · MicroPython", "buttons · e-stop sense · LED bank", PURPLE)
-    b += box(900, 30, 270, 62, "M1 – M4 steppers", "homing barriers · safety switches", BLUE)
-    b += box(900, 110, 270, 62, "Lights", "white COB · (Ph 10) 8-band LEDs", YELLOW)
-    b += box(900, 190, 270, 52, "PAUSE button", "feed hold, no laptop needed", ORANGE)
-    b += box(900, 270, 270, 62, "Panel buttons", "HOME · START · STOP · LIGHT · NEXT", ORANGE)
-    b += box(900, 350, 270, 62, "Sensors", "e-stop sense · optional AS5600", GREEN)
-    b += flow(280, 65, 450, 120, ORANGE, "24 V")
-    b += flow(280, 200, 450, 140, PURPLE, "USB · WiFi · Bluetooth")
-    b += flow(280, 240, 450, 330, PURPLE, "USB")
-    b += flow(155, 330, 155, 260, BLUE, "")
-    b += f'<text x="165" y="300" fill="{BLUE}" font-size="12">USB</text>'
-    b += flow(730, 120, 900, 61, BLUE)
-    b += flow(730, 140, 900, 141, YELLOW)
-    b += flow(900, 216, 730, 160, ORANGE)
-    b += flow(900, 301, 730, 330, ORANGE)
-    b += flow(900, 381, 730, 360, GREEN)
-    return svg(1200, 430, b)
+    b += box(30, 20, 250, 62, "Power", "60 W adapter · fuse · E-STOP", ORANGE)
+    b += box(30, 110, 250, 70, "Laptop (mode 1)", "control · capture · processing", GREEN)
+    b += box(30, 205, 250, 70, "Pi Zero 2 W (mode 2)", "no laptop: runs jobs, saves data", GREEN)
+    b += box(30, 320, 250, 62, "USB camera (fixed)", "on the laptop or the Pi", BLUE)
+    b += box(450, 70, 280, 90, "FYSETC E4 · FluidNC", "ESP32 · 4 × TMC2209 · WebUI", PURPLE)
+    b += box(450, 280, 280, 90, "Pico panel", "buttons · OLED · e-stop sense · LEDs", PURPLE)
+    b += box(900, 20, 270, 62, "M1 – M4 steppers", "optical homing · safety switches", BLUE)
+    b += box(900, 100, 270, 62, "Lights", "white COB · 8-band LEDs", YELLOW)
+    b += box(900, 180, 270, 52, "PAUSE button", "feed hold on the E4", ORANGE)
+    b += box(900, 260, 270, 62, "Buttons + OLED", "NEXT · START · STOP · HOME · LIGHT", ORANGE)
+    b += box(900, 345, 270, 52, "Phone (no computer)", "WebUI: jog, home", MUTED)
+    b += flow(280, 51, 450, 95, ORANGE, "24 V")
+    b += flow(280, 140, 450, 115, PURPLE, "USB · WiFi · BT")
+    b += flow(280, 240, 450, 135, GREEN, "WiFi")
+    b += flow(280, 155, 450, 300, PURPLE, "USB")
+    b += flow(280, 255, 450, 330, GREEN, "UART")
+    b += flow(155, 320, 155, 275, BLUE)
+    b += flow(730, 100, 900, 51, BLUE)
+    b += flow(730, 120, 900, 131, YELLOW)
+    b += flow(900, 206, 730, 140, ORANGE)
+    b += flow(900, 291, 730, 325, ORANGE)
+    b += flow(900, 371, 730, 150, MUTED)
+    return svg(1200, 410, b)
 
 
 def axes() -> str:
@@ -147,25 +149,29 @@ def brdf() -> str:
 
 def phases() -> str:
     import yaml
-    data = yaml.safe_load((ROOT / ".github" / "phases.yml").read_text(encoding="utf-8"))["phases"]
+    y = yaml.safe_load((ROOT / ".github" / "phases.yml").read_text(encoding="utf-8"))
+    count = {}
+    for m in y["milestones"]:
+        count[m["stage"]] = count.get(m["stage"], 0) + 1
     group = lambda n: LINE if n <= 3 else ORANGE if n <= 10 else BLUE if n <= 13 else GREEN
     per_row, w, h, gx, gy, x0, y0 = 6, 182, 76, 14, 14, 24, 56
-    b = '<text x="24" y="36" class="t b" font-size="18">17 phases</text>'
-    for i, (name, col) in enumerate((("setup", LINE), ("measure", ORANGE), ("3D scan", BLUE), ("app + release", GREEN))):
-        b += f'<rect x="{700 + i * 120}" y="24" width="12" height="12" rx="2" fill="{col}"/><text x="{718 + i * 120}" y="35" class="m" font-size="12">{name}</text>'
-    for i, p in enumerate(data):
-        n = int(p["id"][1:])
-        x, y = x0 + (i % per_row) * (w + gx), y0 + (i // per_row) * (h + gy)
+    b = f'<text x="24" y="36" class="t b" font-size="18">{len(y["stages"])} stages · {len(y["milestones"])} small milestones</text>'
+    for i, (name, col) in enumerate((("setup", LINE), ("measure", ORANGE), ("3D scan", BLUE), ("app · standalone · release", GREEN))):
+        b += f'<rect x="{620 + i * 120}" y="24" width="12" height="12" rx="2" fill="{col}"/><text x="{638 + i * 120}" y="35" class="m" font-size="12">{name}</text>'
+    for i, st in enumerate(y["stages"]):
+        n = int(st["folder"][:2])
+        x, yy = x0 + (i % per_row) * (w + gx), y0 + (i // per_row) * (h + gy)
         col = group(n)
-        b += f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{PANEL}" stroke="{col}" stroke-width="2" opacity="0">'
-        b += f'<animate attributeName="opacity" from="0" to="1" begin="{i * 0.12:.2f}s" dur="0.4s" fill="freeze"/></rect>'
-        b += f'<text x="{x + 12}" y="{y + 22}" fill="{col if col != LINE else MUTED}" font-size="12" class="b">{n:02d}</text>'
-        words, lines = p["title"].split(), [""]
+        b += f'<rect x="{x}" y="{yy}" width="{w}" height="{h}" rx="10" fill="{PANEL}" stroke="{col}" stroke-width="2" opacity="0">'
+        b += f'<animate attributeName="opacity" from="0" to="1" begin="{i * 0.1:.2f}s" dur="0.4s" fill="freeze"/></rect>'
+        b += f'<text x="{x + 12}" y="{yy + 22}" fill="{col if col != LINE else MUTED}" font-size="12" class="b">{n:02d} · {count.get(st["folder"], 0)} milestones</text>'
+        words, lines = st["title"].split(), [""]
         for wd in words:
             lines[-1:] = [f"{lines[-1]} {wd}".strip()] if len(f"{lines[-1]} {wd}") <= 23 else [lines[-1], wd]
         for k, ln in enumerate(lines[:2]):
-            b += f'<text x="{x + 12}" y="{y + 42 + 16 * k}" class="t" font-size="13">{ln}</text>'
-    return svg(1200, y0 + 3 * (h + gy) + 6, b)
+            b += f'<text x="{x + 12}" y="{yy + 42 + 16 * k}" class="t" font-size="13">{ln}</text>'
+    rows = (len(y["stages"]) + per_row - 1) // per_row
+    return svg(1200, y0 + rows * (h + gy) + 6, b)
 
 
 def scanner() -> str:

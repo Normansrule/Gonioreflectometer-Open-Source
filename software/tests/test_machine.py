@@ -188,3 +188,57 @@ def test_repeatability_math():
     assert summarize([45.0, 45.04, 44.98], 0.1)["pass"]
     d = reflection_shift_to_deg(8, 1.55, 16, 650, 300)
     assert 0.05 < d < 0.2          # ~8 px per 0.1 deg: the camera can see the target precision
+
+
+# ---- standalone station + verify ----
+def _station(tmp_path, cfg):
+    import json as _json
+    from opengonio.gantry.fluidnc import FluidNC, RecordingTransport
+    from opengonio.gantry.gantry import Gantry
+    from opengonio.gantry.hub import FakeHub
+    from opengonio.station import Station
+
+    class Cam:
+        def grab(self):
+            return b"img"
+    saved = []
+    g = Gantry(cfg, FluidNC(RecordingTransport()))
+    hub = FakeHub()
+    st = Station(cfg, g, hub, Cam(), tmp_path, save=lambda p, img: (p.write_bytes(img), saved.append(p)), clock=lambda: 0.0)
+    return st, hub, saved, _json
+
+
+def test_station_runs_job_without_laptop(tmp_path, cfg):
+    st, hub, saved, json = _station(tmp_path, cfg)
+    assert hub.sent[-1].startswith("SHOW OpenGonio|> Mirror")
+    st.handle("BTN", "START")
+    for _ in range(100):
+        st.tick()
+    m = json.loads((st.run_dir / "manifest.json").read_text())
+    assert m["finished"] and len(m["shots"]) == len(saved) == len(st.plan) > 10
+    assert "done" in hub.sent[-1]
+
+
+def test_station_stop_and_next(tmp_path, cfg):
+    st, hub, saved, json = _station(tmp_path, cfg)
+    st.handle("BTN", "NEXT")
+    assert "Swatch" in hub.sent[-1]
+    st.handle("BTN", "START"); st.tick(); st.tick()
+    st.handle("BTN", "STOP")
+    m = json.loads((st.run_dir / "manifest.json").read_text())
+    assert not st.running and m["aborted"] == "stopped" and not m["finished"]
+
+
+def test_verify_pass_and_fail(tmp_path, cfg):
+    import numpy as np
+    from opengonio.verify import verify
+    st, hub, saved, json = _station(tmp_path, cfg)
+    st.handle("BTN", "START")
+    for _ in range(100):
+        st.tick()
+    peak = min(st.plan, key=lambda p: abs(p["M3"] - p["M4"] / 2))
+    img = lambda p: np.full((30, 30), 200.0 if json.loads((st.run_dir / "manifest.json").read_text())["shots"][int(p.stem[4:])]["pose"] == peak else 50.0)
+    rep = verify(st.run_dir, cfg, read_image=img)
+    assert rep["result"] == "PASS" and abs(rep["mirror_peak_error_deg"]) < 0.2
+    saved[0].unlink()
+    assert verify(st.run_dir, cfg, read_image=img)["result"] == "FAIL"

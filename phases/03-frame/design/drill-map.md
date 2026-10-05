@@ -2,6 +2,8 @@
 
 600 × 600 mm plywood; origin under the zero point; zero point 150 mm above the base.
 
+**1:1 template:** [drill-template.svg](drill-template.svg) (print at 100 %, poster/tile mode; check the 100 mm bar). Drill: M4 tee nut Ø6, M5 tee nut Ø7, M8 tee nut Ø10, M5 clearance Ø5.5.
+
 | Feature | Position (mm) | Holes |
 |---|---|---|
 | Table post | (0, 0) | OG-40, M4 tee nuts |

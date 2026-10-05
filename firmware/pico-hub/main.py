@@ -3,13 +3,15 @@
 #
 # USB serial line protocol (laptop <-> hub)
 #   out: BTN HOME|START|STOP|LIGHT|NEXT   POWER 0|1   ENC a b c d   PONG OpenGonio-hub 1 POWER n   ERR <msg>
-#   in : BAND 0-7 | BAND OFF | ENC? | POWER? | PING
+#   in : BAND 0-7 | BAND OFF | ENC? | POWER? | PING | SHOW line1|line2|line3
+# Same protocol on USB (laptop) and on UART0 GP0 TX / GP1 RX (Pi Zero station, 3.3 V, 115200).
+# Optional SSD1306 128x64 OLED at 0x3C on the first I2C pair (GP17 SCL, GP16 SDA); install: mpremote mip install ssd1306
 # Pins (GP numbers): buttons 2-6 to GND, MOTION_SENSE 7 (PC817 transistor, low = 24 V on), LED bank 8-15 -> ULN2803A,
 # optional AS5600 encoders on SoftI2C pairs (16,17) (18,19) (20,21) (26,27).
 import sys
 import time
 import uselect
-from machine import Pin, SoftI2C
+from machine import UART, Pin, SoftI2C
 
 BUTTONS = {"HOME": 2, "START": 3, "STOP": 4, "LIGHT": 5, "NEXT": 6}
 SENSE_PIN = 7
@@ -27,6 +29,26 @@ led = Pin(25, Pin.OUT)
 buses = [SoftI2C(scl=Pin(s), sda=Pin(d), freq=100_000) for s, d in I2C_PAIRS]
 poll = uselect.poll()
 poll.register(sys.stdin, uselect.POLLIN)
+uart = UART(0, baudrate=115200, tx=Pin(0), rx=Pin(1))
+try:
+    import ssd1306
+    oled = ssd1306.SSD1306_I2C(128, 64, buses[0])
+except Exception:                           # no display fitted: everything else still works
+    oled = None
+
+
+def out(msg):
+    print(msg)
+    uart.write(msg + "\n")
+
+
+def show(lines):
+    if oled is None:
+        return
+    oled.fill(0)
+    for i, t in enumerate(lines[:6]):
+        oled.text(t[:16], 0, i * 11)
+    oled.show()
 
 
 def band(n):
@@ -47,30 +69,35 @@ def motion_power():
 
 
 def handle(line):
+    if line.strip().upper().startswith("SHOW"):
+        show(line.strip()[4:].strip().split("|"))
+        return
     parts = line.strip().upper().split()
     if not parts:
         return
     try:
         if parts[0] == "PING":
-            print("PONG OpenGonio-hub 1 POWER %d" % motion_power())
+            out("PONG OpenGonio-hub 2 POWER %d" % motion_power())
         elif parts[0] == "POWER?":
-            print("POWER %d" % motion_power())
+            out("POWER %d" % motion_power())
         elif parts[0] == "BAND":
             n = None if parts[1] == "OFF" else int(parts[1])
             if n is not None and not 0 <= n < len(bands):
                 raise ValueError("band out of range")
             band(n)
         elif parts[0] == "ENC?":
-            print("ENC " + " ".join("%.3f" % read_angle(b) for b in buses))
+            out("ENC " + " ".join("%.3f" % read_angle(b) for b in buses))
         else:
-            print("ERR unknown " + parts[0])
+            out("ERR unknown " + parts[0])
     except Exception as e:                  # bad input must never stop the hub
-        print("ERR %s" % e)
+        out("ERR %s" % e)
 
 
 power = motion_power()
-print("POWER %d" % power)
+out("POWER %d" % power)
+show(["OpenGonio", "ready", "", "HOME START STOP", "LIGHT NEXT"])
 buf = ""
+ubuf = ""
 t_led = time.ticks_ms()
 while True:
     now = time.ticks_ms()
@@ -80,10 +107,10 @@ while True:
             since[name] = now
             last[name] = v
             if v == 0:
-                print("BTN " + name)
+                out("BTN " + name)
     if motion_power() != power:
         power = motion_power()
-        print("POWER %d" % power)
+        out("POWER %d" % power)
         if not power:
             band(None)
     while poll.poll(0):
@@ -93,6 +120,13 @@ while True:
             buf = ""
         else:
             buf += ch
+    while uart.any():
+        ch = uart.read(1).decode()
+        if ch in "\r\n":
+            handle(ubuf)
+            ubuf = ""
+        else:
+            ubuf += ch
     if time.ticks_diff(now, t_led) > 500:   # heartbeat
         led.toggle()
         t_led = now

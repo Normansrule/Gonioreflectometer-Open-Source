@@ -5,4 +5,4 @@ TLT-03,Purchase,GT2 20T pulley 5 mm bore,Motor pulley,1,ZYLtech,2GT 20T 6 mm,ZYL
 TLT-04,Purchase,Optical endstop TCST2103 module,Home,1,generic,TCST2103 module,eBay,https://www.ebay.com/itm/182778778905,2.93,2.93,"Not confirmed - 33 x 11 mm PCB, 5.8 mm slot",n/a,Price at qty 3.,N,checked 2026-10-04,P43
 TLT-05,Purchase,8 mm steel shaft 100 mm,Axis spindle in 2 x 608 from FRM-08,1,generic,8 mm ground rod,hardware store,n/a,3.00,3.00,Model as 8 x 100 mm rod,n/a,,N,estimate,-
 TLT-06,Purchase,Axis fasteners (M3/M5 set),"Motor mount, pulley, clamp",1,generic,"M3 x 8 (4), M5 x 10 (4), M3 nyloc (4)",hardware store,n/a,2.00,2.00,Onshape Standard Content,n/a,,N,estimate,-
-TLT-07,Print,Printed axis parts,"Hub, 100T pulley (5:1), motor mount, home flag",1,OpenGonio,OG-TLT-*,Self-printed (PETG),n/a,0.00,0.00,Exported from the project Onshape document,CERN-OHL-S-2.0,,N,n/a,-
+TLT-07,Print,Printed axis parts,"Hub, 100T pulley (5:1), motor mount, home flag",1,OpenGonio,OG-TLT-*,Self-printed (PETG),n/a,0.00,0.00,3d/print/TLT-07a_tilt_yoke.step; 3d/print/TLT-07b_pulley_100T.step,CERN-OHL-S-2.0,,N,n/a,-

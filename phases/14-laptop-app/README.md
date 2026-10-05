@@ -1,16 +1,22 @@
 # 14 · Laptop app
 
-Every workflow from one app or the buttons.
+## M38 · Control page
 
-## 14.1 Control user interface (UI)
+Connect, jog, home and live camera in one browser page. · ~2 wk
+
+**M38.1 UI**
 
 - [ ] Connect USB / WiFi / Bluetooth
-- [ ] Live camera, jog, home, light
-- [ ] **Done:** Phase 6 test runs from the browser.
+- [ ] Jog, home, light, live camera
+- [ ] **Done:** Mirror test runs from the browser.
 
-## 14.2 One-button workflows
+## M39 · Presets and resume
 
-- [ ] Presets: swatch, colour, 3D scan
+One click per workflow. · ~1 wk
+
+**M39.1 Presets**
+
+- [ ] Swatch, colour, 3D scan presets
 - [ ] Resume after STOP or e-stop
 - [ ] **Done:** Each preset runs from START.
 

@@ -1,25 +1,48 @@
 # 07 · Calibrate → game material
 
-A measured swatch looks right in Unreal or Unity.
-
 $73.32 · total so far $420.14 / $500
 
 [Research](research/) · [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
-## 07.1 Dark box and targets
+## M21 · Dark box
 
-- [ ] Blackout drape, felt backdrop
-- [ ] Print holders for PTFE, mirror, balls, ChArUco
+Only the lamp lights the sample. · ~1 wk
+
+**M21.1 Drape**
+
+- [ ] Order phases/07-calibrate/bom/bom.csv
+- [ ] Dowels, blackout drape, felt backdrop
 - [ ] **Done:** Stray light < 0.1 % of the PTFE signal.
 
-## 07.2 Calibrate
+## M22 · HDR and angle calibration
 
-- [ ] High dynamic range (HDR) from exposure brackets
-- [ ] Angles from the mirror, light from the balls
-- [ ] Brightness from the PTFE (polytetrafluoroethylene) white target
-- [ ] **Done:** Angle error ≤ 0.2°; swapping light and camera changes values ≤ 5 %.
+Linear brightness and true angles. · ~1 wk
 
-## 07.3 Fit and export
+**M22.1 HDR**
+
+- [ ] Exposure brackets → camera response
+- [ ] **Done:** Merged HDR is linear (R² > 0.99 on a grey ramp).
+
+**M22.2 Angles**
+
+- [ ] Mirror peaks + chrome balls → angle offsets
+- [ ] **Done:** Angle error ≤ 0.2°.
+
+## M23 · Brightness calibration
+
+Values in real reflectance units. · ~1 wk
+
+**M23.1 PTFE and reciprocity**
+
+- [ ] PTFE at 45°:0°
+- [ ] Swap light and camera angles
+- [ ] **Done:** Reciprocity within 5 %.
+
+## M24 · First game material
+
+A measured swatch looks right in Unreal or Unity. · ~1 wk
+
+**M24.1 Fit and export**
 
 - [ ] Fit Lambert + GGX
 - [ ] Export Unreal / Unity material

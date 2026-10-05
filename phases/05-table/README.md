@@ -1,21 +1,27 @@
-# 05 · Table turns (M3)
-
-Sample turns to any angle and returns to the same spot.
+# 05 · Table (M3)
 
 $22.38 · total so far $253.36 / $500
 
 [Design](design/) · [3D files](3d/) · [Bill of materials](bom/)
 
-## 05.1 Build
+## M15 · Table axis built
 
-- [ ] Centre post with two 608 bearings
-- [ ] 100T pulley, belt, motor
+Sample table turns on its post without wobble. · ~1 wk
+
+**M15.1 Build**
+
+- [ ] Order phases/05-table/bom/bom.csv
+- [ ] Post with two 608s, 100T pulley, belt, motor
+- [ ] **Done:** Turns ±180°, no visible wobble.
+
+## M16 · Table homes and repeats
+
+M3 returns to the same spot every time. · ~1 wk
+
+**M16.1 Home and tune**
+
 - [ ] Home flag at −180°, swatch clamp
 - [ ] machine.yaml: installed_phase 5
-- [ ] **Done:** Table turns ±180°.
-
-## 05.2 Tune
-
 - [ ] 20 return moves
 - [ ] **Done:** Returns within 0.1°.
 

@@ -64,11 +64,13 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="machine">
  <h2>Machine simulator</h2>
- <p class="sub">Drag to look around · scroll to zoom · double-click to reset · click a part to see it move.</p>
+ <p class="sub">Drag to look around · scroll to zoom · double-click to reset · click a part for its files · slide the build stage.</p>
  <div class="phase" id="modes"><button data-mode="gonio" class="on">Gonioreflectometer</button><button data-mode="scan">+ 3D scanner add-on</button></div>
  <div class="grid">
   <div class="card"><canvas id="sim" width="900" height="560" aria-label="3D machine view: drag to orbit"></canvas>
    <div class="phase" style="margin-top:10px"><button id="play">▶ Demo</button><button id="bspec">Specular pose</button><button id="bzero">Reset</button></div>
+   <label>Build stage <input id="build" type="range" min="1" max="17" value="17"><output></output></label>
+   <div class="status" id="partinfo" style="font-weight:400">Click any part: what it is, its stage, its parts list and 3D files.</div>
   </div>
   <div class="card">
    <label>Material <select id="mat"></select><span></span></label>
@@ -152,8 +154,8 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="build">
  <h2>Build plan</h2>
- <p class="sub">17 phases; each ends with something that works.</p>
- <img class="full" src="assets/phases.svg" alt="17 build phases">
+ <p class="sub">18 stages, 48 small milestones. Laptop mode or standalone (Pi Zero + buttons).</p>
+ <img class="full" src="assets/phases.svg" alt="Stages and milestones">
  <p></p>
  <img class="full" src="assets/architecture.svg" alt="Control architecture: laptop, FluidNC E4, Pico hub, camera">
  <p></p>
@@ -262,22 +264,50 @@ function arc(a, b, r, col, label, dy = -6) {           // angle arc between unit
   path(pts, col, 2); text(pts[8], label, col, 6, dy);
 }
 const glow = ax => flash && flash.ax === ax ? "#ffffff" : null;
+function box3(c, sz, fill, stroke) {          // axis-aligned box: top + two visible sides
+  const [x, y, z] = c, [a, b, h] = sz.map(v => v / 2);
+  const C = (i, j, k) => [x + i * a, y + j * b, z + k * h];
+  [[C(-1,-1,1), C(1,-1,1), C(1,1,1), C(-1,1,1)], [C(-1,-1,-1), C(1,-1,-1), C(1,-1,1), C(-1,-1,1)],
+   [C(1,-1,-1), C(1,1,-1), C(1,1,1), C(1,-1,1)]].forEach(f => poly(f, fill, stroke));
+}
+const PARTS = {   // what you click -> where its files are (relative to docs/)
+  M4: {n: "Light arm (M4) on the 12 in ring", st: "04-light-arm", bom: "LAR-01…08", ax: "M4"},
+  M3: {n: "Table post (M3)", st: "05-table", bom: "TBL-01…07", ax: "M3"},
+  M2: {n: "Tilt yoke (M2)", st: "08-tilt", bom: "TLT-01…07", ax: "M2"},
+  M1: {n: "Spin platter (M1) + sample", st: "09-spin", bom: "SPN-01…07", ax: "M1"},
+  cam: {n: "Fixed camera, 16 mm lens, f/8 stop", st: "06-camera-light", bom: "CAM-01…03"},
+  lamp: {n: "White lamp (COB + driver)", st: "06-camera-light", bom: "LSR-01…05"},
+  leds: {n: "8-band LED bank on a 40° mast", st: "10-color", bom: "MSK-01…06"},
+  pwr: {n: "Power box (24 V, fuse, e-stop)", st: "01-power", bom: "PWR-01…18"},
+  ctl: {n: "Controller: E4 + Pico + buttons", st: "02-controller", bom: "CTL-01…10"},
+  pi: {n: "Pi Zero 2 W station (optional)", st: "15-standalone", bom: "STA-01…07"},
+  base: {n: "Plywood base + camera rail", st: "03-frame", bom: "FRM-01…11"},
+};
+function showPart(k) { const q = PARTS[k]; if (!q) return;
+  $("partinfo").innerHTML = `<b>${q.n}</b> · stage ${q.st.slice(0, 2)} · BOM ${q.bom} · ` +
+    `<a href="../phases/${q.st}/3d/">3D files</a> · <a href="../phases/${q.st}/bom/bom.csv">parts list</a> · <a href="../phases/${q.st}/">checklist</a>`; }
 function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 8 ? +m2.value : 0, m1: phase >= 9 ? +m1.value : 0}; }
 function draw() {
-  const p = pose(), st = state(p), scan = mode === "scan";
+  const p = pose(), st = state(p), scan = mode === "scan", B = +$("build").value;
   g2.clearRect(0, 0, cv.width, cv.height);
   const ring = []; for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([150 * c(a), 150 * s(a), -144]); }
-  poly([[-220, -220, -150], [M.Dc + 70, -220, -150], [M.Dc + 70, 220, -150], [-220, 220, -150]], "#11161d", "#30363d");
-  poly(ring, null, glow("M4") || "#57606a");
-  line([0, 0, -150], [0, 0, -70], glow("M3") || "#6e7681", 8);
+  if (B < 3) { $("partinfo").textContent = "Stages 01–02 are bench builds: power box and controller."; }
+  poly([[-220, -220, -150], [M.Dc + 70, -220, -150], [M.Dc + 70, 220, -150], [-220, 220, -150]], B >= 3 ? "#11161d" : "#0b0f14", "#30363d");
+  box3([-170, -170, -130], [70, 50, 40], "#1c2128", "#f0883e");
+  box3([-170, 170, -135], [80, 60, 30], "#1c2128", "#bc8cff");
+  if (B >= 15) box3([-110, 170, -140], [40, 25, 20], "#1c2128", "#3fb950");
+  if (B >= 4) poly(ring, null, glow("M4") || "#57606a");
+  if (B >= 5) line([0, 0, -150], [0, 0, -70], glow("M3") || "#6e7681", 8);
   // yoke: turns with M3; plate tilts inside it with M2
   const ay = mv(Rz(p.m3), [0, 1, 0]), Y = 58;
-  path([sc(ay, Y), add(sc(ay, Y), [0, 0, -70]), add(sc(ay, -Y), [0, 0, -70]), sc(ay, -Y)], glow("M2") || "#bc8cff", 5);
+  if (B >= 8) path([sc(ay, Y), add(sc(ay, Y), [0, 0, -70]), add(sc(ay, -Y), [0, 0, -70]), sc(ay, -Y)], glow("M2") || "#bc8cff", 5);
+  else if (B >= 5) line([0, 0, -70], [0, 0, -40], "#6e7681", 8);
   // platter (M1) + sample or object
   const u = mv(st.R, [0, 1, 0]), v = mv(st.R, [0, 0, 1]), n = mv(st.R, [1, 0, 0]);
   const disk = []; for (let k = 0; k < 28; k++) { const a = k * 360 / 28; disk.push(add(sc(n, -6), add(sc(u, 50 * c(a)), sc(v, 50 * s(a))))); }
-  poly(disk, "#2d333b", glow("M1") || "#3fb950");
-  if (scan) {                                  // 50 mm object on the platter
+  if (B >= 9) poly(disk, "#2d333b", glow("M1") || "#3fb950");
+  if (B < 5) {}
+  else if (scan && B >= 11) {                                  // 50 mm object on the platter
     const q = (a, b, h) => add(add(sc(u, a * 25), sc(v, b * 25)), sc(n, h));
     const F = [[[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0]], [[-1,-1,50],[1,-1,50],[1,1,50],[-1,1,50]],
       [[-1,-1,0],[1,-1,0],[1,-1,50],[-1,-1,50]], [[1,-1,0],[1,1,0],[1,1,50],[1,-1,50]],
@@ -291,18 +321,25 @@ function draw() {
   }
   line([0, 0, 0], sc(n, 80), "#f0f6fc", 1.5, [3, 4]); text(sc(n, 84), "n", "#f0f6fc");
   // camera (fixed)
-  line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, -20], "#57606a", 6);
+  if (B >= 3) line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, -20], "#57606a", 6);
+  if (B >= 6) {
   poly([[M.Dc, -22, -18], [M.Dc, 22, -18], [M.Dc, 22, 18], [M.Dc, -22, 18]], "#161b22", "#58a6ff");
-  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]); text([M.Dc, 0, 22], scan ? "camera 650 mm" : "camera", "#58a6ff");
+  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]); text([M.Dc, 0, 22], scan ? "camera 650 mm" : "camera", "#58a6ff"); }
   // light arm (M4) on the ring
   const L = sc(st.l, M.Dl);
-  path([add(sc(st.l, 150), [0, 0, -138]), add(sc(st.l, M.Dl + 30), [0, 0, -138]), sc(st.l, M.Dl + 30), L], glow("M4") || "#8b949e", 6);
-  line(L, [0, 0, 0], "#e3b341", 2.5, [8, 6]);
-  dotp(L, 11, glow("M4") || "#e3b341"); text(L, "light", "#e3b341", 12, -10);
+  if (B >= 4) path([add(sc(st.l, 150), [0, 0, -138]), add(sc(st.l, M.Dl + 30), [0, 0, -138]), sc(st.l, M.Dl + 30), L], glow("M4") || "#8b949e", 6);
+  if (B >= 6) { line(L, [0, 0, 0], "#e3b341", 2.5, [8, 6]); dotp(L, 11, glow("M4") || "#e3b341"); text(L, "light", "#e3b341", 12, -10); }
+  else if (B >= 4) dotp(L, 8, "#57606a");
+  const LB = add(sc(st.l, M.Dl - 10), [0, 0, 60]);
+  if (B >= 10) { path([sc(st.l, M.Dl + 30), add(sc(st.l, M.Dl + 30), [0, 0, 40]), LB], "#8b949e", 4);
+    ["#7b2cbf", "#3a0ca3", "#4361ee", "#4cc9f0", "#2a9d8f", "#e9c46a", "#f4a261", "#e63946"].forEach((cc, i) =>
+      dotp(add(LB, [0, 0, 0]).map((v, j) => v + [6 * c(i * 45), 6 * s(i * 45), 0][j]), 3, cc)); }
   // incident / reflected angles
-  if (!scan) { arc(n, st.l, 55, "#e3b341", `θi ${st.ti.toFixed(0)}°`); arc(n, [1, 0, 0], 85, "#58a6ff", `θr ${st.tr.toFixed(0)}°`, 16); }
+  if (!scan && B >= 6) { arc(n, st.l, 55, "#e3b341", `θi ${st.ti.toFixed(0)}°`); arc(n, [1, 0, 0], 85, "#58a6ff", `θr ${st.tr.toFixed(0)}°`, 16); }
   dotp([0, 0, 0], 4, "#f0f6fc");
-  picks = [["M4", L], ["M1", [0, 0, 0]], ["M2", sc(ay, Y)], ["M2", sc(ay, -Y)], ["M3", [0, 0, -110]]];
+  picks = [["M4", L], ["M1", [0, 0, 0]], ["M2", sc(ay, Y)], ["M2", sc(ay, -Y)], ["M3", [0, 0, -110]],
+    ["cam", [M.Dc, 0, 0]], ["pwr", [-170, -170, -110]], ["ctl", [-170, 170, -120]], ["pi", [-110, 170, -130]],
+    ["leds", LB], ["base", [200, -180, -150]]].filter(([k]) => ({M4: 4, M3: 5, M2: 8, M1: 9, cam: 6, leds: 10, pi: 15, base: 3})[k] <= B || ["pwr", "ctl"].includes(k));
   // readouts
   const fmt = x => x.toFixed(1) + "°";
   ti.textContent = fmt(st.ti); tr.textContent = fmt(st.tr); pi.textContent = fmt(st.pi); $("prr").textContent = fmt(st.pr);
@@ -333,7 +370,7 @@ function wiggle(ax) { needPhase(ax); const v0 = +sliders[ax].value, d = {M4: 40,
   flash = {ax}; tween({[ax]: v0 + d}, 700, () => tween({[ax]: v0}, 700, () => { flash = null; draw(); })); }
 function pick(e) { const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * cv.width / r.width, y = (e.clientY - r.top) * cv.height / r.height;
   let best = null, bd = 40; for (const [ax, v] of picks) { const q = P(v), d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = ax; } }
-  if (best) wiggle(best); }
+  if (best) { showPart(best); if (PARTS[best].ax) wiggle(best); } }
 let demo = false;
 function demoLoop() {
   if (!demo) return;
@@ -476,6 +513,9 @@ function drawSphere() {
 function sc_(v, k) { return v.map(x => x * k); }
 [srings, sper, sps, smast].forEach(el => { const out = el.nextElementSibling; const upd = () => { out.textContent = el.value; drawSphere(); };
   el.addEventListener("input", upd); out.textContent = el.value; });
+$("build").addEventListener("input", e => { const b = +e.target.value; e.target.nextElementSibling.textContent = b;
+  setPhase(b >= 9 ? 9 : b >= 8 ? 8 : 6); });
+$("build").nextElementSibling.textContent = "17";
 setPhase(6); fillMats(); drawLobe(); drawSphere();
 </script>
 </body>

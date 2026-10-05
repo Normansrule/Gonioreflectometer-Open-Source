@@ -8,6 +8,7 @@ cd "$(dirname "$0")/.."
 [ -d .venv ] || python3 -m venv .venv
 . .venv/bin/activate
 pip install -q mpremote pyserial
+mpremote mip install ssd1306 || echo "no OLED driver (display optional)"
 mpremote cp firmware/pico-hub/main.py :main.py
 mpremote reset
 sleep 2

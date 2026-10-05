@@ -1,22 +1,22 @@
-id	licence	file	url
-R1	CC-BY-4.0	R1_ansari-asl_2024_multispectral_device.pdf	https://www.mdpi.com/2313-433X/10/3/55/pdf
-G1	public-domain	G1_nicodemus_1977_nbs_monograph_160.pdf	https://nvlpubs.nist.gov/nistpubs/Legacy/MONO/nbsmonograph160.pdf
-G6	CC-BY-4.0	G6_zou_2022_brdf_measurement_review.pdf	https://www.mdpi.com/1424-8220/22/5/1739/pdf
-G21	public-domain	G21_nist_sp250-48_spectral_reflectance.pdf	https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication250-48.pdf
-G22	public-domain	G22_nist_starr_reflectometer.pdf	https://nvlpubs.nist.gov/nistpubs/jres/101/5/j5proc.pdf
-G24	public-domain	G24_nist_sintered_ptfe_brdf.pdf	https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=919590
-G25	CC-BY-3.0	G25_hoepe_robot_gonioreflectometer.pdf	https://cdn.intechopen.com/pdfs/284/InTech-Robot_based_gonioreflectometer.pdf
-G37	CC-BY-4.0	G37_chitnis_2025_spectral_brdf.pdf	https://www.mdpi.com/2313-433X/11/1/18/pdf
-G38	CC-BY-4.0	G38_rapid_appearance_consumer_hardware.pdf	https://www.mdpi.com/1424-8220/14/10/19785/pdf
-G48	CC-BY-4.0	G48_adaptive_slices_anisotropic_brdf.pdf	https://link.springer.com/content/pdf/10.1007/s41095-017-0099-z.pdf
-G49	CC-BY-4.0	G49_practical_btf_acquisition.pdf	https://www.mdpi.com/1424-8220/14/5/7753/pdf
-R11	personal	R11_westin_cornell_gonioreflectometer.pdf	https://www.graphics.cornell.edu/~westin/SPIE_5878-29_Gonio.pdf
-R14	personal	R14_matusik_merl_tr2003-83.pdf	https://www.merl.com/publications/docs/TR2003-83.pdf
-R17	personal	R17_filip_2017_specular_brdf_goniometer.pdf	https://staff.utia.cas.cz/filip/papers/filip17brdf.pdf
-R39	personal	R39_xrite_tac7_user_guide.pdf	https://www.xrite.com/-/media/xrite/files/manuals_and_userguides/t/tac7_user_guide_en.pdf
-G9	personal	G9_ward_1992_anisotropic_reflection.pdf	https://cseweb.ucsd.edu/~ravir/6998/papers/p265-ward.pdf
-G11	personal	G11_dana_1999_curet.pdf	https://cave.cs.columbia.edu/old/publications/pdfs/Dana_TOG99.pdf
-G16	personal	G16_ngan_2005_brdf_models.pdf	https://www.merl.com/publications/docs/TR2005-151.pdf
-G41	personal	G41_ghosh_2009_specular_roughness.pdf	https://www.cs.wm.edu/~ppeers/publications/Ghosh2009ESR/Ghosh_EGSR2009.pdf
-G42	personal	G42_ghosh_2010_polarized_reflectometry.pdf	https://vgl.ict.usc.edu/Research/CPSIR/CPSIR_SIGGRAPH_Asia2010.pdf
-S13	personal	S13_schnieders_2013_sphere_calibration.pdf	https://i.cs.hku.hk/~kykwong/publications/dschnieders_cviu2013.pdf
+id	licence	file	url	browser_name
+R1	CC-BY-4.0	R1_ansari-asl_2024_multispectral_device.pdf	https://www.mdpi.com/2313-433X/10/3/55/pdf	jimaging-10-00055.pdf
+G1	public-domain	G1_nicodemus_1977_nbs_monograph_160.pdf	https://nvlpubs.nist.gov/nistpubs/Legacy/MONO/nbsmonograph160.pdf	nbsmonograph160.pdf
+G6	CC-BY-4.0	G6_zou_2022_brdf_measurement_review.pdf	https://www.mdpi.com/1424-8220/22/5/1739/pdf	sensors-22-01739.pdf
+G21	public-domain	G21_nist_sp250-48_spectral_reflectance.pdf	https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication250-48.pdf	nistspecialpublication250-48.pdf
+G22	public-domain	G22_nist_starr_reflectometer.pdf	https://nvlpubs.nist.gov/nistpubs/jres/101/5/j5proc.pdf	j5proc.pdf
+G24	public-domain	G24_nist_sintered_ptfe_brdf.pdf	https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=919590	-
+G25	CC-BY-3.0	G25_hoepe_robot_gonioreflectometer.pdf	https://cdn.intechopen.com/pdfs/284/InTech-Robot_based_gonioreflectometer.pdf	InTech-Robot_based_gonioreflectometer.pdf
+G37	CC-BY-4.0	G37_chitnis_2025_spectral_brdf.pdf	https://www.mdpi.com/2313-433X/11/1/18/pdf	jimaging-11-00018.pdf
+G38	CC-BY-4.0	G38_rapid_appearance_consumer_hardware.pdf	https://www.mdpi.com/1424-8220/14/10/19785/pdf	sensors-14-19785.pdf
+G48	CC-BY-4.0	G48_adaptive_slices_anisotropic_brdf.pdf	https://link.springer.com/content/pdf/10.1007/s41095-017-0099-z.pdf	s41095-017-0099-z.pdf
+G49	CC-BY-4.0	G49_practical_btf_acquisition.pdf	https://www.mdpi.com/1424-8220/14/5/7753/pdf	sensors-14-07753.pdf
+R11	personal	R11_westin_cornell_gonioreflectometer.pdf	https://www.graphics.cornell.edu/~westin/SPIE_5878-29_Gonio.pdf	SPIE_5878-29_Gonio.pdf
+R14	personal	R14_matusik_merl_tr2003-83.pdf	https://www.merl.com/publications/docs/TR2003-83.pdf	TR2003-83.pdf
+R17	personal	R17_filip_2017_specular_brdf_goniometer.pdf	https://staff.utia.cas.cz/filip/papers/filip17brdf.pdf	filip17brdf.pdf
+R39	personal	R39_xrite_tac7_user_guide.pdf	https://www.xrite.com/-/media/xrite/files/manuals_and_userguides/t/tac7_user_guide_en.pdf	tac7_user_guide_en.pdf
+G9	personal	G9_ward_1992_anisotropic_reflection.pdf	https://cseweb.ucsd.edu/~ravir/6998/papers/p265-ward.pdf	p265-ward.pdf
+G11	personal	G11_dana_1999_curet.pdf	https://cave.cs.columbia.edu/old/publications/pdfs/Dana_TOG99.pdf	Dana_TOG99.pdf
+G16	personal	G16_ngan_2005_brdf_models.pdf	https://www.merl.com/publications/docs/TR2005-151.pdf	TR2005-151.pdf
+G41	personal	G41_ghosh_2009_specular_roughness.pdf	https://www.cs.wm.edu/~ppeers/publications/Ghosh2009ESR/Ghosh_EGSR2009.pdf	Ghosh_EGSR2009.pdf
+G42	personal	G42_ghosh_2010_polarized_reflectometry.pdf	https://vgl.ict.usc.edu/Research/CPSIR/CPSIR_SIGGRAPH_Asia2010.pdf	CPSIR_SIGGRAPH_Asia2010.pdf
+S13	personal	S13_schnieders_2013_sphere_calibration.pdf	https://i.cs.hku.hk/~kykwong/publications/dschnieders_cviu2013.pdf	dschnieders_cviu2013.pdf

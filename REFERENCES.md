@@ -1,6 +1,6 @@
 # References
 
-478 sources. IDs are cited in docs, code and the BOM `Refs` column; each phase README lists its IDs. Accessed 2026-10-03/04. All figures are original.
+486 sources. IDs are cited in docs, code and the BOM `Refs` column; each phase README lists its IDs. Accessed 2026-10-03/04. All figures are original.
 
 | Prefix | Topic |
 |---|---|
@@ -41,7 +41,7 @@
 | **R12** | Cornell measurement data — [link](https://www.graphics.cornell.edu/online/measurements/) | Validation data |
 | **R13** | MERL BRDF database — [merl.com/brdf](https://www.merl.com/brdf/) | Validation data |
 | **R14** | W. Matusik et al., MERL TR2003-83 — [PDF](https://www.merl.com/publications/docs/TR2003-83.pdf) | Comparison |
-| **R15** | J. Dupuy, W. Jakob, "An Adaptive Parameterization for Efficient Material Acquisition and Rendering," 2018 — [link](https://rgl.epfl.ch/publications/Dupuy2018Adaptive) | Adaptive sampling (phase 16) |
+| **R15** | J. Dupuy, W. Jakob, "An Adaptive Parameterization for Efficient Material Acquisition and Rendering," 2018 — [link](https://rgl.epfl.ch/publications/Dupuy2018Adaptive) | Adaptive sampling (phase 17) |
 | **R16** | RGL-EPFL material database — [link](https://rgl.epfl.ch/pages/lab/material-database) | Validation data |
 | **R17** | J. Filip et al., specular BRDF with a goniometer, 2017 — [PDF](https://staff.utia.cas.cz/filip/papers/filip17brdf.pdf) | Comparison |
 | **R18** | UTIA BTF database — [link](https://btf.utia.cas.cz/?faq=) | BTF context |
@@ -97,11 +97,11 @@
 | **G8** | J. F. Murray-Coleman, A. M. Smith, "The Automated Measurement of BRDFs and their Application to Luminaire Modeling," *J. Illuminating Engineering Society* 19:87–99, 1990 — [doi:10.1080/00994480.1990.10747944](https://doi.org/10.1080/00994480.1990.10747944) | Early automated gonioreflectometer (phase 08) |
 | **G9** | G. J. Ward, "Measuring and Modeling Anisotropic Reflection," *ACM SIGGRAPH Computer Graphics* 26(2):265–272, 1992 — [doi:10.1145/142920.134078](https://doi.org/10.1145/142920.134078) · [PDF](https://cseweb.ucsd.edu/~ravir/6998/papers/p265-ward.pdf) | Imaging gonioreflectometer, anisotropic fit (phase 09) |
 | **G10** | D. R. White, P. Saunders, S. J. Bonsey, J. van de Ven, H. Edgar, "Reflectometer for measuring the bidirectional reflectance of rough surfaces," *Applied Optics* 37(16):3450–3454, 1998 — [doi:10.1364/AO.37.003450](https://doi.org/10.1364/AO.37.003450) | Four-axis rotating-arm gonio design (phases 03, 04) |
-| **G11** | K. J. Dana, B. van Ginneken, S. K. Nayar, J. J. Koenderink, "Reflectance and Texture of Real-World Surfaces," *ACM TOG* 18(1):1–34, 1999 — [doi:10.1145/300776.300778](https://doi.org/10.1145/300776.300778) · [PDF](https://cave.cs.columbia.edu/old/publications/pdfs/Dana_TOG99.pdf) | CUReT robot-arm BTF capture/dataset (phases 09, 16) |
+| **G11** | K. J. Dana, B. van Ginneken, S. K. Nayar, J. J. Koenderink, "Reflectance and Texture of Real-World Surfaces," *ACM TOG* 18(1):1–34, 1999 — [doi:10.1145/300776.300778](https://doi.org/10.1145/300776.300778) · [PDF](https://cave.cs.columbia.edu/old/publications/pdfs/Dana_TOG99.pdf) | CUReT robot-arm BTF capture/dataset (phases 09, 17) |
 | **G12** | S. R. Marschner, S. H. Westin, E. P. F. Lafortune, K. E. Torrance, "Image-based bidirectional reflectance distribution function measurement," *Applied Optics* 39(16):2592–2600, 2000 — [doi:10.1364/AO.39.002592](https://doi.org/10.1364/AO.39.002592) | Camera-based BRDF from curved samples (phases 06, 07) |
-| **G13** | J. Y. Han, K. Perlin, "Measuring Bidirectional Texture Reflectance with a Kaleidoscope," *ACM TOG* 22(3) (SIGGRAPH), 2003 — [doi:10.1145/882262.882341](https://doi.org/10.1145/882262.882341) | Mirror-based multi-view BTF alternative (phase 16) |
+| **G13** | J. Y. Han, K. Perlin, "Measuring Bidirectional Texture Reflectance with a Kaleidoscope," *ACM TOG* 22(3) (SIGGRAPH), 2003 — [doi:10.1145/882262.882341](https://doi.org/10.1145/882262.882341) | Mirror-based multi-view BTF alternative (phase 17) |
 | **G14** | K. J. Dana, J. Wang, "Device for convenient measurement of spatially varying bidirectional reflectance," *JOSA A* 21(1):1–12, 2004 — [doi:10.1364/JOSAA.21.000001](https://doi.org/10.1364/JOSAA.21.000001) | Curved-mirror SVBRDF camera (phase 09) |
-| **G15** | W. Matusik, H. Pfister, M. Brand, L. McMillan, "Efficient Isotropic BRDF Measurement," *Proc. 14th Eurographics Workshop on Rendering*, 241–247, 2003 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) | Sphere-sample MERL acquisition method (phase 16) |
+| **G15** | W. Matusik, H. Pfister, M. Brand, L. McMillan, "Efficient Isotropic BRDF Measurement," *Proc. 14th Eurographics Workshop on Rendering*, 241–247, 2003 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) | Sphere-sample MERL acquisition method (phase 17) |
 | **G16** | A. Ngan, F. Durand, W. Matusik, "Experimental Analysis of BRDF Models," *Eurographics Symposium on Rendering*, 2005 — [EG DL](https://diglib.eg.org/items/b3a3223e-ad94-4366-8ae7-fce371c08d04) · [PDF](https://people.csail.mit.edu/wojciech/BRDFAnalysis/BRDFAnalysis.pdf) · [MERL TR2005-151](https://www.merl.com/publications/docs/TR2005-151.pdf) | Model-fit comparison, anisotropic cylinder rig (phases 07, 09) |
 | **G17** | M. Ben-Ezra, J. Wang, B. Wilburn, X. Li, L. Ma, "An LED-Only BRDF Measurement Device," *CVPR*, 2008 — [doi:10.1109/CVPR.2008.4587766](https://doi.org/10.1109/CVPR.2008.4587766) · [mlanthology](https://mlanthology.org/cvpr/2008/benezra2008cvpr-led/) | LEDs as emitters/sensors, multispectral (phase 10) |
 | **G18** | M. Kurt, L. Szirmay-Kalos, J. Křivánek, "An Anisotropic BRDF Model for Fitting and Monte Carlo Rendering," *ACM SIGGRAPH Computer Graphics* 44(1):1–15, 2010 — [doi:10.1145/1722991.1722996](https://doi.org/10.1145/1722991.1722996) | Anisotropic fit to measured data (phase 09) |
@@ -122,8 +122,8 @@
 | **G28** | A. Höpe et al., "Multidimensional reflectometry for industry (xD-Reflect) an European research project," *Proc. SPIE* 9018:901804, 2014 — [doi:10.1117/12.2035981](https://doi.org/10.1117/12.2035981) · [project](https://www.xdreflect.eu/project-publications/) | Gonio colour, sparkle, gloss metrology (phase 10) |
 | **G29** | E. Molloy, H. Patrick, K.-O. Hauer, D. Hünerhoff, T. Quast, "Comparison of bidirectional reflectance distribution function scales over the hemisphere," *Applied Optics* 65(18):6358–6365, 2026 — [doi:10.1364/AO.603369](https://doi.org/10.1364/AO.603369) | Inter-lab BRDF agreement limits (phase 07) |
 | **G30** | R. Le Breton, G. Ged, G. Obein, "Out of plane BRDF measurement at LNE-Cnam using 'ConDOR' our primary goniospectrophotometer," *Proc. 28th CIE Session*, 1401–1407, 2015 — [Obein publications](https://inm.cnam.fr/gael-obein-71373.kjsp) | High-resolution out-of-plane gonio (phase 08) |
-| **G31** | D. Saha, L. Gevaux, J. R. Frisvad, G. Obein, "Bidirectional reflectance measurements over a micrometric surface area using a goniospectrophotometer," *Rev. Sci. Instrum.* 95(5):055114, 2024 — [doi:10.1063/5.0193490](https://doi.org/10.1063/5.0193490) · [DTU](https://orbit.dtu.dk/en/publications/bidirectional-reflectance-measurements-over-a-micrometric-surface) | Small-spot BRDF, spatial resolution (phase 16) |
-| **G32** | RGL-EPFL, customized PAB pgII gonio-photometer (instrument page) — [rgl.epfl.ch/pages/lab/pgII](https://rgl.epfl.ch/pages/lab/pgII) | Reference instrument behind RGL data (phase 16) |
+| **G31** | D. Saha, L. Gevaux, J. R. Frisvad, G. Obein, "Bidirectional reflectance measurements over a micrometric surface area using a goniospectrophotometer," *Rev. Sci. Instrum.* 95(5):055114, 2024 — [doi:10.1063/5.0193490](https://doi.org/10.1063/5.0193490) · [DTU](https://orbit.dtu.dk/en/publications/bidirectional-reflectance-measurements-over-a-micrometric-surface) | Small-spot BRDF, spatial resolution (phase 17) |
+| **G32** | RGL-EPFL, customized PAB pgII gonio-photometer (instrument page) — [rgl.epfl.ch/pages/lab/pgII](https://rgl.epfl.ch/pages/lab/pgII) | Reference instrument behind RGL data (phase 17) |
 
 ### Lineage of the main design reference (NTNU / LNE-CNAM)
 
@@ -157,9 +157,9 @@
 
 | ID | Source | Used for |
 |---|---|---|
-| **G46** | J. B. Nielsen, H. W. Jensen, R. Ramamoorthi, "On Optimal, Minimal BRDF Sampling for Reflectance Acquisition," *ACM TOG* 34(6):186, 2015 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) | Few-sample BRDF from MERL basis (phase 16) |
-| **G47** | R. Vávra, J. Filip, "Minimal Sampling for Effective Acquisition of Anisotropic BRDFs," *Computer Graphics Forum* 35(7):299–309, 2016 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) | Anisotropic sparse sampling (phase 16) |
-| **G48** | R. Vávra, J. Filip, "Adaptive slices for acquisition of anisotropic BRDF," *Computational Visual Media* 4(1):55–69, 2018 — [doi:10.1007/s41095-017-0099-z](https://doi.org/10.1007/s41095-017-0099-z) | Adaptive 1D-slice sampling (phase 16) |
+| **G46** | J. B. Nielsen, H. W. Jensen, R. Ramamoorthi, "On Optimal, Minimal BRDF Sampling for Reflectance Acquisition," *ACM TOG* 34(6):186, 2015 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) | Few-sample BRDF from MERL basis (phase 17) |
+| **G47** | R. Vávra, J. Filip, "Minimal Sampling for Effective Acquisition of Anisotropic BRDFs," *Computer Graphics Forum* 35(7):299–309, 2016 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) | Anisotropic sparse sampling (phase 17) |
+| **G48** | R. Vávra, J. Filip, "Adaptive slices for acquisition of anisotropic BRDF," *Computational Visual Media* 4(1):55–69, 2018 — [doi:10.1007/s41095-017-0099-z](https://doi.org/10.1007/s41095-017-0099-z) | Adaptive 1D-slice sampling (phase 17) |
 
 ### BTF capture setups (Bonn)
 
@@ -172,7 +172,7 @@
 
 | ID | Source | Used for |
 |---|---|---|
-| **G51** | W. Matusik, H. Pfister, M. Brand, L. McMillan, "BRDF Database – Bidirectional Reflectance Distribution Function" (MERL 100 materials, CC-BY-SA-4.0), Zenodo, 2023 — [doi:10.5281/zenodo.8101681](https://doi.org/10.5281/zenodo.8101681) | Licensed MERL copy for comparison (phase 16) |
+| **G51** | W. Matusik, H. Pfister, M. Brand, L. McMillan, "BRDF Database – Bidirectional Reflectance Distribution Function" (MERL 100 materials, CC-BY-SA-4.0), Zenodo, 2023 — [doi:10.5281/zenodo.8101681](https://doi.org/10.5281/zenodo.8101681) | Licensed MERL copy for comparison (phase 17) |
 | **G52** | D. Lanevski et al., "Machine-readable universal data format for bidirectional reflectance distribution function and BiRDview—An open-source web-based application for viewing and comparing bidirectional reflectance data," *Color Research & Application*, 2022 — [doi:10.1002/col.22790](https://doi.org/10.1002/col.22790) | BRDF export format, viewer (phase 14) |
 
 ## Reflectance models and material formats
@@ -183,11 +183,11 @@
 |---|---|---|
 | **T1** | J. T. Kajiya, "The Rendering Equation," *Proc. SIGGRAPH '86, Computer Graphics* 20(4):143–150, 1986 — [doi:10.1145/15922.15902](https://doi.org/10.1145/15922.15902) · [PDF](https://www.cs.cmu.edu/afs/cs/academic/class/15462-s13/www/lec_slides/86kajiyaRenderingEquation.pdf) | Reflection/rendering equation background (phases 00, 07) |
 | **T2** | M. Pharr, W. Jakob, G. Humphreys, *Physically Based Rendering: From Theory to Implementation*, 4th ed., MIT Press, 2023 — [pbr-book.org/4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) · [MIT Press](https://mitpress.mit.edu/9780262048026/physically-based-rendering/) | BRDF, microfacet, sampling reference (phases 07, 08) |
-| **T3** | E. Veach, "Robust Monte Carlo Methods for Light Transport Simulation," PhD thesis, Stanford University, 1997 — [PDF](https://graphics.stanford.edu/papers/veach_thesis/thesis-bw.pdf) · [dblp](https://dblp.dagstuhl.de/rec/phd/us/Veach97.html) | Reciprocity, importance sampling theory (phases 08, 16) |
+| **T3** | E. Veach, "Robust Monte Carlo Methods for Light Transport Simulation," PhD thesis, Stanford University, 1997 — [PDF](https://graphics.stanford.edu/papers/veach_thesis/thesis-bw.pdf) · [dblp](https://dblp.dagstuhl.de/rec/phd/us/Veach97.html) | Reciprocity, importance sampling theory (phases 08, 17) |
 | **T4** | T. Weyrich, J. Lawrence, H. P. A. Lensch, S. Rusinkiewicz, T. Zickler, "Principles of Appearance Acquisition and Representation," *Foundations and Trends in Computer Graphics and Vision* 4(2):75–191, 2009 — [doi:10.1561/0600000022](https://doi.org/10.1561/0600000022) · [PDF](https://gfx.cs.princeton.edu/pubs/Weyrich_2009_POA/0600000022.pdf) | Measurement-to-representation overview (phases 00, 08, 09) |
 | **T5** | R. Montes, C. Ureña, "An Overview of BRDF Models," Tech. Rep. LSI-2012-001, Univ. of Granada, 2012 — [PDF](https://digibug.ugr.es/bitstream/handle/10481/19751/rmontes_LSI-2012-001TR.pdf) | Model catalogue for choosing fits (phases 07, 08) |
-| **T6** | M. Nimier-David, D. Vicini, T. Zeltner, W. Jakob, "Mitsuba 2: A Retargetable Forward and Inverse Renderer," *ACM TOG* 38(6):203, 2019 — [doi:10.1145/3355089.3356498](https://doi.org/10.1145/3355089.3356498) · [project](https://tizianzeltner.com/projects/NimierDavidVicini2019Mitsuba2/) | Differentiable reference renderer for fit checks (phase 16) |
-| **T7** | Mitsuba 3 documentation, "BSDFs" (roughconductor, measured, …) — [mitsuba.readthedocs.io](https://mitsuba.readthedocs.io/en/stable/src/generated/plugins_bsdfs.html) | Render fitted vs RGL measured BSDF (phase 16) |
+| **T6** | M. Nimier-David, D. Vicini, T. Zeltner, W. Jakob, "Mitsuba 2: A Retargetable Forward and Inverse Renderer," *ACM TOG* 38(6):203, 2019 — [doi:10.1145/3355089.3356498](https://doi.org/10.1145/3355089.3356498) · [project](https://tizianzeltner.com/projects/NimierDavidVicini2019Mitsuba2/) | Differentiable reference renderer for fit checks (phase 17) |
+| **T7** | Mitsuba 3 documentation, "BSDFs" (roughconductor, measured, …) — [mitsuba.readthedocs.io](https://mitsuba.readthedocs.io/en/stable/src/generated/plugins_bsdfs.html) | Render fitted vs RGL measured BSDF (phase 17) |
 
 ### Classic analytic reflectance models
 
@@ -201,20 +201,20 @@
 | **T13** | M. Oren, S. K. Nayar, "Generalization of Lambert's Reflectance Model," *Proc. SIGGRAPH '94*, 239–246, 1994 — [doi:10.1145/192161.192213](https://doi.org/10.1145/192161.192213) | Rough-diffuse alternative to Lambert (phases 07, 08) |
 | **T14** | E. P. F. Lafortune, S.-C. Foo, K. E. Torrance, D. P. Greenberg, "Non-Linear Approximation of Reflectance Functions," *Proc. SIGGRAPH '97*, 117–126, 1997 — [doi:10.1145/258734.258801](https://doi.org/10.1145/258734.258801) | Multi-lobe fit, retroreflection (phase 08) |
 | **T15** | M. Ashikhmin, P. Shirley, "An Anisotropic Phong BRDF Model," *Journal of Graphics Tools* 5(2):25–32, 2000 — [doi:10.1080/10867651.2000.10487522](https://doi.org/10.1080/10867651.2000.10487522) | Anisotropic fit alternative (phase 09) |
-| **T16** | S. Rusinkiewicz, "A New Change of Variables for Efficient BRDF Representation," *Rendering Techniques '98* (EGWR), 11–22, 1998 — [doi:10.1007/978-3-7091-6453-2_2](https://doi.org/10.1007/978-3-7091-6453-2_2) · [project](https://gfx.cs.princeton.edu/gfx/pubs/Rusinkiewicz_1998_ANC/index.php) | Half/difference angle data layout (phases 08, 16) |
+| **T16** | S. Rusinkiewicz, "A New Change of Variables for Efficient BRDF Representation," *Rendering Techniques '98* (EGWR), 11–22, 1998 — [doi:10.1007/978-3-7091-6453-2_2](https://doi.org/10.1007/978-3-7091-6453-2_2) · [project](https://gfx.cs.princeton.edu/gfx/pubs/Rusinkiewicz_1998_ANC/index.php) | Half/difference angle data layout (phases 08, 17) |
 
 ### Microfacet theory and sampling (modern)
 
 | ID | Source | Used for |
 |---|---|---|
 | **T17** | E. Heitz, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs," *JCGT* 3(2):48–107, 2014 — [PDF](https://jcgt.org/published/0003/02/03/paper.pdf) · [HAL](https://hal.science/hal-01024289/) | Correct Smith G for GGX fit (phases 07, 08) |
-| **T18** | E. Heitz, E. d'Eon, "Importance Sampling Microfacet-Based BSDFs using the Distribution of Visible Normals," *Computer Graphics Forum* 33(4):103–112, 2014 — [doi:10.1111/cgf.12417](https://doi.org/10.1111/cgf.12417) | Sampling fitted GGX in renders (phases 14, 16) |
+| **T18** | E. Heitz, E. d'Eon, "Importance Sampling Microfacet-Based BSDFs using the Distribution of Visible Normals," *Computer Graphics Forum* 33(4):103–112, 2014 — [doi:10.1111/cgf.12417](https://doi.org/10.1111/cgf.12417) | Sampling fitted GGX in renders (phases 14, 17) |
 | **T19** | E. Heitz, "Sampling the GGX Distribution of Visible Normals," *JCGT* 7(4):1–13, 2018 — [PDF](https://jcgt.org/published/0007/04/01/paper.pdf) | Simple VNDF sampler code (phase 14) |
 | **T20** | J. Dupuy, A. Benyoub, "Sampling Visible GGX Normals with Spherical Caps," *Computer Graphics Forum* 42(8), 2023 — [doi:10.1111/cgf.14867](https://doi.org/10.1111/cgf.14867) | Faster VNDF sampling (phase 14) |
 | **T21** | E. Heitz, J. Hanika, E. d'Eon, C. Dachsbacher, "Multiple-Scattering Microfacet BSDFs with the Smith Model," *ACM TOG* 35(4):58, 2016 — [doi:10.1145/2897824.2925943](https://doi.org/10.1145/2897824.2925943) | Energy loss at high roughness (phase 08) |
 | **T22** | E. Turquin, "Practical Multiple Scattering Compensation for Microfacet Models," Weta Digital tech. report, 2019 — [PDF](https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf) | Energy compensation when fitting rough metals (phase 07) |
-| **T23** | M. M. Bagher, C. Soler, N. Holzschuch, "Accurate Fitting of Measured Reflectances Using a Shifted Gamma Micro-facet Distribution," *Computer Graphics Forum* 31(4), 2012 — [HAL](https://inria.hal.science/hal-00702304) | Long-tail NDF fitting option (phase 16) |
-| **T24** | M. Ribardière, B. Bringier, D. Meneveaux, L. Simonot, "STD: Student's t-Distribution of Slopes for Microfacet Based BSDFs," *Computer Graphics Forum* 36(2), 2017 — [doi:10.1111/cgf.13137](https://doi.org/10.1111/cgf.13137) | Generalised GGX tail fitting (phase 16) |
+| **T23** | M. M. Bagher, C. Soler, N. Holzschuch, "Accurate Fitting of Measured Reflectances Using a Shifted Gamma Micro-facet Distribution," *Computer Graphics Forum* 31(4), 2012 — [HAL](https://inria.hal.science/hal-00702304) | Long-tail NDF fitting option (phase 17) |
+| **T24** | M. Ribardière, B. Bringier, D. Meneveaux, L. Simonot, "STD: Student's t-Distribution of Slopes for Microfacet Based BSDFs," *Computer Graphics Forum* 36(2), 2017 — [doi:10.1111/cgf.13137](https://doi.org/10.1111/cgf.13137) | Generalised GGX tail fitting (phase 17) |
 
 ### Fitting measured data and evaluating fits
 
@@ -222,9 +222,9 @@
 |---|---|---|
 | **T25** | J. Löw, J. Kronander, A. Ynnerman, J. Unger, "BRDF Models for Accurate and Efficient Rendering of Glossy Surfaces," *ACM TOG* 31(1):9, 2012 — [doi:10.1145/2077341.2077350](https://doi.org/10.1145/2077341.2077350) · [PDF](https://liu.diva-portal.org/smash/get/diva2:683489/FULLTEXT01.pdf) | Fit error metric, glossy model choice (phases 07, 08) |
 | **T26** | J. Dupuy, E. Heitz, J.-C. Iehl, P. Poulin, V. Ostromoukhov, "Extracting Microfacet-based BRDF Parameters from Arbitrary Materials with Power Iterations," *Computer Graphics Forum* 34(4):21–30, 2015 — [doi:10.1111/cgf.12675](https://doi.org/10.1111/cgf.12675) · [HAL](https://inria.hal.science/hal-01168516) | Robust NDF extraction for GGX fit (phases 08, 09) |
-| **T27** | G. Lavoué, N. Bonneel, J.-P. Farrugia, C. Soler, "Perceptual Quality of BRDF Approximations: Dataset and Metrics," *Computer Graphics Forum* 40(2), 2021 — [doi:10.1111/cgf.142636](https://doi.org/10.1111/cgf.142636) · [PDF](https://perso.liris.cnrs.fr/nbonneel/BVQM_CGF.pdf) | Perceptual fit-quality metric (phases 07, 16) |
-| **T28** | B. Kavoosighafi et al., "Perceived Quality of BRDF Models," *Computer Graphics Forum*, 2025 — [doi:10.1111/cgf.70162](https://doi.org/10.1111/cgf.70162) | Which model looks best when fitted (phase 16) |
-| **T29** | A. Sztrajman, G. Rainer, T. Ritschel, T. Weyrich, "Neural BRDF Representation and Importance Sampling," *Computer Graphics Forum* 40, 2021 — [doi:10.1111/cgf.14335](https://doi.org/10.1111/cgf.14335) · [project](https://reality.cs.ucl.ac.uk/projects/reflectance-remapping/sztrajman2021neural.html) | Neural fit stretch; remap to analytic (phase 16) |
+| **T27** | G. Lavoué, N. Bonneel, J.-P. Farrugia, C. Soler, "Perceptual Quality of BRDF Approximations: Dataset and Metrics," *Computer Graphics Forum* 40(2), 2021 — [doi:10.1111/cgf.142636](https://doi.org/10.1111/cgf.142636) · [PDF](https://perso.liris.cnrs.fr/nbonneel/BVQM_CGF.pdf) | Perceptual fit-quality metric (phases 07, 17) |
+| **T28** | B. Kavoosighafi et al., "Perceived Quality of BRDF Models," *Computer Graphics Forum*, 2025 — [doi:10.1111/cgf.70162](https://doi.org/10.1111/cgf.70162) | Which model looks best when fitted (phase 17) |
+| **T29** | A. Sztrajman, G. Rainer, T. Ritschel, T. Weyrich, "Neural BRDF Representation and Importance Sampling," *Computer Graphics Forum* 40, 2021 — [doi:10.1111/cgf.14335](https://doi.org/10.1111/cgf.14335) · [project](https://reality.cs.ucl.ac.uk/projects/reflectance-remapping/sztrajman2021neural.html) | Neural fit stretch; remap to analytic (phase 17) |
 
 ### Fresnel and optical constants
 
@@ -238,7 +238,7 @@
 
 | ID | Source | Used for |
 |---|---|---|
-| **T33** | B. Burley, "Physically-Based Shading at Disney," SIGGRAPH 2012 course *Practical Physically Based Shading in Film and Game Production* — [PDF](https://static1.squarespace.com/static/58586fa5ebbd1a60e7d76d3e/t/593a3afa46c3c4a376d779f6/1496988449807/s2012_pbs_disney_brdf_notes_v2.pdf) · [course](https://blog.selfshadow.com/publications/s2012-shading-course/) | Principled parameters, MERL-based design (phases 07, 16) |
+| **T33** | B. Burley, "Physically-Based Shading at Disney," SIGGRAPH 2012 course *Practical Physically Based Shading in Film and Game Production* — [PDF](https://static1.squarespace.com/static/58586fa5ebbd1a60e7d76d3e/t/593a3afa46c3c4a376d779f6/1496988449807/s2012_pbs_disney_brdf_notes_v2.pdf) · [course](https://blog.selfshadow.com/publications/s2012-shading-course/) | Principled parameters, MERL-based design (phases 07, 17) |
 | **T34** | B. Burley, "Extending the Disney BRDF to a BSDF with Integrated Subsurface Scattering," SIGGRAPH 2015 course notes — [PDF](https://blog.selfshadow.com/publications/s2015-shading-course/burley/s2015_pbs_disney_bsdf_notes.pdf) | Anisotropic alpha mapping, sheen (phase 09) |
 | **T35** | B. Karis, "Real Shading in Unreal Engine 4," SIGGRAPH 2013 course *Physically Based Shading in Theory and Practice* — [PDF](https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf) · [slides](https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_slides.pdf) | UE GGX/Smith/Schlick, α = roughness² (phase 07) |
 | **T36** | S. Lagarde, C. de Rousiers, "Moving Frostbite to Physically Based Rendering 3.0," SIGGRAPH 2014 course notes — [PDF](https://seblagarde.wordpress.com/wp-content/uploads/2015/07/course_notes_moving_frostbite_to_pbr_v3.pdf) · [post](https://seblagarde.wordpress.com/2015/07/14/siggraph-2014-moving-frostbite-to-physically-based-rendering/) | Validation against references, photometric units (phase 07) |
@@ -260,8 +260,8 @@
 | **T47** | Unity, HDRP "Lit Shader" — [docs](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@14.0/manual/Lit-Shader.html); Unity glTFast — [docs](https://docs.unity3d.com/Packages/com.unity.cloud.gltfast@6.9/manual/index.html) | Unity export mapping (phases 07, 13) |
 | **T48** | Blender Manual, "Principled BSDF" — [docs](https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/principled.html) | Check exports in Blender (phases 07, 13) |
 | **T49** | I. Georgiev, J. Portsmouth, Z. Andersson, A. Herubel, A. King, S. Ogaki, F. Servant, *Autodesk Standard Surface* v1.0.1 — [spec](https://autodesk.github.io/standard-surface/) · [GitHub](https://github.com/Autodesk/standard-surface) | DCC/film material mapping (phase 07) |
-| **T50** | Z. Andersson, P. Edmondson, J. Guertault, A. Herubel, P. Kutz, A. Machizaud, J. Portsmouth, F. Servant, J. Stone, "OpenPBR Surface: An Open Shading Model for Physically Based Materials," *DigiPro 2025* — [doi:10.1145/3744199.3744632](https://doi.org/10.1145/3744199.3744632) · [spec v1.1.1](https://academysoftwarefoundation.github.io/OpenPBR/) | Future-proof export, F82-tint metals (phases 07, 15) |
-| **T51** | ASWF, MaterialX Specification and Physically Based Shading Nodes — [GitHub](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.PBRSpec.md) · [v1.38 PDF](https://materialx.org/assets/MaterialX.v1.38.PBRSpec.pdf) | Renderer-neutral material file (phases 13, 15) |
+| **T50** | Z. Andersson, P. Edmondson, J. Guertault, A. Herubel, P. Kutz, A. Machizaud, J. Portsmouth, F. Servant, J. Stone, "OpenPBR Surface: An Open Shading Model for Physically Based Materials," *DigiPro 2025* — [doi:10.1145/3744199.3744632](https://doi.org/10.1145/3744199.3744632) · [spec v1.1.1](https://academysoftwarefoundation.github.io/OpenPBR/) | Future-proof export, F82-tint metals (phases 07, 16) |
+| **T51** | ASWF, MaterialX Specification and Physically Based Shading Nodes — [GitHub](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.PBRSpec.md) · [v1.38 PDF](https://materialx.org/assets/MaterialX.v1.38.PBRSpec.pdf) | Renderer-neutral material file (phases 13, 16) |
 
 ### Spectral rendering
 
@@ -283,7 +283,7 @@
 | **V3** | J. Heikkilä, O. Silvén, "A Four-step Camera Calibration Procedure with Implicit Image Correction," *Proc. CVPR* 1997, pp. 1106–1112 — [doi:10.1109/CVPR.1997.609468](https://doi.org/10.1109/CVPR.1997.609468) | Distortion model and correction (phase 06) |
 | **V4** | D. C. Brown, "Close-Range Camera Calibration," *Photogrammetric Engineering* 37(8):855–866, 1971 — [Semantic Scholar](https://www.semanticscholar.org/paper/Close-Range-Camera-Calibration-Brown/1150007b62a3c7dac99c2c8f85c63bfab74891af) | Radial/tangential lens distortion (phase 06) |
 | **V5** | J.-Y. Bouguet, "Camera Calibration Toolbox for Matlab," Caltech DATA, 2022 release — [doi:10.22002/D1.20164](https://doi.org/10.22002/D1.20164) · [record](https://data.caltech.edu/records/jx9cx-fdh55) | Reference calibration workflow (phase 06) |
-| **V6** | T. Schöps, V. Larsson, M. Pollefeys, T. Sattler, "Why Having 10,000 Parameters in Your Camera Model Is Better Than Twelve," *Proc. CVPR* 2020 — [CVF](https://openaccess.thecvf.com/content_CVPR_2020/html/Schops_Why_Having_10000_Parameters_in_Your_Camera_Model_Is_Better_CVPR_2020_paper.html) · [PDF](https://arxiv.org/pdf/1912.02908) | Calibration accuracy limits (phase 16) |
+| **V6** | T. Schöps, V. Larsson, M. Pollefeys, T. Sattler, "Why Having 10,000 Parameters in Your Camera Model Is Better Than Twelve," *Proc. CVPR* 2020 — [CVF](https://openaccess.thecvf.com/content_CVPR_2020/html/Schops_Why_Having_10000_Parameters_in_Your_Camera_Model_Is_Better_CVPR_2020_paper.html) · [PDF](https://arxiv.org/pdf/1912.02908) | Calibration accuracy limits (phase 17) |
 | **V7** | S. Garrido-Jurado, R. Muñoz-Salinas, F. J. Madrid-Cuevas, M. J. Marín-Jiménez, "Automatic Generation and Detection of Highly Reliable Fiducial Markers under Occlusion," *Pattern Recognition* 47(6):2280–2292, 2014 — [doi:10.1016/j.patcog.2014.01.005](https://doi.org/10.1016/j.patcog.2014.01.005) | ArUco markers on ChArUco board (phases 06, 11) |
 | **V8** | R. Hartley, A. Zisserman, *Multiple View Geometry in Computer Vision*, 2nd ed., Cambridge University Press, 2004 — [doi:10.1017/CBO9780511811685](https://doi.org/10.1017/CBO9780511811685) | Projection, triangulation, bundle adjustment (phases 06, 11) |
 | **V9** | R. Szeliski, *Computer Vision: Algorithms and Applications*, 2nd ed., Springer (Texts in Computer Science), 2022 — [doi:10.1007/978-3-030-34372-9](https://doi.org/10.1007/978-3-030-34372-9) · [free PDF](https://szeliski.org/Book/download.php) | General CV reference (phases 06, 07, 08, 09, 10, 11, 12, 13) |
@@ -324,9 +324,9 @@
 | **V29** | R. Mecca, A. Wetzler, A. M. Bruckstein, R. Kimmel, "Near Field Photometric Stereo with Point Light Sources," *SIAM J. Imaging Sciences* 7(4):2732–2770, 2014 — [doi:10.1137/140968100](https://doi.org/10.1137/140968100) | Near-light PS model (phase 12) |
 | **V30** | Y. Quéau, B. Durix, T. Wu, D. Cremers, F. Lauze, J.-D. Durou, "LED-Based Photometric Stereo: Modeling, Calibration and Numerical Solution," *J. Mathematical Imaging and Vision* 60(3):313–340, 2018 — [doi:10.1007/s10851-017-0761-1](https://doi.org/10.1007/s10851-017-0761-1) | LED anisotropy and falloff model (phases 11, 12) |
 | **V31** | F. Logothetis, Y. Quéau, R. Mecca, R. Cipolla, "Semi-calibrated Near-Light Photometric Stereo," *SSVM* 2017, LNCS — [doi:10.1007/978-3-319-58771-4_52](https://doi.org/10.1007/978-3-319-58771-4_52) | Unknown LED intensities (phase 12) |
-| **V32** | H. Santo, M. Waechter, Y. Matsushita, "Deep Near-Light Photometric Stereo for Spatially Varying Reflectances," *ECCV* 2020 — [doi:10.1007/978-3-030-58598-3_9](https://doi.org/10.1007/978-3-030-58598-3_9) | Learned near-light PS option (phase 16) |
+| **V32** | H. Santo, M. Waechter, Y. Matsushita, "Deep Near-Light Photometric Stereo for Spatially Varying Reflectances," *ECCV* 2020 — [doi:10.1007/978-3-030-58598-3_9](https://doi.org/10.1007/978-3-030-58598-3_9) | Learned near-light PS option (phase 17) |
 | **V33** | T. Papadhimitri, P. Favaro, "A New Perspective on Uncalibrated Photometric Stereo," *Proc. CVPR* 2013 — [PDF](https://openaccess.thecvf.com/content_cvpr_2013/papers/Papadhimitri_A_New_Perspective_2013_CVPR_paper.pdf) · [mlanthology](https://mlanthology.org/cvpr/2013/papadhimitri2013cvpr-new/) | Perspective uncalibrated PS fallback (phase 12) |
-| **V34** | S. Ikehata, "CNN-PS: CNN-Based Photometric Stereo for General Non-convex Surfaces," *ECCV* 2018 — [doi:10.1007/978-3-030-01267-0_1](https://doi.org/10.1007/978-3-030-01267-0_1) · [PDF](https://www.ecva.net/papers/eccv_2018/papers_ECCV/papers/Ikehata_CNN-PS_CNN-based_Photometric_ECCV_2018_paper.pdf) | Learned PS for glossy objects (phase 16) |
+| **V34** | S. Ikehata, "CNN-PS: CNN-Based Photometric Stereo for General Non-convex Surfaces," *ECCV* 2018 — [doi:10.1007/978-3-030-01267-0_1](https://doi.org/10.1007/978-3-030-01267-0_1) · [PDF](https://www.ecva.net/papers/eccv_2018/papers_ECCV/papers/Ikehata_CNN-PS_CNN-based_Photometric_ECCV_2018_paper.pdf) | Learned PS for glossy objects (phase 17) |
 | **V35** | Y. Quéau, J.-D. Durou, J.-F. Aujol, "Normal Integration: A Survey," *J. Mathematical Imaging and Vision* 60(4):576–593, 2018 — [doi:10.1007/s10851-017-0773-x](https://doi.org/10.1007/s10851-017-0773-x) · [code](https://github.com/yqueau/normal_integration) | Normals to depth map (phase 12) |
 | **V36** | D. Nehab, S. Rusinkiewicz, J. Davis, R. Ramamoorthi, "Efficiently Combining Positions and Normals for Precise 3D Geometry," *ACM TOG (SIGGRAPH)* 24(3), 2005 — [project](https://gfx.cs.princeton.edu/pubs/Nehab_2005_ECP/index.php) | Fuse PS normals with mesh (phase 12) |
 
@@ -382,13 +382,13 @@
 | **N2** | ASTM International, "Standard Practice for Angle Resolved Optical Scatter Measurements on Specular or Diffuse Surfaces," ASTM E1392 (withdrawn 2003) — [ASTM](https://www.astm.org/DATABASE.CART/WITHDRAWN/E1392.htm) | Historical BRDF practice cited by Labsphere (phase 07) |
 | **N3** | ASTM International, "Standard Practice for Goniophotometry of Objects and Materials," ASTM E167-96 (withdrawn 2005) — [ASTM store](https://store.astm.org/e0167-96.html) | Goniophotometer geometry conventions (phase 06) |
 | **N4** | ASTM International, "Standard Test Method for Specular Gloss," ASTM D523 — [ASTM store](https://store.astm.org/standards/d523) | 20/60/85° gloss cross-check (phase 07) |
-| **N5** | ASTM International, "Standard Test Methods for Measurement of Gloss of High-Gloss Surfaces by Abridged Goniophotometry," ASTM E430-23, 2023 — [ASTM store](https://store.astm.org/standards/e430) | Haze/distinctness-of-image near specular (phases 08, 16) |
+| **N5** | ASTM International, "Standard Test Methods for Measurement of Gloss of High-Gloss Surfaces by Abridged Goniophotometry," ASTM E430-23, 2023 — [ASTM store](https://store.astm.org/standards/e430) | Haze/distinctness-of-image near specular (phases 08, 17) |
 | **N6** | ASTM International, "Standard Terminology of Appearance," ASTM E284-25, 2025 — [doi:10.1520/E0284-25](https://doi.org/10.1520/E0284-25) · [ASTM store](https://store.astm.org/standards/e284) | Docs glossary terms (phase 00) |
 | **N7** | ASTM International, "Standard Practice for Specifying the Geometry of Multiangle Spectrophotometers," ASTM E2175-01(2026) — [ASTM store](https://store.astm.org/standards/e2175) | Reporting light/camera angle geometry (phase 08) |
 | **N8** | ASTM International, "Standard Test Method for Multiangle Color Measurement of Metal Flake Pigmented Materials," ASTM E2194-14(2025) — [doi:10.1520/E2194-14R25](https://doi.org/10.1520/E2194-14R25) · [ASTM store](https://store.astm.org/standards/e2194) | Aspecular angles for metallic samples (phases 08, 09) |
 | **N9** | ASTM International, "Standard Practice for Obtaining Spectrometric Data for Object-Color Evaluation," ASTM E1164-23, 2023 — [ASTM store](https://store.astm.org/standards/e1164) | Spectral data and calibration practice (phase 10) |
 | **N10** | ISO, "Paints and varnishes — Determination of gloss value at 20°, 60° and 85°," ISO 2813:2014 — [ISO catalogue](https://www.iso.org/standard/56807.html) | Gloss reference geometry (phase 07) |
-| **N11** | M. E. Nadal, E. A. Thompson, "NIST Reference Goniophotometer for Specular Gloss Measurements," *J. Coatings Technology* 73(917):73–80, 2001 — [PDF](https://www.paint.org/wp-content/uploads/2021/09/jctJUNE01-Nadal.pdf) | Reference-instrument design and uncertainty (phases 06, 16) |
+| **N11** | M. E. Nadal, E. A. Thompson, "NIST Reference Goniophotometer for Specular Gloss Measurements," *J. Coatings Technology* 73(917):73–80, 2001 — [PDF](https://www.paint.org/wp-content/uploads/2021/09/jctJUNE01-Nadal.pdf) | Reference-instrument design and uncertainty (phases 06, 17) |
 
 ### CIE colorimetry, appearance and colour rendering
 
@@ -441,7 +441,7 @@
 |---|---|---|
 | **N37** | J.-I. Park, M.-H. Lee, M. D. Grossberg, S. K. Nayar, "Multispectral Imaging Using Multiplexed Illumination," *ICCV* 2007, pp. 1–8 — [doi:10.1109/ICCV.2007.4409090](https://doi.org/10.1109/ICCV.2007.4409090) | Multiplexed LED band capture (phase 10) |
 | **N38** | R. Shrestha, J. Y. Hardeberg, "Multispectral imaging using LED illumination and an RGB camera," *Color and Imaging Conf.* 21(1):8–13, 2013 — [doi:10.2352/CIC.2013.21.1.art00003](https://doi.org/10.2352/cic.2013.21.1.art00003) | LED bank + RGB camera reflectance (phase 10) |
-| **N39** | R. Shrestha, J. Y. Hardeberg, "Evaluation and comparison of multispectral imaging systems," *Color and Imaging Conf.* 22(1), 2014 — [doi:10.2352/CIC.2014.22.1.art00018](https://doi.org/10.2352/cic.2014.22.1.art00018) | Spectral accuracy metrics (phases 10, 16) |
+| **N39** | R. Shrestha, J. Y. Hardeberg, "Evaluation and comparison of multispectral imaging systems," *Color and Imaging Conf.* 22(1), 2014 — [doi:10.2352/CIC.2014.22.1.art00018](https://doi.org/10.2352/cic.2014.22.1.art00018) | Spectral accuracy metrics (phases 10, 17) |
 | **N40** | R. Shrestha, J. Y. Hardeberg, "How Are LED Illumination Based Multispectral Imaging Systems Influenced by Different Factors?," *ICISP 2014*, LNCS, pp. 61–71 — [doi:10.1007/978-3-319-07998-1_8](https://doi.org/10.1007/978-3-319-07998-1_8) | Noise/band-count sensitivity of LED bank (phase 10) |
 | **N41** | F. H. Imai, R. S. Berns, D.-Y. Tzeng, "A Comparative Analysis of Spectral Reflectance Estimated in Various Spaces Using a Trichromatic Camera System," *J. Imaging Sci. Technol.* 44(4):280–287, 2000 — [doi:10.2352/J.ImagingSci.Technol.2000.44.4.art00003](https://doi.org/10.2352/j.imagingsci.technol.2000.44.4.art00003) | Spectral reconstruction from camera signals (phase 10) |
 | **N42** | F. H. Imai, M. R. Rosen, R. S. Berns, "Comparison of Spectrally Narrow-Band Capture Versus Wide-Band with a Priori Sample Analysis for Spectral Reflectance Estimation," *Color and Imaging Conf.* 8(1):234–241, 2000 — [doi:10.2352/CIC.2000.8.1.art00043](https://doi.org/10.2352/cic.2000.8.1.art00043) | Narrow-band LEDs vs filters trade-off (phase 10) |
@@ -462,7 +462,7 @@
 | **N47** | IEC, "Photobiological safety of lamps and lamp systems," IEC 62471 (BS EN 62471) — [BSI record doi:10.3403/30149289](https://doi.org/10.3403/30149289) | COB and LED-bank eye-safety risk groups (phases 04, 10) |
 | **N48** | ISO, "Safety of machinery — Emergency stop function — Principles for design," ISO 13850:2015 (BS EN ISO 13850:2015) — [BSI record doi:10.3403/30265059](https://doi.org/10.3403/30265059) | E-stop category and reset behaviour (phases 01, 02) |
 | **N49** | IEC, "Safety of machinery — Electrical equipment of machines — Part 1: General requirements," IEC 60204-1 (BS EN 60204-1) — [BSI record doi:10.3403/30238348](https://doi.org/10.3403/30238348) | Power box wiring, colours, stop circuit (phase 01) |
-| **N50** | ISO, "Safety of machinery — General principles for design — Risk assessment and risk reduction," ISO 12100:2010 (BS EN ISO 12100:2010) — [BSI record doi:10.3403/30201665](https://doi.org/10.3403/30201665) | Pinch-point/hazard risk assessment (phases 00, 15) |
+| **N50** | ISO, "Safety of machinery — General principles for design — Risk assessment and risk reduction," ISO 12100:2010 (BS EN ISO 12100:2010) — [BSI record doi:10.3403/30201665](https://doi.org/10.3403/30201665) | Pinch-point/hazard risk assessment (phases 00, 16) |
 | **N51** | IEC, "Audio/video, information and communication technology equipment — Part 1: Safety requirements," IEC 62368-1 (BS EN IEC 62368-1) — [BSI record doi:10.3403/30347376U](https://doi.org/10.3403/30347376u) | Bought-in PSU safety listing (phase 01) |
 
 ## Motion control, electronics and open hardware
@@ -487,7 +487,7 @@
 | **H9** | Sharp Corporation, "PC817XxNSZ1B Series" photocoupler data sheet, OP18002EN, 2018 — [PDF](https://global.sharp/products/device/lineup/data/pdf/datasheet/PC817XxNSZ1B_e.pdf) | 24 V sense optocoupler, CTR (phase 01) |
 | **H10** | Texas Instruments, "ULN200x, ULQ200x High-Voltage, High-Current Darlington Transistor Arrays," SLRS027T, 2025 — [PDF](https://www.ti.com/lit/gpn/ULN2003A) · [product](https://www.ti.com/product/ULN2003A); "ULN2803A Darlington Transistor Array," SLRS049 — [PDF](https://datasheet.octopart.com/ULN2803AN-Texas-Instruments-datasheet-14122296.pdf) | 8-band LED low-side switching (phase 10) |
 | **H11** | Vishay Semiconductors, "TCST2103, TCST2202, TCST2300: Transmissive Optical Sensor with Phototransistor Output," doc. 81147 — [PDF](https://www.vishay.com/docs/81147/tcst2103.pdf) · [product](https://www.vishay.com/en/product/81147/) | Optical homing flag, 1 mm aperture (phases 04, 05) |
-| **H12** | ams AG (ams OSRAM), "AS5600 – 12-bit Programmable Contactless Potentiometer," datasheet v1-00, 2014 — [PDF](https://www.mouser.com/pdfdocs/AMS_AS5600_Datasheet_EN.PDF) · [v1-06](https://files.seeedstudio.com/wiki/Grove-12-bit-Magnetic-Rotary-Position-Sensor-AS5600/res/Magnetic%20Rotary%20Position%20Sensor%20AS5600%20Datasheet.pdf) | Absolute-angle check of axes (phase 16) |
+| **H12** | ams AG (ams OSRAM), "AS5600 – 12-bit Programmable Contactless Potentiometer," datasheet v1-00, 2014 — [PDF](https://www.mouser.com/pdfdocs/AMS_AS5600_Datasheet_EN.PDF) · [v1-06](https://files.seeedstudio.com/wiki/Grove-12-bit-Magnetic-Rotary-Position-Sensor-AS5600/res/Magnetic%20Rotary%20Position%20Sensor%20AS5600%20Datasheet.pdf) | Absolute-angle check of axes (phase 17) |
 
 ### Camera interface
 
@@ -526,12 +526,12 @@
 | **H28** | J. M. Pearce, "Building Research Equipment with Free, Open-Source Hardware," *Science* 337(6100):1303–1304, 2012 — [doi:10.1126/science.1228183](https://doi.org/10.1126/science.1228183) · [MTU repository](https://digitalcommons.mtu.edu/michigantech-p/12237/) | Rationale for open lab equipment (phase 00) |
 | **H29** | J. M. Pearce, *Open-Source Lab: How to Build Your Own Hardware and Reduce Research Costs*, Elsevier, 2014 — [doi:10.1016/C2012-0-07249-3](https://doi.org/10.1016/C2012-0-07249-3) · [MTU repository](https://digitalcommons.mtu.edu/michigantech-p/5871/) | Low-cost scientific tool design (phase 00) |
 | **H30** | R. Jones, P. Haufe, E. Sells, P. Iravani, V. Olliver, C. Palmer, A. Bowyer, "RepRap – the replicating rapid prototyper," *Robotica* 29(1):177–191, 2011 — [doi:10.1017/S026357471000069X](https://doi.org/10.1017/S026357471000069X) · [PDF](https://fab.cba.mit.edu/classes/865.18/replication/Jones.pdf) | Printed-part machine heritage (phase 03) |
-| **H31** | Open Source Hardware Association, "Open Source Hardware (OSHW) Definition 1.0" — [oshwa.org](https://oshwa.org/definition/) · [best practices](https://oshwa.org/resources/sharing-best-practices/) | Release documentation criteria (phase 15) |
-| **H32** | CERN, "CERN Open Hardware Licence Version 2" (P, W, S variants) — [ohwr.org](https://www.ohwr.org/cernohl) · [CERN-OHL-S-2.0 text](https://ohwr.org/project/cernohl/-/wikis/uploads/819d71bea3458f71fba6cf4fb0f2de6b/cern_ohl_s_v2.txt) · [FAQ](https://gitlab.com/ohwr/project/cernohl/-/wikis/faq) · [OSI page](https://opensource.org/license/cern-ohl-s-2.0) | Hardware licence choice (phase 15) |
-| **H33** | Gathering for Open Science Hardware, "GOSH Manifesto" — [openhardware.science](https://openhardware.science/gosh-manifesto/) | Project values, accessibility (phase 15) |
-| **H34** | J. Bonvoisin, R. Mies, J.-F. Boujut, R. Stark, "What is the 'Source' of Open Source Hardware?," *Journal of Open Hardware* 1(1), 2017 — [doi:10.5334/joh.7](https://doi.org/10.5334/joh.7) · [HAL/RePEc](https://ideas.repec.org/p/hal/journl/hal-01582660.html) | What files to publish (phase 15) |
-| **H35** | J. T. Collins, J. Knapper, J. Stirling, …, R. Bowman, "Robotic microscopy for everyone: the OpenFlexure microscope," *Biomedical Optics Express* 11(5):2447–2460, 2020 — [doi:10.1364/BOE.385729](https://doi.org/10.1364/BOE.385729) · [open access](https://opg.optica.org/boe/fulltext.cfm?uri=boe-11-5-2447&id=429869) | Model for documented printed instrument (phases 00, 15) |
-| **H36** | Elsevier, "Guide for authors – HardwareX" — [ScienceDirect](https://www.sciencedirect.com/journal/hardwarex/publish/guide-for-authors); T. Duncombe, "HardwareX manuscript templates," Zenodo, 2021 — [doi:10.5281/zenodo.5078227](https://doi.org/10.5281/zenodo.5078227) | Paper structure, BOM, validation (phase 15) |
+| **H31** | Open Source Hardware Association, "Open Source Hardware (OSHW) Definition 1.0" — [oshwa.org](https://oshwa.org/definition/) · [best practices](https://oshwa.org/resources/sharing-best-practices/) | Release documentation criteria (phase 16) |
+| **H32** | CERN, "CERN Open Hardware Licence Version 2" (P, W, S variants) — [ohwr.org](https://www.ohwr.org/cernohl) · [CERN-OHL-S-2.0 text](https://ohwr.org/project/cernohl/-/wikis/uploads/819d71bea3458f71fba6cf4fb0f2de6b/cern_ohl_s_v2.txt) · [FAQ](https://gitlab.com/ohwr/project/cernohl/-/wikis/faq) · [OSI page](https://opensource.org/license/cern-ohl-s-2.0) | Hardware licence choice (phase 16) |
+| **H33** | Gathering for Open Science Hardware, "GOSH Manifesto" — [openhardware.science](https://openhardware.science/gosh-manifesto/) | Project values, accessibility (phase 16) |
+| **H34** | J. Bonvoisin, R. Mies, J.-F. Boujut, R. Stark, "What is the 'Source' of Open Source Hardware?," *Journal of Open Hardware* 1(1), 2017 — [doi:10.5334/joh.7](https://doi.org/10.5334/joh.7) · [HAL/RePEc](https://ideas.repec.org/p/hal/journl/hal-01582660.html) | What files to publish (phase 16) |
+| **H35** | J. T. Collins, J. Knapper, J. Stirling, …, R. Bowman, "Robotic microscopy for everyone: the OpenFlexure microscope," *Biomedical Optics Express* 11(5):2447–2460, 2020 — [doi:10.1364/BOE.385729](https://doi.org/10.1364/BOE.385729) · [open access](https://opg.optica.org/boe/fulltext.cfm?uri=boe-11-5-2447&id=429869) | Model for documented printed instrument (phases 00, 16) |
+| **H36** | Elsevier, "Guide for authors – HardwareX" — [ScienceDirect](https://www.sciencedirect.com/journal/hardwarex/publish/guide-for-authors); T. Duncombe, "HardwareX manuscript templates," Zenodo, 2021 — [doi:10.5281/zenodo.5078227](https://doi.org/10.5281/zenodo.5078227) | Paper structure, BOM, validation (phase 16) |
 
 ### Low-cost open instruments (HardwareX and related)
 
@@ -550,7 +550,7 @@
 |---|---|---|
 | **H43** | KiCad EDA — [kicad.org](https://kicad.org/) · [source mirror](https://github.com/KiCad/kicad-source-mirror) · [developer docs](https://dev-docs.kicad.org) | Power-box and hub schematics (phases 01, 02) |
 | **H44** | GitHub Docs, "REST API endpoints for milestones," "…for issues," "…for labels" — [milestones](https://docs.github.com/en/rest/issues/milestones) · [issues](https://docs.github.com/en/rest/issues/issues) · [labels](https://docs.github.com/en/rest/issues/labels) | Phase milestones and issue scripts (phase 00) |
-| **H45** | GitHub Docs, "Configuring a publishing source for your GitHub Pages site" and "Using custom workflows with GitHub Pages" — [publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) · [custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) | Documentation site deployment (phase 15) |
+| **H45** | GitHub Docs, "Configuring a publishing source for your GitHub Pages site" and "Using custom workflows with GitHub Pages" — [publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) · [custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) | Documentation site deployment (phase 16) |
 
 ### Software dependencies
 
@@ -561,6 +561,20 @@
 | **H48** | P. Virtanen, R. Gommers, T. E. Oliphant, et al., "SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python," *Nature Methods* 17:261–272, 2020 — [doi:10.1038/s41592-019-0686-2](https://doi.org/10.1038/s41592-019-0686-2) · [scipy.org](https://scipy.org/) | BRDF least-squares fitting, rotations (phases 07, 08) |
 | **H49** | G. Bradski, "The OpenCV Library," *Dr. Dobb's Journal of Software Tools*, 2000 — [citation (OpenCV wiki)](https://github.com/opencv/opencv/wiki/CiteOpenCV) · [opencv.org](https://opencv.org) | Capture, calibration, ChArUco (phases 06, 11) |
 | **H50** | PyYAML (YAML parser and emitter for Python) — [pyyaml.org](https://pyyaml.org/) · [docs](https://pyyaml.org/wiki/PyYAMLDocumentation) · [GitHub](https://github.com/yaml/pyyaml); H. Krekel, B. Oliveira, R. Pfannschmidt, F. Bruynooghe, B. Laugher, F. Bruhin, "pytest," 2004– — [docs](https://docs.pytest.org/en/latest/) · [GitHub](https://github.com/pytest-dev/pytest) | Config files and test suite (phase 14) |
+
+### Standalone station
+
+| ID | Source | Used for |
+|---|---|---|
+| **H51** | Raspberry Pi Zero 2 W — [product](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/) | Standalone station (phase 15) |
+| **H52** | micropython-lib SSD1306 driver — [GitHub](https://github.com/micropython/micropython-lib/tree/master/micropython/drivers/display/ssd1306) | Panel OLED (phase 15) |
+| **H53** | Raspberry Pi configuration, `raspi-config` and UART — [docs](https://www.raspberrypi.com/documentation/computers/configuration.html) | Pi UART to Pico (phase 15) |
+| **H54** | usbipd-win — [GitHub](https://github.com/dorssel/usbipd-win) | USB boards into WSL (phase 02) |
+| **H55** | MicroPython `machine.UART` — [docs](https://docs.micropython.org/en/latest/library/machine.UART.html) | Pico ↔ Pi link (phase 15) |
+| **H56** | CadQuery 2.x, parametric CAD in Python — [PyPI](https://pypi.org/project/cadquery/), [GitHub](https://github.com/CadQuery/cadquery) | Generated STEP/STL parts (phase 00) |
+| **H57** | numpy-stl — [PyPI](https://pypi.org/project/numpy-stl/) | Parts gallery rendering (phase 00) |
+| **H58** | Matplotlib — [matplotlib.org](https://matplotlib.org/) | Parts gallery rendering (phase 00) |
+
 
 ## Firmware, protocols, software
 

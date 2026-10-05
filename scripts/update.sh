@@ -12,7 +12,11 @@ if [ -n "$ZIP" ]; then
   TMP=$(mktemp -d)
   unzip -q "$ZIP" -d "$TMP"
   SRC=$(dirname "$(find "$TMP" -maxdepth 3 -name phases.yml -path '*/.github/*' | head -1)")/..
+  chmod -R u+w "$TMP"
   rm -rf "$SRC/.git"
+  mkdir -p papers/personal
+  cp -n "$SRC"/papers/personal/* papers/personal/ 2>/dev/null || true   # never overwrite your PDFs
+  rm -rf "$SRC/papers/personal" "$SRC/papers/open"
   git ls-files -z | xargs -0 rm -f          # drop old tracked files (removed ones stay removed)
   cp -a "$SRC/." ./                         # your .git, .venv and papers stay as they are
   rm -rf "$TMP"
@@ -28,6 +32,6 @@ if [ -z "${NO_GITHUB:-}" ]; then
   REPO=$(git remote get-url origin | sed -E 's#\.git$##; s#.*[:/]([^/:]+/[^/]+)$#\1#')
   [ -d .venv ] || python3 -m venv .venv
   . .venv/bin/activate && pip install -q pyyaml
-  python3 tools/roadmap.py --github --repo "$REPO"     # milestones + issues match .github/phases.yml
+  python3 tools/roadmap.py --github --repo "$REPO" --prune   # milestones + issues match .github/phases.yml
   echo "https://github.com/$REPO"
 fi

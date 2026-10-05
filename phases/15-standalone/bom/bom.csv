@@ -1,0 +1,8 @@
+ID,Type,Part,Use,Qty,Maker,Part number,Supplier,Link,Unit USD,Total USD,STEP,CAD license,Notes,Own,Price,Refs
+STA-01,Optional,Raspberry Pi Zero 2 W,Runs opengonio station: jobs + camera without the laptop,1,Raspberry Pi,SC0510,raspberrypi.com,https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/,15.00,15.00,https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-mechanical-drawing.pdf,Vendor CAD - link only,MSRP; any approved reseller,N,estimate,H51
+STA-02,Optional,microSD card 32 GB,Pi OS + job data,1,any,,any,n/a,6.00,6.00,,,,Y,estimate,-
+STA-03,Optional,Buck converter 24 V to 5 V 3 A,Powers the Pi from BUS_24V (before the e-stop),1,any,MP1584 / LM2596 module,any,n/a,3.00,3.00,,,Set 5.1 V before connecting,N,estimate,-
+STA-04,Optional,Micro-USB OTG adapter,Camera into the Pi USB port,1,any,,any,n/a,2.00,2.00,,,,N,estimate,-
+STA-05,Optional,SSD1306 OLED 0.96 in I2C 128x64,Menu and progress on the panel (both modes),1,any,SSD1306,any,n/a,4.00,4.00,,,On Pico GP16 SDA / GP17 SCL,N,estimate,H52
+STA-06,Optional,Jumper wires female-female (10),Pi UART to Pico; OLED,1,any,,any,n/a,2.00,2.00,,,,Y,estimate,-
+STA-07,Print,Pi Zero mount + OLED window,Clips into the controller case,1,OpenGonio,OG-STA-*,Self-printed (PETG),n/a,0.00,0.00,3d/print/STA-07a_pi_zero_mount.step,CERN-OHL-S-2.0,,N,n/a,-

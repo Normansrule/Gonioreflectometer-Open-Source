@@ -1,16 +1,22 @@
 # 12 · 3D scan: mesh
 
-Turn the photos into an accurate 3D model.
-
 [Research](research/) · [Design](design/) · [Tests](test/)
 
-## 12.1 Quick preview
+## M34 · Quick 3D preview
+
+Shape from silhouettes in minutes. · ~1 wk
+
+**M34.1 Visual hull**
 
 - [ ] Silhouettes from the background pass
 - [ ] Visual hull PLY
-- [ ] **Done:** 40 mm cube hull within ±1 mm.
+- [ ] **Done:** 40 mm cube within ±1 mm.
 
-## 12.2 Full mesh
+## M35 · Full mesh
+
+Accurate, detailed 3D model. · ~1 wk
+
+**M35.1 Mesh**
 
 - [ ] bash run_colmap.sh (or Meshroom without CUDA)
 - [ ] Add photometric-stereo normals

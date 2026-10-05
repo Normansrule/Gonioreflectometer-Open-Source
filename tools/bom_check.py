@@ -76,6 +76,7 @@ def cost(r: dict, own: bool) -> float:
 
 def totals(boms: dict[str, list[dict]]) -> dict[str, dict[str, float]]:
     return {p: {"buy": sum(cost(r, False) for r in rows), "own": sum(cost(r, True) for r in rows),
+                "opt": sum(float(r["Total USD"]) for r in rows if r["Type"] == "Optional"),
                 "est": sum(float(r["Total USD"]) for r in rows if r["Type"] == "Purchase" and r["Price"] == "estimate")}
             for p, rows in boms.items()}
 
@@ -133,6 +134,8 @@ def main(argv=None) -> int:
         print(f"{p:<18} ${v['buy']:>7.2f}   own-stock ${v['own']:>7.2f}   running ${run:>7.2f}")
     own = sum(v["own"] for v in t.values())
     print(f"{'TOTAL':<18} ${run:>7.2f}   own-stock ${own:>7.2f}   cap ${HARD_CAP:.0f}")
+    sa = t.get("15-standalone", {}).get("opt", 0.0)
+    print(f"{'+ standalone kit':<18} ${sa:>7.2f}   optional, not in the total (own-stock path + kit ${own + sa:.2f})")
     SVG.write_text(budget_svg(t), encoding="utf-8")
     if a.strict and run > HARD_CAP:
         print("over the $500 cap")

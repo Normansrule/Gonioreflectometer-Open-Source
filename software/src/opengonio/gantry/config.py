@@ -59,6 +59,7 @@ class Machine:
     camera: dict[str, Any] = field(default_factory=dict)
     lights: dict[str, dict] = field(default_factory=dict)
     scan: dict[str, Any] = field(default_factory=dict)
+    station: dict[str, Any] = field(default_factory=dict)
 
     @property
     def active_axes(self) -> dict[str, Axis]:
@@ -108,4 +109,5 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
         min_phase_angle_deg=float(m["min_phase_angle_deg"]), repeatability_target_deg=float(m["repeatability_target_deg"]),
         axes=axes, controller=raw.get("controller", {}), hub=raw.get("hub", {}),
         camera=raw.get("camera", {}), lights=raw.get("lights", {}), scan=raw.get("scan", {}),
+        station=raw.get("station", {}),
     )

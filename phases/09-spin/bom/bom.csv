@@ -5,4 +5,4 @@ SPN-03,Purchase,GT2 20T pulley 5 mm bore,Motor pulley,1,ZYLtech,2GT 20T 6 mm,ZYL
 SPN-04,Purchase,Optical endstop TCST2103 module,Home,1,generic,TCST2103 module,eBay,https://www.ebay.com/itm/182778778905,2.93,2.93,"Not confirmed - 33 x 11 mm PCB, 5.8 mm slot",n/a,Price at qty 3.,N,checked 2026-10-04,P43
 SPN-05,Purchase,8 mm steel shaft 100 mm,Axis spindle in 2 x 608 from FRM-08,1,generic,8 mm ground rod,hardware store,n/a,3.00,3.00,Model as 8 x 100 mm rod,n/a,,N,estimate,-
 SPN-06,Purchase,Axis fasteners (M3/M5 set),"Motor mount, pulley, clamp",1,generic,"M3 x 8 (4), M5 x 10 (4), M3 nyloc (4)",hardware store,n/a,2.00,2.00,Onshape Standard Content,n/a,,N,estimate,-
-SPN-07,Print,Printed axis parts,"Hub, 100T pulley (5:1), motor mount, home flag",1,OpenGonio,OG-SPN-*,Self-printed (PETG),n/a,0.00,0.00,Exported from the project Onshape document,CERN-OHL-S-2.0,,N,n/a,-
+SPN-07,Print,Printed axis parts,"Hub, 100T pulley (5:1), motor mount, home flag",1,OpenGonio,OG-SPN-*,Self-printed (PETG),n/a,0.00,0.00,3d/print/SPN-07a_spin_platter.step; 3d/print/SPN-07b_pulley_80T.step,CERN-OHL-S-2.0,,N,n/a,-

@@ -69,10 +69,11 @@ def test_optics_basics():
 
 def test_phases_match_folders():
     import roadmap
-    phases = roadmap.load()
-    assert [int(p["id"][1:]) for p in phases] == list(range(len(phases)))
-    folders = {p["folder"] for p in phases}
-    assert set(bom_check.load()) <= folders
-    for p in phases:
-        assert p["folder"].startswith(p["id"][1:] + "-")
-        assert all(s["id"].startswith(p["id"] + ".") and s["tasks"] and s["done"] for s in p["steps"])
+    stages, ms = roadmap.load()
+    folders = [st["folder"] for st in stages]
+    assert [int(f[:2]) for f in folders] == list(range(len(folders)))
+    assert set(bom_check.load()) <= set(folders)
+    assert [int(m["id"][1:]) for m in ms] == list(range(1, len(ms) + 1))
+    for m in ms:
+        assert m["stage"] in folders
+        assert all(s["id"].startswith(m["id"] + ".") and s["tasks"] and s["done"] for s in m["steps"])

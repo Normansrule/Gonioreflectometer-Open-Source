@@ -6,12 +6,16 @@
     opengonio home | move ... | light on|off | sleep | wake | status
     opengonio panel                          run the button panel (Pico hub) loop
     opengonio send '$I' '?'                  raw FluidNC lines; prints the replies
+    opengonio station                        standalone: buttons + OLED run jobs, images to station.data_dir
+    opengonio pull pi@opengonio.local        copy job folders from the station to ./data
+    opengonio verify data/<job>              check a job folder (PASS / WARN / FAIL)
 """
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from .gantry.collision import clearance_mm, min_safe_m4, pose_is_safe
 from .gantry.config import load_config
@@ -78,6 +82,9 @@ def main(argv: list[str] | None = None) -> int:
     li = sub.add_parser("light"); li.add_argument("state", choices=["on", "off"]); li.add_argument("--name", default="white")
     sub.add_parser("panel")
     se = sub.add_parser("send", help="raw FluidNC lines"); se.add_argument("lines", nargs="+")
+    sub.add_parser("station", help="standalone mode (no laptop)")
+    pu = sub.add_parser("pull", help="copy job folders from the station"); pu.add_argument("host"); pu.add_argument("--dest", default="data")
+    ve = sub.add_parser("verify", help="check a job folder"); ve.add_argument("dirs", nargs="+")
     sc = sub.add_parser("scan", help="3D photo scanner (phases 11-12)")
     sc.add_argument("action", choices=["plan", "export-colmap", "demo", "run", "calibrate", "sync-ids"])
     sc.add_argument("--db", default="database.db")
@@ -103,6 +110,41 @@ def main(argv: list[str] | None = None) -> int:
 
     if a.cmd == "scan" and a.action not in ("run", "calibrate"):
         return _scan_offline(cfg, a)
+    if a.cmd == "verify":
+        from .verify import verify
+        worst = 0
+        for d in a.dirs:
+            rep = verify(d, cfg)
+            print(json.dumps(rep, indent=1))
+            worst = max(worst, {"PASS": 0, "WARN": 1, "FAIL": 2}[rep["result"]])
+        return worst
+    if a.cmd == "pull":  # pragma: no cover - needs the station
+        import shutil
+        import subprocess
+        src = f"{a.host}:{cfg.station.get('data_dir', '~/opengonio-data').replace('~/', '')}/"
+        cmd = ["rsync", "-av", src, a.dest + "/"] if shutil.which("rsync") else ["scp", "-r", src + ".", a.dest]
+        Path(a.dest).mkdir(exist_ok=True)
+        return subprocess.call(cmd)
+    if a.cmd == "station":  # pragma: no cover - hardware loop
+        from dataclasses import replace
+        from .camera.uvc import CameraSettings, UvcCamera
+        from .gantry.hub import Hub
+        from .station import Station
+        import cv2
+        st_cfg = cfg.station
+        cfg = replace(cfg, controller={**cfg.controller, **st_cfg.get("controller", {})})
+        g = Gantry(cfg, FluidNC(_transport(cfg, False)))
+        hub = Hub(st_cfg.get("hub_port", "/dev/serial0"), int(cfg.hub.get("baud", 115200)))
+        cam = UvcCamera(int(cfg.camera.get("index", 0)), int(cfg.camera["width"]), int(cfg.camera["height"]))
+        cam.set(CameraSettings(float(st_cfg.get("exposure_ms", 20))))
+        st = Station(cfg, g, hub, cam, Path(st_cfg.get("data_dir", "~/opengonio-data")),
+                     save=lambda path, img: cv2.imwrite(str(path), img))
+        print("station ready: NEXT chooses a job, START runs it")
+        while True:
+            ev = hub.poll()
+            if ev:
+                st.handle(ev.kind, ev.value)
+            st.tick()
 
     t = _transport(cfg, a.dry_run)
     g = Gantry(cfg, FluidNC(t))

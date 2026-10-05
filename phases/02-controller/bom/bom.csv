@@ -8,4 +8,4 @@ CTL-06,Purchase,JST-XH pre-crimped lead kit,Keyed connectors,1,Keszoox,JST-XH 11
 CTL-07,Purchase,Pin headers 2.54 mm (for Pico),Solder to Pico,1,generic,40-pin male strip x2,any,n/a,1.00,1.00,n/a,n/a,,Y,estimate,-
 CTL-08,Optional,Fan 40 mm 24 V,Only if T6 driver temperature fails,1,generic,4010 24 V,any,n/a,4.00,4.00,n/a,n/a,Only if drivers overheat.,N,estimate,-
 CTL-09,Owned,Laptop (Windows or Linux),Control and processing,1,-,-,owned,n/a,0.00,0.00,n/a,n/a,No Raspberry Pi needed.,N,n/a,-
-CTL-10,Print,Controller case + button panel,"Holds E4 and Pico, panel labels",1,OpenGonio,OG-CTL-*,Self-printed (PETG),n/a,0.00,0.00,Project Onshape document,CERN-OHL-S-2.0,,N,n/a,-
+CTL-10,Print,Controller case + button panel,"Holds E4 and Pico, panel labels",1,OpenGonio,OG-CTL-*,Self-printed (PETG),n/a,0.00,0.00,3d/print/CTL-10a_button_panel.step; 3d/print/CTL-10b_controller_tray.step,CERN-OHL-S-2.0,,N,n/a,-
