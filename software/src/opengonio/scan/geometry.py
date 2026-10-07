@@ -64,6 +64,26 @@ def world_to_camera(cfg: Machine, calib=None) -> tuple[np.ndarray, np.ndarray]:
     return np.vstack([r, d, f]), C
 
 
+def scan_view_clearance_mm(cfg: Machine) -> dict[str, float]:
+    """Two-camera layout: how far the scan camera's line of sight, and the lower edge of its picture, pass above the
+    measuring camera head (a capsule from 350 to 410 mm on +X, radius camera_head_radius_mm). Both must be > 0."""
+    from ..gantry.collision import segment_distance
+    s = cfg.for_scan()
+    C = s.camera_distance_mm * camera_dir(s.camera_elevation_deg)
+    c = camera_dir(cfg.camera_elevation_deg)
+    p, q = cfg.camera_distance_mm * c, (cfg.camera_distance_mm + 60.0) * c
+    k = intrinsics(s, s.camera_distance_mm)
+    half = math.atan((k.height / 2) / k.fy)                       # half vertical field angle
+    f = -C / np.linalg.norm(C)
+    down = np.cross(np.cross(f, [0.0, 0.0, 1.0]), f)                # unit "up" in the image plane -> negate for down
+    down = -down / np.linalg.norm(down)
+    edge = math.cos(half) * f + math.sin(half) * down
+    L = 1.2 * np.linalg.norm(C)
+    r = cfg.camera_head_radius_mm
+    return {"line_of_sight_mm": round(segment_distance(C, np.zeros(3), p, q) - r, 1),
+            "frame_edge_mm": round(segment_distance(C, C + L * edge, p, q) - r, 1)}
+
+
 def object_rotation(pose: dict[str, float]) -> np.ndarray:
     """World-from-object rotation (R P)."""
     return sample_rotation(pose.get("M3", 0.0), pose.get("M2", 0.0), pose.get("M1", 0.0)) @ P

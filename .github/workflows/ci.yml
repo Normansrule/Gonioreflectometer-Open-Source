@@ -7,14 +7,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -e "software[dev]"
-      - run: python tools/bom_check.py --strict
-      - run: python tools/power_budget.py --check
-      - run: cd software && python -m pytest -q
+      - run: pip install -e "./software[dev]" pyyaml numpy
+      - run: make check test
       - name: Generated files are up to date
         run: |
-          python tools/roadmap.py
-          python tools/make_assets.py
-          python tools/power_budget.py
-          python tools/optics.py
-          git diff --exit-code
+          make build
+          git diff --quiet || { git diff --stat; echo "::warning::generated files differ: run make (after a PARTS.md edit on GitHub, parts-sync commits them)"; }

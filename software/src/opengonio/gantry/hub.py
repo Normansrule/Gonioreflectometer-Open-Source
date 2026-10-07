@@ -1,7 +1,7 @@
 """Client for the Pico panel + sensor hub (firmware/pico-hub/main.py).
 
-Lines from the hub:  "BTN <HOME|START|STOP|LIGHT|NEXT>", "POWER <0|1>", "ENC a b c d", "PONG ...", "ERR ..."
-Lines to the hub:    "BAND <0-7>", "BAND OFF", "ENC?", "POWER?", "PING", "SHOW a|b|c" (OLED)
+Lines from the hub:  "BTN <HOME|START|STOP|LIGHT|NEXT>", "POWER <0|1>", "ENC a b c d", "SPEC f1..f8 clear nir", "PONG ...", "ERR ..."
+Lines to the hub:    "BAND <0-7>", "BAND OFF", "ENC?", "POWER?", "PING", "SHOW a|b|c" (OLED), "SPEC?" (AS7341 spectral sensor)
 Port: USB (laptop) or the Pi UART /dev/serial0 (standalone station).
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ class HubEvent:
 
 def parse(line: str) -> HubEvent | None:
     parts = line.strip().split(maxsplit=1)
-    if not parts or parts[0] not in ("BTN", "POWER", "ENC", "PONG"):
+    if not parts or parts[0] not in ("BTN", "POWER", "ENC", "PONG", "SPEC"):
         return None
     ev = HubEvent(parts[0], parts[1] if len(parts) > 1 else "")
     if ev.kind == "BTN" and ev.value not in BUTTONS:
@@ -49,6 +49,17 @@ class Hub:  # pragma: no cover - needs hardware
 
     def show(self, *lines: str) -> None:
         self.send("SHOW " + "|".join(str(x).replace("|", "/") for x in lines))
+
+    def spectral(self, timeout_s: float = 3.0) -> list[int]:
+        """Ask the hub for one AS7341 reading: 8 bands + clear + NIR (raw counts)."""
+        import time
+        self.send("SPEC?")
+        end = time.monotonic() + timeout_s
+        while time.monotonic() < end:
+            ev = self.poll()
+            if ev and ev.kind == "SPEC":
+                return [int(x) for x in ev.value.split()]
+        raise RuntimeError("no SPEC reply: check the AS7341 wiring (design.md)")
 
 
 @dataclass

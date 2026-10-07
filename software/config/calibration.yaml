@@ -1,0 +1,11 @@
+# What you MEASURED on your machine (machine.yaml = what you BUILT). Written by `opengonio calibrate …`.
+# Every value has a date; `opengonio verify` warns when one is older than max_age_days.
+# SPDX-License-Identifier: GPL-3.0-or-later
+schema: 1
+angle_offset_deg: {M4: 0.0, M3: 0.0, M2: 0.0, M1: 0.0}   # true angle = commanded + offset (calibrate mirror)
+dark_counts: null          # camera mean with the lamp off, 8-bit counts (calibrate dark)
+spectral_dark: null        # AS7341 counts with the lamp off, 10 channels (calibrate dark --spectral run)
+white: null                # PTFE at 45:0 -> {counts, theta_i_deg, rho, exposure_ms} (calibrate white)
+drift_limit_pct: 2.0       # lamp: reference shot at the end vs the start of a run
+max_age_days: 30
+dates: {angle_offset_deg: null, dark_counts: null, spectral_dark: null, white: null}

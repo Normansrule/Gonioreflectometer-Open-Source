@@ -55,7 +55,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 <body>
 <header><nav>
  <b>OpenGonio</b>
- <a href="#machine">Machine</a><a href="#brdf">BRDF</a><a href="#scanner">3D scan</a><a href="#equations">Equations</a>
+ <a href="#machine">Machine</a><a href="#brdf">BRDF</a><a href="#calibrate">Calibrate</a><a href="#scanner">3D scan</a><a href="#equations">Equations</a>
  <a href="#build">Build</a><a href="#budget">Budget</a><a href="#refs">References</a>
  <button class="toggle" id="theme" aria-label="Toggle light or dark theme">◐</button>
 </nav></header>
@@ -70,6 +70,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
   <div class="card"><canvas id="sim" width="900" height="560" aria-label="3D machine view: drag to orbit"></canvas>
    <div class="phase" style="margin-top:10px"><button id="play">▶ Demo</button><button id="bspec">Specular pose</button><button id="bzero">Reset</button></div>
    <label>Build stage <input id="build" type="range" min="1" max="17" value="17"><output></output></label>
+   <p class="sub" id="buildinfo" style="font-size:13px;margin:2px 0 8px">–</p>
    <div class="status" id="partinfo" style="font-weight:400">Click any part: what it is, its stage, its parts list and 3D files.</div>
   </div>
   <div class="card">
@@ -102,6 +103,29 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
    <label>metallic <input id="bmt" type="range" min="0" max="1" step="0.01" value="0"><output></output></label>
    <div class="read"><div><small>peak θr</small><span id="bpk">–</span></div><div><small>albedo (cos-weighted)</small><span id="bal">–</span></div></div>
    <p class="eq">$$f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r}$$</p>
+  </div>
+ </div>
+</section>
+
+<section id="calibrate">
+ <h2>Calibration lab</h2>
+ <p class="sub">What <code>opengonio verify</code> and <code>calibrate</code> see (stages 06–07), on the same GGX mirror and lamp model as <code>make sim</code>. Hover the chart for values.</p>
+ <div class="grid">
+  <div class="card">
+   <canvas id="mir" width="900" height="380" aria-label="Mirror sweep: brightness vs table angle"></canvas>
+   <canvas id="lamp" width="900" height="200" style="margin-top:12px" aria-label="Lamp brightness during a run"></canvas>
+  </div>
+  <div class="card">
+   <label>θ (mirror) <input id="cth" type="range" min="20" max="60" step="10" value="40"><output></output></label>
+   <label>hidden table error <input id="cerr" type="range" min="-1" max="1" step="0.05" value="0.8"><output></output></label>
+   <label>lamp drift / shot <input id="cdrift" type="range" min="0" max="0.5" step="0.01" value="0"><output></output></label>
+   <div class="phase"><button id="ccal">Run calibrate mirror</button><button id="creset">Forget calibration</button></div>
+   <div class="read">
+    <div><small>M3 offset in calibration.yaml</small><span id="coff">0.00°</span></div><div><small>mirror_peak_error_deg</small><span id="cpe">–</span></div>
+    <div><small>lamp_drift_pct</small><span id="cdp">–</span></div><div><small>shots in the sweep</small><span>31</span></div>
+   </div>
+   <div class="status" id="cstat">–</div>
+   <p class="sub" style="margin-top:10px;font-size:13px">Steps: M19.1 (mirror sweeps), M22.2 (angle offset), M18.3 (warm-up). Practice: M02.3.</p>
   </div>
  </div>
 </section>
@@ -154,7 +178,7 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="build">
  <h2>Build plan</h2>
- <p class="sub">18 stages, 48 small milestones. Laptop mode or standalone (Pi Zero + buttons).</p>
+ <p class="sub">18 stages, 48 milestones, one GitHub issue per step (Time · Needs → Do → Verify → If a check fails → Record). Laptop mode or standalone (Pi Zero + buttons).</p>
  <img class="full" src="assets/phases.svg" alt="Stages and milestones">
  <p></p>
  <img class="full" src="assets/architecture.svg" alt="Control architecture: laptop, FluidNC E4, Pico hub, camera">
@@ -164,13 +188,13 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 
 <section id="budget">
  <h2>Budget</h2>
- <p class="sub">Cheapest parts, prices checked 2026-10-04.</p>
+ <p class="sub">Cheapest parts, prices checked 2026-10-04. Your decisions (agree, have, ordered, swap, skip, paid) live in <code>PARTS.md</code>, editable on GitHub.</p>
  <img class="full" src="assets/budget.svg" alt="Budget per phase">
 </section>
 
 <section id="refs">
  <h2>References</h2>
- <p class="sub">Key sources. Full list (478): <code>REFERENCES.md</code>.</p>
+ <p class="sub">Key sources. Full list (489): <code>REFERENCES.md</code>.</p>
  <table>
   <tr><th>ID</th><th>Source</th></tr>
   <tr><td>R1</td><td>Ansari-Asl, Barbieri, Obein, Hardeberg, <i>J. Imaging</i> 10(3):55, 2024 — <a href="https://doi.org/10.3390/jimaging10030055">doi:10.3390/jimaging10030055</a></td></tr>
@@ -187,6 +211,8 @@ footer{max-width:1180px;margin:auto;padding:24px 16px;color:var(--muted);font-si
 </main>
 <footer>Hardware CERN-OHL-S-2.0 · software GPL-3.0-or-later · docs CC BY-SA 4.0. Figures are original drawings.</footer>
 
+<script src="machine.js"></script>
+<script src="plan.js"></script>
 <script>
 // ---------- shared math ----------
 const $ = id => document.getElementById(id);
@@ -203,7 +229,9 @@ const Rz = d => [[c(d), -s(d), 0], [s(d), c(d), 0], [0, 0, 1]];
 const add = (a, b) => a.map((x, i) => x + b[i]), sub = (a, b) => a.map((x, i) => x - b[i]);
 const sc = (a, k) => a.map(x => x * k), dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const norm = a => Math.hypot(...a), unit = a => sc(a, 1 / norm(a));
-const M = {Dc: 350, Dl: 300, ring: 140, rc: 30, rl: 30, ra: 15, keep: 30, minA: 5};
+// Same numbers as software/config/machine.yaml (docs/machine.js, written by `make`); fallback if it is missing.
+const M = Object.assign({Dc: 350, Dgonio: 350, Dscan: 650, scanElev: 15, twoCams: true, Dl: 300, ring: 140, rc: 30, rl: 30, ra: 15, keep: 30, minA: 5, axes: {}}, window.MACHINE || {});
+Object.entries(M.axes).forEach(([k, [lo, hi]]) => { const el = document.getElementById(k.toLowerCase()); if (el) { el.min = lo; el.max = hi; } });
 
 function segDist(p1, q1, p2, q2) {          // Ericson 5.1.9 [R9]
   const d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2);
@@ -292,7 +320,8 @@ function draw() {
   g2.clearRect(0, 0, cv.width, cv.height);
   const ring = []; for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([150 * c(a), 150 * s(a), -144]); }
   if (B < 3) { $("partinfo").textContent = "Stages 01–02 are bench builds: power box and controller."; }
-  poly([[-220, -220, -150], [M.Dc + 70, -220, -150], [M.Dc + 70, 220, -150], [-220, 220, -150]], B >= 3 ? "#11161d" : "#0b0f14", "#30363d");
+  const xEnd = M.twoCams && (scan || B >= 11) ? M.Dscan * Math.cos(M.scanElev * Math.PI / 180) + 70 : M.Dc + 70;
+  poly([[-220, -220, -150], [xEnd, -220, -150], [xEnd, 220, -150], [-220, 220, -150]], B >= 3 ? "#11161d" : "#0b0f14", "#30363d");
   box3([-170, -170, -130], [70, 50, 40], "#1c2128", "#f0883e");
   box3([-170, 170, -135], [80, 60, 30], "#1c2128", "#bc8cff");
   if (B >= 15) box3([-110, 170, -140], [40, 25, 20], "#1c2128", "#3fb950");
@@ -324,7 +353,13 @@ function draw() {
   if (B >= 3) line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, -20], "#57606a", 6);
   if (B >= 6) {
   poly([[M.Dc, -22, -18], [M.Dc, 22, -18], [M.Dc, 22, 18], [M.Dc, -22, 18]], "#161b22", "#58a6ff");
-  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]); text([M.Dc, 0, 22], scan ? "camera 650 mm" : "camera", "#58a6ff"); }
+  line([0, 0, 0], [M.Dc, 0, 0], "#58a6ff", 2, [8, 6]); text([M.Dc, 0, 22], scan && !M.twoCams ? "camera 650 mm" : "measuring camera", "#58a6ff"); }
+  // scan camera: fixed at 650 mm, raised to look over the measuring camera (stage 11; no lens or position changes)
+  if (M.twoCams && (scan || B >= 11)) {
+    const e = M.scanElev * Math.PI / 180, S = [M.Dscan * Math.cos(e), 0, M.Dscan * Math.sin(e)];
+    line([S[0] + 30, 0, -150], [S[0] + 30, 0, S[2] - 20], "#57606a", 6);
+    poly([[S[0], -22, S[2] - 18], [S[0], 22, S[2] - 18], [S[0], 22, S[2] + 18], [S[0], -22, S[2] + 18]], "#161b22", "#bc8cff");
+    line([0, 0, 0], S, "#bc8cff", scan ? 2 : 1, [8, 6]); text([S[0], 0, S[2] + 24], `scan camera ${M.Dscan} mm, ${M.scanElev}° up`, "#bc8cff"); }
   // light arm (M4) on the ring
   const L = sc(st.l, M.Dl);
   if (B >= 4) path([add(sc(st.l, 150), [0, 0, -138]), add(sc(st.l, M.Dl + 30), [0, 0, -138]), sc(st.l, M.Dl + 30), L], glow("M4") || "#8b949e", 6);
@@ -348,7 +383,7 @@ function draw() {
   const meas = st.ti < 90 && st.tr < 90;
   const spec = meas && Math.abs(st.ti - st.tr) < 0.6 && Math.abs(st.dp - 180) < 0.6;
   if (scan) { S.className = "status " + (unsafe ? "bad" : "ok");
-    S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance` : `Scan view: elevation ${(90 - p.m2).toFixed(0)}°, around ${p.m1.toFixed(0)}°`; return; }
+    S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance` : `Scan view: elevation ${(90 - p.m2 + (M.twoCams ? M.scanElev : 0)).toFixed(0)}°, around ${p.m1.toFixed(0)}°`; return; }
   S.className = "status " + (unsafe ? "bad" : !meas ? "warn" : spec ? "spec" : "ok");
   S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance (< 30 mm)` :
     !meas ? "Not measurable: light or camera behind the sample" :
@@ -404,7 +439,7 @@ const MATS = [
    t: "Back-scatter: light as close to the camera as allowed (M4 = 20°, ≥ 5° + 30 mm keep-out)."},
 ];
 const SCAN_MATS = [
-  {n: "Matte 3D print / plaster figure", t: "Ideal: matte, textured. Rings at M2 = 90…10°, 36 views each."},
+  {n: "Matte 3D print / plaster figure", t: "Ideal: matte, textured. Rings at view elevation 20…80° (M2 = 85…25° with the scan camera 15° up), 12–36 views each."},
   {n: "Painted wood toy", t: "Good. Lamp at M4 = 30° with crossed polarizers to kill glare."},
   {n: "Shiny or clear object", t: "Spray with matte scanning spray first; glass and chrome do not scan."},
 ];
@@ -412,7 +447,7 @@ function fillMats() { const sel = $("mat"); sel.innerHTML = "";
   (mode === "scan" ? SCAN_MATS : MATS).forEach((m, i) => sel.add(new Option(m.n + (m.iso === false ? " (anisotropic)" : ""), i))); applyMat(); }
 function applyMat() { const m = (mode === "scan" ? SCAN_MATS : MATS)[+$("mat").value];
   $("matnote").textContent = m.t;
-  $("isonote").innerHTML = mode === "scan" ? "Scan: view elevation = 90° − M2; M1 gives the views around each ring."
+  $("isonote").innerHTML = mode === "scan" ? "Scan: view elevation = 90° − M2 + 15° (scan camera height); M1 gives the views around each ring. Neither camera moves or refocuses."
     : m.iso ? "<b>Isotropic</b>: only θi, θr and |φr − φi| matter (3 angles) → M4, M3, M2 are enough."
             : "<b>Anisotropic</b>: φi and φr matter separately (4 angles) → needs M1 spin (phase 09).";
   if (m.pose) { Object.keys(m.pose).forEach(needPhase); tween(m.pose);
@@ -422,7 +457,7 @@ function applyMat() { const m = (mode === "scan" ? SCAN_MATS : MATS)[+$("mat").v
 $("mat").onchange = applyMat;
 document.querySelectorAll("#modes button").forEach(b => b.onclick = () => {
   mode = b.dataset.mode; document.querySelectorAll("#modes button").forEach(x => x.classList.toggle("on", x === b));
-  M.Dc = mode === "scan" ? 650 : 350; if (mode === "scan") setPhase(9); fillMats(); });
+  M.Dc = mode === "scan" && !M.twoCams ? M.Dscan : M.Dgonio; if (mode === "scan") setPhase(9); fillMats(); });
 // ---------- sliders and phase buttons ----------
 ["m4", "m3", "m2", "m1"].forEach(id => { const el = $(id); const out = el.nextElementSibling;
   el.addEventListener("input", () => { out.textContent = (+el.value).toFixed(1) + "°"; draw(); }); out.textContent = el.value + "°"; });
@@ -513,10 +548,96 @@ function drawSphere() {
 function sc_(v, k) { return v.map(x => x * k); }
 [srings, sper, sps, smast].forEach(el => { const out = el.nextElementSibling; const upd = () => { out.textContent = el.value; drawSphere(); };
   el.addEventListener("input", upd); out.textContent = el.value; });
+function buildInfo(b) {
+  const P = window.PLAN, st = P && P.stages.find(x => x.n === b);
+  if (!st) { $("buildinfo").textContent = ""; return; }
+  const steps = st.ms.reduce((a, m) => a + m.steps.length, 0), done = st.ms.reduce((a, m) => a + m.steps.filter(s => P.done.includes(s.id)).length, 0);
+  $("buildinfo").textContent = `Stage ${String(b).padStart(2, "0")} ${st.title} · ${st.ms.map(m => m.id).join(", ")} · ${done}/${steps} steps done`;
+}
 $("build").addEventListener("input", e => { const b = +e.target.value; e.target.nextElementSibling.textContent = b;
-  setPhase(b >= 9 ? 9 : b >= 8 ? 8 : 6); });
-$("build").nextElementSibling.textContent = "17";
+  setPhase(b >= 9 ? 9 : b >= 8 ? 8 : 6); buildInfo(b); });
+$("build").nextElementSibling.textContent = "17"; buildInfo(17);
 setPhase(6); fillMats(); drawLobe(); drawSphere();
+</script>
+<script>
+// ---------- calibration lab: same model as software/src/opengonio/sim.py ----------
+(() => {
+  const $ = id => document.getElementById(id), rad = d => d * Math.PI / 180;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function ggxMirror(cosI, cosO, cosH, cosIH) {            // base 0.9, roughness 0.1, metallic 1 (sim "mirror")
+    if (cosI <= 0 || cosO <= 0) return 0;
+    const a = 0.01, a2 = a * a, d = a2 / (Math.PI * (cosH * cosH * (a2 - 1) + 1) ** 2);
+    const g = 2 * cosI * cosO / (cosO * Math.sqrt(cosI * cosI * (1 - a2) + a2) + cosI * Math.sqrt(cosO * cosO * (1 - a2) + a2));
+    const f = 0.9 + 0.1 * (1 - cosIH) ** 5;
+    return d * g * f / (4 * cosI * cosO);
+  }
+  function counts(m3true, m4) {                              // camera on +X, light at M4, sample normal at M3 (in-plane)
+    const n = [Math.cos(rad(m3true)), Math.sin(rad(m3true))], l = [Math.cos(rad(m4)), Math.sin(rad(m4))], c = [1, 0];
+    const h = [l[0] + c[0], l[1] + c[1]], hn = Math.hypot(...h); h[0] /= hn; h[1] /= hn;
+    const cI = n[0] * l[0] + n[1] * l[1], cO = n[0], cH = n[0] * h[0] + n[1] * h[1], cIH = l[0] * h[0] + l[1] * h[1];
+    return ggxMirror(cI, cO, cH, cIH) * cI;
+  }
+  let offset = 0;
+  const S = { th: 40, err: 0.4, drift: 0 };
+  function sweep() {
+    const m4 = 2 * S.th, pts = [];
+    for (let k = 0; k <= 30; k++) { const m3 = S.th - 3 + 0.2 * k; pts.push([m3, counts(m3 - offset + S.err, m4)]); }
+    const peak = counts(S.th, m4) || 1;
+    return pts.map(([x, y], i) => [x, 4 + 216 * y / peak * (1 - S.drift / 100 * (i + 1))]);
+  }
+  let hover = null, last = [];
+  function chart(cv, pts, opts) {
+    const g = cv.getContext("2d"), W = cv.width, H = cv.height, L = 56, R = 20, T = 34, B = 36;
+    const txt = css("--txt"), mut = css("--muted"), line = css("--line");
+    g.clearRect(0, 0, W, H); g.font = "13px Segoe UI, Helvetica, Arial"; g.fillStyle = txt; g.fillText(opts.title, L, 20);
+    const xs = pts.map(p => p[0]), x0 = Math.min(...xs), x1 = Math.max(...xs), y1 = opts.ymax;
+    const X = x => L + (x - x0) / (x1 - x0) * (W - L - R), Y = y => H - B - (y - opts.ymin) / (y1 - opts.ymin) * (H - T - B);
+    g.strokeStyle = line; g.lineWidth = 1; g.fillStyle = mut; g.font = "11px Segoe UI, Helvetica, Arial";
+    opts.yt.forEach(t => { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(W - R, Y(t)); g.stroke(); g.fillText(t, 8, Y(t) + 4); });
+    opts.xt.forEach(t => g.fillText(t + (opts.xunit || ""), X(t) - 10, H - B + 16));
+    g.fillText(opts.xlabel, (W - L) / 2, H - 6);
+    if (opts.band) { g.fillStyle = "rgba(63,185,80,.12)"; g.fillRect(L, Y(opts.band[1]), W - L - R, Y(opts.band[0]) - Y(opts.band[1])); }
+    if (opts.vline != null) { g.strokeStyle = css("--or"); g.lineWidth = 1.5; g.beginPath(); g.moveTo(X(opts.vline), T - 6); g.lineTo(X(opts.vline), H - B); g.stroke();
+      g.fillStyle = txt; g.fillText(opts.vlabel, X(opts.vline) + 6, T + 4); }
+    g.strokeStyle = "#3987e5"; g.lineWidth = 2; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y))); g.stroke();
+    (opts.dots || pts).forEach(([x, y]) => { g.beginPath(); g.arc(X(x), Y(y), 4, 0, 7); g.fillStyle = "#3987e5"; g.fill(); g.lineWidth = 2; g.strokeStyle = css("--bg"); g.stroke(); });
+    if (opts.mark) { g.beginPath(); g.arc(X(opts.mark[0]), Y(opts.mark[1]), 7, 0, 7); g.strokeStyle = txt; g.lineWidth = 2; g.stroke(); }
+    if (opts.hover != null) { const [x, y] = pts[opts.hover]; g.fillStyle = css("--panel"); g.fillRect(X(x) + 8, Y(y) - 34, 150, 28);
+      g.fillStyle = txt; g.fillText(opts.tip(x, y), X(x) + 14, Y(y) - 16); }
+    return { X, Y };
+  }
+  function draw() {
+    const pts = sweep(); last = pts;
+    const k = pts.reduce((b, p, i) => p[1] > pts[b][1] ? i : b, 0), pe = +(pts[k][0] - S.th).toFixed(2);
+    chart($("mir"), pts, { title: `mirror_${S.th}: brightness vs table angle (what curve.svg shows)`, xlabel: "M3 (deg)", ymin: 0, ymax: 240,
+      yt: [0, 50, 100, 150, 200], xt: [S.th - 3, S.th - 2, S.th - 1, S.th, S.th + 1, S.th + 2, S.th + 3], vline: S.th,
+      vlabel: `M3 = M4/2 = ${S.th}°`, mark: pts[k], hover, tip: (x, y) => `M3 ${x.toFixed(1)}° · ${y.toFixed(0)} counts` });
+    const n = 31, run = [];
+    for (let i = 0; i <= n + 1; i++) run.push([i, 100 * (1 - S.drift / 100 * i)]);
+    const dp = +(100 * (run[n + 1][1] - run[0][1]) / run[0][1]).toFixed(2);
+    chart($("lamp"), run, { title: "lamp during the run: ref_start → 31 shots → ref_end (green band = ±2 %)", xlabel: "shot", ymin: 80, ymax: 102,
+      yt: [80, 90, 100], xt: [0, 8, 16, 24, 32], band: [98, 102], dots: [run[0], run[n + 1]] });
+    $("cpe").textContent = (pe > 0 ? "+" : "") + pe.toFixed(2) + "°"; $("coff").textContent = (offset >= 0 ? "+" : "") + offset.toFixed(2) + "°";
+    $("cdp").textContent = (dp > 0 ? "+" : "") + dp.toFixed(2) + " %";
+    const st = $("cstat"), drift = Math.abs(dp) > 2, warn = Math.abs(pe) > 0.5;
+    st.className = "status " + (drift ? "bad" : warn ? "warn" : "ok");
+    st.textContent = drift ? `verify would say FAIL: lamp drift ${dp} % > 2 % — raise lights.white.warmup_s`
+      : warn ? `verify would say WARN: mirror peak ${pe}° off — run calibrate mirror`
+      : `verify would say PASS${Math.abs(pe) > 0.15 ? " (peak " + pe + "°: calibrate mirror for ±0.2°)" : ""}`;
+  }
+  [["cth", v => S.th = v, v => v + "°"], ["cerr", v => S.err = v, v => (v > 0 ? "+" : "") + v.toFixed(2) + "°"],
+   ["cdrift", v => S.drift = v, v => v.toFixed(2) + " %"]].forEach(([id, set, fmt]) => {
+    const el = $(id), out = el.nextElementSibling;
+    const upd = () => { set(+el.value); out.textContent = fmt(+el.value); draw(); };
+    el.addEventListener("input", upd); out.textContent = fmt(+el.value); set(+el.value); });
+  $("ccal").onclick = () => { const k = last.reduce((b, p, i) => p[1] > last[b][1] ? i : b, 0); offset = +(offset - (last[k][0] - S.th)).toFixed(2); draw(); };
+  $("creset").onclick = () => { offset = 0; draw(); };
+  $("mir").addEventListener("mousemove", e => { const r = e.target.getBoundingClientRect(), x = (e.clientX - r.left) * e.target.width / r.width;
+    const L = 56, W = e.target.width - 20; hover = Math.max(0, Math.min(30, Math.round((x - L) / (W - L) * 30))); draw(); });
+  $("mir").addEventListener("mouseleave", () => { hover = null; draw(); });
+  document.getElementById("theme").addEventListener("click", () => setTimeout(draw, 0));
+  draw();
+})();
 </script>
 </body>
 </html>

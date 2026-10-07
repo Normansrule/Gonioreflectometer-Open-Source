@@ -142,7 +142,7 @@ axes:
         direction_pin: gpio.12
         disable_pin: NO_PIN
 
-  a:                        # M1 spin (phase 9): 4:1, range -180..180 deg (E0 driver)
+  a:                        # M1 spin (phase 9): direct drive at 1/64 microstep, range -180..180 deg (E0 driver)
     steps_per_mm: 35.556
     max_rate_mm_per_min: 1800
     acceleration_mm_per_sec2: 60
@@ -167,7 +167,7 @@ axes:
         r_sense_ohms: 0.110
         run_amps: 0.7
         hold_amps: 0.35
-        microsteps: 16
+        microsteps: 64
         stallguard: 0
         stallguard_debug: false
         toff_disable: 0

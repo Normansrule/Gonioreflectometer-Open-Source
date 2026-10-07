@@ -1,4 +1,4 @@
-# OpenGonio machine description. installed_phase = the phase you finished (4 M4 · 5 M3 · 6 light · 8 M2 · 9 M1 · 10 LED bank).
+# OpenGonio machine description (what you BUILT; measured values live in calibration.yaml). installed_phase = the phase you finished (4 M4 · 5 M3 · 6 light · 8 M2 · 9 M1 · 10 LED bank).
 # Geometry follows the fixed-camera / rotating-sample / light-arm layout of [R1].
 # Origin = zero point (sample surface centre). +Z up. Camera fixed on +X.
 # Angles in degrees, lengths in mm.  SPDX-License-Identifier: GPL-3.0-or-later
@@ -35,29 +35,36 @@ station:                        # standalone mode: Pi Zero 2 W runs `opengonio s
   data_dir: ~/opengonio-data    # one folder per job: images + manifest.json
   exposure_ms: 20
 
+spectral:                       # AS7341 above the camera lens (stage 10): set from your mount
+  elevation_deg: 7.0            # sensor line of sight above the camera axis (45 mm over 350 mm)
+  field_deg: 4.0                # 3 mm aperture, 40 mm tube
+
 camera:
   index: 0
   width: 3840
   height: 3032
   focal_length_mm: 16.0
   pixel_um: 1.55
+  exposure_ms: 20               # locked in M17.2; dark and white calibration must use the same value
 
 lights:                         # FluidNC user digital outputs (M62/M63 P<n>)
-  white: {output: 0, phase: 6, elevation_deg: 0.0}
-  multispectral: {output: 1, phase: 10, elevation_deg: 40.0}   # LED bank on a 40 deg mast: non-coplanar lights for photometric stereo
+  white: {output: 0, phase: 6, elevation_deg: 0.0, warmup_s: 60}   # warm-up before every run: measured in M18.2
+  multispectral: {output: 1, phase: 10, elevation_deg: 40.0, built: false}   # optional colour kit (M30): LED bank on a 40 deg mast, non-coplanar lights for photometric stereo; set true once built
 
-scan:                           # Phase 6 photo scanner (camera slid to the far end of the outrigger)
+scan:                           # 3D photo scanner (stage 11): second camera fixed at 650 mm, 15 deg up, looking over the first
+  camera_index: 1               # second USB camera (CAM-04). One-camera option: 0, and move the camera to the scan post
   camera_distance_mm: 650.0     # f/8: see phases/06-camera-light/optics.md (field, DOF, resolution)
+  camera_elevation_deg: 15.0    # its picture clears the measuring camera by 15 mm (opengonio scan plan prints it)
   aperture_f: 8
   object_max_radius_mm: 55.0    # bounding sphere of the object about its centre (2r <= DOF)
   platter_offset_mm: 0.0        # delta: support surface below the zero point = 60 - riser height (mm)
   calibration: null             # path to scan_calibration.yaml from `opengonio scan calibrate` (measured camera pose)
   lamp_m4_deg: 30.0             # white lamp beside the camera for photogrammetry frames
   rings:                        # camera elevation above the platter (deg) : images per ring
-    - {elevation_deg: 0, count: 36}
-    - {elevation_deg: 20, count: 36}
-    - {elevation_deg: 40, count: 36}
-    - {elevation_deg: 60, count: 24}
+    - {elevation_deg: 20, count: 36}   # lowest view: M2 = 90 - 20 + 15 = 85 (tilt limit 90)
+    - {elevation_deg: 35, count: 36}
+    - {elevation_deg: 50, count: 36}
+    - {elevation_deg: 65, count: 24}
     - {elevation_deg: 80, count: 12}
   ps_band: 3                    # LED bank band used for photometric stereo (one band = one albedo)
   ps_m4_deg: [40, 100, 160, 220, 280, 330]
@@ -94,4 +101,5 @@ axes:
     min_deg: -180.0
     max_deg: 180.0
     home_deg: -180.0
-    gear_ratio: 4.0
+    gear_ratio: 1.0             # direct drive: platter on the pancake motor's shaft (no belt)
+    microsteps: 64              # TMC2209 at 1/64: 0.028 deg per step, same steps/deg as the old 4:1 belt

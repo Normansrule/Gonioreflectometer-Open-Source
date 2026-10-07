@@ -1,387 +1,2291 @@
-# Single source for stages (folders) and milestones. `python tools/roadmap.py` writes phases/*/README.md and
-# the README; `--github --repo OWNER/NAME` makes one GitHub milestone per milestone and one checklist issue per step.
-# Each milestone is small: one sitting to a weekend, plus shipping time for orders.
+# Single source for stages and milestones. `python tools/roadmap.py` writes phases/*/README.md and the README;
+# `--github --repo OWNER/NAME` makes one GitHub milestone per milestone and one issue per step (Do / Verify / Record).
+# Edit freely, or use tools/new.py; then run `make`.
 stages:
-  - {folder: 00-plan, title: Plan}
-  - {folder: 01-power, title: Power box, safety: "Mains stays inside the adapter. Plug in with the rocker off."}
-  - {folder: 02-controller, title: Controller and buttons, safety: "Never plug or unplug motors with 24 V on."}
-  - {folder: 03-frame, title: Frame}
-  - {folder: 04-light-arm, title: Light arm (M4)}
-  - {folder: 05-table, title: Table (M3)}
-  - {folder: 06-camera-light, title: Camera and light, safety: "Don't stare into the lamp."}
-  - {folder: 07-calibrate, title: Calibrate → game material}
-  - {folder: 08-tilt, title: Tilt (M2)}
-  - {folder: 09-spin, title: Spin (M1)}
-  - {folder: 10-color, title: Colour bands and polarizers}
-  - {folder: 11-scan-capture, title: "3D scan: capture"}
-  - {folder: 12-scan-mesh, title: "3D scan: mesh"}
-  - {folder: 13-object-material, title: Material on the 3D model}
-  - {folder: 14-laptop-app, title: Laptop app}
-  - {folder: 15-standalone, title: Standalone (no laptop)}
-  - {folder: 16-release, title: Release}
-  - {folder: 17-upgrades, title: Upgrades (optional)}
-
+- folder: 00-plan
+  title: Plan
+- folder: 01-power
+  title: Power box
+  safety: Mains stays inside the certified adapter. Plug in with the e-stop pressed; unplug before touching any screw terminal.
+- folder: 02-controller
+  title: Controller and buttons
+  safety: Never plug or unplug motors with 24 V on.
+- folder: 03-frame
+  title: Frame
+- folder: 04-light-arm
+  title: Light arm (M4)
+- folder: 05-table
+  title: Table (M3)
+- folder: 06-camera-light
+  title: Camera and light
+  safety: Don't stare into the lamp.
+- folder: 07-calibrate
+  title: Calibrate → game material
+- folder: 08-tilt
+  title: Tilt (M2)
+- folder: 09-spin
+  title: Spin (M1)
+- folder: 10-color
+  title: Colour add-ons (optional)
+- folder: 11-scan-capture
+  title: '3D scan: capture'
+- folder: 12-scan-mesh
+  title: '3D scan: mesh'
+- folder: 13-object-material
+  title: Material on the 3D model
+- folder: 14-laptop-app
+  title: Laptop app
+- folder: 15-standalone
+  title: Standalone (no laptop)
+- folder: 16-release
+  title: Release
+- folder: 17-upgrades
+  title: Upgrades (optional)
 milestones:
-  # ---- 00 Plan ----
-  - id: M01
-    stage: 00-plan
-    title: Read and decide
-    goal: Know what you are building and what to buy.
-    weeks: 1
-    steps:
-      - {id: M01.1, title: Read, tasks: ["bash scripts/get_papers.sh", "Read R1 sections 2–4 (papers/open)", "Try the simulator: docs/index.html"], done: "You can explain M1–M4 and θi/θr."}
-      - {id: M01.2, title: Shopping list, tasks: ["Set Own = Y for parts you have, in phases/*/bom.csv", "python3 tools/bom_check.py --strict"], done: "Total ≤ $500."}
-  - id: M02
-    stage: 00-plan
-    title: Software runs on the laptop
-    goal: Simulator, tests and dry-run moves work before any hardware.
-    weeks: 1
-    steps:
-      - {id: M02.1, title: Install, tasks: ["cd software && python3 -m venv .venv && . .venv/bin/activate && pip install -e '.[dev]'", "python -m pytest -q"], done: "All tests pass."}
-      - {id: M02.2, title: Dry run, tasks: ["opengonio check-pose M4=60 M3=30", "opengonio --dry-run move M4=80 M3=25", "opengonio scan demo --out demo"], done: "G-code printed; demo PLY opens in Blender."}
-  - id: M03
-    stage: 00-plan
-    title: CAD and printer ready
-    goal: Printed parts will fit first time.
-    weeks: 1
-    steps:
-      - {id: M03.1, title: Onshape, tasks: ["Create the document and OG globals (design.md)"], done: "Globals match design.md."}
-      - {id: M03.2, title: Tolerance coupon, tasks: ["Print phases/00-plan/3d/PLAN-01_tolerance_coupon.stl in PETG", "Set CLEAR and INSERT in tools/cad/parts.py from the hole that fits; python tools/cad/parts.py"], done: "Coupon fits."}
-
-  # ---- 01 Power ----
-  - id: M04
-    stage: 01-power
-    title: Order power parts
-    goal: Everything for the power box on the bench.
-    weeks: 2
-    steps:
-      - {id: M04.1, title: Order and print, tasks: ["Order phases/01-power/bom.csv", "Print PWR-18a box and PWR-18b lid (3d/README.md)"], done: "Parts arrived, checked against the BOM."}
-  - id: M05
-    stage: 01-power
-    title: Build the protection board
-    goal: Fuse, reverse-polarity MOSFET and e-stop wired, not yet powered.
-    weeks: 1
-    steps:
-      - {id: M05.1, title: Solder, tasks: ["Solder per design.md", "Heat-shrink every joint"], done: "Board matches the netlist."}
-      - {id: M05.2, title: Checks with power off, tasks: ["Run T1–T3 (continuity, no shorts)", "Fill test.csv"], done: "T1–T3 pass."}
-  - id: M06
-    stage: 01-power
-    title: First power-on
-    goal: Safe 24 V that the e-stop cuts.
-    weeks: 1
-    steps:
-      - {id: M06.1, title: Power tests, tasks: ["Run T4–T10 with no load", "Close the box, add labels"], done: "All T tests pass; e-stop drops the bus to 0 V."}
-
-  # ---- 02 Controller ----
-  - id: M07
-    stage: 02-controller
-    title: Order controller parts
-    goal: E4, Pico, buttons and one motor on the bench.
-    weeks: 2
-    steps:
-      - {id: M07.1, title: Order, tasks: ["Order phases/02-controller/bom.csv and one NEMA 17 (LAR-02)"], done: "Parts arrived."}
-  - id: M08
-    stage: 02-controller
-    title: One motor turns from the laptop
-    goal: Laptop → E4 → motor works on the bench.
-    weeks: 1
-    steps:
-      - {id: M08.1, title: Flash the E4, tasks: ["WSL only: usbipd bind/attach (design.md)", "bash scripts/e4.sh flash", "bash scripts/e4.sh wifi \"SSID\" \"PASS\"", "bash scripts/e4.sh config fluidnc.local"], done: "opengonio send '?' prints <Idle|…>."}
-      - {id: M08.2, title: Bench motor, tasks: ["Motor on X, 24 V on", "opengonio send 'G91 G1 X10 F600' 'G1 X-10'"], done: "Motor turns both ways; e-stop stops it."}
-  - id: M09
-    stage: 02-controller
-    title: Buttons work with the laptop
-    goal: Physical buttons drive the machine.
-    weeks: 1
-    steps:
-      - {id: M09.1, title: Pico hub, tasks: ["bash scripts/pico.sh", "Wire 5 buttons to GP2–6, PAUSE to E4 GPIO39"], done: "Each button prints its BTN line."}
-      - {id: M09.2, title: Panel, tasks: ["opengonio panel", "PAUSE during a move"], done: "HOME, START, STOP, LIGHT, NEXT act; PAUSE holds."}
-  - id: M10
-    stage: 02-controller
-    title: Controller box closed
-    goal: Boards boxed, links tested.
-    weeks: 1
-    steps:
-      - {id: M10.1, title: Box and test, tasks: ["Print case + panel, mount boards", "Run C1–C8 (USB, WiFi, Bluetooth), fill test.csv"], done: "C1–C8 pass."}
-
-  # ---- 03 Frame ----
-  - id: M11
-    stage: 03-frame
-    title: Cut and drill the base
-    goal: Every hole for every later stage, drilled once.
-    weeks: 1
-    steps:
-      - {id: M11.1, title: Cut and drill, tasks: ["Order phases/03-frame/bom.csv", "Print drill-template.svg at 100 % (check the 100 mm bar), tape on", "Cut 600 × 600 plywood, centre-punch and drill"], done: "Holes within ±0.5 mm."}
-  - id: M12
-    stage: 03-frame
-    title: Assemble the frame
-    goal: Level base with post, camera rail and scales.
-    weeks: 1
-    steps:
-      - {id: M12.1, title: Assemble, tasks: ["Tee nuts, feet, level", "Camera outrigger + post, scale marks"], done: "Bubble level centred; ring holes concentric ±0.5 mm."}
-
-  # ---- 04 Light arm ----
-  - id: M13
-    stage: 04-light-arm
-    title: Ring drive built
-    goal: Light arm turns smoothly on the ring.
-    weeks: 1
-    steps:
-      - {id: M13.1, title: Build, tasks: ["Measure the lazy Susan, model the belt rim", "Fit belt, idlers, motor, arm"], done: "Arm turns 20–340° by hand, no binding."}
-  - id: M14
-    stage: 04-light-arm
-    title: Light arm homes and repeats
-    goal: M4 returns to the same spot every time.
-    weeks: 1
-    steps:
-      - {id: M14.1, title: Home, tasks: ["Home flag at 20°, over-travel switch beyond it", "machine.yaml: installed_phase 4"], done: "opengonio home finds the flag 10/10 times."}
-      - {id: M14.2, title: Tune, tasks: ["Set gear_ratio from the measured rim", "bash scripts/e4.sh test; 20 return moves"], done: "Returns within 0.1°."}
-
-  # ---- 05 Table ----
-  - id: M15
-    stage: 05-table
-    title: Table axis built
-    goal: Sample table turns on its post without wobble.
-    weeks: 1
-    steps:
-      - {id: M15.1, title: Build, tasks: ["Order phases/05-table/bom.csv", "Post with two 608s, 100T pulley, belt, motor"], done: "Turns ±180°, no visible wobble."}
-  - id: M16
-    stage: 05-table
-    title: Table homes and repeats
-    goal: M3 returns to the same spot every time.
-    weeks: 1
-    steps:
-      - {id: M16.1, title: Home and tune, tasks: ["Home flag at −180°, swatch clamp", "machine.yaml: installed_phase 5", "20 return moves"], done: "Returns within 0.1°."}
-
-  # ---- 06 Camera and light ----
-  - id: M17
-    stage: 06-camera-light
-    title: Camera sees the zero point
-    goal: Sharp, fixed-exposure image centred on the sample.
-    weeks: 2
-    steps:
-      - {id: M17.1, title: Mount, tasks: ["Order phases/06-camera-light/bom.csv", "Camera at 350 mm, 16 mm lens, f/8 stop"], done: "Table centre at image centre ±0.5 mm."}
-      - {id: M17.2, title: Lock settings, tasks: ["Lock exposure, gain, white balance", "Two frames 1 min apart differ < 1 %"], done: "Stable images."}
-  - id: M18
-    stage: 06-camera-light
-    title: Lamp on and safe
-    goal: Light switches from the laptop and stays cool.
-    weeks: 1
-    steps:
-      - {id: M18.1, title: Lamp, tasks: ["COB on heatsink, NLDD driver on E4 HE0", "opengonio light on / off", "machine.yaml: installed_phase 6"], done: "COB case ≤ 70 °C after 10 min."}
-  - id: M19
-    stage: 06-camera-light
-    title: Mirror test
-    goal: First real data proves the angles are right.
-    weeks: 1
-    steps:
-      - {id: M19.1, title: Mirror, tasks: ["opengonio plan mirror --theta 20, 40, 60", "Record peak positions"], done: "Peak within 0.5° of M3 = M4/2."}
-  - id: M20
-    stage: 06-camera-light
-    title: First reflectance curves
-    goal: Two real materials measured.
-    weeks: 1
-    steps:
-      - {id: M20.1, title: Paper and plastic, tasks: ["In-plane scan of matte paper and glossy plastic"], done: "Two curves saved; paper ≈ cos θr."}
-
-  # ---- 07 Calibrate ----
-  - id: M21
-    stage: 07-calibrate
-    title: Dark box
-    goal: Only the lamp lights the sample.
-    weeks: 1
-    steps:
-      - {id: M21.1, title: Drape, tasks: ["Order phases/07-calibrate/bom.csv", "Dowels, blackout drape, felt backdrop"], done: "Stray light < 0.1 % of the PTFE signal."}
-  - id: M22
-    stage: 07-calibrate
-    title: HDR and angle calibration
-    goal: Linear brightness and true angles.
-    weeks: 1
-    steps:
-      - {id: M22.1, title: HDR, tasks: ["Exposure brackets → camera response"], done: "Merged HDR is linear (R² > 0.99 on a grey ramp)."}
-      - {id: M22.2, title: Angles, tasks: ["Mirror peaks + chrome balls → angle offsets"], done: "Angle error ≤ 0.2°."}
-  - id: M23
-    stage: 07-calibrate
-    title: Brightness calibration
-    goal: Values in real reflectance units.
-    weeks: 1
-    steps:
-      - {id: M23.1, title: PTFE and reciprocity, tasks: ["PTFE at 45°:0°", "Swap light and camera angles"], done: "Reciprocity within 5 %."}
-  - id: M24
-    stage: 07-calibrate
-    title: First game material
-    goal: A measured swatch looks right in Unreal or Unity.
-    weeks: 1
-    steps:
-      - {id: M24.1, title: Fit and export, tasks: ["Fit Lambert + GGX", "Export Unreal / Unity material"], done: "Render matches a photo at 3 light angles."}
-
-  # ---- 08 Tilt ----
-  - id: M25
-    stage: 08-tilt
-    title: Tilt yoke built and homed
-    goal: Sample tilts without moving off the zero point.
-    weeks: 2
-    steps:
-      - {id: M25.1, title: Build, tasks: ["Order phases/08-tilt/bom.csv", "Yoke on the table flange, motor, home flag at −90°", "machine.yaml: installed_phase 8"], done: "Returns within 0.1°; sample centre unchanged."}
-  - id: M26
-    stage: 08-tilt
-    title: Full isotropic scan
-    goal: All light directions, unattended.
-    weeks: 1
-    steps:
-      - {id: M26.1, title: Run, tasks: ["Plan angles, skip unsafe poses", "Unattended run on glossy plastic"], done: "Finishes alone; no collisions."}
-
-  # ---- 09 Spin ----
-  - id: M27
-    stage: 09-spin
-    title: Spin platter built and homed
-    goal: Sample spins on its own axis.
-    weeks: 2
-    steps:
-      - {id: M27.1, title: Build, tasks: ["Order phases/09-spin/bom.csv", "Platter on the yoke, home flag on TH0", "machine.yaml: installed_phase 9"], done: "Returns within 0.1°."}
-  - id: M28
-    stage: 09-spin
-    title: Anisotropic material measured
-    goal: Brushed metal and a textured swatch.
-    weeks: 1
-    steps:
-      - {id: M28.1, title: Brushed aluminium, tasks: ["Specular pose, spin M1 0–180° in 15° steps"], done: "Brushing direction found within 5°."}
-      - {id: M28.2, title: Texture, tasks: ["Per-pixel fit of a textured swatch"], done: "Maps look right in a renderer."}
-
-  # ---- 10 Colour ----
-  - id: M29
-    stage: 10-color
-    title: LED bank
-    goal: 8 colour bands switch from laptop and buttons.
-    weeks: 2
-    steps:
-      - {id: M29.1, title: Build, tasks: ["Order phases/10-color/bom.csv", "8 LEDs on the 40° mast, ULN2803A from Pico GP8–15", "Mast in the collision model; machine.yaml: installed_phase 10"], done: "Each band switches."}
-  - id: M30
-    stage: 10-color
-    title: Polarizers and band calibration
-    goal: Shine separated from colour; bands repeat.
-    weeks: 1
-    steps:
-      - {id: M30.1, title: Calibrate, tasks: ["Film on the lamp, disc on the lens", "Per-band PTFE reference"], done: "Crossed polarizers cut mirror shine ≥ 20×; bands repeat within 3 %."}
-
-  # ---- 11 Scan capture ----
-  - id: M31
-    stage: 11-scan-capture
-    title: Scan hardware
-    goal: Object held securely, camera at 650 mm.
-    weeks: 1
-    steps:
-      - {id: M31.1, title: Risers and camera stop, tasks: ["Print risers, nest, 650 mm stop", "Slide camera, refocus"], done: "Putty holds a 100 g object at 80° tilt for 3 turns."}
-  - id: M32
-    stage: 11-scan-capture
-    title: Camera position calibrated
-    goal: Every photo's pose known to 0.3 mm.
-    weeks: 1
-    steps:
-      - {id: M32.1, title: Calibrate, tasks: ["opengonio scan calibrate", "Set scan.calibration in machine.yaml"], done: "Fit ≤ 0.2° and ≤ 0.3 mm (S1–S2)."}
-  - id: M33
-    stage: 11-scan-capture
-    title: First full scan
-    goal: 144 photos plus photometric-stereo set, unattended.
-    weeks: 1
-    steps:
-      - {id: M33.1, title: Capture, tasks: ["opengonio scan run --background", "opengonio scan run"], done: "All photos sharp; S3 passes."}
-
-  # ---- 12 Scan mesh ----
-  - id: M34
-    stage: 12-scan-mesh
-    title: Quick 3D preview
-    goal: Shape from silhouettes in minutes.
-    weeks: 1
-    steps:
-      - {id: M34.1, title: Visual hull, tasks: ["Silhouettes from the background pass", "Visual hull PLY"], done: "40 mm cube within ±1 mm."}
-  - id: M35
-    stage: 12-scan-mesh
-    title: Full mesh
-    goal: Accurate, detailed 3D model.
-    weeks: 1
-    steps:
-      - {id: M35.1, title: Mesh, tasks: ["bash run_colmap.sh (or Meshroom without CUDA)", "Add photometric-stereo normals"], done: "Cube 40.0 ± 0.5 mm; model car opens in Blender."}
-
-  # ---- 13 Object material ----
-  - id: M36
-    stage: 13-object-material
-    title: Textures on the mesh
-    goal: Colour, roughness, metal, normal per texel.
-    weeks: 2
-    steps:
-      - {id: M36.1, title: Fit, tasks: ["UV-unwrap the mesh", "Fit maps per texel"], done: "Held-out photos within 10 %."}
-  - id: M37
-    stage: 13-object-material
-    title: Object in a game engine
-    goal: The scanned object looks real.
-    weeks: 1
-    steps:
-      - {id: M37.1, title: Export, tasks: ["glTF with PBR textures", "Check in Unreal and Unity"], done: "Render matches a photo."}
-
-  # ---- 14 Laptop app ----
-  - id: M38
-    stage: 14-laptop-app
-    title: Control page
-    goal: Connect, jog, home and live camera in one browser page.
-    weeks: 2
-    steps:
-      - {id: M38.1, title: UI, tasks: ["Connect USB / WiFi / Bluetooth", "Jog, home, light, live camera"], done: "Mirror test runs from the browser."}
-  - id: M39
-    stage: 14-laptop-app
-    title: Presets and resume
-    goal: One click per workflow.
-    weeks: 1
-    steps:
-      - {id: M39.1, title: Presets, tasks: ["Swatch, colour, 3D scan presets", "Resume after STOP or e-stop"], done: "Each preset runs from START."}
-
-  # ---- 15 Standalone ----
-  - id: M40
-    stage: 15-standalone
-    title: Panel screen
-    goal: OLED shows menu and progress (works in both modes).
-    weeks: 1
-    steps:
-      - {id: M40.1, title: OLED, tasks: ["Order phases/15-standalone/bom.csv", "OLED on Pico GP16/GP17, bash scripts/pico.sh"], done: "Screen shows 'OpenGonio ready'."}
-  - id: M41
-    stage: 15-standalone
-    title: Pi Zero station set up
-    goal: Pi drives the E4 over WiFi and grabs camera frames.
-    weeks: 1
-    steps:
-      - {id: M41.1, title: Install, tasks: ["Imager: Pi OS Lite, hostname opengonio, SSH, WiFi", "Wire UART + buck (design.md)", "bash scripts/station.sh USER@opengonio.local; reboot"], done: "journalctl shows 'station ready'."}
-  - id: M42
-    stage: 15-standalone
-    title: Job with no laptop
-    goal: Buttons choose and run a job; images saved on the Pi.
-    weeks: 1
-    steps:
-      - {id: M42.1, title: Run, tasks: ["Laptop off; NEXT → Mirror check; START", "STOP mid-job, START again"], done: "Job folder with images + manifest.json."}
-  - id: M43
-    stage: 15-standalone
-    title: Laptop collects and verifies
-    goal: Laptop only pulls and checks data.
-    weeks: 1
-    steps:
-      - {id: M43.1, title: Pull and verify, tasks: ["opengonio pull USER@opengonio.local", "opengonio verify data/*"], done: "Mirror job: PASS, peak within 0.5°."}
-
-  # ---- 16 Release ----
-  - id: M44
-    stage: 16-release
-    title: Docs complete
-    goal: A new builder can finish stage 06 from the docs alone.
-    weeks: 2
-    steps:
-      - {id: M44.1, title: Finish docs, tasks: ["STEP + 3MF for every printed part", "Photo or GIF per stage"], done: "A friend builds stage 06 without help."}
-  - id: M45
-    stage: 16-release
-    title: Public release
-    goal: Public, certified open hardware.
-    weeks: 1
-    steps:
-      - {id: M45.1, title: Publish, tasks: ["Make repo and Onshape public", "Apply for Open Source Hardware Association (OSHWA) certification", "Tag v1.0"], done: "OSHWA ID in README."}
-
-  # ---- 17 Upgrades ----
-  - {id: M46, stage: 17-upgrades, title: Adaptive sampling, goal: "Same fit with fewer photos.", weeks: 0, steps: [{id: M46.1, title: Adaptive sampling, tasks: ["Measure where the BRDF changes most [R15]"], done: "Same fit with ≥ 3× fewer photos."}]}
-  - {id: M47, stage: 17-upgrades, title: Space carving, goal: "Concave shapes in the preview.", weeks: 0, steps: [{id: M47.1, title: Space carving, tasks: ["Hull + photo-consistency [S7]"], done: "Concave test bowl recovered."}]}
-  - {id: M48, stage: 17-upgrades, title: Compare with MERL / RGL data, goal: "Check against published measurements.", weeks: 0, steps: [{id: M48.1, title: Compare, tasks: ["Measure a shared material [R13][R16]"], done: "Comparison published."}]}
+- id: M01
+  stage: 00-plan
+  title: Read and decide
+  goal: Know what you are building, why, and what to buy.
+  weeks: 1
+  steps:
+  - id: M01.1
+    title: Get the papers
+    time: 20 min
+    needs:
+    - laptop with Ubuntu (WSL)
+    - browser
+    do:
+    - '`bash scripts/get_papers.sh`'
+    - 'For each line under *Blocked for scripts*: open it in your browser, save the PDF to Downloads.'
+    - '`bash scripts/get_papers.sh --from /mnt/c/Users/<you>/Downloads`'
+    verify:
+    - Second run prints only `have` / `took` lines and no *Blocked* list.
+    - '`ls papers/open | grep R1` shows the R1 PDF.'
+    fail:
+    - '`took` missing for a file: the saved name differs; check `papers/papers.tsv` → `browser_name`.'
+    - 'PDF opens as an HTML page: the publisher served a login page; download again from the article page.'
+    record: Nothing to record. Tick the boxes; `make done id=M01.1`.
+  - id: M01.2
+    title: Read R1
+    time: 2 h
+    needs:
+    - papers/open/R1_*.pdf
+    do:
+    - Read R1 sections 2 (device), 3 (calibration), 4 (results).
+    - 'Close the paper. In `phases/00-plan/design.md` → Results, answer in one line each: (1) which axes turn the sample, (2) why the camera never moves, (3) what the mirror test calibrates, (4) why a 5°
+      minimum light–camera angle.'
+    verify:
+    - Your four answers match README → *The machine* and *Theory and equations* (open them only now).
+    fail:
+    - 'An answer is wrong: re-read that part of R1 section 2 or 3 and correct the line.'
+    record: The four answers in phases/00-plan/design.md → Results; commit.
+  - id: M01.3
+    title: Explore the simulator
+    time: 30 min
+    needs:
+    - docs/index.html in a browser
+    do:
+    - Open `docs/index.html`. Drag to orbit; scroll to zoom; double-click to reset.
+    - Press ▶ Demo. Drag *Build stage* from 1 to 17 and watch parts appear.
+    - Set M4 = 60, M3 = 30. Then M4 = 60, M3 = 25.
+    - 'Calibration lab: hidden table error +0.8°; press *Run calibrate mirror*; then drag *lamp drift* to 0.2 %.'
+    verify:
+    - M4 60 / M3 30 shows *Specular geometry ✓*; M3 25 does not.
+    - 'Calibration lab: −0.80° WARN before, 0.00° PASS after calibrate; drift 0.2 % → FAIL.'
+    - 'Without notes, sketch the machine: M1–M4, light, camera, zero point.'
+    fail:
+    - 'Page blank: open it with Chrome or Firefox (not a preview pane).'
+    record: 'Optional: sketch photo as `phases/00-plan/sketch.jpg`. Tick the boxes; `make done id=M01.3`.'
+  - id: M01.4
+    title: Decide the parts
+    time: 45 min
+    needs:
+    - '`PARTS.md` (on GitHub: open it → ✏️)'
+    do:
+    - Read each part's *why* line in `PARTS.md`.
+    - 'Tick `[x]` the parts you agree with; `status: have` for ones you own; `status: swap` + `note:` for ones you want changed; `status: skip` for ones you won''t use.'
+    - 'Tools: set `have` on each TLS row (00 · Tools) you own. Optional kits: tick the SPC rows (spectral, +$17), MSK rows (colour bands + polarizers, +$30), CAM-04/05 (second camera: no camera moves, +$81),
+      CAL-03 (chrome balls, +$10), ENC-01/03 (drape, only if M21.2 fails) and STA rows (standalone, +$38) only if you want them.'
+    - Commit (*Commit changes* on GitHub, or `make publish m="M01.4 parts decided"` locally).
+    verify:
+    - Stages 01–03 headings in `PARTS.md` read `N/N decided` (nothing left `suggested`).
+    - 'Summary table: *Still to buy* core ≤ $450; `make check` prints four `OK`.'
+    fail:
+    - 'A line stays `suggested` after ticking: the box must read `[x]` with no space inside.'
+    - '`swap` parts: tell me the replacement, or add it with `python tools/new.py part …`, then `skip` the old one.'
+    record: '`PARTS.md` committed. Tick the boxes; `make done id=M01.4`.'
+- id: M02
+  stage: 00-plan
+  title: Software runs on the laptop
+  goal: Tests, dry runs and the simulated machine work before any hardware.
+  weeks: 1
+  steps:
+  - id: M02.1
+    title: Install
+    time: 20 min
+    needs:
+    - laptop
+    - internet
+    do:
+    - 'In the repo folder: `make setup` (once).'
+    - '`source .venv/bin/activate` (every new terminal).'
+    - '`make all`'
+    verify:
+    - '`make all` ends with `passed` and no `failed`, after four `OK` lines from the check.'
+    fail:
+    - '`python3-venv` missing: `sudo apt install -y python3-venv`, then `make setup`.'
+    - '`ERR` lines: each names a file; `make build` then `make check` again.'
+    record: Tick the boxes; `make done id=M02.1`.
+  - id: M02.2
+    title: Dry run
+    time: 10 min
+    needs:
+    - M02.1
+    do:
+    - '`opengonio check-pose M4=60 M3=30`'
+    - '`opengonio --dry-run move M4=80 M3=25`'
+    - '`opengonio check-pose M4=10 M3=0`'
+    verify:
+    - 'First: `"safe": true`, `theta_i` = `theta_r` = 30.0.'
+    - Second prints `G53 G1 X80.0000 Y25.0000 F600`.
+    - 'Third: `"safe": false` (light would hit the camera) and exit code 2.'
+    fail:
+    - '`command not found`: run `source .venv/bin/activate` first.'
+    record: Tick the boxes; `make done id=M02.2`.
+  - id: M02.3
+    title: Simulated machine
+    time: 20 min
+    needs:
+    - M02.1
+    do:
+    - '`make sim`'
+    - '`opengonio --cal data/sim/try.yaml --sim mirror --sim-error M3=0.8 capture mirror --theta 30 --out data/sim/a`'
+    - '`opengonio --cal data/sim/try.yaml verify data/sim/a`; `opengonio --cal data/sim/try.yaml curve data/sim/a`'
+    - Open `data/sim/a/curve.svg` in a browser.
+    - '`opengonio --cal data/sim/try.yaml calibrate mirror data/sim/a`'
+    - Capture again with `--out data/sim/b` (same `--sim-error`), then verify `data/sim/b`.
+    verify:
+    - '`make sim` ends with `"result": "ALL PASS"`.'
+    - 'First verify: `mirror_peak_error_deg` = −0.8, `result` WARN; the chart peak sits left of the orange line.'
+    - 'Second verify: `mirror_peak_error_deg` within ±0.1, `result` PASS.'
+    fail:
+    - '`ALL PASS` missing: `data/sim/summary.json` → `checks` shows which one is false; run `make test`.'
+    record: Nothing to commit (`data/sim/` is ignored). Tick the boxes; `make done id=M02.3`.
+  - id: M02.4
+    title: Practice a full measurement
+    time: 30 min
+    needs:
+    - M02.3
+    do:
+    - '`C="--cal data/sim/p.yaml"; G="--sim-gamma 2.2"`'
+    - '`opengonio $C --sim ptfe $G capture dark --out data/sim/dark && opengonio $C calibrate dark data/sim/dark`'
+    - '`opengonio $C --sim ptfe $G capture linearity --out data/sim/lin && opengonio $C calibrate linearity data/sim/lin`'
+    - '`opengonio $C --sim ptfe $G capture white --out data/sim/white && opengonio $C calibrate white data/sim/white`'
+    - '`opengonio $C --sim plastic $G capture inplane --step 10 --out data/sim/plastic`'
+    - '`opengonio $C curve data/sim/plastic && opengonio $C fit data/sim/plastic`; open `fit.svg`.'
+    verify:
+    - '`calibrate linearity` prints `gamma` 2.2 ± 0.1.'
+    - '`fit` prints base_color 0.20 ± 0.02, roughness 0.30 ± 0.02, metallic ≤ 0.05 (the simulated plastic).'
+    - In `fit.svg` the lines pass through the dots.
+    fail:
+    - '`brdf_per_sr` blank / fit error: a calibrate step was skipped; `opengonio $C calibrate show` lists what is missing.'
+    record: This is exactly stage 07 on real hardware. Tick the boxes; `make done id=M02.4`.
+- id: M03
+  stage: 00-plan
+  title: CAD and printer ready
+  goal: Printed parts fit first time.
+  weeks: 1
+  steps:
+  - id: M03.1
+    title: Onshape document
+    time: 30 min
+    needs:
+    - free Onshape account
+    do:
+    - Create document **OpenGonio**; add Variable Studio `OG globals` with the values in `phases/00-plan/design.md` → Onshape set-up.
+    - Insert → Import `phases/00-plan/3d/PLAN-01_tolerance_coupon.step`.
+    verify:
+    - 'Coupon imports as one solid (Parts list: 1 part, not a mesh).'
+    fail:
+    - 'Imported as a mesh: you picked the .stl; import the .step.'
+    record: Onshape link under Onshape set-up in `phases/00-plan/design.md`; commit.
+  - id: M03.2
+    title: Print the coupon
+    time: 15 min
+    wait: print 1.5 h
+    needs:
+    - TLS-01 3D printer
+    - PETG
+    do:
+    - 'Slice `phases/00-plan/3d/PLAN-01_tolerance_coupon.stl`: PETG, 0.2 mm layers, 4 walls, 25 % infill, no supports.'
+    - Print; let it cool on the bed.
+    verify:
+    - 'Holes round (no elephant foot at the bottom layer); calipers: coupon length within ±0.3 mm of the model.'
+    fail:
+    - 'Bottom flare: lower the first-layer squish or enable elephant-foot compensation (0.2 mm).'
+    record: Tick the boxes; `make done id=M03.2`.
+  - id: M03.3
+    title: Set clearances
+    time: 30 min
+    needs:
+    - 5 × M3 × 10 from FRM-06
+    - FRM-08 608 bearings (3)
+    - TLS-03 hex key 2.5 mm
+    - TLS-06 calipers
+    do:
+    - Drive one M3 × 10 into each of the 5 holes (2.5 → 2.9 mm) with the hex key, slowly, until the head touches; back it out.
+    - Push a 608 into each of the 3 pockets by thumb.
+    - Pick the smallest hole where the screw goes all the way without splitting the coupon and holds when you pull on it → `M3_TAP` = that hole Ø.
+    - Pick the pocket where the 608 presses in and does not fall out upside down → `CLEAR` = pocket Ø − 22.0.
+    - Set both at the top of `tools/cad/parts.py`.
+    - 'Once: `.venv/bin/pip install cadquery numpy-stl matplotlib`; then `make parts`.'
+    verify:
+    - '`git status` lists changed `.step` / `.stl` files in `phases/*/3d/`.'
+    - '`make check` prints four `OK`.'
+    fail:
+    - 'Every screw spins loose: print 10 °C hotter (better layer bonding) and reprint the coupon.'
+    - '`make parts` import error: the cadquery install failed; re-run the pip line and read its last error.'
+    record: 'Commit: `make publish m="M03.3 clearances set"`.'
+- id: M04
+  stage: 01-power
+  title: Order power parts
+  goal: Everything for the power box on the bench.
+  weeks: 2
+  steps:
+  - id: M04.1
+    title: Order
+    time: 30 min
+    wait: shipping 3–10 days
+    needs:
+    - '`PARTS.md` → 01 · Power box'
+    - FRM-06 screws (03 · Frame)
+    - '`PARTS.md` → 00 · Tools'
+    do:
+    - Order every stage-01 part ticked `[x]` (status `agreed`), using its link.
+    - 'Also order FRM-06 (M3/M4/M5 screws): the box needs them now.'
+    - 'Tools: set `have` on the TLS rows you own; buy the multimeter (TLS-05) and wire stripper (TLS-04) now if you don''t.'
+    - 'In `PARTS.md` set each ordered part to `status: ordered` and fill `paid:`.'
+    verify:
+    - Stage 01 in `PARTS.md` has no `agreed` or `suggested` parts left; *Paid so far* went up.
+    - Tools TLS-02 to TLS-06 are `have` or `ordered`.
+    fail:
+    - 'Part out of stock: its *Must meet* line says what a substitute needs; set `swap` + `note:`, or add one with `python tools/new.py part …`.'
+    record: Commit the dated BOM.
+  - id: M04.2
+    title: Print the box
+    time: 15 min
+    wait: print 5 h
+    needs:
+    - PETG
+    do:
+    - 'Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl`: PETG, 0.2 mm, 4 walls, 30 % infill.'
+    verify:
+    - Walls not split; the Ø22.3 e-stop hole in the lid is round (calipers 22.2–22.5 mm).
+    fail:
+    - 'Hole too small: scale the lid XY by +1 % in the slicer and reprint (no drilling).'
+    record: Tick the boxes; `make done id=M04.2`.
+  - id: M04.3
+    title: Check parts
+    time: 20 min
+    needs:
+    - all PWR parts
+    - printed box + lid
+    do:
+    - Lay all parts out; check each against its *Must meet* line in `PARTS.md` (value, rating).
+    - 'Dry-fit: DC jack adapter PWR-03 in the slot of the +X wall; e-stop PWR-13 in the lid.'
+    verify:
+    - Fuse PWR-05 marked 3.15 A **T** (time-lag), 2 pieces.
+    - E-stop has an NC contact block with screw terminals.
+    - Each part fits its hole without forcing.
+    fail:
+    - 'Wrong part: return it now; don''t substitute ratings (fuse 3.15 A T, e-stop NC ≥ 3 A at 24 V DC).'
+    record: '`status: have` per part in `PARTS.md` as it arrives; commit.'
+- id: M05
+  stage: 01-power
+  title: Wire the power box
+  goal: Fuse and e-stop wired with screw terminals only; nothing soldered; not powered yet.
+  weeks: 1
+  steps:
+  - id: M05.1
+    title: Box hardware
+    time: 20 min
+    needs:
+    - PWR-18 box + lid
+    - PWR-03 jack adapter
+    - PWR-13 e-stop
+    - 4 × M3 × 10
+    - TLS-02 / TLS-03
+    do:
+    - Drive the 4 M3 × 10 into the box posts once and back out (cuts the threads).
+    - 'DC jack adapter (PWR-03) into the +X wall slot: barrel facing out, screw block inside.'
+    - E-stop (PWR-13) through the lid hole, ring nut tight; NC contact block on its back (marked NC, usually red, terminals 1–2).
+    verify:
+    - 'Twisting each part by hand: nothing rotates.'
+    - Lid closes on 4 × M3 × 10 with no gap.
+    fail:
+    - 'Lid screw spins: that post''s hole is too big; reprint the box with a smaller `M3_TAP`.'
+    record: Tick the boxes; `make done id=M05.1`.
+  - id: M05.2
+    title: Main wiring
+    time: 45 min
+    needs:
+    - PWR-04 fuse holder + PWR-05 fuse
+    - PWR-15 18 AWG pair (1 m)
+    - TLS-04 stripper
+    - TLS-02 flat screwdriver
+    do:
+    - Strip 8 mm, twist the strands tight.
+    - Jack `+` terminal → fuse holder lead A. Fuse holder lead B → e-stop NC terminal 1.
+    - E-stop NC terminal 2 → the whole red wire, out through the J3 slot (it will later pass through the over-travel switch, M14.1, on its way to the E4).
+    - Jack `−` terminal → the whole black wire, out through the −X slot. Leave both ends free; zip-tie the pair to the box.
+    - 'Tug every wire: none slips out.'
+    verify:
+    - 'Continuity beeps along each row of the netlist (`phases/01-power/design.md`): jack + … red end, jack − … black end.'
+    - No beep red out ↔ black out.
+    fail:
+    - 'No beep through the e-stop: you used the NO block; move the wires to NC.'
+    - 'Wire pulls out: strip longer, twist, re-tighten.'
+    record: Tick each row on the printed netlist. Tick the boxes; `make done id=M05.2`.
+  - id: M05.3
+    title: Checks with power off
+    time: 10 min
+    needs:
+    - TLS-05 multimeter
+    - adapter unplugged
+    - e-stop released
+    do:
+    - 'Ω range: red out to black out (T1).'
+    - 'Ω range: across the fuse holder leads with the fuse in (T2).'
+    verify:
+    - T1 > 10 kΩ (or OL).
+    - T2 < 1 Ω.
+    fail:
+    - 'T1 low: a stray strand bridges + and − at the jack screws; re-strip and re-tighten.'
+    - 'T2 OL: fuse blown or not seated; fit the spare.'
+    record: T1, T2 in `phases/01-power/test.csv` (date, value, PASS/FAIL).
+- id: M06
+  stage: 01-power
+  title: First power-on
+  goal: Safe 24 V that the e-stop cuts.
+  weeks: 1
+  steps:
+  - id: M06.1
+    title: First 24 V and polarity
+    time: 15 min
+    needs:
+    - PWR-01 adapter
+    - PWR-02 cord
+    - TLS-05 multimeter
+    do:
+    - E-stop pressed. Plug the adapter into the jack, then into the wall.
+    - 'Release the e-stop; DC V: black probe on black out, red probe on red out (T3).'
+    verify:
+    - 'T3 = +23.5 to +24.5 V (a plus sign: polarity right).'
+    - No smell, nothing warm after 1 min.
+    fail:
+    - 'Reads −24 V: jack + / − swapped; unplug, swap the two wires at the jack screws.'
+    - '0 V: fuse (check T2), e-stop pressed, or the J3 loop open.'
+    record: T3 in `test.csv`.
+  - id: M06.2
+    title: E-stop and unplug
+    time: 10 min
+    needs:
+    - TLS-05 multimeter
+    do:
+    - Press the e-stop; read the out leads after 1 s (T5). Release.
+    - 'Pull the adapter from the wall; read after 2 s (T6). (No rocker: off = e-stop pressed or unplugged.)'
+    verify:
+    - T5 < 1 V within 1 s.
+    - T6 < 0.5 V within 2 s.
+    fail:
+    - 'Stays high on e-stop: J3 loop bypassed or NC/NO swapped.'
+    record: T5, T6 in `test.csv`.
+  - id: M06.3
+    title: Heat
+    time: 15 min
+    wait: 30 min soak
+    needs:
+    - TLS-05 temperature probe
+    - 'optional: plug-in power meter'
+    do:
+    - Check the fitted fuse and the spare (T8).
+    - Lid closed, 30 min on; temperature probe through the J3 slot into the box air (T9).
+    - 'Optional: wall power meter, nothing on the out leads: read watts (T10).'
+    verify:
+    - T8 3.15 A T fitted + spare.
+    - T9 ≤ 45 °C.
+    - T10 ≤ 3 W (if measured).
+    fail:
+    - 'T9 high: a loose screw terminal heats up; feel each one, re-tighten.'
+    record: T8–T10 in `test.csv`; label the box *24 V*; commit.
+- id: M07
+  stage: 02-controller
+  title: Order controller parts
+  goal: E4, Pico H, keypads, one motor and one endstop on the bench.
+  weeks: 2
+  steps:
+  - id: M07.1
+    title: Order
+    time: 30 min
+    wait: shipping 3–10 days
+    needs:
+    - '`PARTS.md` → 02 · Controller and buttons'
+    do:
+    - Order every stage-02 part ticked `[x]`.
+    - Also order LAR-02 (one NEMA 17) and LAR-05 (one TCST2103 endstop) from stage 04 for bench tests.
+    - 'Set them `status: ordered` with `paid:` in `PARTS.md`.'
+    verify:
+    - Stage 02 has no `agreed` or `suggested` parts left.
+    fail:
+    - 'E4 sold out: its *Must meet* line names what a replacement needs; its pins differ — update `firmware/fluidnc/config.yaml`.'
+    record: Commit the dated BOM.
+  - id: M07.2
+    title: Unpack and check
+    time: 10 min
+    needs:
+    - CTL parts
+    - PWR-19 breadboard
+    - PWR-10 PC817
+    - PWR-11 10 k
+    do:
+    - 'Pico H: both 20-pin headers fitted. Keypads: 5-wire tails intact. Jumpers: male–female.'
+    - 'Find each keypad''s common pin: meter on continuity, one probe on a tail pin, press keys; the common pin beeps with every key.'
+    verify:
+    - Common pin found on both keypads (write it on the tail with a marker).
+    fail:
+    - 'No pin beeps with all keys: tail not fully seated in the meter probe; use a jumper''s male end as a probe tip.'
+    record: '`status: have` per arrived part in `PARTS.md`; commit.'
+- id: M08
+  stage: 02-controller
+  title: One motor turns from the laptop
+  goal: Laptop → E4 → motor works on the bench.
+  weeks: 1
+  steps:
+  - id: M08.1
+    title: USB into Ubuntu
+    time: 15 min
+    needs:
+    - CTL-01 E4
+    - CTL-03 USB cable
+    - Windows PowerShell (admin)
+    do:
+    - Plug the E4 into the laptop by USB (no 24 V needed).
+    - 'PowerShell (admin): `usbipd list`; `usbipd bind --busid <E4 busid>`; `usbipd attach --wsl --busid <E4 busid>`.'
+    - 'Ubuntu: `sudo usermod -aG dialout $USER && newgrp dialout`; `ls /dev/ttyUSB*`.'
+    verify:
+    - '`ls` prints `/dev/ttyUSB0`.'
+    fail:
+    - 'Not listed in `usbipd list`: charge-only cable; swap it.'
+    - 'Vanishes after replug: run `usbipd attach` again (needed after every replug).'
+    record: Tick the boxes; `make done id=M08.1`.
+  - id: M08.2
+    title: Flash FluidNC
+    time: 20 min
+    needs:
+    - M08.1
+    do:
+    - '`bash scripts/e4.sh flash`; close its terminal with Ctrl+].'
+    - '`bash scripts/e4.sh wifi "SSID" "PASSWORD"`; press E4 reset.'
+    - '`bash scripts/e4.sh config fluidnc.local`; press E4 reset.'
+    verify:
+    - '`opengonio send ''$I''` lists `FluidNC`.'
+    - '`opengonio send ''?''` prints a line starting `<Idle|MPos:` (or `<Alarm` before homing).'
+    fail:
+    - '`fluidnc.local` not found: use the IP the E4 prints on boot, or join hotspot FluidNC / 12345678 and use 192.168.0.1.'
+    record: C1 (USB) in `phases/02-controller/test.csv`.
+  - id: M08.3
+    title: Bench motor
+    time: 20 min
+    needs:
+    - LAR-02 motor
+    - power box
+    - tape flag on the shaft
+    do:
+    - Adapter unplugged. Red out → E4 VIN `+`, black out → E4 VIN `−` (screw terminal). Motor → E4 X socket. Plug in, e-stop released.
+    - '`opengonio send ''G91'' ''G1 X10 F600'' ''G1 X-10 F600'' ''G90''`'
+    - '`opengonio send ''G91'' ''G1 X360 F300'' ''G90''`; press the e-stop halfway.'
+    verify:
+    - Shaft turns, then returns to the tape mark.
+    - E-stop stops it at once; after release `opengonio send '?'` shows `Alarm` (must re-home).
+    fail:
+    - 'Motor buzzes, no turn: coil pairs crossed; swap the middle two wires of its plug.'
+    - 'Wrong direction: flip `direction_pin` in `firmware/fluidnc/config.yaml`, `bash scripts/e4.sh config`.'
+    record: Note the result under C7 in `test.csv`.
+- id: M09
+  stage: 02-controller
+  title: Keypads work with the laptop
+  goal: Membrane keys drive the machine.
+  weeks: 1
+  steps:
+  - id: M09.1
+    title: Hub firmware
+    time: 15 min
+    needs:
+    - CTL-02 Pico H
+    - CTL-04 USB cable
+    do:
+    - Hold BOOTSEL, plug the Pico in, copy the MicroPython .uf2 onto `RPI-RP2`.
+    - 'WSL: `usbipd attach` the Pico too.'
+    - '`bash scripts/pico.sh`'
+    verify:
+    - '`pico.sh` prints `PONG OpenGonio-hub 2`.'
+    fail:
+    - '`mpremote` can''t find it: `ls /dev/ttyACM*` empty → attach with usbipd again.'
+    record: C4 (PING part) in `test.csv`.
+  - id: M09.2
+    title: Wire the keypads
+    time: 30 min
+    needs:
+    - 2 × CTL-05 keypads
+    - CTL-07 jumpers
+    - pin table in `phases/02-controller/design.md`
+    do:
+    - 'Keypad A: male jumper ends into its tail; common → Pico GND; keys 1–4 → GP2 HOME, GP3 START, GP4 STOP, GP5 LIGHT.'
+    - 'Keypad B: common → GND; key 1 → GP6 NEXT.'
+    - 'Common ground (always): one jumper from the E4 TH1 ground pin to Pico GND: the M1 endstop (M27.1) and PAUSE need it without the laptop.'
+    - 'Optional PAUSE: keypad B key 2 → E4 GPIO39 (TH1 signal pin).'
+    - '`python -m serial.tools.miniterm /dev/ttyACM0 115200`, press each key.'
+    verify:
+    - Each press prints its own `BTN <NAME>` exactly once.
+    fail:
+    - 'Nothing on any key: common on a key pin; redo M07.2.'
+    - 'Two lines per press: the firmware debounces 30 ms — reseat the jumper on that pin.'
+    record: C4 in `test.csv`.
+  - id: M09.3
+    title: Panel drives the motor
+    time: 20 min
+    needs:
+    - bench motor on X
+    do:
+    - '`opengonio panel`'
+    - Press HOME, LIGHT, NEXT, START, then STOP.
+    - 'Optional PAUSE: start again; press PAUSE during a move; then `opengonio send ''~''`.'
+    verify:
+    - Each press prints its action in the panel log.
+    - PAUSE (if wired) freezes the shaft even with the laptop unplugged; `~` resumes.
+    fail:
+    - 'PAUSE does nothing: GPIO39 pin wrong in config; check the pin table.'
+    record: C5, C6 in `test.csv` (C6 `n/a` if PAUSE not wired).
+- id: M10
+  stage: 02-controller
+  title: Controller box closed
+  goal: Boards boxed; links, homing, e-stop sense and heat tested.
+  weeks: 1
+  steps:
+  - id: M10.1
+    title: Print and mount
+    time: 30 min
+    wait: print 4 h
+    needs:
+    - CTL-10 prints
+    - 4 × M3 × 8
+    - PWR-19 breadboard
+    do:
+    - Print `CTL-10a_button_panel.stl`, `CTL-10b_controller_tray.stl`.
+    - Drive M3 × 8 into the 4 E4 standoffs once; mount the E4 (holes 83.6 × 60.6 mm). Press the Pico H's corner holes over the tray pegs.
+    - 'Breadboard: peel its backing, stick it in the recess. Keypads: peel and stick into the panel recesses, tails through the slots.'
+    verify:
+    - E4 sits flat on all four standoffs; USB ports reachable through the slots.
+    - Pico doesn't lift when you unplug a jumper.
+    fail:
+    - 'Holes off: measure your E4 hole spacing, set it in `tools/cad/parts.py` (CTL-10b), `make parts`, reprint.'
+    record: Tick the boxes; `make done id=M10.1`.
+  - id: M10.2
+    title: WiFi and Bluetooth
+    time: 30 min
+    needs:
+    - phone or laptop Bluetooth
+    do:
+    - 'In `software/config/machine.yaml`: `controller.transport: tcp`; `opengonio status`.'
+    - 'Pair the E4 over Bluetooth; set `transport: serial`, `port: /dev/rfcomm0` (or the COM port); `opengonio status`.'
+    - Set it back to the link you will use.
+    verify:
+    - Both links print `<Idle|MPos:` or `<Alarm|MPos:`.
+    fail:
+    - 'Bluetooth missing: flash the BT build from installer.fluidnc.com.'
+    record: C1 (WiFi, BT) in `test.csv`.
+  - id: M10.3
+    title: Flags and homing
+    time: 30 min
+    needs:
+    - LAR-05 endstop
+    - 'CTL-06: 3 double-ended XH leads + two 3-pin housings'
+    - a card to block it
+    do:
+    - 'Endstop lead: push 3 leads into a 3-pin XH housing at each end, same order both ends (V, G, S from the E4 pin table). One end into the E4 X-MIN socket, the other onto the module''s 3 pins (an XH
+      housing fits a 2.54 mm header).'
+    - '`opengonio send ''?''` with the slot open, then blocked.'
+    - 'Motor on X, endstop flag taped to the shaft: `opengonio send ''$HX''`.'
+    verify:
+    - Blocked shows `Pn:X`; open shows no `Pn`.
+    - '`$HX` turns until the flag cuts the slot and stops; `?` shows MPos X = 20.'
+    fail:
+    - 'Never stops: inverted input; toggle `:low` on the home pin in config.yaml.'
+    - 'Module LED never lights: V and G swapped (flip the housing at the module end).'
+    record: C2, C3 in `test.csv`.
+  - id: M10.4
+    title: E-stop sense on the breadboard
+    time: 30 min
+    needs:
+    - PWR-10 PC817
+    - PWR-11 10 k
+    - 2 cut jumpers
+    - M-F jumpers
+    do:
+    - PC817 across the breadboard trench (dot = pin 1). 10 k from pin 1's row to a free row (*24 V sense*).
+    - Cut jumper from E4 VIN `+` (bare end under the screw with the main lead) → *24 V sense* row; another from E4 VIN `−` → pin 2's row.
+    - Pin 4's row → Pico GP7; pin 3's row → Pico GND (male–female jumpers).
+    - 'Motor holding (`opengonio send ''$ME''`): measure E4 VIN (T4). Press the e-stop: watch the hub output and the panel; release; `opengonio home`.'
+    verify:
+    - T4 ≥ 23.0 V.
+    - Hub prints `POWER 0` on e-stop, `POWER 1` after release (T7); moves refused until HOME (C7).
+    fail:
+    - 'Always `POWER 0`: PC817 backwards (pins 1/2 vs 3/4) or the 10 k in the wrong row.'
+    - 'Always `POWER 1`: pin 4 not on GP7, or pin 3 not on GND.'
+    record: T4, T7 in `phases/01-power/test.csv`; C7 in `phases/02-controller/test.csv`.
+  - id: M10.5
+    title: Heat
+    time: 10 min
+    wait: 30 min hold
+    needs:
+    - TLS-05 temperature probe
+    do:
+    - '`opengonio send ''$ME''`, motor holding at 0.8 A run current for 30 min, lid on; probe on the driver area.'
+    verify:
+    - Driver area ≤ 80 °C (C8).
+    fail:
+    - 'Hotter: fit the optional CTL-08 fan on `M62 P2`, or lower `run_amps` to 0.7.'
+    record: C8 in `test.csv`; commit `make publish m="M10 controller done"`.
+- id: M11
+  stage: 03-frame
+  title: Place the base mounts
+  goal: Every mount screwed to the board from a paper template; no cutting, no drilling.
+  weeks: 1
+  steps:
+  - id: M11.1
+    title: Order frame parts
+    time: 20 min
+    wait: shipping
+    needs:
+    - '`PARTS.md` → 03 · Frame'
+    do:
+    - Order every stage-03 part ticked `[x]`; set them `ordered` with `paid:`.
+    verify:
+    - Stage 03 has no `agreed` or `suggested` parts left.
+    record: Commit `PARTS.md`.
+  - id: M11.2
+    title: Print the template and mounts
+    time: 30 min
+    wait: print 4 h
+    needs:
+    - TLS-08 paper printer
+    - tape
+    - PETG
+    do:
+    - Print `phases/03-frame/placement-template.svg` at 100 % in poster/tile mode; tape the tiles on the crosses.
+    - Print 4 × `FRM-09b_foot.stl`, 2 × `FRM-09d_extrusion_saddle.stl`.
+    verify:
+    - The 100 mm bar measures 100 ± 0.5 mm.
+    - 'Tile joins: lines meet within 0.5 mm.'
+    fail:
+    - 'Bar 97 mm: the printer scaled to fit; turn *fit to page* off.'
+    record: Tick the boxes; `make done id=M11.2`.
+  - id: M11.3
+    title: Screw down the mounts
+    time: 45 min
+    needs:
+    - FRM-01 plywood as bought
+    - FRM-12 wood screws
+    - 'TLS-02 Phillips #2'
+    - TLS-06 calipers
+    do:
+    - Template on the best face, centred (equal overhang on all sides), taped.
+    - Saddles 1 and 2 on their outlines (x = 237 and 282), walls along the +X line; 4 screws each, straight down through the paper, firm, not over-tightened.
+    - Leave the template on for the boxes (M12.4).
+    verify:
+    - Saddle centres 237 ± 1 and 282 ± 1 mm from the centre cross (tape).
+    - Nothing moves when you push it hard sideways.
+    fail:
+    - 'Screw spins without tightening: glue a wooden toothpick into the hole, snap it flush, drive the screw again.'
+    record: Photo `phases/03-frame/base.jpg`; commit.
+- id: M12
+  stage: 03-frame
+  title: Assemble the frame
+  goal: Board on feet with outrigger, camera post, scales and boxes.
+  weeks: 1
+  steps:
+  - id: M12.1
+    title: Feet
+    time: 15 min
+    needs:
+    - 4 × FRM-09b feet
+    - 8 × FRM-12 screws
+    do:
+    - Board face down on a towel. A foot flush in each corner; 2 screws each.
+    - Turn it over on the table where it will live.
+    verify:
+    - Board doesn't rock when pressed at each corner.
+    - No screw tip shows on the top face.
+    fail:
+    - 'Rocks: the table isn''t flat; fold paper under the short foot. (No levelling needed: the optics reference the board, not gravity.)'
+    record: Tick the boxes; `make done id=M12.1`.
+  - id: M12.2
+    title: Outrigger and camera posts
+    time: 45 min
+    wait: print 3 h
+    needs:
+    - 3 × FRM-02 2020
+    - 9 × FRM-03 T-nuts
+    - 9 × M5 × 10
+    - FRM-09e post sockets (2)
+    - FRM-09f end foot
+    - TLS-07 tape + phone level app
+    do:
+    - Print 2 × `FRM-09e_post_socket.stl` and 1 × `FRM-09f_end_foot.stl`.
+    - Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under the far end.
+    - M5 × 10 through each saddle wall and the end foot into the T-nuts; tighten.
+    - Post sockets on the outrigger at x = 380 (measuring camera) and x = 658 (scan camera); a 2020 post in each (M5 × 10 + T-nut).
+    verify:
+    - 'Posts vertical: phone level app on two faces reads 90.0 ± 0.5°.'
+    - Post centres 380 ± 1 and 658 ± 2 mm from the board centre (tape).
+    - Outrigger level end to end (phone level app ±0.5°).
+    fail:
+    - 'Far end low: the end foot is 30 mm for 12 mm feet + 12 mm plywood + 6 mm saddle; shim it.'
+    record: Tick the boxes; `make done id=M12.2`.
+  - id: M12.3
+    title: Protractor scales
+    time: 30 min
+    wait: print 2 h
+    needs:
+    - 4 × FRM-09c
+    - double-sided tape or glue
+    do:
+    - Print 4 × `FRM-09c_protractor_segment.stl` (80° each).
+    - Stick them end to end around the ring circle from 20° to 340° (0° = +X, toward the camera; the gap is the M4 motor).
+    verify:
+    - The 20° and 340° ends sit symmetric about the line board centre → camera post (string line).
+    record: Tick the boxes; `make done id=M12.3`.
+  - id: M12.4
+    title: Mount the boxes
+    time: 15 min
+    needs:
+    - power box
+    - controller box
+    - 8 × FRM-12 screws
+    do:
+    - 'Power box: 4 wood screws through its floor''s OG-40 holes at the template crosses (220, −220), e-stop toward you.'
+    - 'Controller tray: 4 wood screws through its corner bosses at the template crosses (centre −190, 220).'
+    - Black wire along the board edge to E4 VIN `−`. Red wire for now straight to E4 VIN `+` (it gets the over-travel switch in M14.1).
+    verify:
+    - '`opengonio status` still answers; e-stop still cuts (repeat T5).'
+    record: Photo `phases/03-frame/frame.jpg`; commit.
+- id: M13
+  stage: 04-light-arm
+  title: Ring drive built
+  goal: Light arm turns smoothly on the ring.
+  weeks: 1
+  steps:
+  - id: M13.1
+    title: Measure and set the rim
+    time: 30 min
+    needs:
+    - LAR-01 lazy Susan
+    - calipers
+    do:
+    - Order the stage-04 parts ticked in `PARTS.md` (if not done); mark them `ordered`.
+    - Measure the lazy Susan top-plate outer Ø and its 4 hole positions.
+    - Set `RIM_TEETH` in `tools/cad/parts.py` so `RIM_R` ≈ plate radius − 5 mm; `python tools/cad/parts.py --only LAR-08a`.
+    verify:
+    - Printed `RIM_R` within 5 ± 1 mm of the plate edge.
+    - '`gear_ratio` = `RIM_TEETH` / 20 noted.'
+    record: Plate Ø, `RIM_TEETH`, `gear_ratio` in phases/04-light-arm/design.md → Results.
+  - id: M13.2
+    title: Print ring parts
+    time: 15 min
+    wait: print 9 h
+    needs:
+    - PETG
+    do:
+    - Print 8 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08c_arm_bracket.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl` (8 washers).
+    verify:
+    - Segments butt into a closed ring on the table (no gap > 0.5 mm).
+    record: Tick the boxes; `make done id=M13.2`.
+  - id: M13.3
+    title: Lazy Susan, rim and belt
+    time: 1.25 h
+    needs:
+    - LAR-01 lazy Susan
+    - LAR-03 belt
+    - FRM-12 wood screws + 4 mm printed washers
+    - M4 × 12 + nuts (FRM-06)
+    - TLS-09 CA glue
+    - TLS-04 cutter
+    do:
+    - 'Lazy Susan centred on the template circle; #8 wood screws through its bottom-plate holes, each through a 4 mm printed washer (the steel plate is thin: without the washer the 16 mm screw pokes through
+      the plywood).'
+    - 'Rim segments on the top plate: M4 × 12 + nut through every slot that lands on a plate hole; CA-glue the others to the plate.'
+    - Glue the GT2 belt teeth-out into the groove, ends butted, no gap; it ties the segments together.
+    verify:
+    - 'Count the belt teeth: equals `RIM_TEETH` ± 1.'
+    - No tooth step at the joint (run a fingernail over it).
+    - No screw tip under the plywood.
+    fail:
+    - 'Gap at the joint: cut a 1-tooth filler from spare belt.'
+    record: Tooth count in design.md.
+  - id: M13.4
+    title: Motor
+    time: 30 min
+    needs:
+    - LAR-02 motor
+    - LAR-04 20T pulley
+    - LAR-08b mount
+    - 4 × M3 × 8
+    - FRM-12 wood screws
+    do:
+    - Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt.
+    - Mount on its template outline at 0° (+X), base outside the lazy Susan; slide it in until the pulley meshes the rim belt fully, then screw the base down (2 screws in the slots).
+    verify:
+    - Pulley teeth engage the rim belt across its full width; turning the ring by hand turns the motor, no skipped tooth.
+    fail:
+    - 'Skips under a light push: slide the mount 0.5 mm inward and re-tighten.'
+    record: Tick the boxes; `make done id=M13.4`.
+  - id: M13.5
+    title: Arm
+    time: 45 min
+    needs:
+    - LAR-08c bracket
+    - 2 × FRM-02 2020 (upright + arm)
+    - LAR-08e cross clamp
+    - M4 × 12 + nuts
+    - LSR-05 lamp body (stage 06, or a dummy)
+    do:
+    - 'Arm bracket on the top plate at r ≈ 140 mm: M4 × 12 + nuts through its slots and two plate holes.'
+    - 2020 upright in the bracket socket (M5 × 10 + T-nut). Cross clamp on the upright; horizontal 2020 arm in its top channel pointing outward, so the lamp centre will sit 300 mm from the zero point at
+      zero-point height (150 mm).
+    verify:
+    - 'Turning by hand 20 → 340°: no tight spot, no skipped tooth; the bracket never touches the motor.'
+    - 'Lamp position: 300 ± 2 mm from the zero point, height 150 ± 2 mm.'
+    record: Commit.
+- id: M14
+  stage: 04-light-arm
+  title: Light arm homes and repeats
+  goal: M4 returns to the same spot every time (≤ 0.1°).
+  weeks: 1
+  steps:
+  - id: M14.1
+    title: Home switch
+    time: 45 min
+    needs:
+    - LAR-05 TCST2103
+    - LAR-06 roller switch
+    - flag on the arm
+    do:
+    - Mount the TCST2103 so the arm flag cuts it at 20° (lead as in M10.3).
+    - Roller over-travel switch (LAR-06) screwed to the base 3° beyond. Unplug the adapter; cut the red wire where it passes the switch, strip both ends, one under COM, one under NC.
+    verify:
+    - '`opengonio send ''?''` shows `Pn:X` with the flag in the slot.'
+    - Pressing the roller switch drops E4 VIN to 0 V (and the hub prints `POWER 0`).
+    record: Tick the boxes; `make done id=M14.1`.
+  - id: M14.2
+    title: Config and homing
+    time: 20 min
+    needs:
+    - '`software/config/machine.yaml`'
+    do:
+    - 'Set `installed_phase: 4` and `M4.gear_ratio` (from M13.1).'
+    - '`make test`'
+    - '`opengonio home` ten times.'
+    verify:
+    - Tests pass; home finishes 10/10; arm stops on the flag, never on the roller switch.
+    fail:
+    - 'Homes the wrong way: `homing.positive_direction` for X in `firmware/fluidnc/config.yaml`.'
+    record: 10/10 in design.md.
+  - id: M14.3
+    title: Angle check
+    time: 20 min
+    needs:
+    - protractor scale FRM-09c
+    do:
+    - '`opengonio move M4=90`, read the scale; `M4=180`; `M4=270`.'
+    verify:
+    - Each reading within ±0.5° of the command.
+    fail:
+    - 'Error grows with angle: wrong `gear_ratio`; ratio_new = ratio × commanded / read.'
+    record: Three readings in design.md.
+  - id: M14.4
+    title: Repeatability
+    time: 45 min
+    needs:
+    - LAR-09 laser + mirror
+    - wall 2.0 m away
+    do:
+    - Laser on the base, small mirror taped to the arm, spot on a wall 2.0 m away (0.1° = 7 mm).
+    - '`opengonio repeat M4 --at 60 --away 30 --n 20`; type each spot offset (mm).'
+    - '`opengonio repeat M4 --at 60 --home --n 10`'
+    verify:
+    - 'Both print `"pass": true` (every spot ≤ 7.0 mm from the mark).'
+    fail:
+    - 'Spread > 7 mm: pinion mesh (slide the mount in 0.5 mm), pulley grub tight on the motor flat, wobble in the lazy Susan.'
+    record: Both JSON summaries in phases/04-light-arm/design.md → Results; commit.
+- id: M15
+  stage: 05-table
+  title: Table axis built
+  goal: Sample table turns on its fixed bolt axle without wobble.
+  weeks: 1
+  steps:
+  - id: M15.1
+    title: Print table parts
+    time: 10 min
+    wait: print 5 h
+    needs:
+    - stage-05 parts `have` in `PARTS.md`
+    do:
+    - Print `TBL-07a_table_drum`, 3 × `TBL-07b_home_flag`, `TBL-07c_table_motor_bracket`, `TBL-07d_table_post`, `TBL-07f_spacers`.
+    verify:
+    - A 608 presses into each drum seat by thumb and stays.
+    - The M8 bolt head drops into the post's hex pocket from below and can't turn.
+    record: Tick the boxes; `make done id=M15.1`.
+  - id: M15.2
+    title: Fixed axle and drum
+    time: 45 min
+    needs:
+    - 2 × FRM-08 608
+    - TBL-05 M8 × 75 bolt + nut
+    - 1 mm shim + 6 mm spacer (TBL-07f)
+    - 4 × FRM-12 screws
+    - TLS-10 13 mm spanner
+    do:
+    - Bolt up through the post from below, head into the hex pocket. Post on its template outline at (0, 0); 4 wood screws (the bolt is now trapped and can't turn).
+    - 'Press both 608s into the drum. Onto the bolt: 1 mm shim (sits on the post top), the drum (lower 608 onto the bolt), 6 mm spacer down the drum''s top hole, M8 nut.'
+    - Tighten the nut with the spanner until the drum has no up-down play but still turns freely (the nut presses only the inner races).
+    verify:
+    - 'Spin by hand ±180°: smooth, no click.'
+    - 'Calipers on the drum top at 30 mm radius: height changes < 0.3 mm over a turn.'
+    fail:
+    - 'Tight spot: nut too tight; back it off 1/6 turn.'
+    - 'Wobble: a 608 not pressed square into its seat.'
+    record: Tick the boxes; `make done id=M15.2`.
+  - id: M15.3
+    title: Drive belt
+    time: 30 min
+    needs:
+    - TBL-01 motor
+    - TBL-02 232 mm belt
+    - TBL-03 pulley
+    - TBL-07c bracket
+    - 4 × M3 × 8
+    do:
+    - Motor face up, bracket top plate on its face (4 × M3 × 8); 20T pulley on the shaft, teeth level with the drum's teeth.
+    - Belt on the motor pulley and the drum's teeth; bracket on its template outline (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; screw the rails down
+      through the slots.
+    verify:
+    - No belt skip when you hold the table and the motor turns slowly (`opengonio send 'G91' 'G1 Y5 F100' 'G90'` after M16.1).
+    - Motor and bracket stay inside the lazy Susan opening (no contact when M4 turns).
+    record: Commit.
+- id: M16
+  stage: 05-table
+  title: Table homes and repeats
+  goal: M3 returns to the same spot every time (≤ 0.1°).
+  weeks: 1
+  steps:
+  - id: M16.1
+    title: Flag and homing
+    time: 30 min
+    needs:
+    - TBL-04 endstop
+    - TBL-07b flag
+    - CTL-06 leads (as M10.3)
+    do:
+    - Flag on the drum's two flag holes (M3 × 8 self-tap), pointing at −180°; endstop on a printed riser beside the post, lead into the E4 Y-MIN socket.
+    - '`installed_phase: 5`; `opengonio home` ten times.'
+    verify:
+    - Home 10/10; `?` shows MPos Y = −180 after homing.
+    record: 10/10 in design.md.
+  - id: M16.2
+    title: Angle check
+    time: 15 min
+    needs:
+    - paper 360° protractor (any free printable, TLS-08) taped on the drum top
+    - a fixed pointer (tape on the post)
+    do:
+    - '`opengonio move M3=0`, `M3=90`, `M3=-90`; read the protractor against the pointer.'
+    verify:
+    - Each within ±0.5°.
+    fail:
+    - 'Scaled error: `M3.gear_ratio` = 100 / 20 = 5 only with the printed 100T pulley.'
+    record: Readings in design.md.
+  - id: M16.3
+    title: Repeatability
+    time: 45 min
+    needs:
+    - laser + mirror
+    - wall 2.0 m
+    do:
+    - Mirror on the table; `opengonio repeat M3 --at 0 --away 45 --n 20`.
+    verify:
+    - '`"pass": true`.'
+    record: JSON in phases/05-table/design.md → Results.
+  - id: M16.4
+    title: Both axes and collision guard
+    time: 15 min
+    needs:
+    - M4 and M3 built
+    do:
+    - '`opengonio move M4=60 M3=30`'
+    - '`opengonio move M4=10`'
+    verify:
+    - First move runs.
+    - 'Second prints `refused: M4=10.0 outside [20.0, 340.0]` and nothing moves.'
+    record: Commit `make publish m="M16 table done"`.
+- id: M17
+  stage: 06-camera-light
+  title: Camera sees the zero point
+  goal: Sharp, fixed-exposure image centred on the sample.
+  weeks: 2
+  steps:
+  - id: M17.1
+    title: Camera reaches the software
+    time: 30 min
+    needs:
+    - CAM-01 camera
+    - Windows PowerShell (or a Linux laptop)
+    do:
+    - 'WSL''s standard kernel has no USB-camera driver, so camera stages run `opengonio` from Windows Python. PowerShell, in the repo folder (`cd \\wsl.localhost\Ubuntu\home\<you>\projects\Gonioreflectometer-Open-Source`):'
+    - '`py -m venv $HOME\og-win; & $HOME\og-win\Scripts\pip install "./software[hw]"`'
+    - '`usbipd detach --busid <E4 busid>` (Windows keeps the E4 as a COM port); set `controller.port: COM5` (your port) in `machine.yaml`.'
+    - '`& $HOME\og-win\Scripts\opengonio status`'
+    verify:
+    - '`status` prints `<Idle|` or `<Alarm|`.'
+    - '`& $HOME\og-win\Scripts\python -c "import cv2; print(cv2.VideoCapture(0).read()[0])"` prints `True`.'
+    fail:
+    - '`False`: camera index is 1 (laptop webcam is 0); set `camera.index: 1`.'
+    - 'Linux laptop instead: everything runs natively; `v4l2-ctl --list-devices` shows the camera.'
+    record: Which setup you use in phases/06-camera-light/design.md → Results.
+  - id: M17.2
+    title: Mount
+    time: 1 h
+    wait: print 1 h
+    needs:
+    - CAM-01 camera
+    - CAM-02 lens
+    - CAM-03 prints
+    do:
+    - 'Order the stage-06 parts ticked in `PARTS.md`, plus CAL-01 PTFE, CAL-02 mirror (stage 07): M17.5–M19 use them. Print `CAM-03a_aperture_stop_f8.stl`, `CAM-03b_camera_plate.stl`, `CAL-06a/b` holders.'
+    - 'Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 2.2 mm holes.'
+    - 'Camera on the post: lens front 350 mm from the zero point; aperture stop in front of the lens.'
+    verify:
+    - 'Tape measure zero point → lens front: 350 ± 2 mm; camera axis level (phone level app on the plate).'
+    record: Tick the boxes; `make done id=M17.2`.
+  - id: M17.3
+    title: Focus
+    time: 30 min
+    needs:
+    - printed 1 mm grid
+    do:
+    - 'Grid at the zero point. Live view: Windows *Camera* app (or `guvcview` on Linux).'
+    - Turn the lens for the sharpest grid; lock it with the M12 lock ring.
+    verify:
+    - 1 mm lines resolved across the whole image.
+    record: Image as `phases/06-camera-light/focus.jpg`.
+  - id: M17.4
+    title: Centre
+    time: 15 min
+    needs:
+    - table centre mark
+    do:
+    - Image the table centre mark; find its pixel position (any image viewer).
+    verify:
+    - Within ±15 px of the image centre (= ±0.5 mm).
+    fail:
+    - 'Off-centre: shim the camera plate or slide it on the post.'
+    record: Offset (px) in design.md.
+  - id: M17.5
+    title: Lock exposure and colour
+    time: 30 min
+    needs:
+    - CAL-01 PTFE in its holder (or CAL-07 grey card if you bought it)
+    do:
+    - Lock exposure, gain, white balance (`v4l2-ctl` lines in `software/src/opengonio/camera/uvc.py`).
+    - Two frames of the PTFE tile 60 s apart.
+    verify:
+    - Mean grey of the two frames differs < 1 %.
+    fail:
+    - 'Drifts: auto exposure still on; `v4l2-ctl -l` and set `auto_exposure=1`.'
+    record: Locked values into `machine.yaml` → `camera:` (`exposure_ms`); commit.
+- id: M18
+  stage: 06-camera-light
+  title: Lamp on and safe
+  goal: Light switches from the laptop, stays cool and steady.
+  weeks: 1
+  steps:
+  - id: M18.1
+    title: Lamp assembly
+    time: 1 h
+    wait: print 2 h
+    needs:
+    - LSR-01 COB
+    - LSR-06 holder
+    - LSR-02 driver
+    - LSR-03 heatsink
+    - LSR-04 pad
+    - LSR-05 print
+    - PWR-20 lever connectors
+    do:
+    - Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. COB in the pre-wired holder (LSR-06); thermal pad on the heatsink; holder + COB + heatsink into the body's square pocket, leads out of the cap slot;
+      cap on with 4 × M3 × 8.
+    - Lamp clamp onto the horizontal arm (M5 × 10 + T-nut), aperture facing the zero point.
+    - Driver (LSR-02) pins into the breadboard. +Vin row ← 24 V sense row; −Vin row → E4 HE0 `−` (cut jumper under the screw).
+    - Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–340°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to
+      the holder's red (+) / black (−).
+    verify:
+    - 'Polarity checked with the meter before power: +Vo row → red lead beeps.'
+    record: Tick the boxes; `make done id=M18.1`.
+  - id: M18.2
+    title: Switch and heat
+    time: 20 min
+    needs:
+    - TLS-05 temperature probe
+    - '`installed_phase: 6`'
+    do:
+    - '`opengonio light on`; wait 10 min; `opengonio light off`. Repeat on/off 5 ×.'
+    verify:
+    - Lamp follows every command.
+    - COB case ≤ 70 °C after 10 min.
+    fail:
+    - 'Lamp always on: driver −Vin on GND instead of HE0.'
+    record: Temperature in phases/06-camera-light/design.md → Results.
+  - id: M18.3
+    title: Warm-up time
+    time: 15 min
+    wait: 10 min run
+    needs:
+    - PTFE tile or grey card
+    - room dark
+    do:
+    - '`opengonio capture warmup --minutes 10 --out data/warmup`'
+    - Set `lights.white.warmup_s` in `machine.yaml` to the printed value.
+    verify:
+    - '`settle_s` ≤ 300.'
+    fail:
+    - 'Longer: thermal pad missing or driver current too high (check LSR-02 is the 350 mA part).'
+    record: '`settle_s`, `change_pct` in design.md; commit.'
+- id: M19
+  stage: 06-camera-light
+  title: Mirror test
+  goal: First real data proves the angles are right.
+  weeks: 1
+  steps:
+  - id: M19.1
+    title: Mirror sweeps
+    time: 30 min
+    needs:
+    - CAL-02 mirror
+    - CAL-06b holder (print)
+    do:
+    - Mirror in `CAL-06b_mirror_holder`, clamped on the table.
+    - '`opengonio capture mirror --theta 20`, then `--theta 40`, then `--theta 60`.'
+    - '`opengonio verify data/mirror_20 data/mirror_40 data/mirror_60`'
+    - '`opengonio curve data/mirror_40`; open `data/mirror_40/curve.svg`.'
+    verify:
+    - Each `mirror_peak_error_deg` between −0.5 and +0.5.
+    - The chart's peak sits within one dot of the orange line.
+    fail:
+    - 'Same sign every time: table zero offset — fixed in M22.2.'
+    - 'No clear peak: mirror not facing the camera at M3 = 0; reseat the holder.'
+    record: Three errors in phases/06-camera-light/design.md → Results; commit.
+- id: M20
+  stage: 06-camera-light
+  title: First reflectance curves
+  goal: Two real materials measured and pictured.
+  weeks: 1
+  steps:
+  - id: M20.1
+    title: Paper
+    time: 20 min
+    needs:
+    - matte printer paper
+    do:
+    - Clamp the paper on the table.
+    - '`opengonio capture inplane --step 10 --out data/paper`'
+    - '`opengonio verify data/paper`'
+    - '`opengonio curve data/paper`; open `curve.svg`.'
+    verify:
+    - 'verify: `lamp_drift_pct` within ±2, `result` PASS.'
+    - 'Chart: flat-ish curves; centre_mean ÷ cos(θr) varies < 15 % for θr ≤ 60° at a fixed θi (from `curve.csv`).'
+    fail:
+    - 'Drift FAIL: raise `warmup_s`; check the lamp heatsink.'
+    record: '`curve.csv` + `curve.svg` → `phases/06-camera-light/paper_*`.'
+  - id: M20.2
+    title: Glossy plastic
+    time: 20 min
+    needs:
+    - acrylic sheet or flat LEGO plate
+    do:
+    - Clamp it.
+    - '`opengonio capture inplane --step 10 --out data/plastic`; `opengonio verify data/plastic`; `opengonio curve data/plastic`.'
+    verify:
+    - Each θi curve peaks at θr = θi ± 10° (chart).
+    record: '`curve.csv` + `curve.svg` → `phases/06-camera-light/plastic_*`; commit.'
+- id: M21
+  stage: 07-calibrate
+  title: Dark box
+  goal: Only the lamp lights the sample.
+  weeks: 1
+  steps:
+  - id: M21.1
+    title: Darken the room
+    time: 20 min
+    needs:
+    - ENC-02 felt
+    - curtains / door
+    - tape over bright LEDs
+    do:
+    - Order the stage-07 parts ticked in `PARTS.md`. Felt behind the sample (opposite the camera).
+    - Room lights off, curtains closed, tape over power LEDs that face the sample; laptop screen dimmed and turned away.
+    - 'Only if M21.2 fails: build the optional drape (ENC-01 fabric on ENC-03 dowels in 4 printed `ENC-04a` sockets), vents of both boxes open.'
+    verify:
+    - Standing at the machine, you can't read the template text without the lamp.
+    record: Tick the boxes; `make done id=M21.1`.
+  - id: M21.2
+    title: Stray light test
+    time: 15 min
+    needs:
+    - PTFE tile (CAL-01)
+    - darkened room
+    do:
+    - PTFE at 45:0 (`opengonio move M4=45 M3=0`). Room lights on.
+    - '`opengonio capture white --out data/stray_on`; then the same with the room light on: `--out data/stray_gap`.'
+    verify:
+    - 'Dark vs lit room: centre brightness differs < 0.5 % (`opengonio curve` each, compare `centre_mean`): ambient light is negligible.'
+    fail:
+    - 'Larger: find the source (window, monitor) and block it; if you can''t, build the optional drape (M21.1) and repeat.'
+    record: Both values in phases/07-calibrate/design.md → Results.
+  - id: M21.3
+    title: Dark level
+    time: 10 min
+    needs:
+    - room dark (drape closed if built)
+    do:
+    - '`opengonio capture dark`'
+    - '`opengonio calibrate dark data/dark`'
+    verify:
+    - '`opengonio calibrate show` lists `dark_counts` < 10 with today''s date.'
+    fail:
+    - 'High: light leak or camera gain not locked (M17.5).'
+    record: Commit `software/config/calibration.yaml`.
+- id: M22
+  stage: 07-calibrate
+  title: Camera response and angle calibration
+  goal: Linear brightness and true angles.
+  weeks: 1
+  steps:
+  - id: M22.1
+    title: Camera response
+    time: 20 min
+    needs:
+    - PTFE at the zero point
+    - M21.3 done
+    do:
+    - '`opengonio capture linearity`'
+    - '`opengonio calibrate linearity data/linearity`'
+    verify:
+    - '`r2` ≥ 0.995 and `gamma` between 0.9 and 2.6; `points_used` ≥ 4.'
+    fail:
+    - '`points_used` < 3: change `--exposures` so the brightest is just below saturation (e.g. `--exposures 1 2 4 8 16 32`).'
+    record: '`gamma`, `r2` in design.md; commit `calibration.yaml`.'
+  - id: M22.2
+    title: Angle offset
+    time: 45 min
+    needs:
+    - mirror holder
+    do:
+    - '`opengonio capture mirror --theta 20` … repeat for 30, 40, 50, 60.'
+    - '`opengonio calibrate mirror data/mirror_20 data/mirror_30 data/mirror_40 data/mirror_50 data/mirror_60`'
+    - '`opengonio capture mirror --theta 40 --out data/mirror_40_after`; `opengonio verify data/mirror_40_after`'
+    verify:
+    - '`calibrate` prints five errors and `M3_offset_deg`.'
+    - 'After: `mirror_peak_error_deg` within ±0.2.'
+    fail:
+    - 'Errors grow with θ: M4 gear ratio wrong (M14.3), not an offset.'
+    record: Five errors + offset in design.md; commit `calibration.yaml`.
+- id: M23
+  stage: 07-calibrate
+  title: Brightness calibration
+  goal: Values in real reflectance units (1/sr).
+  weeks: 1
+  steps:
+  - id: M23.1
+    title: White reference
+    time: 15 min
+    needs:
+    - CAL-01 PTFE in CAL-06a holder
+    do:
+    - '`opengonio capture white`'
+    - '`opengonio calibrate white data/white --rho 0.99` (ρ from the PTFE datasheet).'
+    verify:
+    - '`calibrate show` lists `white` with today''s date and `exposure_ms` = your locked exposure.'
+    record: Commit `calibration.yaml`.
+  - id: M23.2
+    title: PTFE check
+    time: 20 min
+    needs:
+    - PTFE still mounted
+    do:
+    - '`opengonio capture inplane --step 10 --out data/ptfe`; `opengonio curve data/ptfe`.'
+    verify:
+    - '`brdf_per_sr` = 0.315 ± 5 % for θi ≤ 60°, θr ≤ 60° (0.99 / π).'
+    fail:
+    - 'Falls with θi: lamp spot smaller than the sample at grazing angles — check the aperture in LSR-05.'
+    - 'Uniformly off: exposure changed since `calibrate white`; redo M23.1.'
+    record: Min / max `brdf_per_sr` in design.md.
+  - id: M23.3
+    title: Reciprocity
+    time: 30 min
+    needs:
+    - matte swatch (card or paper)
+    do:
+    - '`opengonio capture inplane --step 10 --out data/matte`; `opengonio curve data/matte`.'
+    - Compare rows (θi, θr) = (30, 50) and (50, 30).
+    verify:
+    - The two `brdf_per_sr` values agree within 5 %.
+    fail:
+    - 'Larger: angle calibration (M22.2) or stray light (M21.2).'
+    record: Both values in design.md; commit.
+- id: M24
+  stage: 07-calibrate
+  title: First game material
+  goal: A measured swatch looks right in Blender, Unreal or Unity.
+  weeks: 1
+  steps:
+  - id: M24.1
+    title: Measure
+    time: 40 min
+    needs:
+    - glossy plastic swatch
+    do:
+    - '`opengonio capture inplane --step 5 --out data/swatch`'
+    - '`opengonio verify data/swatch`; `opengonio curve data/swatch`'
+    verify:
+    - '`result` PASS (or WARN with only `saturated` ≤ 5 % of shots).'
+    - '`curve.csv`: `brdf_per_sr` filled on every unsaturated row.'
+    record: Tick the boxes; `make done id=M24.1`.
+  - id: M24.2
+    title: Fit
+    time: 10 min
+    needs:
+    - M24.1
+    do:
+    - '`opengonio fit data/swatch`; open `data/swatch/fit.svg`.'
+    verify:
+    - '`rms_pct_of_peak` < 10.'
+    - Fitted lines pass through the dots around each peak.
+    fail:
+    - 'Big error only near grazing angles: normal; refit with `--step 10` data, or ignore θ > 70°.'
+    record: Copy `fit.json` to `phases/07-calibrate/swatch_fit.json`.
+  - id: M24.3
+    title: In a game engine
+    time: 1 h
+    needs:
+    - Blender (free), Unreal or Unity
+    - photo of the swatch at θi = 40°
+    do:
+    - 'New material with the values under `engines` in `fit.json` (Blender: Principled BSDF Base Color, Roughness, Metallic).'
+    - Plane + point light at 40° from the normal, camera at the mirror angle; render.
+    verify:
+    - 'Side by side with the photo: highlight size and position match by eye.'
+    record: '`phases/07-calibrate/render_vs_photo.png`; commit `make publish m="M24 first material"`.'
+- id: M25
+  stage: 08-tilt
+  title: Tilt yoke built and homed
+  goal: Sample tilts without leaving the zero point.
+  weeks: 2
+  steps:
+  - id: M25.1
+    title: Print
+    time: 10 min
+    wait: print 9 h
+    needs:
+    - stage-08 and stage-09 parts `have` in `PARTS.md`
+    do:
+    - Print `TLT-07a_tilt_yoke.stl` (upright, 184 mm tall), `TLT-07b_pulley_100T.stl`, `TLT-07c_tilt_cradle.stl`, `SPN-07a_spin_platter.stl` (top face down).
+    verify:
+    - A 608 presses into each arm seat; an M8 nut drops into each cradle trap and can't turn.
+    record: Tick the boxes; `make done id=M25.1`.
+  - id: M25.2
+    title: Cradle, platter and stub axles
+    time: 1 h
+    needs:
+    - 2 × 608
+    - TLT-05 2 × M8 × 35 + nuts
+    - spacers (TBL-07f)
+    - SPN-01 pancake motor
+    - 4 × M3 × 8, 4 × M4 × 16
+    - M3 grub or M3 × 8 + nut
+    - TLS-10 spanner
+    do:
+    - 'Pancake motor under the cradle floor (shaft up through it, 4 × M3 × 8). Platter on the shaft: M3 nut in its slot, grub onto the D flat; platter top level with the stub-bolt axis (the end blocks stand
+      10 mm higher).'
+    - 'Yoke on the drum (4 × M4 × 16 self-tap into the OG-40 holes) with its arms along ±Y: at M3 = 0 the tilt axis is square to the camera direction (+X) and the flag holes on the drum stay clear. The
+      pulley-side arm is +Y.'
+    - 'Pulley side: bolt through 100T pulley → 1 mm shim → 608 (outer face of the arm) → 6.8 mm spacer → cradle nut. Other side: the same with the 9.4 mm spacer instead of the pulley. Hold each bolt head
+      with the spanner; snug, not tight.'
+    verify:
+    - Cradle tilts ±90° by hand, no play you can feel at the platter edge.
+    - Platter top level with the bolt axis (ruler across both bolt centres).
+    fail:
+    - 'Binds: over-tightened; back off 1/6 turn.'
+    record: Tick the boxes; `make done id=M25.2`.
+  - id: M25.3
+    title: Tilt drive and flag
+    time: 45 min
+    needs:
+    - TLT-01 motor
+    - TLT-02 280 mm belt
+    - TLT-03 pulley
+    - TLT-04 endstop
+    - TBL-07b flag
+    - 4 × M3 × 8
+    do:
+    - Motor on the inner face of the pulley-side arm above the axis, shaft out through the arm slot (4 × M3 × 8 in the slots); 20T pulley outside, level with the 100T; belt on; slide the motor up to tension
+      (~3 mm deflection); tighten.
+    - Flag on a cradle end block at −90°; endstop on the arm; lead into the E4 Z-MIN socket (CTL-06, as M10.3).
+    verify:
+    - '`?` shows `Pn:Z` with the flag in the slot.'
+    - Belt doesn't skip when you hold the platter and jog `M2` slowly.
+    record: Tick the boxes; `make done id=M25.3`.
+  - id: M25.4
+    title: Home and repeat
+    time: 1 h
+    needs:
+    - laser + mirror
+    - wall 2.0 m
+    do:
+    - '`installed_phase: 8`; `opengonio home` × 10.'
+    - '`opengonio move M2=0`: platter vertical (phone level app on its face).'
+    - 'Mirror on the platter: `opengonio repeat M2 --at 0 --away 30 --n 20`.'
+    verify:
+    - Home 10/10.
+    - Platter vertical within ±0.5° at M2 = 0.
+    - '`"pass": true`.'
+    record: JSON in phases/08-tilt/design.md → Results.
+  - id: M25.5
+    title: Zero point stays
+    time: 20 min
+    needs:
+    - sample-centre mark
+    do:
+    - '`opengonio move M2=-45`, capture a frame; `M2=45`, capture a frame; compare the mark position.'
+    verify:
+    - Mark moves < 15 px (0.5 mm).
+    fail:
+    - 'Larger: platter surface not on the bolt axis; move the platter on the shaft (grub) and redo.'
+    record: Shift (px) in design.md; commit.
+- id: M26
+  stage: 08-tilt
+  title: Full isotropic scan
+  goal: All light directions, unattended.
+  weeks: 1
+  steps:
+  - id: M26.1
+    title: Plan check
+    time: 5 min
+    needs:
+    - '`installed_phase: 8`'
+    do:
+    - '`opengonio plan isotropic --step 15`'
+    verify:
+    - '`poses` ≥ 100 and `axes` includes `M2`.'
+    record: Tick the boxes; `make done id=M26.1`.
+  - id: M26.2
+    title: Run
+    time: 10 min
+    wait: ~15 min unattended
+    needs:
+    - glossy plastic swatch on the yoke
+    do:
+    - '`opengonio capture isotropic --step 15 --out data/iso_plastic` (or station job *Isotropic 15deg*).'
+    - Don't touch the machine until it finishes.
+    verify:
+    - '`opengonio verify data/iso_plastic`: PASS, or WARN with only `saturated` ≤ 5 % of shots.'
+    record: Tick the boxes; `make done id=M26.2`.
+  - id: M26.3
+    title: Fit and compare
+    time: 15 min
+    needs:
+    - M24 swatch fit
+    do:
+    - '`opengonio curve data/iso_plastic && opengonio fit data/iso_plastic`'
+    verify:
+    - Roughness within 10 % of the in-plane fit (M24.2) for the same swatch.
+    fail:
+    - 'Very different: check M2 zero (M25.4) — a tilt offset biases out-of-plane rows.'
+    record: Both fits in phases/08-tilt/design.md → Results; commit.
+- id: M27
+  stage: 09-spin
+  title: Spin wired and homed
+  goal: Sample spins on its own axis (direct drive).
+  weeks: 1
+  steps:
+  - id: M27.1
+    title: Wire the spin motor
+    time: 30 min
+    needs:
+    - CTL-11 cable
+    - SPN-04 endstop
+    - TBL-07b flag
+    - CTL-06 leads
+    - jumpers
+    do:
+    - Spin motor cable into the E4 E0 socket (route it along the yoke arm with slack for ±90° tilt and ±180° table).
+    - Flag on the platter rim (2 × M3 × 8), endstop on the cradle.
+    - 'Endstop lead to TH0 (2-pin: signal + ground, no supply): S and G from TH0 via a 2-pin XH lead; the module''s V from Pico 3V3 OUT (pin 36) via a lead whose XH housing slides over Pico pins 36–37 with
+      only pin 36 populated. Pico GND is already tied to the E4 (M09.2 ground jumper).'
+    verify:
+    - Platter turns 360° by hand with the motor unpowered; face runout < 0.3 mm at 40 mm radius.
+    - '`?` shows `Pn:A` with the flag in the slot.'
+    fail:
+    - 'No `Pn:A`: module V missing (3V3 lead) or the Pico not powered.'
+    record: Tick the boxes; `make done id=M27.1`.
+  - id: M27.2
+    title: Home and repeat
+    time: 45 min
+    needs:
+    - laser + mirror
+    do:
+    - '`installed_phase: 9`; `opengonio home`.'
+    - 'Mirror on the platter: `opengonio repeat M1 --at 0 --away 90 --n 20`.'
+    verify:
+    - '`"pass": true`.'
+    record: JSON in phases/09-spin/design.md → Results; commit.
+- id: M28
+  stage: 09-spin
+  title: Anisotropic material measured
+  goal: 'Brushed metal: highlight depends on direction.'
+  weeks: 1
+  steps:
+  - id: M28.1
+    title: Spin sweep
+    time: 30 min
+    needs:
+    - brushed aluminium swatch
+    - tape arrow on the brushing direction
+    do:
+    - Clamp the swatch, arrow at M1 = 0.
+    - '`opengonio capture spin --theta 30 --step 15 --out data/spin_brushed`'
+    - '`opengonio curve data/spin_brushed`'
+    verify:
+    - '`centre_mean` max ÷ min ≥ 2 across M1 (curve.csv).'
+    - Brightest when the arrow is vertical, i.e. grooves perpendicular to the light–camera plane (note that M1).
+    fail:
+    - '< 2×: swatch not brushed enough, or polished; try a different piece.'
+    record: Max/min ratio and brightest M1 in phases/09-spin/design.md → Results.
+  - id: M28.2
+    title: Anisotropic set
+    time: 10 min
+    wait: ~1.5 h unattended
+    needs:
+    - same swatch
+    do:
+    - '`opengonio capture anisotropic --step 15 --phi-step 30 --out data/aniso_brushed`'
+    - '`opengonio verify data/aniso_brushed`'
+    verify:
+    - PASS, or WARN with only `saturated` ≤ 5 % of shots.
+    record: Tick the boxes; `make done id=M28.2`.
+  - id: M28.3
+    title: Why it needs 4 angles
+    time: 15 min
+    needs:
+    - M28.2
+    - M26.3 plastic fit
+    do:
+    - '`opengonio curve data/aniso_brushed && opengonio fit data/aniso_brushed`'
+    verify:
+    - '`rms_pct_of_peak` for brushed ≥ 2 × the plastic''s (an isotropic model can''t fit it).'
+    record: Both RMS values in design.md; commit.
+- id: M29
+  stage: 10-color
+  title: Spectral sensor (optional kit)
+  goal: Colour spectrum of the spot at the zero point; camera stays for images.
+  weeks: 1
+  steps:
+  - id: M29.1
+    title: Mount
+    time: 30 min
+    wait: print 1 h
+    needs:
+    - SPC-01 AS7341
+    - SPC-03 print
+    - 2 × M2.5 screws
+    do:
+    - Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it.
+    - Clamp it on the camera post just above the camera; aim at the zero point.
+    verify:
+    - 'Looking down the tube: the zero point is centred.'
+    record: Tick the boxes; `make done id=M29.1`.
+  - id: M29.2
+    title: Wire and read
+    time: 20 min
+    needs:
+    - SPC-02 cable
+    do:
+    - SDA → Pico GP16, SCL → GP17, VIN → 3V3, GND → GND (same bus as the OLED).
+    - '`bash scripts/pico.sh`; `python -m serial.tools.miniterm /dev/ttyACM0 115200`; type `SPEC?`.'
+    verify:
+    - Reply `SPEC` + 10 numbers; covering the tube drops all to < 5 % of uncovered.
+    fail:
+    - '`ERR`: SDA/SCL swapped, or no 3V3.'
+    record: Wiring check in phases/10-color/design.md → Results.
+  - id: M29.3
+    title: Aim angle
+    time: 10 min
+    needs:
+    - ruler
+    do:
+    - Measure the tube axis height h above the camera axis (mm).
+    - Set `spectral.elevation_deg` = atan(h / 350) in `machine.yaml`.
+    verify:
+    - '`make test` passes.'
+    record: h and the angle in design.md.
+  - id: M29.4
+    title: Spectral curves
+    time: 45 min
+    needs:
+    - PTFE
+    - red paper
+    - blue paper
+    do:
+    - '`opengonio capture inplane --step 10 --spectral --out data/ptfe_spec`; same for `red_spec`, `blue_spec`.'
+    - '`opengonio curve data/ptfe_spec data/red_spec data/blue_spec`'
+    verify:
+    - 'PTFE repeated twice: F1–F8 within 3 %.'
+    - Red ÷ PTFE highest in F7–F8; blue ÷ PTFE highest in F2–F3.
+    record: Ratios in design.md; commit.
+- id: M30
+  stage: 10-color
+  title: LED bank and polarizers (optional kit)
+  goal: '8 colour bands for images; shine separated from colour. Built it: set `lights.multispectral.built: true`; without it scans leave out the photometric set.'
+  weeks: 2
+  steps:
+  - id: M30.1
+    title: Print and fit LEDs
+    time: 2 h
+    wait: print 3 h
+    needs:
+    - MSK-01 LEDs
+    - MSK-04 heatsink
+    - MSK-06 prints
+    do:
+    - Print `MSK-06a_led_ring.stl`, `MSK-06b_led_mast.stl`.
+    - 8 pre-wired LED stars on the ring, thermal pad, wavelength written next to each.
+    verify:
+    - Ring on the mast at 40° elevation (angle gauge).
+    record: Tick the boxes; `make done id=M30.1`.
+  - id: M30.2
+    title: Driver wiring
+    time: 1 h
+    needs:
+    - MSK-02 driver
+    - MSK-03 ULN2803A
+    do:
+    - ULN2803A into the breadboard. LED − leads → its outputs (lever connector to a cut jumper each); inputs ← Pico GP8–15 (jumpers); driver supply switched by `M62 P1`.
+    verify:
+    - 'Continuity: each GP pin → its ULN input; each output → one LED cathode.'
+    record: Tick the boxes; `make done id=M30.2`.
+  - id: M30.3
+    title: Band test
+    time: 15 min
+    needs:
+    - '`installed_phase: 10`'
+    - '`lights.multispectral.built: true`'
+    do:
+    - 'Hub: `BAND 0` … `BAND 7`, then `BAND OFF`.'
+    - '`opengonio check-pose M4=60 M3=30`'
+    verify:
+    - Exactly one LED per command.
+    - '`"safe": true` with the mast fitted.'
+    record: Band → wavelength table in phases/10-color/design.md → Results.
+  - id: M30.4
+    title: Polarizers
+    time: 30 min
+    needs:
+    - MSK-05 film
+    - mirror
+    do:
+    - Film in the lamp slot; film disc on the lens.
+    - Mirror at the specular pose; turn the lens disc to the darkest image, then 90°.
+    verify:
+    - Crossed ÷ parallel brightness ≤ 1/20.
+    record: Both values in design.md; commit.
+- id: M31
+  stage: 11-scan-capture
+  title: Scan hardware
+  goal: Scan camera fixed at 650 mm, object held securely; nothing on the measuring side moves.
+  weeks: 1
+  steps:
+  - id: M31.1
+    title: Print risers and wedge
+    time: 10 min
+    wait: print 3 h
+    needs:
+    - SCN-03 prints
+    - a second CAM-03b camera plate
+    do:
+    - Print `SCN-03a/b/c` risers, `SCN-03d_scan_camera_wedge_15.stl` and a second `CAM-03b_camera_plate.stl` + `CAM-03a_aperture_stop_f8.stl`.
+    verify:
+    - Risers sit flat on the platter.
+    - 'Wedge: thin end 3 mm, thick end 16.4 mm (calipers).'
+    record: Tick the boxes; `make done id=M31.1`.
+  - id: M31.2
+    title: Mount the scan camera
+    time: 45 min
+    needs:
+    - scan post at x = 658 (M12.2)
+    - CAM-08 M2.5 × 20 screws
+    - CAM-04 camera + CAM-05 lens (optional kit), or the measuring camera moved here
+    do:
+    - The scan post stands on the outrigger at x = 658 mm (650 mm × cos 15° + 30) since M12.2.
+    - 'Camera plate on the post, wedge between plate and board (thick end down): lens centre 168 mm above the zero point, looking 15° down.'
+    - Focus on the zero point (M17.3 method) and lock the lens; aperture stop on.
+    - Plug it in; `machine.yaml` → `scan.camera_index` = its index (usually 1); `opengonio scan plan`.
+    verify:
+    - '`scan plan` prints `two_cameras: true` and both clearances > 0.'
+    - 'Scan camera image: zero point within ±15 px of centre; the measuring camera is not in the picture.'
+    - 1 mm grid resolved at the zero point.
+    fail:
+    - 'Measuring camera visible at the bottom edge: raise the scan camera (bigger `scan.camera_elevation_deg`, re-check with `scan plan`).'
+    - 'One-camera option (no CAM-04/05): move the measuring camera to this post, refocus, set `scan.camera_index` = `camera.index`; move it back and redo M17.3–M17.5 before measuring BRDFs.'
+    record: Index, height and the clearance numbers in phases/11-scan-capture/design.md → Results.
+  - id: M31.3
+    title: Putty hold (S3)
+    time: 20 min
+    needs:
+    - SCN-01 putty
+    - 100 g object
+    - SCN-02 ChArUco mat
+    do:
+    - Object on the riser with putty; `opengonio move M2=80`; spin `M1` three turns (`opengonio move M1=180` … `-180`).
+    verify:
+    - Mat corners move ≤ 1 px between turn 1 and turn 3.
+    record: S3 in `phases/11-scan-capture/test.csv`.
+- id: M32
+  stage: 11-scan-capture
+  title: Camera position calibrated
+  goal: Every photo's pose known to 0.3 mm.
+  weeks: 1
+  steps:
+  - id: M32.1
+    title: ChArUco board
+    time: 20 min
+    needs:
+    - CAL-04 print + glass
+    do:
+    - Print the ChArUco board at 100 %; glue flat under the picture-frame glass.
+    verify:
+    - Square size = 10.0 ± 0.1 mm (calipers).
+    record: Tick the boxes; `make done id=M32.1`.
+  - id: M32.2
+    title: Calibrate
+    time: 30 min
+    needs:
+    - board on the platter
+    do:
+    - '`opengonio scan calibrate`'
+    - Copy the printed file path into `scan.calibration` in `machine.yaml`.
+    verify:
+    - S1 reprojection RMS ≤ 0.5 px; S2 ≤ 0.2° and ≤ 0.3 mm (both printed).
+    fail:
+    - 'S1 high: blurry board → refocus; board not flat → re-glue.'
+    record: S1, S2 in `test.csv`; commit.
+- id: M33
+  stage: 11-scan-capture
+  title: First full scan
+  goal: 144 photos (plus the photometric set with the optional LED bank), unattended.
+  weeks: 1
+  steps:
+  - id: M33.1
+    title: Background pass
+    time: 10 min
+    wait: ~15 min
+    needs:
+    - empty platter with the riser
+    do:
+    - 'Riser on, no object, lamp at M4 = 30: `opengonio scan run --background --out scan_cube`.'
+    verify:
+    - '`ls scan_cube/background | wc -l` prints 144.'
+    record: Tick the boxes; `make done id=M33.1`.
+  - id: M33.2
+    title: Cube scan
+    time: 15 min
+    wait: ~20 min
+    needs:
+    - printed 40 mm cube
+    - putty
+    do:
+    - Cube on the riser, one face toward M1 = 0.
+    - '`opengonio scan run --out scan_cube`'
+    verify:
+    - '`ls scan_cube/images | wc -l` prints 144; with the LED bank (M30), `scan_cube/ps/` has the photometric set.'
+    - No image blurred at 100 % zoom.
+    record: Folder name in phases/11-scan-capture/design.md → Results.
+- id: M34
+  stage: 12-scan-mesh
+  title: Quick 3D preview
+  goal: Shape from silhouettes in minutes.
+  weeks: 1
+  steps:
+  - id: M34.1
+    title: Visual hull
+    time: 15 min
+    needs:
+    - scan_cube from M33
+    do:
+    - '`opengonio scan hull --out scan_cube --voxel 0.5`'
+    verify:
+    - '`size_mm` each 40 ± 1 (S4).'
+    fail:
+    - 'Too big: background moved between passes → redo M33.1. Too small: threshold — dark faces vanish; light the cube more.'
+    record: S4 in `phases/12-scan-mesh/test.csv`.
+  - id: M34.2
+    title: Look at it
+    time: 15 min
+    needs:
+    - Blender
+    do:
+    - 'Blender: File → Import → PLY → `scan_cube/hull.ply`.'
+    verify:
+    - A cube with flat faces; no holes.
+    record: Screenshot `phases/12-scan-mesh/hull.png`; commit.
+- id: M35
+  stage: 12-scan-mesh
+  title: Full mesh
+  goal: Accurate, detailed 3D model.
+  weeks: 1
+  steps:
+  - id: M35.1
+    title: COLMAP mesh
+    time: 20 min
+    wait: ~1 h compute
+    needs:
+    - COLMAP (NVIDIA GPU) or Meshroom
+    do:
+    - '`cd scan_cube && bash run_colmap.sh` — or Meshroom on `images/` without a GPU.'
+    verify:
+    - '`dense/meshed-poisson.ply` exists and opens in Blender.'
+    record: Tick the boxes; `make done id=M35.1`.
+  - id: M35.2
+    title: Measure the cube (S5)
+    time: 20 min
+    needs:
+    - Blender measure tool
+    do:
+    - Measure all 12 edges of the mesh.
+    verify:
+    - Every edge 40.0 ± 0.5 mm.
+    record: S5 in `test.csv`.
+  - id: M35.3
+    title: Photometric sphere (S6, optional kit)
+    time: 30 min
+    needs:
+    - ping-pong ball, matte spray
+    - 'LED bank (M30, optional: without it mark S6 n/a and tick this step)'
+    do:
+    - 'Ball on the riser: `opengonio scan run --out scan_ball`'
+    - '`opengonio scan ps --out scan_ball --sphere`'
+    verify:
+    - '`sphere_median_normal_error_deg` ≤ 5.'
+    fail:
+    - 'Large: wrong `gamma` (M22.1) or LED bank angle not 40° (M30.1).'
+    record: S6 in `test.csv`; `normals_st00.png` into `phases/12-scan-mesh/`.
+  - id: M35.4
+    title: Scan a model car (S7)
+    time: 30 min
+    wait: ~2 h
+    needs:
+    - 1:43 model car
+    do:
+    - Background pass + scan + COLMAP as for the cube.
+    - Import into Blender.
+    verify:
+    - Opens without repair (Mesh → Clean Up finds nothing).
+    record: S7; commit.
+- id: M36
+  stage: 13-object-material
+  title: Textures on the mesh
+  goal: Colour per texel from the scan photos.
+  weeks: 2
+  steps:
+  - id: M36.1
+    title: Write the texture tool
+    time: 4 h
+    needs:
+    - Python
+    - M35 mesh
+    do:
+    - 'New file `software/src/opengonio/scan/texture.py`: `bake(mesh, scan_dir) -> albedo.png` — project each texel into every image where it faces the camera, average linear values (gamma from `calibration.yaml`).'
+    - 'Test `software/tests/test_texture.py`: synthetic sphere with a known albedo pattern (reuse `scan.demo`).'
+    verify:
+    - '`make test` passes; the test recovers albedo within 5 %.'
+    record: Commit the tool + test.
+  - id: M36.2
+    title: Bake the car
+    time: 1 h
+    needs:
+    - M35.4 car
+    do:
+    - UV-unwrap (Blender Smart UV Project), export OBJ; bake with 10 % of images held out.
+    verify:
+    - 'Re-rendered held-out views vs photos: mean absolute error ≤ 10 %.'
+    record: Error in phases/13-object-material/design.md → Results; commit.
+- id: M37
+  stage: 13-object-material
+  title: Object in a game engine
+  goal: The scanned object looks real.
+  weeks: 1
+  steps:
+  - id: M37.1
+    title: Export glTF
+    time: 30 min
+    needs:
+    - Blender
+    do:
+    - Mesh + albedo (+ roughness/metallic from M24 or M26 fits) → File → Export → glTF 2.0 (.glb).
+    verify:
+    - https://gltf.report shows 0 errors.
+    record: Tick the boxes; `make done id=M37.1`.
+  - id: M37.2
+    title: Side by side
+    time: 30 min
+    needs:
+    - Unreal, Unity or Blender
+    do:
+    - Import the .glb; light it like the photo (one light, same angle).
+    verify:
+    - 'Next to the photo: shape, colour and highlight match by eye.'
+    record: Screenshot `phases/13-object-material/engine.png`; commit.
+- id: M38
+  stage: 14-laptop-app
+  title: Control page
+  goal: Connect, jog, home, live camera and run a plan in one browser page.
+  weeks: 2
+  steps:
+  - id: M38.1
+    title: Server and status
+    time: 3 h
+    needs:
+    - Python
+    do:
+    - 'New `software/src/opengonio/web.py` (standard library `http.server`): `opengonio web` serves `http://localhost:8000`.'
+    - '`GET /api/status` → `{state, pose, lights}`; works with `--sim`.'
+    - Test `software/tests/test_web.py` with the simulated machine.
+    verify:
+    - '`opengonio --sim mirror web` then `curl localhost:8000/api/status` prints JSON with `pose`.'
+    - '`make test` passes.'
+    record: Commit.
+  - id: M38.2
+    title: Jog, home, light
+    time: 3 h
+    needs:
+    - M38.1
+    do:
+    - '`POST /api/home`, `/api/move {M4: 60}`, `/api/light {on: true}`; page buttons for each.'
+    - Unsafe or out-of-range moves return HTTP 400 with the `GantryError` text.
+    verify:
+    - 'With `--sim`: buttons move the pose shown by `/api/status`.'
+    - '`M4: 10` is refused with *keep-out*.'
+    record: Commit.
+  - id: M38.3
+    title: Live camera
+    time: 2 h
+    needs:
+    - M38.2
+    do:
+    - '`GET /api/frame.png` (simulated camera under `--sim`); page refreshes it every second.'
+    verify:
+    - 'Image changes when M3 moves (`--sim mirror`: bright at the mirror pose).'
+    record: Commit.
+  - id: M38.4
+    title: Run a plan with progress
+    time: 3 h
+    needs:
+    - M38.3
+    do:
+    - '`POST /api/run {plan: "mirror", theta: 30}` runs `run_plan` in a thread; `GET /api/progress`; STOP button.'
+    verify:
+    - The M19 mirror test runs start to finish from the page (sim, then hardware); `verify` on its folder PASS.
+    record: Screenshot `phases/14-laptop-app/page.png`; commit.
+- id: M39
+  stage: 14-laptop-app
+  title: Presets and resume
+  goal: One click per workflow; stopped jobs continue.
+  weeks: 1
+  steps:
+  - id: M39.1
+    title: Presets
+    time: 2 h
+    needs:
+    - M38
+    do:
+    - 'Buttons: *Mirror check*, *Swatch*, *Isotropic*, *Spin*, *3D scan* (same lists as the station jobs).'
+    verify:
+    - Each preset runs with `--sim` and its folder verifies PASS.
+    record: Commit.
+  - id: M39.2
+    title: Resume
+    time: 3 h
+    needs:
+    - M39.1
+    do:
+    - '`run_plan(..., resume=True)`: skip poses already in `manifest.json`; page button *Resume*.'
+    - 'Test: stop at 50 %, resume.'
+    verify:
+    - Final shot count = plan length; no pose captured twice.
+    - '`make test` passes.'
+    record: Commit.
+- id: M40
+  stage: 15-standalone
+  title: Panel screen
+  goal: OLED shows menu and progress (both modes).
+  weeks: 1
+  steps:
+  - id: M40.1
+    title: Order the kit
+    time: 15 min
+    wait: shipping
+    needs:
+    - '`PARTS.md` → 15 · Standalone'
+    do:
+    - Tick and order the STA parts you don't have; mark them `ordered`; print `STA-07a_pi_zero_mount.stl`.
+    verify:
+    - Stage 15 has no `agreed` or `suggested` parts left.
+    record: Commit.
+  - id: M40.2
+    title: OLED
+    time: 20 min
+    needs:
+    - STA-05 OLED
+    - STA-06 jumpers
+    do:
+    - OLED SDA → GP16, SCL → GP17, VCC → 3V3, GND → GND.
+    - '`bash scripts/pico.sh`'
+    verify:
+    - Screen shows `OpenGonio ready` and the button names.
+    fail:
+    - 'Blank: address not 0x3C — some boards are 0x3D; change it in `firmware/pico-hub/main.py`.'
+    record: Tick the boxes; `make done id=M40.2`.
+- id: M41
+  stage: 15-standalone
+  title: Pi Zero station set up
+  goal: Pi drives the E4 over WiFi and grabs camera frames.
+  weeks: 1
+  steps:
+  - id: M41.1
+    title: SD card
+    time: 20 min
+    needs:
+    - STA-01 Pi Zero 2 W
+    - STA-02 microSD
+    - Raspberry Pi Imager
+    do:
+    - 'Imager: Pi OS Lite 64-bit; hostname `opengonio`; SSH on; your WiFi; your user.'
+    verify:
+    - Pi boots; `ssh <you>@opengonio.local` logs in.
+    record: Tick the boxes; `make done id=M41.1`.
+  - id: M41.2
+    title: Buck and UART
+    time: 45 min
+    needs:
+    - STA-03 buck
+    - STA-04 OTG adapter
+    - TLS-05 multimeter
+    - cut jumpers
+    do:
+    - Set the buck to 5.1 V **before** connecting the Pi (meter on its output).
+    - 'Two cameras: a powered USB hub on the Pi''s OTG port (STA-04) carries both.'
+    - 'Buck input: a thin pair under the jack''s `+` / `−` screws in the power box (adapter unplugged first).'
+    - Wire buck output, UART and Pico power per `phases/15-standalone/design.md` (Pi GPIO14 → Pico GP1, GPIO15 ← GP0, GND, Pi 5V → Pico VSYS).
+    verify:
+    - Buck output 5.05–5.15 V under the Pi's load.
+    record: Tick the boxes; `make done id=M41.2`.
+  - id: M41.3
+    title: Install the station
+    time: 20 min
+    needs:
+    - M41.2
+    do:
+    - '`bash scripts/station.sh <you>@opengonio.local`; then `ssh <you>@opengonio.local sudo reboot`.'
+    verify:
+    - '`ssh <you>@opengonio.local journalctl -u opengonio-station -n 20` shows `station ready`.'
+    - OLED shows the first job name.
+    record: Commit.
+- id: M42
+  stage: 15-standalone
+  title: Job with no laptop
+  goal: Buttons choose and run a job; images saved on the Pi.
+  weeks: 1
+  steps:
+  - id: M42.1
+    title: Mirror job
+    time: 20 min
+    needs:
+    - mirror on the table
+    - laptop off
+    do:
+    - NEXT until `Mirror check 30`; START.
+    verify:
+    - OLED shows `lamp warm-up`, then counts shots, then `done`.
+    record: Tick the boxes; `make done id=M42.1`.
+  - id: M42.2
+    title: Stop and restart
+    time: 10 min
+    needs:
+    - M42.1
+    do:
+    - START a job; STOP midway; START again.
+    verify:
+    - '`~/opengonio-data/` has an aborted folder (`"aborted": "stopped"`) and a finished one (`"finished": true`).'
+    record: Tick the boxes; `make done id=M42.2`.
+- id: M43
+  stage: 15-standalone
+  title: Laptop collects and verifies
+  goal: Laptop only pulls and checks data.
+  weeks: 1
+  steps:
+  - id: M43.1
+    title: Pull and verify
+    time: 15 min
+    needs:
+    - M42 folders on the Pi
+    do:
+    - '`opengonio pull <you>@opengonio.local`'
+    - '`opengonio verify data/*`; `opengonio curve data/<mirror job>`'
+    verify:
+    - 'Mirror job: `"result": "PASS"`, `mirror_peak_error_deg` within ±0.5; chart peak on the orange line.'
+    record: Verify output in phases/15-standalone/design.md → Results; commit.
+- id: M44
+  stage: 16-release
+  title: Docs complete
+  goal: A new builder can finish stage 06 from the docs alone.
+  weeks: 2
+  steps:
+  - id: M44.1
+    title: Final 3D files
+    time: 1 h
+    needs:
+    - Onshape
+    do:
+    - Export final STEP + STL of every part you changed into its `3d/`; `make all`.
+    verify:
+    - '`make check` four `OK`; `git status` clean after commit.'
+    record: Commit.
+  - id: M44.2
+    title: Photos
+    time: 1 h
+    needs:
+    - phone
+    do:
+    - One photo per finished stage as `phases/NN/photo.jpg`; link it at the top of that `design.md`.
+    verify:
+    - Every stage 00–15 has a photo (`ls phases/*/photo.jpg | wc -l` ≥ 16).
+    record: Commit.
+  - id: M44.3
+    title: Test build
+    time: 30 min
+    wait: 1–4 weeks
+    needs:
+    - a friend
+    do:
+    - Give them the repo link; they build stages 00–06 using only the README and issues.
+    verify:
+    - They finish without asking you anything.
+    fail:
+    - 'Each question they ask = a missing line: add it to that step in `.github/phases.yml`.'
+    record: Their notes in phases/16-release/design.md → Results; commit.
+- id: M45
+  stage: 16-release
+  title: Public release
+  goal: Public, certified open hardware.
+  weeks: 1
+  steps:
+  - id: M45.1
+    title: Go public
+    time: 30 min
+    needs:
+    - '`gh` logged in'
+    do:
+    - Check `LICENSE` and `LICENSES/`; `gh repo edit --visibility public`; make the Onshape document public.
+    verify:
+    - Repo page opens in a private browser window.
+    record: Tick the boxes; `make done id=M45.1`.
+  - id: M45.2
+    title: OSHWA certification
+    time: 1 h
+    wait: 1–4 weeks review
+    needs:
+    - certification.oshwa.org account
+    do:
+    - Apply with the repo link, licences (CERN-OHL-S-2.0, GPL-3.0-or-later, CC BY-SA 4.0).
+    verify:
+    - OSHWA UID issued.
+    record: UID in the README title line; commit.
+  - id: M45.3
+    title: Tag the release
+    time: 10 min
+    needs:
+    - clean `git status`
+    do:
+    - '`make release s=16`'
+    verify:
+    - GitHub → Releases shows `v0.16` with the 3D zip.
+    record: —
+- id: M46
+  stage: 17-upgrades
+  title: Adaptive sampling
+  goal: Same fit with fewer photos.
+  weeks: 0
+  steps:
+  - id: M46.1
+    title: Adaptive plan
+    time: 4 h
+    needs:
+    - Python
+    - simulator
+    do:
+    - 'New `software/src/opengonio/plans/adaptive.py`: start at a 30° isotropic grid; add poses between neighbours whose `brdf_per_sr` differ > 20 % [R15]; repeat until none.'
+    - 'Test with `--sim plastic`: compare with the 15° full grid.'
+    verify:
+    - Fit within 2 % of the full-grid fit with ≥ 3 × fewer shots; `make test` passes.
+    record: Shot counts + fits in phases/17-upgrades/design.md → Results.
+- id: M47
+  stage: 17-upgrades
+  title: Space carving
+  goal: Concave shapes in the preview.
+  weeks: 0
+  steps:
+  - id: M47.1
+    title: Photo-consistency carving
+    time: 6 h
+    needs:
+    - Python
+    - M34 hull
+    do:
+    - 'Extend `scan/carve.py`: after the hull, remove surface voxels whose colour disagrees across the views that see them [S7].'
+    verify:
+    - 'A printed bowl: concave depth recovered within 2 mm (S4-style test in `make test`).'
+    record: Result in design.md.
+- id: M48
+  stage: 17-upgrades
+  title: Compare with MERL / RGL data
+  goal: Check against published measurements.
+  weeks: 0
+  steps:
+  - id: M48.1
+    title: Compare
+    time: 3 h
+    needs:
+    - a material that exists in MERL or RGL [R13][R16]
+    do:
+    - Measure it (`capture isotropic`); `opengonio fit`.
+    - Fit the published data with the same model (`opengonio.fit.fit`).
+    verify:
+    - Fitted roughness within 20 % of the published fit.
+    record: Both fits + a plot in `phases/17-upgrades/`.

@@ -73,7 +73,7 @@ def test_phases_match_folders():
     folders = [st["folder"] for st in stages]
     assert [int(f[:2]) for f in folders] == list(range(len(folders)))
     assert set(bom_check.load()) <= set(folders)
-    assert [int(m["id"][1:]) for m in ms] == list(range(1, len(ms) + 1))
+    assert len({m["id"] for m in ms}) == len(ms)
     for m in ms:
         assert m["stage"] in folders
-        assert all(s["id"].startswith(m["id"] + ".") and s["tasks"] and s["done"] for s in m["steps"])
+        assert all(s["id"].startswith(m["id"] + ".") and s["do"] and s["verify"] and s["record"] for s in m["steps"])

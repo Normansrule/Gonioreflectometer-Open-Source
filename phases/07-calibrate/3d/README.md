@@ -23,11 +23,13 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 |---|---|---|
 | ENC-01 | Blackout fabric 54 in (2 yd) | n/a |
 | ENC-02 | Black felt sheet | n/a |
-| ENC-03 | Oak dowel 1/2 in x 36 in | n/a |
+| ENC-03 | Poplar dowel 1/2 in x 36 in | n/a |
 | CAL-01 | PTFE sheet 6 x 6 x 0.375 in | n/a |
 | CAL-02 | Glass mirror tile ~50 mm | n/a |
 | CAL-03 | Chrome steel ball 1 in G25 (2) | 25.4 mm sphere |
 | CAL-04 | ChArUco print + picture-frame glass | n/a |
 | CAL-05 | Colour target (ColorChecker Mini or similar) | n/a |
+| ENC-05 | Flocked light-trap sheet 17.5 x 15 in, self-adhesive | n/a |
+| CAL-07 | 18 % grey card + white card set (8 x 10 in) | n/a |
 
 Design notes: [../design.md](../design.md).

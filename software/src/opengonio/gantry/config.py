@@ -8,7 +8,7 @@ from typing import Any
 import yaml
 
 DEFAULT_CONFIG = Path(__file__).resolve().parents[3] / "config" / "machine.yaml"
-MICROSTEPS_PER_REV = 200 * 16
+MICROSTEPS_PER_REV = 200 * 16          # default: 1.8 deg motor at 1/16 (an axis may set its own microsteps)
 
 
 class ConfigError(ValueError):
@@ -25,11 +25,12 @@ class Axis:
     max_deg: float
     home_deg: float
     gear_ratio: float
+    microsteps: int = 16
 
     @property
     def steps_per_deg(self) -> float:
         """FluidNC steps_per_mm, used as steps per output degree."""
-        return MICROSTEPS_PER_REV * self.gear_ratio / 360.0
+        return 200 * self.microsteps * self.gear_ratio / 360.0
 
     @property
     def resolution_deg(self) -> float:
@@ -60,6 +61,7 @@ class Machine:
     lights: dict[str, dict] = field(default_factory=dict)
     scan: dict[str, Any] = field(default_factory=dict)
     station: dict[str, Any] = field(default_factory=dict)
+    spectral: dict[str, Any] = field(default_factory=dict)
 
     @property
     def active_axes(self) -> dict[str, Axis]:
@@ -68,14 +70,19 @@ class Machine:
 
     @property
     def active_lights(self) -> dict[str, int]:
-        return {k: v["output"] for k, v in self.lights.items() if v["phase"] <= self.installed_phase}
+        """Lights of finished stages; `built: false` marks an optional one you skipped (stage 10 colour kit)."""
+        return {k: v["output"] for k, v in self.lights.items() if v["phase"] <= self.installed_phase and v.get("built", True)}
 
     def light_elevation(self, name: str) -> float:
         return float(self.lights.get(name, {}).get("elevation_deg", 0.0))
 
     def for_scan(self) -> "Machine":
-        """Camera slid to the scan position on the outrigger (phase 11)."""
-        return replace(self, camera_distance_mm=float(self.scan["camera_distance_mm"]))
+        """The scan camera (stage 11): a second camera fixed at 650 mm, raised to look over the measuring
+        camera (scan.camera_index / camera_elevation_deg), or the same camera moved there (index unchanged)."""
+        s = self.scan
+        return replace(self, camera_distance_mm=float(s["camera_distance_mm"]),
+                       camera_elevation_deg=float(s.get("camera_elevation_deg", self.camera_elevation_deg)),
+                       camera={**self.camera, "index": int(s.get("camera_index", self.camera.get("index", 0)))})
 
     def with_phase(self, phase: int) -> "Machine":
         return replace(self, installed_phase=phase)
@@ -91,7 +98,8 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
     axes = {}
     for k, d in raw["axes"].items():
         a = Axis(k, d["name"], d["fluidnc_axis"].upper(), int(d["phase"]), float(d["min_deg"]),
-                 float(d["max_deg"]), float(d["home_deg"]), float(d["gear_ratio"]))
+                 float(d["max_deg"]), float(d["home_deg"]), float(d["gear_ratio"]),
+                 int(d.get("microsteps", 16)))
         if a.min_deg >= a.max_deg or not a.in_range(a.home_deg):
             raise ConfigError(f"{k}: bad range or home")
         if a.home_deg not in (a.min_deg, a.max_deg):
@@ -109,5 +117,5 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
         min_phase_angle_deg=float(m["min_phase_angle_deg"]), repeatability_target_deg=float(m["repeatability_target_deg"]),
         axes=axes, controller=raw.get("controller", {}), hub=raw.get("hub", {}),
         camera=raw.get("camera", {}), lights=raw.get("lights", {}), scan=raw.get("scan", {}),
-        station=raw.get("station", {}),
+        station=raw.get("station", {}), spectral=raw.get("spectral", {}),
     )

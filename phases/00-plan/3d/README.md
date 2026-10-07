@@ -8,7 +8,7 @@ PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry
 
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| PLAN-01 | Fit test: insert holes + 608 pockets | [PLAN-01_tolerance_coupon.step](PLAN-01_tolerance_coupon.step) | [PLAN-01_tolerance_coupon.stl](PLAN-01_tolerance_coupon.stl) |
+| PLAN-01 | Fit test: M3 self-tap holes + 608 pockets | [PLAN-01_tolerance_coupon.step](PLAN-01_tolerance_coupon.step) | [PLAN-01_tolerance_coupon.stl](PLAN-01_tolerance_coupon.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 

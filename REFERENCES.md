@@ -1,6 +1,6 @@
 # References
 
-486 sources. IDs are cited in docs, code and the BOM `Refs` column; each phase README lists its IDs. Accessed 2026-10-03/04. All figures are original.
+507 sources. IDs are cited in docs, code and the BOM `Refs` column; each phase README lists its IDs. Accessed 2026-10-03/07. All figures are original.
 
 | Prefix | Topic |
 |---|---|
@@ -574,6 +574,8 @@
 | **H56** | CadQuery 2.x, parametric CAD in Python — [PyPI](https://pypi.org/project/cadquery/), [GitHub](https://github.com/CadQuery/cadquery) | Generated STEP/STL parts (phase 00) |
 | **H57** | numpy-stl — [PyPI](https://pypi.org/project/numpy-stl/) | Parts gallery rendering (phase 00) |
 | **H58** | Matplotlib — [matplotlib.org](https://matplotlib.org/) | Parts gallery rendering (phase 00) |
+| **H59** | ams AS7341 11-channel spectral sensor; Adafruit breakout #4698 — [product](https://www.adafruit.com/product/4698) (not fetched; price to confirm) | Spectral sensor (phase 10) |
+| **H60** | W3C, Portable Network Graphics (PNG) Specification — [w3.org/TR/png](https://www.w3.org/TR/png/) | Built-in PNG reader/writer in `opengonio.imageio` (phase 00) |
 
 
 ## Firmware, protocols, software
@@ -651,24 +653,24 @@
 | **P1** | MEAN WELL GST60A24-P1J — [Mouser](https://www.mouser.com/ProductDetail/MEAN-WELL/GST60A24-P1J?qs=odmYgEirbwyH6XaEPxnETQ%3D%3D) | $19.40, STEP listing |
 | **P2** | GST60A spec — [PDF](https://www.meanwell.com/Upload/PDF/GST60A/GST60A-SPEC.PDF); [MEAN WELL UK](https://www.meanwell.co.uk/power-supplies/external-power-supplies/gst60a-series) | Plug, efficiency, Level VI, UL |
 | **P3** | GST60A24-P1J — [TRC](https://trcelectronics.com/products/mean-well-gst60a24-p1j), [Jameco](https://www.jameco.com/z/GST60A24-P1J-MEAN-WELL-24-Volt-2500mA-60-Watt-3-Wire-Regulated-Switching-Desktop-Power-Adapter-2-1mm-Plug-Level-VI_2224411.html), [Bravo](https://www.bravoelectro.com/gst60a24-p1j.html), [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/GST60A24-P1J/7703715) | No-load power, price cross-check, cord sold separately |
-| **P4** | Switchcraft 721A — [product](https://www.switchcraft.com/dc-power-jack-0-084-2-1mm-pin-solder-lugs-termination/721a/) | 2.1 mm, 5 A / 24 V |
-| **P5** | Switchcraft 721A — [Octopart](https://octopart.com/721a-switchcraft-89444436), [Digi-Key](https://www.digikey.com/en/products/detail/switchcraft-inc/721A/8571716) | $4.03 |
+| **P4** | Switchcraft 721A — [product](https://www.switchcraft.com/dc-power-jack-0-084-2-1mm-pin-solder-lugs-termination/721a/) | 2.1 mm, 5 A / 24 V · not used since the no-solder, no-drill build |
+| **P5** | Switchcraft 721A — [Octopart](https://octopart.com/721a-switchcraft-89444436), [Digi-Key](https://www.digikey.com/en/products/detail/switchcraft-inc/721A/8571716) | $4.03 · not used since the no-solder, no-drill build |
 | **P6** | Littelfuse 01500274ZXU — [Mouser](https://www.mouser.com/ProductDetail/Littelfuse/01500274ZXU?qs=HS3fcsxbgMwxzHo3fy8LGg%3D%3D) | $3.27 |
-| **P7** | Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) | $2.73 |
-| **P8** | IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) | Rds(on), Vgs |
-| **P9** | onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) | $0.28 |
-| **P10** | P6KE30A (Littelfuse via Verical, chosen; ST at Mouser compared) — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) | $0.94 |
-| **P11** | Nichicon UFW1H101MPD1TD — [Mouser](https://www.mouser.com/ProductDetail/Nichicon/UFW1H101MPD1TD?qs=WJSLByB5Mu30jPPJ2KiG3A%3D%3D) | $0.59 |
+| **P7** | Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) | $2.73 · not used since the no-solder, no-drill build |
+| **P8** | IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) | Rds(on), Vgs · not used since the no-solder, no-drill build |
+| **P9** | onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) | $0.28 · not used since the no-solder, no-drill build |
+| **P10** | P6KE30A (Littelfuse via Verical, chosen; ST at Mouser compared) — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) | $0.94 · not used since the no-solder, no-drill build |
+| **P11** | Nichicon UFW1H101MPD1TD — [Mouser](https://www.mouser.com/ProductDetail/Nichicon/UFW1H101MPD1TD?qs=WJSLByB5Mu30jPPJ2KiG3A%3D%3D) | $0.59 · not used since the no-solder, no-drill build |
 | **P12** | Vishay BAT85S-TAP — [Mouser](https://www.mouser.com/ProductDetail/Vishay-Semiconductors/BAT85S-TAP?qs=yIvl1B2wDi5bZOHuqaPTHw%3D%3D) | Considered for the sense clamp (replaced by an optocoupler) |
-| **P13** | Bulgin C1353ABNAB — [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) | 10 A DC rating |
+| **P13** | Bulgin C1353ABNAB — [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) | 10 A DC rating · not used since the no-solder, no-drill build |
 | **P14** | Arcolectric C1300ALAAA — [Newark](https://www.newark.com/arcolectric-bulgin-limited/c1300alaaa/rocker-switch-spst-on-off-black/dp/48W5536), [Octopart](https://octopart.com/part/arcolectric/C1300ALAAA) | Rocker alternative |
 | **P15** | IDEC YW1B-V4E01R — [TME](https://www.tme.com/us/en-us/details/yw1b-v4e01r/panel-mount-switches-standard-22mm/idec/) | $9.96 |
 | **P16** | IDEC YW series — [datasheet](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/6163/D004450YWapem.pdf) | DC ratings |
 | **P17** | Eaton M22-PV / M22-K01 — [IMC](https://www.imc-direct.com/product_p/m22-pv.htm), [TME](https://www.tme.com/us/en-us/details/m22-k01/panel-mount-accessories/eaton-electric/), [IMC kit](https://www.imc-direct.com/product_p/m22-pv-k01.htm), [Mouser](https://www.mouser.com/en/ProductDetail/Eaton-Electrical/M22-PV-K01?qs=HFfMDpzxxd0QRHbJBijxWA%3D%3D) | E-stop price comparison |
-| **P18** | AMASS XT30U — [rcbattery](https://rcbattery.com/genuine-amass-xt30u-male-female-pair-plugs-5-pairs.html) | $2.19 / 5 pairs |
-| **P19** | realthunder/Connectors_Amass.3dshapes — [GitHub](https://github.com/realthunder/Connectors_Amass.3dshapes) | XT30 STEP |
+| **P18** | AMASS XT30U — [rcbattery](https://rcbattery.com/genuine-amass-xt30u-male-female-pair-plugs-5-pairs.html) | $2.19 / 5 pairs · not used since the no-solder, no-drill build |
+| **P19** | realthunder/Connectors_Amass.3dshapes — [GitHub](https://github.com/realthunder/Connectors_Amass.3dshapes) | XT30 STEP · not used since the no-solder, no-drill build |
 | **P20** | 18 AWG silicone pair — [Walmart](https://www.walmart.com/ip/2-Conductor-Parallel-Silicone-Wire-18AWG-18-Gauge-Red-Black-Electrical-Wire-Tinned-Copper-1m-3-3ft/2401235173), [BNTECHGO](https://www.amazon.com/BNTECHGO-Silicone-Flexible-Strands-Stranded/dp/B01AQOI36M) | $8.09 |
-| **P21** | Adafruit perfboard 4783 — [link](https://www.adafruit.com/product/4783) | $2.25 |
+| **P21** | Adafruit perfboard 4783 — [link](https://www.adafruit.com/product/4783) | $2.25 · not used since the no-solder, no-drill build |
 | **P22** | Keszoox JST-XH kit — [Amazon](https://www.amazon.com/Keszoox-Connector-Pre-Crimped-Housing-Socket%EF%BC%8810/dp/B09SX4LC13) | Listing (price not confirmed) |
 | **P23** | Schneider XB5AS8442 — [TME](https://www.tme.com/us/en-us/details/xb5as8442/panel-mount-switches-standard-22mm/schneider-electric/), [RSP Supply](https://rspsupply.com/p-83740-schneider-electric-xb5as8442-red-40-emergency-stop-switching-off-pushbutton-22-latching-turn-release.aspx); XB2BS542C — [LCSC](https://www.lcsc.com/product-detail/Pushbutton-Switches_Schneider-XB2BS542C_C5122145.html) | Rejected (0.5 A DC-13) |
 | **P24** | Omron A22E-M-01 — [Octopart](https://octopart.com/a22e-m-01-omron-35187) | Rejected (price) |
@@ -688,6 +690,10 @@
 | **P42** | ZYLtech GT2 20T pulley — [link](https://www.zyltech.com/2gt-gt2-6mm-wide-20t-pulley-5mm-6-35mm-or-8mm-bore/) | $2.95 |
 | **P43** | TCST2103 optical endstop — [eBay](https://www.ebay.com/itm/182778778905) | $2.93 |
 | **P44** | ZYLtech GT2 belt per metre — [link](https://www.zyltech.com/fiber-glass-reinforced-2gt-gt2-timing-belt-custom-length-price-per-meter/) | $2.50/m |
+| **P45** | Adafruit 368 DC jack to screw terminal — [product](https://www.adafruit.com/product/368) | $2.00, + / − marked, centre-positive |
+| **P46** | Adafruit 64 half-size breadboard — [product](https://www.adafruit.com/products/64) | 400 points, solderless |
+| **P47** | WAGO 221 lever connectors, 28-piece assortment — [Amazon](https://www.amazon.com/dp/B01N0LRTXZ), [price seen $15.71](https://slickdeals.net/f/18335398-28-piece-wago-221-lever-nuts-splicing-wire-connector-assortment-w-case-15-71-free-shipping-w-prime) | Solderless joins |
+| **P48** | StepperOnline 17HS08-1004S pancake NEMA 17 — [product](https://www.omc-stepperonline.com/hybrid-stepper-motor/nema-17-bipolar-18deg-13ncm-184ozin-1a-35v-42x42x20mm-4-wires-17hs08-1004s.html) | $7.99, 21.5 mm body, 16 N·cm, 1 A, 5 mm D-shaft |
 
 ## Parts: controller
 
@@ -700,6 +706,10 @@
 | **C5** | Raspberry Pi Pico — [product](https://www.raspberrypi.com/products/raspberry-pi-pico/), [SparkFun](https://www.sparkfun.com/raspberry-pi-pico.html) | $4.00 |
 | **C6** | Pico files — [STEP](https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip), [pinout](https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf), [datasheet](https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf), [docs](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html) | CAD, pins |
 | **C7** | Adafruit USB cables — [4474](https://www.adafruit.com/product/4474), [898](https://www.adafruit.com/product/898) | Cable prices |
+| **C8** | Raspberry Pi Pico H (headers soldered) — [Adafruit 5525](https://www.adafruit.com/product/5525), [Jameco](https://www.jameco.com/z/5525-Adafruit-Industries-Raspberry-Pi-Pico-H-Pico-with-Headers-Soldered_2882023.html) | No soldering |
+| **C9** | Adafruit 1332 membrane 1x4 keypad — [product](https://www.adafruit.com/product/1332) | Panel keys |
+| **C10** | Adafruit 1954 male/female jumper wires 20 x 6 in — [product](https://www.adafruit.com/product/1954), [Jameco](https://www.jameco.com/z/1954-Adafruit-Industries-Premium-Female-Male-Extension-Jumper-Wires-20-X-6_2507535.html) | Solderless leads |
+| **C11** | Stepper cable PH2.0 6-pin to XH2.54 4-pin, 1 m — [Jameco 2333607](https://www.jameco.com/z/JST-PH20-XH4P-Jameco-ValuePro-4-Wire-Stepper-Motor-Cable-4-Pin-Series-PH-2mm-to-6-Pin-XH2-2-54mm-1-Meter_2333607.html) | $1.95, closeout |
 
 ## Parts: camera
 
@@ -711,6 +721,7 @@
 | **K4** | Arducam B0446 (IMX179) — [product](https://www.arducam.com/8mp-imx179-usb-camera-module-with-wide-angle-115h-m12-lens-for-windows-linux-android-and-mac-os.html) | Fallback ($54.99, manual WB) |
 | **K5** | VA Imaging 16 mm M12 lens — [link](https://va-imaging.com/en-us/products/lens-m12-5mp-16mm-f2-0-1-2-va-lm12-5mp-16mm-f2-0-020) | $21.00 |
 | **K6** | Arducam forum, B0433 exposure via v4l2 — [link](https://forum.arducam.com/t/b0433-camera-unable-to-change-exposure-time-from-v4l2/7522) | Discard frames after a change |
+| **K23** | SparkFun M2.5 x 8 mm Phillips machine screw — [product](https://www.sparkfun.com/m2-5-0-45x8mm-machine-screw-phillips-head.html) | $0.15 each |
 | **K7** | Arducam forum, IMX477 UVC max exposure — [link](https://forum.arducam.com/t/arducam-imx477-uvc-camera-adapter-board-max-exposure-time/1387) | ~0.5 s limit |
 | **K8** | Arducam forum, IMX477 USB 12-bit — [link](https://forum.arducam.com/t/imx477-usb-12bit-capabilities/2466) | No RAW over UVC |
 | **K9** | Arducam USB3.0 Camera Shield Plus — [link](https://docs.arducam.com/USB-Industrial-Camera/USB3.0-Camera-Shield-Plus/USB3.0-Camera-Shield-Plus-Datasheet/) | RAW option (SDK) |
@@ -752,6 +763,7 @@
 | **L18** | Cree CXA1507 — [Newark](https://www.newark.com/cree-led/cxa1507-0000-000n0ye230g/led-array-cob-warm-wht-3000k-590lm/dp/49AC0147) | Rejected (35 V) |
 | **L19** | 24 V COB strip CRI 90 — [ledupdates](https://ledupdates.com/products/24v-cob-series-cri-90-4000k-natural-white-color-led-strip-light) | Rejected (roll price) |
 | **L20** | Edmund XP42 polarizer film — [link](https://www.edmundoptics.com/p/100-x-100mm-linear-polarizing-film-xp42-40/52988/) | Compared |
+| **L21** | Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) | COB holder (price to confirm) |
 
 ## Parts: mechanics and frame
 
@@ -766,13 +778,20 @@
 | **M7** | VXB bearings — [608 10-pack](https://vxb.com/products/10-pack-skateboard-bearing-608-2rs-sealed-8x22x7mm), [6806](https://vxb.com/products/6806-2rs-bearing-30x42x7-sealed) | Compared |
 | **M8** | TNutz LF-015-A foot — [link](https://www.tnutz.com/product/lf-015-a/) | First draft: feet |
 | **M9** | ZYLtech extrusion and T-nuts — [2020](https://www.zyltech.com/store/aluminum-extrusion-hardware/2020-t-slot/), [T-nuts](https://www.zyltech.com/100x-zyltech-spring-loaded-t-nuts-for-2020-aluminum-extrusion-m4-or-m5/) | First draft: |
+| **M10** | ME-8108 roller-lever limit switch, screw terminals, 2-pack — [eBay](https://www.ebay.com/itm/156727632134), [spec page](https://st.robu.in/product/me-8108-rotary-adjustable-roller-lever-arm-mini-limit-switch) | Over-travel, no solder |
 | **F1** | Birch plywood 2 x 2 ft — [Lowe's](https://www.lowes.com/pd/1-2-in-Birch-Plywood-Application-as-2-x-2/1000066183) | Base (price not confirmed) |
 | **F2** | OpenBuilds V-Slot 20x20 — [link](https://us.openbuilds.com/v-slot-20x20-linear-rail/) | $3.29 / 500 mm |
 | **F3** | KB-3D M5 T-nut — [link](https://kb-3d.com/store/extrusion-framing/252-t-nut-drop-inroll-in-20-series-6mm-slot-width-m5-threads-1657989339400.html) | $0.17 |
-| **F4** | M8 tee nut — [Albany County Fasteners](https://www.albanycountyfasteners.com/metric-t-nuts-zinc-plated-steel-m8-x-125-4-prong-5602-010-042/) | $0.45 |
+| **F4** | M8 tee nut — [Albany County Fasteners](https://www.albanycountyfasteners.com/metric-t-nuts-zinc-plated-steel-m8-x-125-4-prong-5602-010-042/) | $0.45 · not used since the no-solder, no-drill build |
 | **F5** | Glarks screw kit — [Amazon](https://www.amazon.com/Glarks-510Pcs-Socket-Screws-Assortment/dp/B08HHZHXTP) | Listing |
-| **F6** | M3 heat-set inserts — [Adafruit 4255](https://www.adafruit.com/product/4255), [CNC Kitchen](https://cnckitchenus.store/products/heat-set-insert-m3-x-5-7-100-pieces) | $5.95 |
+| **F6** | M3 heat-set inserts — [Adafruit 4255](https://www.adafruit.com/product/4255), [CNC Kitchen](https://cnckitchenus.store/products/heat-set-insert-m3-x-5-7-100-pieces) | $5.95 · not used since the no-solder, no-drill build |
 | **F7** | 608-2RS 10-pack — [Walmart](https://www.walmart.com/ip/10Pcs-set-608-2RS-Bearing-Deep-Groove-Steel-Sealed-Ball-Bearings-608RS-608-2RS/3999331773) | $9.90 |
+| **F8** | #8 x 5/8 in Type 17 pan-head wood screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/578040/wood-screws) | Self-drilling: no pilot holes (price to confirm) |
+| **F9** | AstroAI DM6000AR multimeter with temperature probe — [AstroAI](https://www.astroai.com/digital-multimeter-6000-counts-dm6000ar/ap/100019) | Tool |
+| **F10** | IRWIN VISE-GRIP 2078300 self-adjusting wire stripper 10–24 AWG — [Gexpro](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) | Tool |
+| **F11** | SparkFun 6 in digital calipers — [product](https://www.sparkfun.com/6-digital-calipers.html) | Tool |
+| **F12** | DIN 931 M8 hex bolts, partial thread — [M8 x 75](https://www.fastenersuperstore.com/products/276566/hex-cap-screws), [M8 x 35](https://www.fastenersuperstore.com/products/276362/hex-cap-screws) | Bolt axles (price to confirm) |
+| **F13** | M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) | Scan wedge (price to confirm) |
 
 ## Parts: enclosure, calibration, multispectral
 
@@ -789,3 +808,5 @@
 | **E9** | Neewer 18 % gray card — [link](https://neewer.com/products/neewer-18-gray-white-card-set-for-white-balance-exposure-value-66600656) | Optional |
 | **E10** | Opal acrylic 12 x 12 — [Walmart](https://www.walmart.com/ip/1-8-3mm-Milky-White-Acrylic-12-x12-Sheet-Translucent-Plexiglass-Cast-AZM/1515407359) | Diffuser option |
 | **E11** | Micro servos — [Adafruit SG92R](https://www.adafruit.com/product/169), [Pololu FS90](https://www.pololu.com/product/2818) | Phase 10 option |
+| **E12** | Protostar Hi-Tack flocked light-trap material, absorbs > 99 % — [fpi-protostar.com](https://www.fpi-protostar.com/hitack.htm), [First Light Optics](https://www.firstlightoptics.com/telescope-flocking-material.html) | Stray-light lining behind the sample and inside the lamp tube (phase 07) |
+| **E13** | Madison Mill 1/2 x 36 in poplar dowel — [True Value](https://www.truevalue.com/product/163701/madison-mill-1-2-in-x-36-in-poplar-dowel-rod-163701/) | $2.79, drape posts |

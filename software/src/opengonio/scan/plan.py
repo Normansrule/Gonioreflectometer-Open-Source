@@ -38,6 +38,11 @@ def check_object(cfg: Machine, radius_mm: float | None = None) -> None:
     half_h_mm = (k.height / 2) / k.fy * cfg.scan["camera_distance_mm"]
     if r > 0.95 * half_h_mm:
         raise PlanError(f"object radius {r} mm does not fit the {2 * half_h_mm:.0f} mm tall field of view")
+    if cfg.for_scan().camera.get("index") != cfg.camera.get("index"):      # two cameras: look over the first one
+        from .geometry import scan_view_clearance_mm
+        cl = scan_view_clearance_mm(cfg)
+        if cl["line_of_sight_mm"] <= 0:
+            raise PlanError(f"scan camera can't see over the measuring camera ({cl}): raise scan.camera_elevation_deg")
     import sys
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "tools"))
@@ -60,7 +65,7 @@ def rings_plan(cfg: Machine, rings: list[dict] | None = None, lamp_m4: float | N
     out, idx = [], 0
     for ri, ring in enumerate(rings):
         e = float(ring["elevation_deg"])
-        m2 = 90.0 - e + cfg.camera_elevation_deg      # view elevation = 90 - |M2 - camera elevation|
+        m2 = 90.0 - e + cfg.for_scan().camera_elevation_deg      # view elevation = 90 - |M2 - camera elevation|
         if not a2.in_range(m2):
             raise PlanError(f"elevation {e} needs M2 = {m2}, outside the tilt range")
         n = int(ring["count"])
@@ -76,7 +81,7 @@ def rings_plan(cfg: Machine, rings: list[dict] | None = None, lamp_m4: float | N
 
 def photometric_stations(cfg: Machine, every_deg: float = 60.0, elevation_deg: float = 30.0) -> list[dict[str, float]]:
     """Object poses where the LED bank sweeps for photometric stereo (object held still)."""
-    m2 = 90.0 - elevation_deg + cfg.camera_elevation_deg
+    m2 = 90.0 - elevation_deg + cfg.for_scan().camera_elevation_deg
     a1 = cfg.axes["M1"]
     n = int(round(360.0 / every_deg))
     return [{"M3": 0.0, "M2": m2, "M1": a1.min_deg + k * every_deg} for k in range(n)]

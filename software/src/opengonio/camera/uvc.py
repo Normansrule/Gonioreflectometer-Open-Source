@@ -56,6 +56,9 @@ class UvcCamera:  # pragma: no cover - needs hardware
             self.cap.set(cv2.CAP_PROP_AUTO_WB, 0)
             self.cap.set(cv2.CAP_PROP_WB_TEMPERATURE, s.wb_kelvin)
 
+    def set_exposure_ms(self, ms: float) -> None:
+        self.set(CameraSettings(ms))
+
     def grab(self):
         for _ in range(self.discard):            # flush frames taken with old settings
             self.cap.read()

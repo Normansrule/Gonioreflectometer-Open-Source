@@ -2,11 +2,26 @@
 
 # Gonioreflectometer-Open-Source
 
-Measures how materials reflect light, then scans objects in 3D. Runs from a laptop, or on its own with buttons and a Pi Zero. $498.95 total. Based on Ansari-Asl et al. 2024 [R1]. This README is the main guide; every section links to the files you need.
+Measures how materials reflect light, then scans objects in 3D. Runs from a laptop, or on its own with buttons and a Pi Zero. $428.39 total (cap $450). **No soldering, drilling, sawing or crimping:** a 3D printer, screwdrivers, a wire stripper and a multimeter are the whole tool kit. Based on Ansari-Asl et al. 2024 [R1]. This README is the main guide; every section links to the files you need.
 
 [Interactive simulator](docs/index.html) (drag to orbit, build stage by stage, click parts, pick materials) · [Papers (PDF)](papers/) · [All references](REFERENCES.md)
 
-**Contents:** [Two ways to run](#two-ways-to-run) · [The machine](#the-machine) · [Stages and milestones](#stages-and-milestones) · [Budget](#budget) · [3D files and making parts](#3d-files-and-making-parts) · [Test materials](#test-materials) · [Theory and equations](#theory-and-equations) · [Commands](#commands) · [References](#references)
+| | |
+|---|---|
+| **Start** | [Start here](#start-here) · [Two ways to run](#two-ways-to-run) · [The machine](#the-machine) |
+| **Build** | [Stages and milestones](#stages-and-milestones) · [Budget](#budget) · [Tools and joins](#tools-and-joins) · [3D files and making parts](#3d-files-and-making-parts) · [Commands](#commands) |
+| **Measure** | [Test materials](#test-materials) · [Theory and equations](#theory-and-equations) |
+| **Change** | [Tweak and extend](#tweak-and-extend) |
+| **Find** | [Repository map](#repository-map) · [References](#references) · [Licence](#licence) |
+
+## Start here
+
+1. **Set up once:** publish the repo ([commands](#publish-and-update-the-private-github-repo-ubuntu)), then `make setup`. Decide your parts in [PARTS.md](PARTS.md).
+2. **Try the software without hardware:** [Try without hardware](#try-without-hardware).
+3. **Do the steps in order.** `make next` prints the next one; its stage checklist has the full instructions.
+4. **After each step:** `make done id=M05.1` closes its GitHub issue, ticks it in the checklists and figures, and publishes.
+
+Every step (= one GitHub issue) is **Time · Needs** → **Do** (numbered actions) → **Verify** (a measurement with a pass number) → **If a check fails** (what to look at first) → **Record** (the file to fill in). To change or extend anything, see [Tweak and extend](#tweak-and-extend).
 
 ## Two ways to run
 
@@ -15,7 +30,7 @@ Measures how materials reflect light, then scans objects in 3D. Runs from a lapt
 | Who runs jobs | laptop (`opengonio`) | Pi Zero 2 W (`opengonio station`) |
 | Inputs | laptop or buttons | buttons + OLED menu; phone WebUI for jogging |
 | Data | processed live | saved on the Pi → laptop `opengonio pull` + `opengonio verify` |
-| Extra cost | $0 | $32 kit (optional) |
+| Extra cost | $0 | $38 kit (optional) |
 
 <img src="docs/assets/architecture.svg" width="100%" alt="Laptop mode and standalone mode">
 
@@ -28,99 +43,159 @@ Measures how materials reflect light, then scans objects in 3D. Runs from a lapt
 | M4 | light arm around the sample | 20–340° | GT2 belt on 12 in ring, 24:1 | 0.0047° | stage 04 |
 | M3 | table (sample yaw) | ±180° | 20T → 100T, 5:1 | 0.0225° | stage 05 |
 | M2 | sample tilt (yoke) | ±90° | 20T → 100T, 5:1 | 0.0225° | stage 08 |
-| M1 | sample spin (platter) | ±180° | 20T → 80T, 4:1 | 0.028° | stage 09 |
+| M1 | sample spin (platter) | ±180° | direct drive (pancake motor), 1/64 microstep | 0.028° | stage 09 |
 
-Camera fixed on +X at 350 mm (650 mm for 3D scans). Light 300 mm from the zero point. Optical homing on every axis, over-travel switches in the e-stop loop, 30 mm keep-out and 5° minimum light–camera angle [R1].
+Measuring camera fixed on +X at 350 mm; scan camera fixed at 650 mm, 15° up, looking over it, so no camera ever moves or refocuses (one-camera option: move it, $81 cheaper). Light 300 mm from the zero point. Optical homing on every axis, over-travel switches in the e-stop loop, 30 mm keep-out and 5° minimum light–camera angle [R1].
+
+**Why the light is on a side ring.** Reflectance depends only on the light and camera directions *relative to the sample*, and the table (M3) and tilt (M2) already turn the sample to every direction an overhead light could reach. A horizontal ring keeps the arm's weight on the bearing (the motor only moves it), stays low and stiff, and keeps cables out of the light path. A light on the camera axis (coaxial, via a beam splitter) sees only back-scatter, not the mirror peak, and loses ~75 % of the light in the splitter; it stays a possible later add-on for retroreflective materials.
+
+### Two sensors, two jobs
+
+| | Camera (IMX477, fixed, 350 mm) | Spectral sensor (AS7341, above the camera) |
+|---|---|---|
+| Measures | images: brightness per pixel, 3 colours | 10 bands 415–680 nm + clear + NIR, one spot |
+| Used for | angles (mirror test), textures (SVBRDF), 3D scan, calibration | colour spectrum vs angle (spectral BRDF) |
+| Command | `opengonio capture … ` | `opengonio capture … --spectral` (or `--no-camera`) |
+| Stage | 06 | 10 (optional, +$17) |
 
 ## Stages and milestones
 
-18 stages, 48 small milestones; each step is a GitHub issue with a checklist. Start at M01.
+<!-- next:start -->
+**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 139 steps done
+<!-- next:end -->
+
+18 stages, 48 milestones; each step is one GitHub issue: **Time · Needs → Do → Verify → If a check fails → Record**. Finished a step? `make done id=M05.1` closes its issue and ticks it here, in the stage checklist and in the figures.
 
 Each stage folder: `README.md` (checklist) · `design.md` · `research.md` · `bom.csv` · `test.csv` · `3d/` (only the ones it needs).
 
 <img src="docs/assets/phases.svg" width="100%" alt="Stages">
 
 <!-- phases:start -->
-| # | Stage | Milestones | Cost |
-|---:|---|---|---:|
-| 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | — |
-| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Build the protection board, M06 First power-on | $67 |
-| 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Buttons work with the laptop, M10 Controller box closed | $56 |
-| 03 | [Frame](phases/03-frame/) | M11 Cut and drill the base, M12 Assemble the frame | $63 |
-| 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | $45 |
-| 05 | [Table (M3)](phases/05-table/) | M15 Table axis built, M16 Table homes and repeats | $22 |
-| 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | $93 |
-| 07 | [Calibrate → game material](phases/07-calibrate/) | M21 Dark box, M22 HDR and angle calibration, M23 Brightness calibration, M24 First game material | $73 |
-| 08 | [Tilt (M2)](phases/08-tilt/) | M25 Tilt yoke built and homed, M26 Full isotropic scan | $22 |
-| 09 | [Spin (M1)](phases/09-spin/) | M27 Spin platter built and homed, M28 Anisotropic material measured | $22 |
-| 10 | [Colour bands and polarizers](phases/10-color/) | M29 LED bank, M30 Polarizers and band calibration | $30 |
-| 11 | [3D scan: capture](phases/11-scan-capture/) | M31 Scan hardware, M32 Camera position calibrated, M33 First full scan | $4 |
-| 12 | [3D scan: mesh](phases/12-scan-mesh/) | M34 Quick 3D preview, M35 Full mesh | — |
-| 13 | [Material on the 3D model](phases/13-object-material/) | M36 Textures on the mesh, M37 Object in a game engine | — |
-| 14 | [Laptop app](phases/14-laptop-app/) | M38 Control page, M39 Presets and resume | — |
-| 15 | [Standalone (no laptop)](phases/15-standalone/) | M40 Panel screen, M41 Pi Zero station set up, M42 Job with no laptop, M43 Laptop collects and verifies | — |
-| 16 | [Release](phases/16-release/) | M44 Docs complete, M45 Public release | — |
-| 17 | [Upgrades (optional)](phases/17-upgrades/) | M46 Adaptive sampling, M47 Space carving, M48 Compare with MERL / RGL data | — |
+| # | Stage | Milestones | Hours | Done | Cost |
+|---:|---|---|---:|---:|---:|
+| 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | 6.2 h | 0/11 | — |
+| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Wire the power box, M06 First power-on | 3 h | 0/9 | $70 |
+| 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Keypads work with the laptop, M10 Controller box closed | 4.8 h | 0/13 | $71 |
+| 03 | [Frame](phases/03-frame/) | M11 Place the base mounts, M12 Assemble the frame | 3.3 h | 0/7 | $61 |
+| 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | 5.4 h | 0/9 | $41 |
+| 05 | [Table (M3)](phases/05-table/) | M15 Table axis built, M16 Table homes and repeats | 3.2 h | 0/7 | $18 |
+| 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | 5.5 h | 0/11 | $98 |
+| 07 | [Calibrate → game material](phases/07-calibrate/) | M21 Dark box, M22 Camera response and angle calibration, M23 Brightness calibration, M24 First game material | 4.8 h | 0/11 | $34 |
+| 08 | [Tilt (M2)](phases/08-tilt/) | M25 Tilt yoke built and homed, M26 Full isotropic scan | 3.8 h | 0/8 | $19 |
+| 09 | [Spin (M1)](phases/09-spin/) | M27 Spin wired and homed, M28 Anisotropic material measured | 2.2 h | 0/5 | $11 |
+| 10 | [Colour add-ons (optional)](phases/10-color/) | M29 Spectral sensor (optional kit), M30 LED bank and polarizers (optional kit) | 5.5 h | 0/8 | — |
+| 11 | [3D scan: capture](phases/11-scan-capture/) | M31 Scan hardware, M32 Camera position calibrated, M33 First full scan | 2.5 h | 0/7 | $4 |
+| 12 | [3D scan: mesh](phases/12-scan-mesh/) | M34 Quick 3D preview, M35 Full mesh | 2.2 h | 0/6 | — |
+| 13 | [Material on the 3D model](phases/13-object-material/) | M36 Textures on the mesh, M37 Object in a game engine | 6 h | 0/4 | — |
+| 14 | [Laptop app](phases/14-laptop-app/) | M38 Control page, M39 Presets and resume | 16 h | 0/6 | — |
+| 15 | [Standalone (no laptop)](phases/15-standalone/) | M40 Panel screen, M41 Pi Zero station set up, M42 Job with no laptop, M43 Laptop collects and verifies | 2.8 h | 0/8 | — |
+| 16 | [Release](phases/16-release/) | M44 Docs complete, M45 Public release | 4.2 h | 0/6 | — |
+| 17 | [Upgrades (optional)](phases/17-upgrades/) | M46 Adaptive sampling, M47 Space carving, M48 Compare with MERL / RGL data | 13 h | 0/3 | — |
 <!-- phases:end -->
 
 ### All milestones and issues
 
+Each issue holds Do / Verify / Record; click *open* for the full steps.
+
 <!-- issues:start -->
-- **M01 · Read and decide** — [M01.1] Read · [M01.2] Shopping list
-- **M02 · Software runs on the laptop** — [M02.1] Install · [M02.2] Dry run
-- **M03 · CAD and printer ready** — [M03.1] Onshape · [M03.2] Tolerance coupon
-- **M04 · Order power parts** — [M04.1] Order and print
-- **M05 · Build the protection board** — [M05.1] Solder · [M05.2] Checks with power off
-- **M06 · First power-on** — [M06.1] Power tests
-- **M07 · Order controller parts** — [M07.1] Order
-- **M08 · One motor turns from the laptop** — [M08.1] Flash the E4 · [M08.2] Bench motor
-- **M09 · Buttons work with the laptop** — [M09.1] Pico hub · [M09.2] Panel
-- **M10 · Controller box closed** — [M10.1] Box and test
-- **M11 · Cut and drill the base** — [M11.1] Cut and drill
-- **M12 · Assemble the frame** — [M12.1] Assemble
-- **M13 · Ring drive built** — [M13.1] Build
-- **M14 · Light arm homes and repeats** — [M14.1] Home · [M14.2] Tune
-- **M15 · Table axis built** — [M15.1] Build
-- **M16 · Table homes and repeats** — [M16.1] Home and tune
-- **M17 · Camera sees the zero point** — [M17.1] Mount · [M17.2] Lock settings
-- **M18 · Lamp on and safe** — [M18.1] Lamp
-- **M19 · Mirror test** — [M19.1] Mirror
-- **M20 · First reflectance curves** — [M20.1] Paper and plastic
-- **M21 · Dark box** — [M21.1] Drape
-- **M22 · HDR and angle calibration** — [M22.1] HDR · [M22.2] Angles
-- **M23 · Brightness calibration** — [M23.1] PTFE and reciprocity
-- **M24 · First game material** — [M24.1] Fit and export
-- **M25 · Tilt yoke built and homed** — [M25.1] Build
-- **M26 · Full isotropic scan** — [M26.1] Run
-- **M27 · Spin platter built and homed** — [M27.1] Build
-- **M28 · Anisotropic material measured** — [M28.1] Brushed aluminium · [M28.2] Texture
-- **M29 · LED bank** — [M29.1] Build
-- **M30 · Polarizers and band calibration** — [M30.1] Calibrate
-- **M31 · Scan hardware** — [M31.1] Risers and camera stop
-- **M32 · Camera position calibrated** — [M32.1] Calibrate
-- **M33 · First full scan** — [M33.1] Capture
-- **M34 · Quick 3D preview** — [M34.1] Visual hull
-- **M35 · Full mesh** — [M35.1] Mesh
-- **M36 · Textures on the mesh** — [M36.1] Fit
-- **M37 · Object in a game engine** — [M37.1] Export
-- **M38 · Control page** — [M38.1] UI
-- **M39 · Presets and resume** — [M39.1] Presets
-- **M40 · Panel screen** — [M40.1] OLED
-- **M41 · Pi Zero station set up** — [M41.1] Install
-- **M42 · Job with no laptop** — [M42.1] Run
-- **M43 · Laptop collects and verifies** — [M43.1] Pull and verify
-- **M44 · Docs complete** — [M44.1] Finish docs
-- **M45 · Public release** — [M45.1] Publish
-- **M46 · Adaptive sampling** — [M46.1] Adaptive sampling
-- **M47 · Space carving** — [M47.1] Space carving
-- **M48 · Compare with MERL / RGL data** — [M48.1] Compare
+| Milestone | Steps (issues) | Checklist |
+|---|---|---|
+| M01 · Read and decide | M01.1 Get the papers (20 min) · M01.2 Read R1 (2 h) · M01.3 Explore the simulator (30 min) · M01.4 Decide the parts (45 min) | [open](phases/00-plan/README.md#m01--read-and-decide) |
+| M02 · Software runs on the laptop | M02.1 Install (20 min) · M02.2 Dry run (10 min) · M02.3 Simulated machine (20 min) · M02.4 Practice a full measurement (30 min) | [open](phases/00-plan/README.md#m02--software-runs-on-the-laptop) |
+| M03 · CAD and printer ready | M03.1 Onshape document (30 min) · M03.2 Print the coupon (15 min) · M03.3 Set clearances (30 min) | [open](phases/00-plan/README.md#m03--cad-and-printer-ready) |
+| M04 · Order power parts | M04.1 Order (30 min) · M04.2 Print the box (15 min) · M04.3 Check parts (20 min) | [open](phases/01-power/README.md#m04--order-power-parts) |
+| M05 · Wire the power box | M05.1 Box hardware (20 min) · M05.2 Main wiring (45 min) · M05.3 Checks with power off (10 min) | [open](phases/01-power/README.md#m05--wire-the-power-box) |
+| M06 · First power-on | M06.1 First 24 V and polarity (15 min) · M06.2 E-stop and unplug (10 min) · M06.3 Heat (15 min) | [open](phases/01-power/README.md#m06--first-power-on) |
+| M07 · Order controller parts | M07.1 Order (30 min) · M07.2 Unpack and check (10 min) | [open](phases/02-controller/README.md#m07--order-controller-parts) |
+| M08 · One motor turns from the laptop | M08.1 USB into Ubuntu (15 min) · M08.2 Flash FluidNC (20 min) · M08.3 Bench motor (20 min) | [open](phases/02-controller/README.md#m08--one-motor-turns-from-the-laptop) |
+| M09 · Keypads work with the laptop | M09.1 Hub firmware (15 min) · M09.2 Wire the keypads (30 min) · M09.3 Panel drives the motor (20 min) | [open](phases/02-controller/README.md#m09--keypads-work-with-the-laptop) |
+| M10 · Controller box closed | M10.1 Print and mount (30 min) · M10.2 WiFi and Bluetooth (30 min) · M10.3 Flags and homing (30 min) · M10.4 E-stop sense on the breadboard (30 min) · M10.5 Heat (10 min) | [open](phases/02-controller/README.md#m10--controller-box-closed) |
+| M11 · Place the base mounts | M11.1 Order frame parts (20 min) · M11.2 Print the template and mounts (30 min) · M11.3 Screw down the mounts (45 min) | [open](phases/03-frame/README.md#m11--place-the-base-mounts) |
+| M12 · Assemble the frame | M12.1 Feet (15 min) · M12.2 Outrigger and camera posts (45 min) · M12.3 Protractor scales (30 min) · M12.4 Mount the boxes (15 min) | [open](phases/03-frame/README.md#m12--assemble-the-frame) |
+| M13 · Ring drive built | M13.1 Measure and set the rim (30 min) · M13.2 Print ring parts (15 min) · M13.3 Lazy Susan, rim and belt (1.25 h) · M13.4 Motor (30 min) · M13.5 Arm (45 min) | [open](phases/04-light-arm/README.md#m13--ring-drive-built) |
+| M14 · Light arm homes and repeats | M14.1 Home switch (45 min) · M14.2 Config and homing (20 min) · M14.3 Angle check (20 min) · M14.4 Repeatability (45 min) | [open](phases/04-light-arm/README.md#m14--light-arm-homes-and-repeats) |
+| M15 · Table axis built | M15.1 Print table parts (10 min) · M15.2 Fixed axle and drum (45 min) · M15.3 Drive belt (30 min) | [open](phases/05-table/README.md#m15--table-axis-built) |
+| M16 · Table homes and repeats | M16.1 Flag and homing (30 min) · M16.2 Angle check (15 min) · M16.3 Repeatability (45 min) · M16.4 Both axes and collision guard (15 min) | [open](phases/05-table/README.md#m16--table-homes-and-repeats) |
+| M17 · Camera sees the zero point | M17.1 Camera reaches the software (30 min) · M17.2 Mount (1 h) · M17.3 Focus (30 min) · M17.4 Centre (15 min) · M17.5 Lock exposure and colour (30 min) | [open](phases/06-camera-light/README.md#m17--camera-sees-the-zero-point) |
+| M18 · Lamp on and safe | M18.1 Lamp assembly (1 h) · M18.2 Switch and heat (20 min) · M18.3 Warm-up time (15 min) | [open](phases/06-camera-light/README.md#m18--lamp-on-and-safe) |
+| M19 · Mirror test | M19.1 Mirror sweeps (30 min) | [open](phases/06-camera-light/README.md#m19--mirror-test) |
+| M20 · First reflectance curves | M20.1 Paper (20 min) · M20.2 Glossy plastic (20 min) | [open](phases/06-camera-light/README.md#m20--first-reflectance-curves) |
+| M21 · Dark box | M21.1 Darken the room (20 min) · M21.2 Stray light test (15 min) · M21.3 Dark level (10 min) | [open](phases/07-calibrate/README.md#m21--dark-box) |
+| M22 · Camera response and angle calibration | M22.1 Camera response (20 min) · M22.2 Angle offset (45 min) | [open](phases/07-calibrate/README.md#m22--camera-response-and-angle-calibration) |
+| M23 · Brightness calibration | M23.1 White reference (15 min) · M23.2 PTFE check (20 min) · M23.3 Reciprocity (30 min) | [open](phases/07-calibrate/README.md#m23--brightness-calibration) |
+| M24 · First game material | M24.1 Measure (40 min) · M24.2 Fit (10 min) · M24.3 In a game engine (1 h) | [open](phases/07-calibrate/README.md#m24--first-game-material) |
+| M25 · Tilt yoke built and homed | M25.1 Print (10 min) · M25.2 Cradle, platter and stub axles (1 h) · M25.3 Tilt drive and flag (45 min) · M25.4 Home and repeat (1 h) · M25.5 Zero point stays (20 min) | [open](phases/08-tilt/README.md#m25--tilt-yoke-built-and-homed) |
+| M26 · Full isotropic scan | M26.1 Plan check (5 min) · M26.2 Run (10 min) · M26.3 Fit and compare (15 min) | [open](phases/08-tilt/README.md#m26--full-isotropic-scan) |
+| M27 · Spin wired and homed | M27.1 Wire the spin motor (30 min) · M27.2 Home and repeat (45 min) | [open](phases/09-spin/README.md#m27--spin-wired-and-homed) |
+| M28 · Anisotropic material measured | M28.1 Spin sweep (30 min) · M28.2 Anisotropic set (10 min) · M28.3 Why it needs 4 angles (15 min) | [open](phases/09-spin/README.md#m28--anisotropic-material-measured) |
+| M29 · Spectral sensor (optional kit) | M29.1 Mount (30 min) · M29.2 Wire and read (20 min) · M29.3 Aim angle (10 min) · M29.4 Spectral curves (45 min) | [open](phases/10-color/README.md#m29--spectral-sensor-optional-kit) |
+| M30 · LED bank and polarizers (optional kit) | M30.1 Print and fit LEDs (2 h) · M30.2 Driver wiring (1 h) · M30.3 Band test (15 min) · M30.4 Polarizers (30 min) | [open](phases/10-color/README.md#m30--led-bank-and-polarizers-optional-kit) |
+| M31 · Scan hardware | M31.1 Print risers and wedge (10 min) · M31.2 Mount the scan camera (45 min) · M31.3 Putty hold (S3) (20 min) | [open](phases/11-scan-capture/README.md#m31--scan-hardware) |
+| M32 · Camera position calibrated | M32.1 ChArUco board (20 min) · M32.2 Calibrate (30 min) | [open](phases/11-scan-capture/README.md#m32--camera-position-calibrated) |
+| M33 · First full scan | M33.1 Background pass (10 min) · M33.2 Cube scan (15 min) | [open](phases/11-scan-capture/README.md#m33--first-full-scan) |
+| M34 · Quick 3D preview | M34.1 Visual hull (15 min) · M34.2 Look at it (15 min) | [open](phases/12-scan-mesh/README.md#m34--quick-3d-preview) |
+| M35 · Full mesh | M35.1 COLMAP mesh (20 min) · M35.2 Measure the cube (S5) (20 min) · M35.3 Photometric sphere (S6, optional kit) (30 min) · M35.4 Scan a model car (S7) (30 min) | [open](phases/12-scan-mesh/README.md#m35--full-mesh) |
+| M36 · Textures on the mesh | M36.1 Write the texture tool (4 h) · M36.2 Bake the car (1 h) | [open](phases/13-object-material/README.md#m36--textures-on-the-mesh) |
+| M37 · Object in a game engine | M37.1 Export glTF (30 min) · M37.2 Side by side (30 min) | [open](phases/13-object-material/README.md#m37--object-in-a-game-engine) |
+| M38 · Control page | M38.1 Server and status (3 h) · M38.2 Jog, home, light (3 h) · M38.3 Live camera (2 h) · M38.4 Run a plan with progress (3 h) | [open](phases/14-laptop-app/README.md#m38--control-page) |
+| M39 · Presets and resume | M39.1 Presets (2 h) · M39.2 Resume (3 h) | [open](phases/14-laptop-app/README.md#m39--presets-and-resume) |
+| M40 · Panel screen | M40.1 Order the kit (15 min) · M40.2 OLED (20 min) | [open](phases/15-standalone/README.md#m40--panel-screen) |
+| M41 · Pi Zero station set up | M41.1 SD card (20 min) · M41.2 Buck and UART (45 min) · M41.3 Install the station (20 min) | [open](phases/15-standalone/README.md#m41--pi-zero-station-set-up) |
+| M42 · Job with no laptop | M42.1 Mirror job (20 min) · M42.2 Stop and restart (10 min) | [open](phases/15-standalone/README.md#m42--job-with-no-laptop) |
+| M43 · Laptop collects and verifies | M43.1 Pull and verify (15 min) | [open](phases/15-standalone/README.md#m43--laptop-collects-and-verifies) |
+| M44 · Docs complete | M44.1 Final 3D files (1 h) · M44.2 Photos (1 h) · M44.3 Test build (30 min) | [open](phases/16-release/README.md#m44--docs-complete) |
+| M45 · Public release | M45.1 Go public (30 min) · M45.2 OSHWA certification (1 h) · M45.3 Tag the release (10 min) | [open](phases/16-release/README.md#m45--public-release) |
+| M46 · Adaptive sampling | M46.1 Adaptive plan (4 h) | [open](phases/17-upgrades/README.md#m46--adaptive-sampling) |
+| M47 · Space carving | M47.1 Photo-consistency carving (6 h) | [open](phases/17-upgrades/README.md#m47--space-carving) |
+| M48 · Compare with MERL / RGL data | M48.1 Compare (3 h) | [open](phases/17-upgrades/README.md#m48--compare-with-merl--rgl-data) |
 <!-- issues:end -->
 
 ## Budget
 
 <img src="docs/assets/budget.svg" width="100%" alt="Cost per stage">
 
-$498.95 with every part bought (cheapest options, prices checked 2026-10-04); $443.27 if you own the consumables; +$32 optional standalone kit. Per-stage lists: `phases/NN/bom.csv` · check: `python3 tools/bom_check.py --strict`.
+**Your working parts list: [PARTS.md](PARTS.md).** Every part I suggested, with why. Tick the ones you agree with, mark `have` / `ordered` / `swap` / `skip`, write `paid:` and notes, right on GitHub (open it → ✏️ → *Commit changes*). The *parts-sync* action then updates the parts lists, budget and checklists.
+
+<!-- budget:start -->
+| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided |
+|---:|---:|---:|---:|---:|
+| $428.39 | $382.01 | $46.38 | $0.00 | 11/111 parts |
+
+Optional spectral sensor +$16.95 · Optional standalone kit +$38.00 · Optional no-switching camera kit +$80.99 · Optional colour kit (bands + polarizers) +$29.56
+<!-- budget:end -->
+
+Cheapest options, prices checked 2026-10-04. Per-stage specs: `phases/NN/bom.csv` · check: `python3 tools/bom_check.py --strict`.
+
+## Tools and joins
+
+Everything is built with these tools; the parts were picked so nothing needs a soldering iron, drill, saw, crimper or heat-set inserts. They are rows `TLS-01`–`TLS-10` in [PARTS.md](PARTS.md) (mark `have`).
+
+| Tool | Used for | Example (cheap) |
+|---|---|---|
+| 3D printer (PETG, bed ≥ 220 × 220 mm) | every printed part | — |
+| Screwdrivers: Phillips #2, flat 2–3 mm | wood screws; screw terminals | — |
+| Hex keys 1.5–4 mm | socket and grub screws (often in the screw kit FRM-06) | — |
+| Wire stripper / cutter 10–24 AWG | strip 11 mm for lever connectors; cut jumpers and belt | [IRWIN 2078300](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) [F10] |
+| Multimeter with temperature probe | every electrical check; LED, driver and box temperatures | [AstroAI DM6000AR](https://www.astroai.com/digital-multimeter-6000-counts-dm6000ar/ap/100019) [F9] |
+| Digital calipers 150 mm | print fit, coupon, positions | [SparkFun 6 in](https://www.sparkfun.com/6-digital-calipers.html) [F11] |
+| Tape measure + phone level app | camera distance; level and square checks | — |
+| Paper printer at 100 % (or a print shop) | placement template, ChArUco boards, focus grid | — |
+| 13 mm spanner or adjustable wrench | M8 nuts on the table axle and tilt stub axles | — |
+| CA glue + double-sided tape | rim belt, scales | — |
+
+| Join | How, without solder or drilling | Parts |
+|---|---|---|
+| Wire to wire | strip 11 mm, lever connector (thin jumper wire: fold the stripped end double) | PWR-20 [P47] |
+| Wire to terminal | stripped, twisted wire under the screw (2 wires may share one) | PWR-03 jack, PWR-13 e-stop, LAR-06, E4 VIN |
+| Wire to a pin | jumper wire (cut one in half for pin → bare wire); XH leads crimped on both ends for endstops; PH→XH cables for motors | CTL-07 [C10], CTL-06, CTL-11 [C11] |
+| Small parts (opto, resistor, LED driver, ULN2803A) | push into the breadboard | PWR-19 [P46] |
+| Boards | Pico H and Pi Zero 2 WH come with headers soldered | CTL-02 [C8], STA-01 |
+| COB LED | clamps into a pre-wired holder | LSR-06 [L21] |
+| Printed part to plywood | #8 Type 17 wood screws start without a pilot hole; [placement template](phases/03-frame/placement-template.svg) shows where | FRM-12 [F8] |
+| Screw into a printed part | M3 self-taps into 2.7 mm holes (`M3_TAP`, set from the coupon) | FRM-06 |
+| Axles | M8 bolts instead of shafts: the table drum turns on two 608s around a fixed bolt (one nut clamps the inner races); the tilt cradle turns on two stub bolts; spin is direct drive. No shaft to cut, no flat to file | TBL-05, TLT-05, SPN-01 |
+
+Trade-off: the solderless power box has no reverse-polarity MOSFET, surge diode or bulk capacitor. The adapter plug is keyed, the jack's screw terminals are marked + / −, and step M06.1 checks polarity with the meter before anything is connected; the E4 has its own input capacitors.
 
 ## 3D files and making parts
 
@@ -134,156 +209,68 @@ Every stage has `3d/`: each printed part as **STEP** (imports into Onshape as an
 | [00 Plan](phases/00-plan/3d/) | [PLAN-01](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) tolerance coupon |
 | [01 Power box](phases/01-power/3d/) | [PWR-18a](phases/01-power/3d/PWR-18a_power_box.stl) power box · [PWR-18b](phases/01-power/3d/PWR-18b_power_lid.stl) power lid |
 | [02 Controller and buttons](phases/02-controller/3d/) | [CTL-10a](phases/02-controller/3d/CTL-10a_button_panel.stl) button panel · [CTL-10b](phases/02-controller/3d/CTL-10b_controller_tray.stl) controller tray |
-| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/FRM-09c_protractor_segment.stl) protractor segment |
-| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/LAR-08b_nema17_mount.stl) nema17 mount · [LAR-08c](phases/04-light-arm/3d/LAR-08c_arm_bracket.stl) arm bracket |
-| [05 Table (M3)](phases/05-table/3d/) | [TBL-07a](phases/05-table/3d/TBL-07a_pulley_100T.stl) pulley 100T · [TBL-07b](phases/05-table/3d/TBL-07b_home_flag.stl) home flag · [TBL-07c](phases/05-table/3d/TBL-07c_nema17_mount.stl) nema17 mount |
-| [06 Camera and light](phases/06-camera-light/3d/) | [CAM-03a](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) aperture stop f8 · [CAM-03b](phases/06-camera-light/3d/CAM-03b_camera_plate.stl) camera plate · [LSR-05a](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) lamp tube |
+| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/FRM-09c_protractor_segment.stl) protractor segment · [FRM-09d](phases/03-frame/3d/FRM-09d_extrusion_saddle.stl) extrusion saddle · [FRM-09e](phases/03-frame/3d/FRM-09e_post_socket.stl) post socket · [FRM-09f](phases/03-frame/3d/FRM-09f_end_foot.stl) end foot · [FRM-09g](phases/03-frame/3d/FRM-09g_washers.stl) washers |
+| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl) ring motor mount · [LAR-08c](phases/04-light-arm/3d/LAR-08c_arm_bracket.stl) arm bracket · [LAR-08e](phases/04-light-arm/3d/LAR-08e_cross_clamp.stl) cross clamp |
+| [05 Table (M3)](phases/05-table/3d/) | [TBL-07a](phases/05-table/3d/TBL-07a_table_drum.stl) table drum · [TBL-07b](phases/05-table/3d/TBL-07b_home_flag.stl) home flag · [TBL-07c](phases/05-table/3d/TBL-07c_table_motor_bracket.stl) table motor bracket · [TBL-07d](phases/05-table/3d/TBL-07d_table_post.stl) table post · [TBL-07f](phases/05-table/3d/TBL-07f_spacers.stl) spacers |
+| [06 Camera and light](phases/06-camera-light/3d/) | [CAM-03a](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) aperture stop f8 · [CAM-03b](phases/06-camera-light/3d/CAM-03b_camera_plate.stl) camera plate · [LSR-05a](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) lamp tube · [LSR-05b](phases/06-camera-light/3d/LSR-05b_lamp_cap.stl) lamp cap |
 | [07 Calibrate → game material](phases/07-calibrate/3d/) | [CAL-06a](phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl) ptfe holder · [CAL-06b](phases/07-calibrate/3d/CAL-06b_mirror_holder.stl) mirror holder · [CAL-06c](phases/07-calibrate/3d/CAL-06c_ball_holder.stl) ball holder · [ENC-04a](phases/07-calibrate/3d/ENC-04a_dowel_socket.stl) dowel socket |
-| [08 Tilt (M2)](phases/08-tilt/3d/) | [TLT-07a](phases/08-tilt/3d/TLT-07a_tilt_yoke.stl) tilt yoke · [TLT-07b](phases/08-tilt/3d/TLT-07b_pulley_100T.stl) pulley 100T |
-| [09 Spin (M1)](phases/09-spin/3d/) | [SPN-07a](phases/09-spin/3d/SPN-07a_spin_platter.stl) spin platter · [SPN-07b](phases/09-spin/3d/SPN-07b_pulley_80T.stl) pulley 80T |
-| [10 Colour bands and polarizers](phases/10-color/3d/) | [MSK-06a](phases/10-color/3d/MSK-06a_led_ring.stl) led ring · [MSK-06b](phases/10-color/3d/MSK-06b_led_mast.stl) led mast |
-| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/SCN-03d_camera_stop_650.stl) camera stop 650 |
+| [08 Tilt (M2)](phases/08-tilt/3d/) | [TLT-07a](phases/08-tilt/3d/TLT-07a_tilt_yoke.stl) tilt yoke · [TLT-07b](phases/08-tilt/3d/TLT-07b_pulley_100T.stl) pulley 100T · [TLT-07c](phases/08-tilt/3d/TLT-07c_tilt_cradle.stl) tilt cradle |
+| [09 Spin (M1)](phases/09-spin/3d/) | [SPN-07a](phases/09-spin/3d/SPN-07a_spin_platter.stl) spin platter |
+| [10 Colour add-ons (optional)](phases/10-color/3d/) | [MSK-06a](phases/10-color/3d/MSK-06a_led_ring.stl) led ring · [MSK-06b](phases/10-color/3d/MSK-06b_led_mast.stl) led mast · [SPC-03a](phases/10-color/3d/SPC-03a_spectral_tube.stl) spectral tube |
+| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/SCN-03d_scan_camera_wedge_15.stl) scan camera wedge 15 |
 | [15 Standalone (no laptop)](phases/15-standalone/3d/) | [STA-07a](phases/15-standalone/3d/STA-07a_pi_zero_mount.stl) pi zero mount |
 <!-- parts:end -->
 
-- **Starter geometry, generated:** `python tools/cad/parts.py` (CadQuery; parameters at the top). Print the [tolerance coupon](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) first and set `CLEAR` / `INSERT`.
+- **Starter geometry, generated:** `python tools/cad/parts.py` (CadQuery; parameters at the top). Print the [tolerance coupon](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) first and set `CLEAR` / `M3_TAP`.
 - **Vendor models:** `bash scripts/get_cad.sh` → `phases/NN/3d/vendor/` (not committed).
-- **Base:** [1:1 drill template](phases/03-frame/drill-template.svg) (print at 100 %, check the 100 mm bar) · [drill map](phases/03-frame/design.md).
+- **Base:** [1:1 placement template](phases/03-frame/placement-template.svg) (print at 100 %, check the 100 mm bar; screws go through the paper) · [placement map](phases/03-frame/design.md).
 - **Wiring:** [power netlist](phases/01-power/design.md) · [controller pins](phases/02-controller/design.md) · [standalone wiring](phases/15-standalone/design.md).
 - **Onshape:** [set-up steps](phases/00-plan/design.md#onshape-set-up) — import the STEP files, edit, export STEP + STL back.
-
-## Test materials
-
-θi = M4 − M3 (light from the normal), θr = M3 (camera from the normal), in-plane. Isotropic needs 3 angles (M4, M3, M2); anisotropic needs 4 (adds M1).
-
-| Material | Type | Light (M4) · camera (θr = M3) | What to look for |
-|---|---|---|---|
-| PTFE white reference | isotropic, diffuse | 45° · 0° (CIE 45°:0°) | flat response; calibrates brightness [N30] |
-| Matte paper | isotropic, diffuse | 60° · sweep M3 | ≈ cos θr |
-| First-surface mirror | isotropic, specular | 60° · 30° | peak at M3 = M4/2; calibrates angles |
-| Glossy plastic (acrylic, LEGO) | isotropic, glossy | 40/80/120° · M4/2 ± 10° | lobe width → roughness |
-| Metallic car paint | isotropic, flake | 90° · 35° (15° off specular) | sparkle, colour shift [N8] |
-| Brushed aluminium | **anisotropic** | 60° · 30°, spin M1 0–180° | highlight stretches across the brushing [G9] |
-| Satin ribbon | **anisotropic** | 70° · 35°, M2 15°, M1 15° steps | two lobes vs direction |
-| Velvet / retroreflective tape | back-scatter | 20° (closest allowed) · 10° | peak toward the light |
-| 3D scan: matte print, painted toy | object | lamp 30°, camera 650 mm, M2 90→10°, M1 36 steps | spray shiny parts matte |
-
-## Theory and equations
-
-- **Bidirectional reflectance distribution function (BRDF):** how much light arriving from one direction leaves toward another. The machine sets both directions: the light arm (M4) sets where light comes from; the fixed camera is where it goes; the sample axes (M3, M2, M1) turn the sample between them.
-- **Isotropic vs anisotropic:** most materials look the same when spun about their normal (3 angles). Brushed metal, satin and hair do not (4 angles), so they need M1.
-- **Microfacet model:** a rough surface is many tiny mirrors; GGX describes how they are tilted, Fresnel how much each reflects, Smith how they shadow each other. Fitting roughness, colour and metalness to measurements gives a game-engine material.
-- **Mirror check:** a mirror only reflects when the incident and reflected angles are equal, so with no tilt the peak must sit at M3 = M4 / 2. That calibrates the angles.
-- **3D scan:** the camera never moves, so every photo's pose is known from the axes; silhouettes give a quick shape (visual hull), photogrammetry gives the full mesh, and lights from several known directions give surface detail (photometric stereo).
-
-**BRDF and reflection equation** [R2][G1]
-
-```math
-f_r(\omega_i\to\omega_r)=\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\;[\mathrm{sr}^{-1}],\qquad L_r(x,\omega_r)=\int_{H^2} f_r\,L_i(x,\omega_i)\cos\theta_i\,d\omega_i
-```
-
-**Reciprocity, isotropy, energy** [R2]
-
-```math
-f_r(\omega_r\to\omega_i)=f_r(\omega_i\to\omega_r),\qquad f_r^{\mathrm{iso}}=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|),\qquad \int_{H^2} f_r\cos\theta_r\,d\omega_r\le 1
-```
-
-**Anisotropic (needs M1)** [G9]
-
-```math
-f_r^{\mathrm{aniso}}=f_r(\theta_i,\varphi_i,\theta_r,\varphi_r)\quad\text{(4 angles; } \varphi \text{ measured from the brushing direction)}
-```
-
-**Mirror, Snell, total internal reflection** [R2]
-
-```math
-\hat R=\hat I-2(\hat I\cdot\hat N)\hat N,\qquad \eta_i\sin\theta_i=\eta_t\sin\theta_t,\qquad 1-\mu^2\left(1-(\hat I\cdot\hat N)^2\right)<0
-```
-
-**Fresnel (Schlick), Lambert** [R7][R2]
-
-```math
-F(\theta)=F_0+(1-F_0)(1-\cos\theta)^5,\quad F_0=\left(\tfrac{\eta-1}{\eta+1}\right)^2,\qquad f_{r,d}=\frac{\rho_d}{\pi}
-```
-
-**Fitted model (Lambert + GGX)** [R6][T11][T17]
-
-```math
-f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r},\quad D=\frac{\alpha^2}{\pi\left((h\cdot n)^2(\alpha^2-1)+1\right)^2},\quad h=\frac{\omega_i+\omega_r}{\lVert\omega_i+\omega_r\rVert}
-```
-
-**Sample orientation and angles** [R1]
-
-```math
-R=R_z(M_3)\,R_y(-M_2)\,R_x(M_1),\quad \omega^s=R^\top\omega^w,\quad \theta=\arccos(\omega^s\cdot\hat n),\quad \varphi=\operatorname{atan2}(\omega^s_z,\omega^s_y)
-```
-
-**Light and camera directions** [R1]
-
-```math
-\hat l=R_z(M_4)\,\hat x,\qquad \hat c=\hat x\;(\text{fixed}),\qquad \omega_i(p)=\frac{P_L-p}{\lVert P_L-p\rVert},\quad \omega_r(p)=\frac{P_C-p}{\lVert P_C-p\rVert}
-```
-
-**In-plane geometry (M2 = M1 = 0)** [R1]
-
-```math
-\theta_r=M_3,\qquad \theta_i=M_4-M_3,\qquad \text{specular: } M_3=\tfrac{M_4}{2}
-```
-
-**Step size** 
-
-```math
-\Delta\theta=\frac{360^\circ}{200\cdot 16\cdot G}\;\Rightarrow\;0.0047^\circ\,(M_4,\,G=24),\;0.0225^\circ\,(M_3,M_2),\;0.028^\circ\,(M_1)
-```
-
-**Optics** [R1]
-
-```math
-\frac{1}{p'}-\frac{1}{p}=\frac{1}{f},\quad m=\frac{p'}{p},\quad d_{\mathrm{Airy}}=2.44\,\lambda N,\quad \mathrm{DOF}\approx\frac{2Nc(1+m)}{m^2}
-```
-
-**HDR** [R5]
-
-```math
-g(Z_{ij})=\ln E_i+\ln\Delta t_j
-```
-
-**Repeatability from the mirror** [R1]
-
-```math
-\Delta\theta_L=\frac{s\,p_{px}\,P}{f\,D_L}
-```
-
-**3D scan: projection, view elevation** [S1][S11]
-
-```math
-\lambda[u,v,1]^\top=K(R_{oc}p_O+t_{oc}),\quad R_{oc}=R_{wc}RP,\qquad \epsilon=90^\circ-M_2+e_{cam}
-```
-
-**3D scan: camera calibration (AX = YB)** [V15]
-
-```math
-\min_{X,Y}\sum_i\left\lVert\log\left(A_i^{-1}XB_iY\right)\right\rVert^2
-```
-
-**3D scan: visual hull, photometric stereo** [S5][S4]
-
-```math
-V=\bigcap_j\{p:\pi_j(p)\in S_j\},\qquad I=L\,g,\;g=L^{+}I,\;\rho=\lVert g\rVert,\;\hat n=g/\rho
-```
-
-Full notes: [theory.md](phases/00-plan/research.md) · [scan methods](phases/12-scan-mesh/research.md).
 
 ## Commands
 
 ### Try without hardware
 
 ```bash
-cd software && python3 -m venv .venv && . .venv/bin/activate && pip install -e ".[dev]"
-python -m pytest -q
-opengonio check-pose M4=60 M3=30
-opengonio scan demo --out demo
+make setup && source .venv/bin/activate     # once; `source …` again in every new terminal
+make all                                     # build + check + tests
+make sim                                     # simulated machine: mirror → calibrate → dark → gamma → white → matte → drift → fit; ends "ALL PASS"
+opengonio check-pose M4=60 M3=30             # angles + collision check for one pose
+opengonio --sim plastic capture inplane --step 10 --out data/sim/plastic && opengonio curve data/sim/plastic
+opengonio scan demo --out demo               # 3D scan pipeline on a synthetic object
 ```
+
+`--sim MATERIAL` (mirror, ptfe, matte, paper, plastic) runs any `capture` on a simulated machine; `--sim-error M3=0.8` hides an angle error in it, `--sim-drift 0.3` dims its lamp 0.3 % per shot and `--sim-gamma 2.2` makes its camera non-linear, so you can watch `verify` and `calibrate` find them. The [Calibration lab](docs/index.html#calibrate) shows the same thing interactively.
+
+### Measure and calibrate
+
+<img src="docs/assets/measure.svg" width="100%" alt="Measuring loop: capture, verify, calibrate, curve, fit">
+
+```bash
+opengonio capture warmup --minutes 10        # stage 06: lamp settle time -> lights.white.warmup_s
+opengonio capture mirror --theta 40          # mirror sweep -> data/mirror_40/ (images + manifest.json)
+opengonio verify data/mirror_40              # PASS / WARN / FAIL: missing images, angles, lamp drift, saturation
+opengonio curve data/mirror_40               # curve.csv + curve.svg (picture of the run)
+opengonio calibrate mirror data/mirror_*     # angle offset -> software/config/calibration.yaml
+opengonio capture dark      && opengonio calibrate dark data/dark            # lamp-off level
+opengonio capture linearity && opengonio calibrate linearity data/linearity  # camera response (gamma)
+opengonio capture white     && opengonio calibrate white data/white          # PTFE at 45:0 -> absolute units
+opengonio capture inplane --step 10 --out data/paper && opengonio curve data/paper   # brdf_per_sr column
+opengonio fit data/paper                     # base colour, roughness, metallic -> fit.json (+ Blender/Unreal/Unity values), fit.svg
+opengonio capture isotropic --step 15        # stage 08: out-of-plane set from BRDF angles (inverse kinematics)
+opengonio capture spin --theta 30            # stage 09: sample spun 0–180° (brushed metal)
+opengonio scan hull --out scan_cube --voxel 0.5   # stage 12: silhouettes -> hull.ply + object size
+opengonio scan ps --out scan_ball --sphere        # stage 12: photometric stereo -> normals, error on a sphere
+opengonio calibrate show                     # every value, its date, and what is stale or not measured yet
+```
+
+| Mirror run before calibration (`curve.svg`) | Material fit (`fit.svg`) |
+|---|---|
+| <img src="docs/assets/example-mirror.svg" width="100%" alt="Mirror sweep: peak 0.4 degrees left of M3 = M4/2"> | <img src="docs/assets/example-fit.svg" width="100%" alt="Fitted GGX curves through measured points"> |
+
+Both from the simulated machine (`make build` regenerates them): the mirror peak sits 0.4° left of the orange line until `calibrate mirror` runs; the fit recovers the simulated plastic (base 0.2, roughness 0.3).
+
+Every run shoots its first pose again at the end (`ref_start.png`, `ref_end.png`); `verify` fails the run if the lamp changed by more than `drift_limit_pct` (2 %). Every `manifest.json` carries `schema`, units and the calibration used, so old data can be re-processed later.
 
 ### Flash and move the motors
 
@@ -341,17 +328,226 @@ Other account over SSH: `OWNER=<user> REMOTE=git@<host-alias>:<user>/Gonioreflec
 ```bash
 cd ~/projects/Gonioreflectometer-Open-Source
 
-# your own edits
-bash scripts/update.sh "phase 01: power box built"
+# your own edits (same as: make publish m="…")
+bash scripts/update.sh "M05.1 done"
 
 # a new zip (keeps your history; replaces repo files with the zip's)
 bash scripts/update.sh "update from new zip" /mnt/c/Users/<you>/Downloads/Gonioreflectometer-Open-Source.zip
 bash scripts/get_papers.sh
 ```
 
+## Test materials
+
+θi = M4 − M3 (light from the normal), θr = M3 (camera from the normal), in-plane. Isotropic needs 3 angles (M4, M3, M2); anisotropic needs 4 (adds M1).
+
+| Material | Type | Light (M4) · camera (θr = M3) | What to look for |
+|---|---|---|---|
+| PTFE white reference | isotropic, diffuse | 45° · 0° (CIE 45°:0°) | flat response; calibrates brightness [N30] |
+| Matte paper | isotropic, diffuse | 60° · sweep M3 | ≈ cos θr |
+| First-surface mirror | isotropic, specular | 60° · 30° | peak at M3 = M4/2; calibrates angles |
+| Glossy plastic (acrylic, LEGO) | isotropic, glossy | 40/80/120° · M4/2 ± 10° | lobe width → roughness |
+| Metallic car paint | isotropic, flake | 90° · 35° (15° off specular) | sparkle, colour shift [N8] |
+| Brushed aluminium | **anisotropic** | 60° · 30°, spin M1 0–180° | highlight stretches across the brushing [G9] |
+| Satin ribbon | **anisotropic** | 70° · 35°, M2 15°, M1 15° steps | two lobes vs direction |
+| Velvet / retroreflective tape | back-scatter | 20° (closest allowed) · 10° | peak toward the light |
+| 3D scan: matte print, painted toy | object | lamp 30°, scan camera 650 mm / 15° up, M2 85→25°, M1 36 steps | spray shiny parts matte |
+
+## Theory and equations
+
+- **Bidirectional reflectance distribution function (BRDF):** how much light arriving from one direction leaves toward another. The machine sets both directions: the light arm (M4) sets where light comes from; the fixed camera is where it goes; the sample axes (M3, M2, M1) turn the sample between them.
+- **Isotropic vs anisotropic:** most materials look the same when spun about their normal (3 angles). Brushed metal, satin and hair do not (4 angles), so they need M1.
+- **Microfacet model:** a rough surface is many tiny mirrors; GGX describes how they are tilted, Fresnel how much each reflects, Smith how they shadow each other. Fitting roughness, colour and metalness to measurements gives a game-engine material.
+- **Mirror check:** a mirror only reflects when the incident and reflected angles are equal, so with no tilt the peak must sit at M3 = M4 / 2. That calibrates the angles.
+- **Calibration:** the mirror peak gives the angle offset; a lamp-off image gives the dark level; a PTFE tile (≈ 99 % white, diffuse) at 45° turns camera counts into absolute BRDF units; repeating the first pose at the end of every run shows whether the lamp drifted.
+- **3D scan:** the camera never moves, so every photo's pose is known from the axes; silhouettes give a quick shape (visual hull), photogrammetry gives the full mesh, and (with the optional LED bank) lights from several known directions give surface detail (photometric stereo).
+
+**BRDF and reflection equation** [R2][G1]
+
+```math
+f_r(\omega_i\to\omega_r)=\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\;[\mathrm{sr}^{-1}],\qquad L_r(x,\omega_r)=\int_{H^2} f_r\,L_i(x,\omega_i)\cos\theta_i\,d\omega_i
+```
+
+**Reciprocity, isotropy, energy** [R2]
+
+```math
+f_r(\omega_r\to\omega_i)=f_r(\omega_i\to\omega_r),\qquad f_r^{\mathrm{iso}}=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|),\qquad \int_{H^2} f_r\cos\theta_r\,d\omega_r\le 1
+```
+
+**Anisotropic (needs M1)** [G9]
+
+```math
+f_r^{\mathrm{aniso}}=f_r(\theta_i,\varphi_i,\theta_r,\varphi_r)\quad\text{(4 angles; } \varphi \text{ measured from the brushing direction)}
+```
+
+**Mirror, Snell, total internal reflection** [R2]
+
+```math
+\hat R=\hat I-2(\hat I\cdot\hat N)\hat N,\qquad \eta_i\sin\theta_i=\eta_t\sin\theta_t,\qquad 1-\mu^2\left(1-(\hat I\cdot\hat N)^2\right)<0
+```
+
+**Fresnel (Schlick), Lambert** [R7][R2]
+
+```math
+F(\theta)=F_0+(1-F_0)(1-\cos\theta)^5,\quad F_0=\left(\tfrac{\eta-1}{\eta+1}\right)^2,\qquad f_{r,d}=\frac{\rho_d}{\pi}
+```
+
+**Fitted model (Lambert + GGX)** [R6][T11][T17]
+
+```math
+f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r},\quad D=\frac{\alpha^2}{\pi\left((h\cdot n)^2(\alpha^2-1)+1\right)^2},\quad h=\frac{\omega_i+\omega_r}{\lVert\omega_i+\omega_r\rVert}
+```
+
+**Sample orientation and angles** [R1]
+
+```math
+R=R_z(M_3)\,R_y(-M_2)\,R_x(M_1),\quad \omega^s=R^\top\omega^w,\quad \theta=\arccos(\omega^s\cdot\hat n),\quad \varphi=\mathrm{atan2}(\omega^s_z,\omega^s_y)
+```
+
+**Light and camera directions** [R1]
+
+```math
+\hat l=R_z(M_4)\,\hat x,\qquad \hat c=\hat x\;(\text{fixed}),\qquad \omega_i(p)=\frac{P_L-p}{\lVert P_L-p\rVert},\quad \omega_r(p)=\frac{P_C-p}{\lVert P_C-p\rVert}
+```
+
+**In-plane geometry (M2 = M1 = 0)** [R1]
+
+```math
+\theta_r=M_3,\qquad \theta_i=M_4-M_3,\qquad \text{specular: } M_3=\tfrac{M_4}{2}
+```
+
+**Step size** 
+
+```math
+\Delta\theta=\frac{360^\circ}{200\cdot 16\cdot G}\;\Rightarrow\;0.0047^\circ\,(M_4,\,G=24),\;0.0225^\circ\,(M_3,M_2);\;M_1\text{ direct at }1/64\text{: }0.028^\circ
+```
+
+**Optics** [R1]
+
+```math
+\frac{1}{p'}-\frac{1}{p}=\frac{1}{f},\quad m=\frac{p'}{p},\quad d_{\mathrm{Airy}}=2.44\,\lambda N,\quad \mathrm{DOF}\approx\frac{2Nc(1+m)}{m^2}
+```
+
+**HDR** [R5]
+
+```math
+g(Z_{ij})=\ln E_i+\ln\Delta t_j
+```
+
+**Repeatability from the mirror** [R1]
+
+```math
+\Delta\theta_L=\frac{s\,p_{px}\,P}{f\,D_L}
+```
+
+**Calibration: angle offset, camera response, absolute BRDF, lamp drift** [R1][R2][R5]
+
+```math
+\delta_{M3}\leftarrow\delta_{M3}-\overline{\left(M_3^{\mathrm{peak}}-\tfrac{M_4}{2}\right)},\qquad
+\ln(C-C_d)=\tfrac{1}{\gamma}\ln t+k,\qquad C_{\mathrm{lin}}=(C-C_d)^{\gamma}
+```
+
+```math
+f_r=\frac{C_{\mathrm{lin}}}{C_{w,\mathrm{lin}}}\cdot\frac{\rho_w}{\pi}\cdot\frac{\cos 45^\circ}{\cos\theta_i},\qquad
+\mathrm{drift}=\frac{C_{\mathrm{end}}-C_{\mathrm{start}}}{C_{\mathrm{start}}-C_d}\le 2\,\%
+```
+
+$C$ = camera counts (centre of the sample), $C_d$ = lamp off, $t$ = exposure, $\gamma$ = camera response (1 = linear), $C_w$ = PTFE at $\theta_i=45^\circ$, $\rho_w$ = PTFE reflectance, $\delta$ = angle offset (true = commanded + $\delta$). Same exposure for all shots.
+
+**Out-of-plane poses from BRDF angles (inverse kinematics, stages 08–09)** [R1][R2]
+
+```math
+\cos\alpha=\cos\theta_i\cos\theta_r+\sin\theta_i\sin\theta_r\cos\Delta\varphi,\quad M_4=\alpha,\quad
+\hat n=a\hat c+b\hat l+g(\hat c\times\hat l),\quad M_2=\arcsin n_z,\quad M_3=\mathrm{atan2}(n_y,n_x)
+```
+
+$a, b$ from $\hat n\cdot\hat c=\cos\theta_r$, $\hat n\cdot\hat l=\cos\theta_i$; $g$ from $|\hat n|=1$. Light on the camera axis ($\alpha<20^\circ$) is out of reach, so pure back-scatter is not measured.
+
+**3D scan: projection, view elevation** [S1][S11]
+
+```math
+\lambda[u,v,1]^\top=K(R_{oc}p_O+t_{oc}),\quad R_{oc}=R_{wc}RP,\qquad \epsilon=90^\circ-M_2+e_{cam}
+```
+
+**3D scan: camera calibration (AX = YB)** [V15]
+
+```math
+\min_{X,Y}\sum_i\left\lVert\log\left(A_i^{-1}XB_iY\right)\right\rVert^2
+```
+
+**3D scan: visual hull, photometric stereo** [S5][S4]
+
+```math
+V=\bigcap_j\{p:\pi_j(p)\in S_j\},\qquad I=L\,g,\;g=L^{+}I,\;\rho=\lVert g\rVert,\;\hat n=g/\rho
+```
+
+Full notes: [theory.md](phases/00-plan/research.md) · [scan methods](phases/12-scan-mesh/research.md).
+
+## Tweak and extend
+
+Everything is generated from a few source files. Edit the source, run `make all`, then `make publish m="…"`.
+
+| To change… | Edit | Then |
+|---|---|---|
+| a step, a milestone, a pass number | `.github/phases.yml` (`do`, `verify`, `fail`, `record`, `time`, `wait`, `needs`) | `make all` |
+| mark a step done | — | `make done id=M05.1` (closes the issue, refreshes ticks and figures) |
+| add a stage / milestone / step | `python tools/new.py stage 18-name "Title"` · `milestone 04-light-arm "Title" "Goal"` · `step M14 "Title"` | fill the TODO lines, `make all` |
+| agree / have / ordered / swap / skip a part, what you paid | [PARTS.md](PARTS.md) (also on GitHub in the browser) | `make` locally, or nothing: *parts-sync* runs on GitHub |
+| a part's spec, price or link; a new part | `phases/NN/bom.csv` (or `python tools/new.py part …`) | `make all` (budget is re-checked) |
+| a printed part's size | the PARAMETERS block or the part function in `tools/cad/parts.py` | `make parts` |
+| a printed part, by hand | import `phases/NN/3d/*.step` into Onshape, export STEP + STL back | `make all` |
+| machine geometry, ports, gear ratios (what you **built**) | `software/config/machine.yaml` | `make all` (simulator numbers update too) |
+| angle offsets, dark level, white reference (what you **measured**) | written by `opengonio calibrate …` into `software/config/calibration.yaml` | commit it |
+| lamp warm-up, drift limit | `lights.white.warmup_s` (machine.yaml) · `drift_limit_pct` (calibration.yaml) | — |
+| what you paid | `Paid USD` column in `phases/NN/bom.csv` | `make` prints *spent so far* |
+| mark a stage done | — | `make release s=06` (tag `v0.6` + every STEP/STL as a zip on GitHub) |
+| motor board settings | `firmware/fluidnc/config.yaml` | `bash scripts/e4.sh config` |
+| buttons, screen, spectral sensor | `firmware/pico-hub/main.py` | `bash scripts/pico.sh` |
+| a reference | `python tools/new.py ref G "Source" "Used for (phase NN)"`; cite as `[G53]` | `make all` |
+| how-to text for a stage | `phases/NN/design.md` (how) · `research.md` (why) | `make check` |
+| a test result | `phases/NN/test.csv` | commit |
+
+Rules that keep it simple:
+- **Generated, don't edit by hand:** `phases/NN/README.md`, `phases/NN/3d/README.md`, the tables between `<!-- … -->` markers in this README, `docs/assets/*.svg`, `docs/assets/steps/*.svg`, `docs/machine.js`, `docs/plan.js`, `.github/progress.json`, `optics.md`, `power_budget.md`, `placement-template.svg`.
+- **Specs vs decisions:** `bom.csv` holds what a part is (spec, price, link); `PARTS.md` holds what you decided (status, paid, note). `make` copies decisions into `bom.csv` (`Status`, `Own`, `Paid USD`), so edit those three only in `PARTS.md`. Zip updates never overwrite your `PARTS.md`.
+- **Math on GitHub:** `make check` rejects TeX macros GitHub refuses (operator-name and new-command macros); write `\mathrm{atan2}`.
+- **Built vs measured:** `machine.yaml` holds design values; `calibration.yaml` holds measured ones with dates. `verify` warns when a calibration is older than 30 days.
+- **Simulator = software:** the web simulator reads `docs/machine.js`, generated from `machine.yaml`; `make check` fails if they differ.
+- **Test without hardware first:** a code change must keep `make sim` at `ALL PASS`.
+- **Go back:** `git checkout v0.6` returns to the state when stage 06 passed (`git checkout main` to return).
+- **Every step has a time and a pass number:** `make check` rejects a step without Do / Verify, with a malformed `time`, or with `TODO` left in it.
+- **Milestone IDs never change** once published: new ones get the next free number, so GitHub issue history stays attached.
+- **`make check`** lists every problem in one place: milestone format, parts lists, the $450 cap, reference IDs, broken links, machine and calibration config.
+- **Measurement data** goes in `data/<job>/`: `manifest.json`, `curve.csv` and `spectral.csv` are committed; images stay local.
+
+## Repository map
+
+```
+README.md            this guide
+PARTS.md             your working parts list: decisions, paid, notes (edit on GitHub)
+Makefile             make help · setup · build · parts · check · test · all · sim · next · done · release · publish
+REFERENCES.md        487 sources (also listed below)
+phases/NN-name/      one folder per stage
+  README.md          checklist: Do / Verify / Record (generated)
+  design.md          how it is built (wiring, dimensions, notes)
+  research.md        why (requirements, methods)
+  bom.csv            parts to buy, prices, links
+  test.csv           test log you fill in
+  3d/                printed parts: .step (Onshape) + .stl (slicer); vendor/ = downloaded models
+firmware/            FluidNC config (E4) · MicroPython hub (Pico)
+software/            opengonio: control, capture, calibration, simulator, scanning
+  config/            machine.yaml (built) · calibration.yaml (measured)
+tools/               check.py (health) · new.py (add things) · roadmap, BOM, figures, CAD parts, placement template, export_machine
+scripts/             e4.sh · pico.sh · station.sh · publish.sh · update.sh · release.sh · get_papers.sh · get_cad.sh
+docs/                interactive simulator (index.html, machine.js, plan.js) + figures (assets/, assets/steps/NN.svg)
+papers/              PDFs: open/ (committed) · personal/ (local only)
+data/                measurement jobs: manifest.json, curve.csv, spectral.csv (images stay local; data/sim/ not committed)
+.github/phases.yml   stages + milestones (source of every checklist and issue)
+.github/progress.json  closed steps, pulled from GitHub by `make done` / `make publish`
+```
+
 ## References
 
-486 sources, grouped by ID prefix; IDs are cited throughout the repo. Full table with "used for": [REFERENCES.md](REFERENCES.md).
+507 sources, grouped by ID prefix; IDs are cited throughout the repo. Full table with "used for": [REFERENCES.md](REFERENCES.md).
 
 <!-- refs:start -->
 ### Primary design references
@@ -826,6 +1022,8 @@ bash scripts/get_papers.sh
 - **H56** CadQuery 2.x, parametric CAD in Python — [PyPI](https://pypi.org/project/cadquery/), [GitHub](https://github.com/CadQuery/cadquery) — *Generated STEP/STL parts (phase 00)*
 - **H57** numpy-stl — [PyPI](https://pypi.org/project/numpy-stl/) — *Parts gallery rendering (phase 00)*
 - **H58** Matplotlib — [matplotlib.org](https://matplotlib.org/) — *Parts gallery rendering (phase 00)*
+- **H59** ams AS7341 11-channel spectral sensor; Adafruit breakout #4698 — [product](https://www.adafruit.com/product/4698) (not fetched; price to confirm) — *Spectral sensor (phase 10)*
+- **H60** W3C, Portable Network Graphics (PNG) Specification — [w3.org/TR/png](https://www.w3.org/TR/png/) — *Built-in PNG reader/writer in `opengonio.imageio` (phase 00)*
 
 ### Firmware, protocols, software
 
@@ -894,24 +1092,24 @@ bash scripts/get_papers.sh
 - **P1** MEAN WELL GST60A24-P1J — [Mouser](https://www.mouser.com/ProductDetail/MEAN-WELL/GST60A24-P1J?qs=odmYgEirbwyH6XaEPxnETQ%3D%3D) — *$19.40, STEP listing*
 - **P2** GST60A spec — [PDF](https://www.meanwell.com/Upload/PDF/GST60A/GST60A-SPEC.PDF); [MEAN WELL UK](https://www.meanwell.co.uk/power-supplies/external-power-supplies/gst60a-series) — *Plug, efficiency, Level VI, UL*
 - **P3** GST60A24-P1J — [TRC](https://trcelectronics.com/products/mean-well-gst60a24-p1j), [Jameco](https://www.jameco.com/z/GST60A24-P1J-MEAN-WELL-24-Volt-2500mA-60-Watt-3-Wire-Regulated-Switching-Desktop-Power-Adapter-2-1mm-Plug-Level-VI_2224411.html), [Bravo](https://www.bravoelectro.com/gst60a24-p1j.html), [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/GST60A24-P1J/7703715) — *No-load power, price cross-check, cord sold separately*
-- **P4** Switchcraft 721A — [product](https://www.switchcraft.com/dc-power-jack-0-084-2-1mm-pin-solder-lugs-termination/721a/) — *2.1 mm, 5 A / 24 V*
-- **P5** Switchcraft 721A — [Octopart](https://octopart.com/721a-switchcraft-89444436), [Digi-Key](https://www.digikey.com/en/products/detail/switchcraft-inc/721A/8571716) — *$4.03*
+- **P4** Switchcraft 721A — [product](https://www.switchcraft.com/dc-power-jack-0-084-2-1mm-pin-solder-lugs-termination/721a/) — *2.1 mm, 5 A / 24 V · not used since the no-solder, no-drill build*
+- **P5** Switchcraft 721A — [Octopart](https://octopart.com/721a-switchcraft-89444436), [Digi-Key](https://www.digikey.com/en/products/detail/switchcraft-inc/721A/8571716) — *$4.03 · not used since the no-solder, no-drill build*
 - **P6** Littelfuse 01500274ZXU — [Mouser](https://www.mouser.com/ProductDetail/Littelfuse/01500274ZXU?qs=HS3fcsxbgMwxzHo3fy8LGg%3D%3D) — *$3.27*
-- **P7** Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) — *$2.73*
-- **P8** IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) — *Rds(on), Vgs*
-- **P9** onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) — *$0.28*
-- **P10** P6KE30A (Littelfuse via Verical, chosen; ST at Mouser compared) — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) — *$0.94*
-- **P11** Nichicon UFW1H101MPD1TD — [Mouser](https://www.mouser.com/ProductDetail/Nichicon/UFW1H101MPD1TD?qs=WJSLByB5Mu30jPPJ2KiG3A%3D%3D) — *$0.59*
+- **P7** Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) — *$2.73 · not used since the no-solder, no-drill build*
+- **P8** IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) — *Rds(on), Vgs · not used since the no-solder, no-drill build*
+- **P9** onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) — *$0.28 · not used since the no-solder, no-drill build*
+- **P10** P6KE30A (Littelfuse via Verical, chosen; ST at Mouser compared) — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) — *$0.94 · not used since the no-solder, no-drill build*
+- **P11** Nichicon UFW1H101MPD1TD — [Mouser](https://www.mouser.com/ProductDetail/Nichicon/UFW1H101MPD1TD?qs=WJSLByB5Mu30jPPJ2KiG3A%3D%3D) — *$0.59 · not used since the no-solder, no-drill build*
 - **P12** Vishay BAT85S-TAP — [Mouser](https://www.mouser.com/ProductDetail/Vishay-Semiconductors/BAT85S-TAP?qs=yIvl1B2wDi5bZOHuqaPTHw%3D%3D) — *Considered for the sense clamp (replaced by an optocoupler)*
-- **P13** Bulgin C1353ABNAB — [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) — *10 A DC rating*
+- **P13** Bulgin C1353ABNAB — [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) — *10 A DC rating · not used since the no-solder, no-drill build*
 - **P14** Arcolectric C1300ALAAA — [Newark](https://www.newark.com/arcolectric-bulgin-limited/c1300alaaa/rocker-switch-spst-on-off-black/dp/48W5536), [Octopart](https://octopart.com/part/arcolectric/C1300ALAAA) — *Rocker alternative*
 - **P15** IDEC YW1B-V4E01R — [TME](https://www.tme.com/us/en-us/details/yw1b-v4e01r/panel-mount-switches-standard-22mm/idec/) — *$9.96*
 - **P16** IDEC YW series — [datasheet](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/6163/D004450YWapem.pdf) — *DC ratings*
 - **P17** Eaton M22-PV / M22-K01 — [IMC](https://www.imc-direct.com/product_p/m22-pv.htm), [TME](https://www.tme.com/us/en-us/details/m22-k01/panel-mount-accessories/eaton-electric/), [IMC kit](https://www.imc-direct.com/product_p/m22-pv-k01.htm), [Mouser](https://www.mouser.com/en/ProductDetail/Eaton-Electrical/M22-PV-K01?qs=HFfMDpzxxd0QRHbJBijxWA%3D%3D) — *E-stop price comparison*
-- **P18** AMASS XT30U — [rcbattery](https://rcbattery.com/genuine-amass-xt30u-male-female-pair-plugs-5-pairs.html) — *$2.19 / 5 pairs*
-- **P19** realthunder/Connectors_Amass.3dshapes — [GitHub](https://github.com/realthunder/Connectors_Amass.3dshapes) — *XT30 STEP*
+- **P18** AMASS XT30U — [rcbattery](https://rcbattery.com/genuine-amass-xt30u-male-female-pair-plugs-5-pairs.html) — *$2.19 / 5 pairs · not used since the no-solder, no-drill build*
+- **P19** realthunder/Connectors_Amass.3dshapes — [GitHub](https://github.com/realthunder/Connectors_Amass.3dshapes) — *XT30 STEP · not used since the no-solder, no-drill build*
 - **P20** 18 AWG silicone pair — [Walmart](https://www.walmart.com/ip/2-Conductor-Parallel-Silicone-Wire-18AWG-18-Gauge-Red-Black-Electrical-Wire-Tinned-Copper-1m-3-3ft/2401235173), [BNTECHGO](https://www.amazon.com/BNTECHGO-Silicone-Flexible-Strands-Stranded/dp/B01AQOI36M) — *$8.09*
-- **P21** Adafruit perfboard 4783 — [link](https://www.adafruit.com/product/4783) — *$2.25*
+- **P21** Adafruit perfboard 4783 — [link](https://www.adafruit.com/product/4783) — *$2.25 · not used since the no-solder, no-drill build*
 - **P22** Keszoox JST-XH kit — [Amazon](https://www.amazon.com/Keszoox-Connector-Pre-Crimped-Housing-Socket%EF%BC%8810/dp/B09SX4LC13) — *Listing (price not confirmed)*
 - **P23** Schneider XB5AS8442 — [TME](https://www.tme.com/us/en-us/details/xb5as8442/panel-mount-switches-standard-22mm/schneider-electric/), [RSP Supply](https://rspsupply.com/p-83740-schneider-electric-xb5as8442-red-40-emergency-stop-switching-off-pushbutton-22-latching-turn-release.aspx); XB2BS542C — [LCSC](https://www.lcsc.com/product-detail/Pushbutton-Switches_Schneider-XB2BS542C_C5122145.html) — *Rejected (0.5 A DC-13)*
 - **P24** Omron A22E-M-01 — [Octopart](https://octopart.com/a22e-m-01-omron-35187) — *Rejected (price)*
@@ -931,6 +1129,10 @@ bash scripts/get_papers.sh
 - **P42** ZYLtech GT2 20T pulley — [link](https://www.zyltech.com/2gt-gt2-6mm-wide-20t-pulley-5mm-6-35mm-or-8mm-bore/) — *$2.95*
 - **P43** TCST2103 optical endstop — [eBay](https://www.ebay.com/itm/182778778905) — *$2.93*
 - **P44** ZYLtech GT2 belt per metre — [link](https://www.zyltech.com/fiber-glass-reinforced-2gt-gt2-timing-belt-custom-length-price-per-meter/) — *$2.50/m*
+- **P45** Adafruit 368 DC jack to screw terminal — [product](https://www.adafruit.com/product/368) — *$2.00, + / − marked, centre-positive*
+- **P46** Adafruit 64 half-size breadboard — [product](https://www.adafruit.com/products/64) — *400 points, solderless*
+- **P47** WAGO 221 lever connectors, 28-piece assortment — [Amazon](https://www.amazon.com/dp/B01N0LRTXZ), [price seen $15.71](https://slickdeals.net/f/18335398-28-piece-wago-221-lever-nuts-splicing-wire-connector-assortment-w-case-15-71-free-shipping-w-prime) — *Solderless joins*
+- **P48** StepperOnline 17HS08-1004S pancake NEMA 17 — [product](https://www.omc-stepperonline.com/hybrid-stepper-motor/nema-17-bipolar-18deg-13ncm-184ozin-1a-35v-42x42x20mm-4-wires-17hs08-1004s.html) — *$7.99, 21.5 mm body, 16 N·cm, 1 A, 5 mm D-shaft*
 
 ### Parts: controller
 
@@ -941,6 +1143,10 @@ bash scripts/get_papers.sh
 - **C5** Raspberry Pi Pico — [product](https://www.raspberrypi.com/products/raspberry-pi-pico/), [SparkFun](https://www.sparkfun.com/raspberry-pi-pico.html) — *$4.00*
 - **C6** Pico files — [STEP](https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip), [pinout](https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf), [datasheet](https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf), [docs](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html) — *CAD, pins*
 - **C7** Adafruit USB cables — [4474](https://www.adafruit.com/product/4474), [898](https://www.adafruit.com/product/898) — *Cable prices*
+- **C8** Raspberry Pi Pico H (headers soldered) — [Adafruit 5525](https://www.adafruit.com/product/5525), [Jameco](https://www.jameco.com/z/5525-Adafruit-Industries-Raspberry-Pi-Pico-H-Pico-with-Headers-Soldered_2882023.html) — *No soldering*
+- **C9** Adafruit 1332 membrane 1x4 keypad — [product](https://www.adafruit.com/product/1332) — *Panel keys*
+- **C10** Adafruit 1954 male/female jumper wires 20 x 6 in — [product](https://www.adafruit.com/product/1954), [Jameco](https://www.jameco.com/z/1954-Adafruit-Industries-Premium-Female-Male-Extension-Jumper-Wires-20-X-6_2507535.html) — *Solderless leads*
+- **C11** Stepper cable PH2.0 6-pin to XH2.54 4-pin, 1 m — [Jameco 2333607](https://www.jameco.com/z/JST-PH20-XH4P-Jameco-ValuePro-4-Wire-Stepper-Motor-Cable-4-Pin-Series-PH-2mm-to-6-Pin-XH2-2-54mm-1-Meter_2333607.html) — *$1.95, closeout*
 
 ### Parts: camera
 
@@ -950,6 +1156,7 @@ bash scripts/get_papers.sh
 - **K4** Arducam B0446 (IMX179) — [product](https://www.arducam.com/8mp-imx179-usb-camera-module-with-wide-angle-115h-m12-lens-for-windows-linux-android-and-mac-os.html) — *Fallback ($54.99, manual WB)*
 - **K5** VA Imaging 16 mm M12 lens — [link](https://va-imaging.com/en-us/products/lens-m12-5mp-16mm-f2-0-1-2-va-lm12-5mp-16mm-f2-0-020) — *$21.00*
 - **K6** Arducam forum, B0433 exposure via v4l2 — [link](https://forum.arducam.com/t/b0433-camera-unable-to-change-exposure-time-from-v4l2/7522) — *Discard frames after a change*
+- **K23** SparkFun M2.5 x 8 mm Phillips machine screw — [product](https://www.sparkfun.com/m2-5-0-45x8mm-machine-screw-phillips-head.html) — *$0.15 each*
 - **K7** Arducam forum, IMX477 UVC max exposure — [link](https://forum.arducam.com/t/arducam-imx477-uvc-camera-adapter-board-max-exposure-time/1387) — *~0.5 s limit*
 - **K8** Arducam forum, IMX477 USB 12-bit — [link](https://forum.arducam.com/t/imx477-usb-12bit-capabilities/2466) — *No RAW over UVC*
 - **K9** Arducam USB3.0 Camera Shield Plus — [link](https://docs.arducam.com/USB-Industrial-Camera/USB3.0-Camera-Shield-Plus/USB3.0-Camera-Shield-Plus-Datasheet/) — *RAW option (SDK)*
@@ -989,6 +1196,7 @@ bash scripts/get_papers.sh
 - **L18** Cree CXA1507 — [Newark](https://www.newark.com/cree-led/cxa1507-0000-000n0ye230g/led-array-cob-warm-wht-3000k-590lm/dp/49AC0147) — *Rejected (35 V)*
 - **L19** 24 V COB strip CRI 90 — [ledupdates](https://ledupdates.com/products/24v-cob-series-cri-90-4000k-natural-white-color-led-strip-light) — *Rejected (roll price)*
 - **L20** Edmund XP42 polarizer film — [link](https://www.edmundoptics.com/p/100-x-100mm-linear-polarizing-film-xp42-40/52988/) — *Compared*
+- **L21** Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) — *COB holder (price to confirm)*
 
 ### Parts: mechanics and frame
 
@@ -1001,13 +1209,20 @@ bash scripts/get_papers.sh
 - **M7** VXB bearings — [608 10-pack](https://vxb.com/products/10-pack-skateboard-bearing-608-2rs-sealed-8x22x7mm), [6806](https://vxb.com/products/6806-2rs-bearing-30x42x7-sealed) — *Compared*
 - **M8** TNutz LF-015-A foot — [link](https://www.tnutz.com/product/lf-015-a/) — *First draft: feet*
 - **M9** ZYLtech extrusion and T-nuts — [2020](https://www.zyltech.com/store/aluminum-extrusion-hardware/2020-t-slot/), [T-nuts](https://www.zyltech.com/100x-zyltech-spring-loaded-t-nuts-for-2020-aluminum-extrusion-m4-or-m5/) — *First draft:*
+- **M10** ME-8108 roller-lever limit switch, screw terminals, 2-pack — [eBay](https://www.ebay.com/itm/156727632134), [spec page](https://st.robu.in/product/me-8108-rotary-adjustable-roller-lever-arm-mini-limit-switch) — *Over-travel, no solder*
 - **F1** Birch plywood 2 x 2 ft — [Lowe's](https://www.lowes.com/pd/1-2-in-Birch-Plywood-Application-as-2-x-2/1000066183) — *Base (price not confirmed)*
 - **F2** OpenBuilds V-Slot 20x20 — [link](https://us.openbuilds.com/v-slot-20x20-linear-rail/) — *$3.29 / 500 mm*
 - **F3** KB-3D M5 T-nut — [link](https://kb-3d.com/store/extrusion-framing/252-t-nut-drop-inroll-in-20-series-6mm-slot-width-m5-threads-1657989339400.html) — *$0.17*
-- **F4** M8 tee nut — [Albany County Fasteners](https://www.albanycountyfasteners.com/metric-t-nuts-zinc-plated-steel-m8-x-125-4-prong-5602-010-042/) — *$0.45*
+- **F4** M8 tee nut — [Albany County Fasteners](https://www.albanycountyfasteners.com/metric-t-nuts-zinc-plated-steel-m8-x-125-4-prong-5602-010-042/) — *$0.45 · not used since the no-solder, no-drill build*
 - **F5** Glarks screw kit — [Amazon](https://www.amazon.com/Glarks-510Pcs-Socket-Screws-Assortment/dp/B08HHZHXTP) — *Listing*
-- **F6** M3 heat-set inserts — [Adafruit 4255](https://www.adafruit.com/product/4255), [CNC Kitchen](https://cnckitchenus.store/products/heat-set-insert-m3-x-5-7-100-pieces) — *$5.95*
+- **F6** M3 heat-set inserts — [Adafruit 4255](https://www.adafruit.com/product/4255), [CNC Kitchen](https://cnckitchenus.store/products/heat-set-insert-m3-x-5-7-100-pieces) — *$5.95 · not used since the no-solder, no-drill build*
 - **F7** 608-2RS 10-pack — [Walmart](https://www.walmart.com/ip/10Pcs-set-608-2RS-Bearing-Deep-Groove-Steel-Sealed-Ball-Bearings-608RS-608-2RS/3999331773) — *$9.90*
+- **F8** #8 x 5/8 in Type 17 pan-head wood screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/578040/wood-screws) — *Self-drilling: no pilot holes (price to confirm)*
+- **F9** AstroAI DM6000AR multimeter with temperature probe — [AstroAI](https://www.astroai.com/digital-multimeter-6000-counts-dm6000ar/ap/100019) — *Tool*
+- **F10** IRWIN VISE-GRIP 2078300 self-adjusting wire stripper 10–24 AWG — [Gexpro](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) — *Tool*
+- **F11** SparkFun 6 in digital calipers — [product](https://www.sparkfun.com/6-digital-calipers.html) — *Tool*
+- **F12** DIN 931 M8 hex bolts, partial thread — [M8 x 75](https://www.fastenersuperstore.com/products/276566/hex-cap-screws), [M8 x 35](https://www.fastenersuperstore.com/products/276362/hex-cap-screws) — *Bolt axles (price to confirm)*
+- **F13** M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) — *Scan wedge (price to confirm)*
 
 ### Parts: enclosure, calibration, multispectral
 
@@ -1022,6 +1237,8 @@ bash scripts/get_papers.sh
 - **E9** Neewer 18 % gray card — [link](https://neewer.com/products/neewer-18-gray-white-card-set-for-white-balance-exposure-value-66600656) — *Optional*
 - **E10** Opal acrylic 12 x 12 — [Walmart](https://www.walmart.com/ip/1-8-3mm-Milky-White-Acrylic-12-x12-Sheet-Translucent-Plexiglass-Cast-AZM/1515407359) — *Diffuser option*
 - **E11** Micro servos — [Adafruit SG92R](https://www.adafruit.com/product/169), [Pololu FS90](https://www.pololu.com/product/2818) — *Phase 10 option*
+- **E12** Protostar Hi-Tack flocked light-trap material, absorbs > 99 % — [fpi-protostar.com](https://www.fpi-protostar.com/hitack.htm), [First Light Optics](https://www.firstlightoptics.com/telescope-flocking-material.html) — *Stray-light lining behind the sample and inside the lamp tube (phase 07)*
+- **E13** Madison Mill 1/2 x 36 in poplar dowel — [True Value](https://www.truevalue.com/product/163701/madison-mill-1-2-in-x-36-in-poplar-dowel-rod-163701/) — *$2.79, drape posts*
 <!-- refs:end -->
 
 ## Licence

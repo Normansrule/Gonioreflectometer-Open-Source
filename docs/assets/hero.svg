@@ -3,7 +3,7 @@
 <rect width="1200" height="460" rx="14" fill="#0d1117"/>
 <text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
 <text x="56" y="196" class="t b" font-size="40">Open-Source</text>
-<text x="58" y="236" fill="#f0883e" font-size="18" class="b">material capture + 3D scanner · under $500</text>
+<text x="58" y="236" fill="#f0883e" font-size="18" class="b">material capture + 3D scanner · under $450</text>
 <text x="58" y="266" class="m" font-size="15">sample turns, tilts, spins · light circles · camera fixed</text>
 <text x="58" y="340" class="m" font-size="12">after Ansari-Asl et al. 2024 [R1]</text>
 <polygon points="535.4,313.7 688.1,484.3 958.7,444.2 806.1,273.6" fill="#1c2128" stroke="#30363d"/>

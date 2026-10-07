@@ -4,7 +4,7 @@
 
 **Light:** Cree CXA1304 on a 40 mm heatsink, NLDD-350H at 350 mA, switched by E4 HE0 (`M62/M63 P0`, no PWM). Printed collimation tube + aperture [R1]. COB case ≤ 70 °C. Eye safety [N47].
 
-Optics numbers: [optics.md](optics.md). Fasteners: M2.5 × 8 × 4 (camera, 34 mm pitch [K3]), M5 × 10 + T-nuts × 2, M3 × 8 × 2, M3 inserts × 4.
+Optics numbers: [optics.md](optics.md). Fasteners: M2.5 × 8 × 4 (camera, 34 mm pitch [K3]), M5 × 10 + T-nuts × 2, M3 × 8 × 6 (self-tap into 2.7 mm holes).
 
 ## 3D parts
 
@@ -13,3 +13,7 @@ Optics numbers: [optics.md](optics.md). Fasteners: M2.5 × 8 × 4 (camera, 34 mm
 | Camera L-arm, f/8 stop, lens lock (CAM-03) | Onshape `CAM` |
 | Lamp housing, tube, aperture, polarizer slot (LSR-05) | Onshape `LSR` |
 | Arducam B0433 | drawing only: 38 × 38 mm, holes 34/28 mm ([datasheet](https://www.uctronics.com/download/Amazon/B0433_Arducam_12MP_USB_Camera_Module_Datasheet.pdf)) [K3] |
+
+## Results
+
+(fill in)

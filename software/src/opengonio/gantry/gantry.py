@@ -3,6 +3,8 @@
 All axes are degrees (FluidNC steps_per_mm = steps per degree). A single G1 move
 interpolates every axis linearly, so the collision check of the straight joint path
 is exactly the path the machine takes. Machine coordinates via G53 [R20].
+Angles here are TRUE angles: offsets from calibration.yaml (true = commanded + offset) are removed
+only in the G-code words, so plans, manifests and collision checks never see them.
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ class Gantry:
     position: dict[str, float] = field(default_factory=dict)
     homed: set[str] = field(default_factory=set)
     light_state: dict[str, bool] = field(default_factory=dict)
+    offsets: dict[str, float] = field(default_factory=dict)      # calibration.yaml angle_offset_deg
 
     @property
     def axes(self):
@@ -34,7 +37,7 @@ class Gantry:
         for k in [k for k in ("M4", "M3", "M2", "M1") if k in self.axes and (keys is None or k in keys)]:
             a = self.axes[k]
             self.nc.command(f"$H{a.fluidnc_axis}")
-            self.position[k] = a.home_deg
+            self.position[k] = a.home_deg + self.offsets.get(k, 0.0)
             self.homed.add(k)
         if "M4" in self.homed:          # park the light behind the sample after homing
             self.move({"M4": 180.0})
@@ -59,7 +62,7 @@ class Gantry:
 
     def move(self, target: dict[str, float], feed: float | None = None) -> None:
         end = self.validate(target)
-        words = " ".join(f"{self.axes[k].fluidnc_axis}{v:.4f}" for k, v in target.items())
+        words = " ".join(f"{self.axes[k].fluidnc_axis}{v - self.offsets.get(k, 0.0):.4f}" for k, v in target.items())
         f = feed or self.cfg.controller.get("feed_deg_per_min", 600)
         self.nc.command(f"G53 G1 {words} F{f:.0f}")
         self.nc.wait_idle()

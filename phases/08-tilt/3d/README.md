@@ -8,8 +8,9 @@ PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry
 
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| TLT-07a | Tilt yoke | [TLT-07a_tilt_yoke.step](TLT-07a_tilt_yoke.step) | [TLT-07a_tilt_yoke.stl](TLT-07a_tilt_yoke.stl) |
-| TLT-07b | GT2 100T pulley (5:1) | [TLT-07b_pulley_100T.step](TLT-07b_pulley_100T.step) | [TLT-07b_pulley_100T.stl](TLT-07b_pulley_100T.stl) |
+| TLT-07a | Tilt yoke: 608 seats, motor slots above the axis | [TLT-07a_tilt_yoke.step](TLT-07a_tilt_yoke.step) | [TLT-07a_tilt_yoke.stl](TLT-07a_tilt_yoke.stl) |
+| TLT-07b | GT2 100T pulley (5:1) on the stub axle | [TLT-07b_pulley_100T.step](TLT-07b_pulley_100T.step) | [TLT-07b_pulley_100T.stl](TLT-07b_pulley_100T.stl) |
+| TLT-07c | Tilt cradle: stub-axle nut traps, spin motor floor | [TLT-07c_tilt_cradle.step](TLT-07c_tilt_cradle.step) | [TLT-07c_tilt_cradle.stl](TLT-07c_tilt_cradle.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
@@ -23,7 +24,7 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 | TLT-02 | GT2 6 mm closed belt 280 mm | Model as belt path in Onshape |
 | TLT-03 | GT2 20T pulley 5 mm bore | Not confirmed - 16 mm flange, 12.2 mm pitch dia |
 | TLT-04 | Optical endstop TCST2103 module | Not confirmed - 33 x 11 mm PCB, 5.8 mm slot |
-| TLT-05 | 8 mm steel shaft 100 mm | Model as 8 x 100 mm rod |
+| TLT-05 | M8 x 35 hex bolts, partial thread + nuts (2, tilt stub axles) | Model as 8 x 35 bolt |
 | TLT-06 | Axis fasteners (M3/M5 set) | Onshape Standard Content |
 
 Design notes: [../design.md](../design.md).

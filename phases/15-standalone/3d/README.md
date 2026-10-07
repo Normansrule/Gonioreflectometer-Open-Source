@@ -18,11 +18,12 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 | ID | Part | 3D model |
 |---|---|---|
-| STA-01 | Raspberry Pi Zero 2 W | [link](https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-mechanical-drawing.pdf) |
+| STA-01 | Raspberry Pi Zero 2 WH (header soldered) | [link](https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-mechanical-drawing.pdf) |
 | STA-02 | microSD card 32 GB | — |
 | STA-03 | Buck converter 24 V to 5 V 3 A | — |
 | STA-04 | Micro-USB OTG adapter | — |
 | STA-05 | SSD1306 OLED 0.96 in I2C 128x64 | — |
 | STA-06 | Jumper wires female-female (10) | — |
+| STA-08 | USB-A to micro-B data cable 1 m | n/a |
 
 Design notes: [../design.md](../design.md).

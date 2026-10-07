@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Check every phases/*/bom.csv and the $500 total; draw docs/assets/budget.svg.
+"""Check every phases/*/bom.csv and the $450 total; draw docs/assets/budget.svg.
+Fill `Paid USD` as you buy (shipping included): the summary then shows planned vs actually spent.
 
     python tools/bom_check.py            # check + chart
-    python tools/bom_check.py --strict   # also fail if the total > $500
+    python tools/bom_check.py --strict   # also fail if the total > HARD_CAP ($450)
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -18,10 +19,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PHASES = ROOT / "phases"
 SVG = ROOT / "docs" / "assets" / "budget.svg"
 REFS = ROOT / "REFERENCES.md"
-COLUMNS = ["ID", "Type", "Part", "Use", "Qty", "Maker", "Part number", "Supplier", "Link", "Unit USD",
-           "Total USD", "STEP", "CAD license", "Notes", "Own", "Price", "Refs"]
+COLUMNS = ["ID", "Type", "Part", "Use", "Requirement", "Qty", "Maker", "Part number", "Supplier", "Link", "Unit USD",
+           "Total USD", "STEP", "CAD license", "Notes", "Own", "Price", "Refs", "Paid USD", "Status"]
 TYPES = {"Purchase", "Print", "Owned", "Optional"}
-HARD_CAP = 500.0
+HARD_CAP = 450.0
 
 
 def load() -> dict[str, list[dict]]:
@@ -58,6 +59,17 @@ def validate(boms: dict[str, list[dict]]) -> list[str]:
                 errs.append(f"{i}: Qty × Unit ≠ Total")
             if r["Type"] in {"Print", "Owned"} and u:
                 errs.append(f"{i}: {r['Type']} must be $0")
+            if r["Paid USD"]:
+                try:
+                    float(r["Paid USD"])
+                except ValueError:
+                    errs.append(f"{i}: Paid USD must be a number (what you actually paid, shipping included)")
+            if "TODO" in r["Requirement"]:
+                errs.append(f"{i}: Requirement still says TODO")
+            if r["Type"] in {"Purchase", "Optional"} and not r["Requirement"].strip():
+                errs.append(f"{i}: Requirement empty (what a substitute must meet: rating, size, spec)")
+            if r["Status"] not in {"suggested", "agreed", "ordered", "have", "swap", "skip"}:
+                errs.append(f"{i}: Status must be suggested/agreed/ordered/have/swap/skip (set it in PARTS.md)")
             if r["Own"] not in {"Y", "N"}:
                 errs.append(f"{i}: Own must be Y/N")
             if r["Type"] == "Purchase" and not r["Price"].startswith(("checked", "estimate")):
@@ -82,7 +94,7 @@ def totals(boms: dict[str, list[dict]]) -> dict[str, dict[str, float]]:
 
 
 def budget_svg(t: dict[str, dict[str, float]]) -> str:
-    """Bars per phase + running total against $500."""
+    """Bars per phase + running total against the cap."""
     w, h, left, bottom, top = 1000, 330, 60, 260, 70
     n = len(t)
     gap = (w - left - 40) / n
@@ -105,9 +117,9 @@ def budget_svg(t: dict[str, dict[str, float]]) -> str:
 .t{{fill:#f0f6fc;font-size:16px;font-weight:600}} .s{{fill:#8b949e;font-size:12px}}</style>
 <rect width="{w}" height="{h}" rx="12" fill="#0d1117"/>
 <text class="t" x="24" y="30">Cost per phase (USD, cheapest parts)</text>
-<text class="s" x="{w - 24}" y="30" text-anchor="end">total ${run:.2f} of $500</text>
+<text class="s" x="{w - 24}" y="30" text-anchor="end">total ${run:.2f} of ${HARD_CAP:.0f}</text>
 <line x1="{left}" y1="{cap_y}" x2="{w - 30}" y2="{cap_y}" stroke="#f85149" stroke-dasharray="6 5"/>
-<text class="s" x="{w - 32}" y="{cap_y - 6}" text-anchor="end">$500 cap</text>
+<text class="s" x="{w - 32}" y="{cap_y - 6}" text-anchor="end">${HARD_CAP:.0f} cap</text>
 <line x1="{left}" y1="{bottom}" x2="{w - 30}" y2="{bottom}" stroke="#30363d"/>
 {''.join(bars)}
 <polyline points="{' '.join(pts)}" fill="none" stroke="#58a6ff" stroke-width="2.5" stroke-dasharray="1200" stroke-dashoffset="1200">
@@ -131,14 +143,22 @@ def main(argv=None) -> int:
     run = 0.0
     for p, v in t.items():
         run += v["buy"]
-        print(f"{p:<18} ${v['buy']:>7.2f}   own-stock ${v['own']:>7.2f}   running ${run:>7.2f}")
+        print(f"{p:<18} ${v['buy']:>7.2f}   minus have ${v['own']:>7.2f}   running ${run:>7.2f}")
     own = sum(v["own"] for v in t.values())
-    print(f"{'TOTAL':<18} ${run:>7.2f}   own-stock ${own:>7.2f}   cap ${HARD_CAP:.0f}")
-    sa = t.get("15-standalone", {}).get("opt", 0.0)
-    print(f"{'+ standalone kit':<18} ${sa:>7.2f}   optional, not in the total (own-stock path + kit ${own + sa:.2f})")
+    print(f"{'TOTAL':<18} ${run:>7.2f}   minus have ${own:>7.2f}   cap ${HARD_CAP:.0f}")
+    kits = {"spectral sensor": sum(float(r["Total USD"]) for rows in boms.values() for r in rows if r["ID"].startswith("SPC-")),
+            "standalone kit": t.get("15-standalone", {}).get("opt", 0.0),
+            "2nd camera kit": sum(float(r["Total USD"]) for r in boms.get("11-scan-capture", []) if r["Type"] == "Optional"),
+            "colour kit": sum(float(r["Total USD"]) for rows in boms.values() for r in rows if r["ID"].startswith("MSK-") and r["Type"] == "Optional")}
+    for k, v in kits.items():
+        print(f"{'+ ' + k:<18} ${v:>7.2f}   optional, not in the total")
+    print(f"{'minus have + kits':<18} ${own + sum(kits.values()):>7.2f}")
+    paid = [(float(r["Paid USD"]), float(r["Total USD"])) for rows in boms.values() for r in rows if r["Paid USD"]]
+    if paid:
+        print(f"{'spent so far':<18} ${sum(p for p, _ in paid):>7.2f}   on {len(paid)} rows planned at ${sum(t for _, t in paid):.2f}")
     SVG.write_text(budget_svg(t), encoding="utf-8")
     if a.strict and run > HARD_CAP:
-        print("over the $500 cap")
+        print(f"over the ${HARD_CAP:.0f} cap")
         return 1
     return 0
 

@@ -10,7 +10,8 @@ PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry
 |---|---|---|---|
 | CAM-03a | f/8 aperture stop | [CAM-03a_aperture_stop_f8.step](CAM-03a_aperture_stop_f8.step) | [CAM-03a_aperture_stop_f8.stl](CAM-03a_aperture_stop_f8.stl) |
 | CAM-03b | Camera plate + post clamp | [CAM-03b_camera_plate.step](CAM-03b_camera_plate.step) | [CAM-03b_camera_plate.stl](CAM-03b_camera_plate.stl) |
-| LSR-05a | Lamp tube, aperture, polarizer slot | [LSR-05a_lamp_tube.step](LSR-05a_lamp_tube.step) | [LSR-05a_lamp_tube.stl](LSR-05a_lamp_tube.stl) |
+| LSR-05a | Lamp body + tube, 2020 clamp, polarizer slot | [LSR-05a_lamp_tube.step](LSR-05a_lamp_tube.step) | [LSR-05a_lamp_tube.stl](LSR-05a_lamp_tube.stl) |
+| LSR-05b | Lamp back cap | [LSR-05b_lamp_cap.step](LSR-05b_lamp_cap.step) | [LSR-05b_lamp_cap.stl](LSR-05b_lamp_cap.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
@@ -22,6 +23,9 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 |---|---|---|
 | CAM-01 | USB camera 12 MP IMX477, M12 mount (UVC) | [link](https://www.uctronics.com/download/Amazon/B0433_Arducam_12MP_USB_Camera_Module_Datasheet.pdf) Drawing only:  (38 x 38 mm, holes 34/28 mm) |
 | CAM-02 | M12 lens 16 mm F2.0, 1/2 in | Not confirmed - M12 x 0.5 barrel |
+| LSR-06 | Solderless COB holder, pre-wired (CXA13) | n/a |
+| CAM-07 | M2.5 x 8 mm screws (4) | n/a |
+| CAM-08 | M2.5 x 20 mm screws (4) | n/a |
 | LSR-01 | COB LED CRI 93, 9 V, 400 mA | Not confirmed |
 | LSR-02 | Constant-current driver 350 mA | Mean Well 3D OUTLINE on the spec page (not downloaded) |
 | LSR-03 | Heatsink 40 x 40 mm (from a pack) | Block model |

@@ -21,7 +21,9 @@
 | Pi GPIO15 RX (pin 10) | Pico GP0 TX |
 | Pi GND (pin 6) | Pico GND |
 | OLED SDA / SCL / VCC / GND | Pico GP16 / GP17 / 3V3 / GND |
-| Buck 5.1 V out | Pi 5V (pin 2) + GND (pin 6); buck input on BUS_24V, before the e-stop |
+| Buck input | the jack's `+` / `−` screws in the power box (a second thin pair under the same screws: the Pi keeps running on e-stop) |
+| Buck 5.1 V out | Pi 5V (pin 2) + GND (pin 6), two cut female jumpers |
+| Pi 5V (pin 4) | Pico VSYS (pin 39): powers the Pico without the laptop |
 | Camera USB | Pi micro-USB data port via OTG adapter |
 
 ### Set up the Pi (from the laptop)
@@ -34,5 +36,9 @@
 
 | Part | Source |
 |---|---|
-| Pi Zero mount + OLED window (STA-07) | Onshape `STA`: Pi holes 58 × 23 mm, M2.5; OLED cut-out 26 × 15 mm in the panel |
+| Pi Zero mount (STA-07) | `tools/cad/parts.py`: push-fit pegs on the Pi's 58 × 23 mm holes (no screws); OLED window in the keypad panel |
 | Pi Zero 2 W | [mechanical drawing](https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-mechanical-drawing.pdf) [H51] |
+
+## Results
+
+(fill in)

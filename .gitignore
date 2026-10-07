@@ -14,3 +14,9 @@ captures/
 .DS_Store
 .fluidnc/
 papers/personal/
+# measurement data: keep manifests and tables, not the images
+data/**/*.png
+data/**/*.jpg
+data/**/*.npy
+# simulator runs (make sim)
+data/sim/

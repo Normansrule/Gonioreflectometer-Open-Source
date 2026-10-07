@@ -8,8 +8,12 @@ cd "$(dirname "$0")/.."
 MSG=${1:-update}
 ZIP=${2:-}
 
+git pull -q --rebase --autostash 2>/dev/null || echo "note: could not pull (offline, or first push)"   # get PARTS.md edits made on GitHub
+FIRST_PARTS=""; [ -f PARTS.md ] || FIRST_PARTS=1
+
 if [ -n "$ZIP" ]; then
   TMP=$(mktemp -d)
+  OLD=$(mktemp -d); cp -r phases "$OLD/" 2>/dev/null || true          # your old bom.csv (Own / Paid) for the first PARTS.md
   unzip -q "$ZIP" -d "$TMP"
   SRC=$(dirname "$(find "$TMP" -maxdepth 3 -name phases.yml -path '*/.github/*' | head -1)")/..
   chmod -R u+w "$TMP"
@@ -17,21 +21,27 @@ if [ -n "$ZIP" ]; then
   mkdir -p papers/personal
   cp -n "$SRC"/papers/personal/* papers/personal/ 2>/dev/null || true   # never overwrite your PDFs
   rm -rf "$SRC/papers/personal" "$SRC/papers/open"
+  [ -f PARTS.md ] && rm -f "$SRC/PARTS.md"                            # your parts decisions always win
   git ls-files -z | xargs -0 rm -f          # drop old tracked files (removed ones stay removed)
   cp -a "$SRC/." ./                         # your .git, .venv and papers stay as they are
   rm -rf "$TMP"
   echo "copied $ZIP"
+  if [ -n "$FIRST_PARTS" ] && [ -d "$OLD/phases" ]; then rm -f PARTS.md; .venv/bin/python tools/parts_doc.py --seed "$OLD/phases" 2>/dev/null || true; fi
+  rm -rf "$OLD"
 fi
 
+.venv/bin/python -c "import yaml, numpy, opengonio" 2>/dev/null || make setup
+REPO=$(git remote get-url origin | sed -E 's#\.git$##; s#.*[:/]([^/:]+/[^/]+)$#\1#')
+if [ -z "${NO_GITHUB:-}" ]; then        # closed issues -> .github/progress.json (ticks + figures)
+  .venv/bin/python tools/roadmap.py --progress --repo "$REPO" >/dev/null 2>&1 || echo "note: progress not refreshed (offline?)"
+fi
+make -s build >/dev/null 2>&1 || echo "note: make build failed (run: make setup)"   # keep generated files in step
 git add -A
 git diff --cached --quiet && echo "nothing new to commit" || git commit -qm "$MSG"
 git push -q origin HEAD
 echo "pushed: $(git log -1 --format='%h %s')"
 
 if [ -z "${NO_GITHUB:-}" ]; then
-  REPO=$(git remote get-url origin | sed -E 's#\.git$##; s#.*[:/]([^/:]+/[^/]+)$#\1#')
-  [ -d .venv ] || python3 -m venv .venv
-  . .venv/bin/activate && pip install -q pyyaml
-  python3 tools/roadmap.py --github --repo "$REPO" --prune   # milestones + issues match .github/phases.yml
+  .venv/bin/python tools/roadmap.py --github --repo "$REPO" --prune   # milestones + issues match .github/phases.yml
   echo "https://github.com/$REPO"
 fi

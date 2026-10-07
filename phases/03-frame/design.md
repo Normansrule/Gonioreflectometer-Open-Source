@@ -1,28 +1,34 @@
 # 03 · Design
 
-## Drill map
+## Placement map (no cutting, no drilling)
 
-600 × 600 mm plywood; origin under the zero point; zero point 150 mm above the base.
+2 × 2 ft plywood used as bought; origin at the panel centre, under the zero point; zero point 150 mm above the base.
 
-**1:1 template:** [drill-template.svg](drill-template.svg) (print at 100 %, poster/tile mode; check the 100 mm bar). Drill: M4 tee nut Ø6, M5 tee nut Ø7, M8 tee nut Ø10, M5 clearance Ø5.5.
+**1:1 template:** [placement-template.svg](placement-template.svg) (print at 100 %, poster/tile mode; check the 100 mm bar). Each printed part sits on its outline; #8 × 5/8 in Type 17 wood screws [F8] go straight through the paper at the crosses; the point drills its own hole. Every screw passes through ≥ 6 mm of printed part, so 16 mm never pokes through 12 mm plywood.
 
-| Feature | Position (mm) | Holes |
+| Feature | Position (mm) | Fixing |
 |---|---|---|
-| Table post | (0, 0) | OG-40, M4 tee nuts |
-| Ring sub-plate | 4 × on Ø250 at 45/135/225/315° | M5 tee nuts |
-| Camera outrigger (2020) | +X from (200, 0) to (700, 0) | 2 × M5 |
-| Camera post | (380, 0) measure · (680, 0) scan | M5 T-nuts |
-| Outrigger end foot | (700, 0) | printed |
-| Power box | (−220, −220) | OG-40 |
-| Controller | (−220, 220) | OG-40 |
-| Feet | 30 mm from corners | M8 tee nuts |
+| Table post (TBL-07d) | (0, 0) | 4 wood screws through its round flange (stage 05) |
+| Table motor bracket (TBL-07c) | (−49.4, 0), inside the lazy Susan | 2 wood screws in slots (stage 05) |
+| 12 in lazy Susan | centred on the Ø305 circle | wood screws through its own holes + 4 mm washers (stage 04) |
+| M4 motor mount (LAR-08b) | 0°, base r 156–211 | 2 wood screws in radial slots (stage 04) |
+| Outrigger saddles (FRM-09d) | (237, 0), (282, 0) | 4 wood screws each; 2020 held by M5 × 10 into side-slot T-nuts |
+| Camera outrigger (2020) | +X from (215, 0) to (715, 0) | in the saddles, end foot (FRM-09f, 30 mm) at 705 |
+| Camera posts | (380, 0) measuring camera · (658, 0) scan camera, 15° up | post sockets (FRM-09e) on the outrigger |
+| Power box | (220, −220) | 4 wood screws through its floor bosses (OG-40) |
+| Controller tray | centre (−190, 220) | 4 wood screws through its corner bosses |
+| Feet (FRM-09b) | flush in each corner, underneath | 2 wood screws each; no levelling bolts (the optics reference the board, not gravity) |
 
-Fasteners: M8 × 40 + jam nut × 4, M8 tee nuts × 4, M4 tee nuts × 12, M5 tee nuts × 4, M5 × 10 + T-nuts × 6.
+Fasteners: #8 × 5/8 Type 17 wood screws × ~50 (FRM-12), M5 × 10 + T-nuts × 9 (stage 03; 15 in all).
 
 ## 3D parts
 
 | Part | Source |
 |---|---|
-| Post feet, OG-40 adapters, camera L-arm, protractor scales (FRM-09) | Onshape `FRM` |
+| OG-40 adapter, feet, 2020 saddles, post sockets, end foot, washers, protractor scales (FRM-09) | `tools/cad/parts.py` (`FRM-09a`–`g`) |
 | 2020 extrusion | Onshape Standard Content |
 | 608 bearings | Onshape bearing generator |
+
+## Results
+
+(fill in)

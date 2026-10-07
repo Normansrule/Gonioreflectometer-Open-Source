@@ -35,7 +35,7 @@ def hero() -> str:
     poses, active = m3d.demo_poses()
     body = f"""<text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
 <text x="56" y="196" class="t b" font-size="40">Open-Source</text>
-<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">material capture + 3D scanner · under $500</text>
+<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">material capture + 3D scanner · under $450</text>
 <text x="58" y="266" class="m" font-size="15">sample turns, tilts, spins · light circles · camera fixed</text>
 <text x="58" y="340" class="m" font-size="12">after Ansari-Asl et al. 2024 [R1]</text>
 {m3d.machine(m3d.View(720, 250, 0.72), poses, active, labels=(1010, 60))}"""
@@ -147,33 +147,6 @@ def brdf() -> str:
     return svg(1100, 380, b)
 
 
-def phases() -> str:
-    import yaml
-    y = yaml.safe_load((ROOT / ".github" / "phases.yml").read_text(encoding="utf-8"))
-    count = {}
-    for m in y["milestones"]:
-        count[m["stage"]] = count.get(m["stage"], 0) + 1
-    group = lambda n: LINE if n <= 3 else ORANGE if n <= 10 else BLUE if n <= 13 else GREEN
-    per_row, w, h, gx, gy, x0, y0 = 6, 182, 76, 14, 14, 24, 56
-    b = f'<text x="24" y="36" class="t b" font-size="18">{len(y["stages"])} stages · {len(y["milestones"])} small milestones</text>'
-    for i, (name, col) in enumerate((("setup", LINE), ("measure", ORANGE), ("3D scan", BLUE), ("app · standalone · release", GREEN))):
-        b += f'<rect x="{620 + i * 120}" y="24" width="12" height="12" rx="2" fill="{col}"/><text x="{638 + i * 120}" y="35" class="m" font-size="12">{name}</text>'
-    for i, st in enumerate(y["stages"]):
-        n = int(st["folder"][:2])
-        x, yy = x0 + (i % per_row) * (w + gx), y0 + (i // per_row) * (h + gy)
-        col = group(n)
-        b += f'<rect x="{x}" y="{yy}" width="{w}" height="{h}" rx="10" fill="{PANEL}" stroke="{col}" stroke-width="2" opacity="0">'
-        b += f'<animate attributeName="opacity" from="0" to="1" begin="{i * 0.1:.2f}s" dur="0.4s" fill="freeze"/></rect>'
-        b += f'<text x="{x + 12}" y="{yy + 22}" fill="{col if col != LINE else MUTED}" font-size="12" class="b">{n:02d} · {count.get(st["folder"], 0)} milestones</text>'
-        words, lines = st["title"].split(), [""]
-        for wd in words:
-            lines[-1:] = [f"{lines[-1]} {wd}".strip()] if len(f"{lines[-1]} {wd}") <= 23 else [lines[-1], wd]
-        for k, ln in enumerate(lines[:2]):
-            b += f'<text x="{x + 12}" y="{yy + 42 + 16 * k}" class="t" font-size="13">{ln}</text>'
-    rows = (len(y["stages"]) + per_row - 1) // per_row
-    return svg(1200, y0 + rows * (h + gy) + 6, b)
-
-
 def scanner() -> str:
     """Fixed camera, object on the tilted platter spinning (M1), elevation stepping (M2), view sphere filling in."""
     cx, cy = 330, 230
@@ -229,7 +202,7 @@ def scanner() -> str:
 
 
 def power_flow() -> str:
-    steps = ["Wall", "GST60A24 60 W", "Fuse 3.15 A T", "Rocker", "IRF4905", "24 V bus", "E-STOP", "FYSETC E4"]
+    steps = ["Wall", "GST60A24 60 W", "Jack (screws)", "Fuse 3.15 A T", "E-STOP (NC)", "J3 over-travel", "24 V out", "FYSETC E4"]
     w, gap, y = 128, 18, 50
     b = ""
     for i, s in enumerate(steps):
@@ -241,16 +214,57 @@ def power_flow() -> str:
             b += f'<line x1="{x - gap}" y1="{y + 24}" x2="{x}" y2="{y + 24}" stroke="{YELLOW}" stroke-width="2"/>'
     b += (f'<circle cy="{y + 24}" r="5" fill="{YELLOW}"><animate attributeName="cx" from="20" to="{20 + 8 * (w + gap) - gap}" '
           f'dur="3s" repeatCount="indefinite"/></circle>')
-    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">Mains stays in the adapter. E-STOP cuts 24 V to the motors; the laptop keeps running.</text>'
+    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">Mains stays in the adapter. E-STOP or an over-travel switch cuts 24 V to the E4 and motors; the laptop keeps running. Every join: screw terminal or lever connector, no solder.</text>'
     return svg(1200, 150, b)
+
+
+def measure() -> str:
+    """The measuring loop: capture -> verify -> calibrate -> curve -> fit (stages 06-07)."""
+    nodes = [("capture", "mirror · inplane · isotropic", "images + manifest.json", BLUE),
+             ("verify", "PASS · WARN · FAIL", "angles, drift, saturation", YELLOW),
+             ("calibrate", "calibration.yaml", "offset · dark · gamma · white", ORANGE),
+             ("curve", "curve.csv + curve.svg", "θi θr φ · BRDF in 1/sr", BLUE),
+             ("fit", "fit.json + fit.svg", "base · roughness · metallic", GREEN)]
+    w, gap, y = 206, 32, 70
+    b = '<text x="24" y="36" class="t b" font-size="18">Measuring loop (stages 06–07)</text>'
+    b += '<text x="24" y="56" class="m" font-size="13">Same commands on the simulator (--sim) and on the machine. Calibration feeds every later capture.</text>'
+    for i, (t, sub, sub2, col) in enumerate(nodes):
+        x = 24 + i * (w + gap)
+        b += box(x, y, w, 76, f"opengonio {t}", sub, col)
+        b += f'<text x="{x + 14}" y="{y + 66}" class="m" font-size="11">{sub2}</text>'
+        if i:
+            b += flow(x - gap, y + 38, x, y + 38, col)
+    # feedback arc: calibrate -> next capture
+    x2, x0 = 24 + 2 * (w + gap) + w / 2, 24 + w / 2
+    b += (f'<path d="M{x2},{y + 76} C{x2},{y + 140} {x0},{y + 140} {x0},{y + 76}" fill="none" stroke="{ORANGE}" stroke-width="2" '
+          f'stroke-dasharray="8 6"><animate attributeName="stroke-dashoffset" from="0" to="28" dur="1s" repeatCount="indefinite"/></path>'
+          f'<text x="{(x0 + x2) / 2}" y="{y + 146}" fill="{ORANGE}" font-size="12" text-anchor="middle">offsets and gamma used by the next capture</text>')
+    return svg(1200, 236, b)
+
+
+def examples() -> None:
+    """Example outputs from the simulated machine (deterministic): what a mirror run and a fit look like."""
+    import shutil
+    import tempfile
+    from opengonio.gantry.config import load_config
+    from opengonio.sim import demo
+    from opengonio.verify import curve
+    from opengonio.calibration import Calibration
+    with tempfile.TemporaryDirectory() as d:
+        demo(load_config(), d, today=__import__("datetime").date(2026, 1, 1))
+        curve(Path(d) / "mirror_40", load_config(), cal=Calibration())
+        shutil.copy(Path(d) / "mirror_40" / "curve.svg", OUT / "example-mirror.svg")
+        shutil.copy(Path(d) / "plastic" / "fit.svg", OUT / "example-fit.svg")
+    print("wrote docs/assets/example-mirror.svg, example-fit.svg")
 
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in (("hero", hero), ("architecture", architecture), ("axes", axes), ("brdf-lobe", brdf),
-                     ("phases", phases), ("power-flow", power_flow), ("scanner", scanner)):
+                     ("power-flow", power_flow), ("measure", measure), ("scanner", scanner)):
         (OUT / f"{name}.svg").write_text(fn(), encoding="utf-8")
         print("wrote", f"docs/assets/{name}.svg")
+    examples()
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+from dataclasses import replace
 import math
 
 import numpy as np
@@ -31,7 +32,9 @@ def test_phase_gating(cfg):
     assert list(cfg.with_phase(8).active_axes) == ["M4", "M3", "M2"]
     assert list(cfg.with_phase(9).active_axes) == ["M4", "M3", "M2", "M1"]
     assert list(cfg.active_lights) == ["white"]
-    assert list(cfg.with_phase(10).active_lights) == ["white", "multispectral"]
+    assert list(cfg.with_phase(11).active_lights) == ["white"]              # optional colour kit not built (default)
+    built = replace(cfg, lights={**cfg.lights, "multispectral": {**cfg.lights["multispectral"], "built": True}})
+    assert list(built.with_phase(10).active_lights) == ["white", "multispectral"]
 
 
 def test_resolution_beats_target(cfg):
@@ -204,7 +207,9 @@ def _station(tmp_path, cfg):
     saved = []
     g = Gantry(cfg, FluidNC(RecordingTransport()))
     hub = FakeHub()
-    st = Station(cfg, g, hub, Cam(), tmp_path, save=lambda p, img: (p.write_bytes(img), saved.append(p)), clock=lambda: 0.0)
+    import itertools
+    tick = itertools.count(0.0, 5.0)                     # 5 s per call: the 60 s lamp warm-up passes in 12 ticks
+    st = Station(cfg, g, hub, Cam(), tmp_path, save=lambda p, img: (p.write_bytes(img), saved.append(p)), clock=lambda: next(tick))
     return st, hub, saved, _json
 
 
@@ -215,8 +220,9 @@ def test_station_runs_job_without_laptop(tmp_path, cfg):
     for _ in range(100):
         st.tick()
     m = json.loads((st.run_dir / "manifest.json").read_text())
-    assert m["finished"] and len(m["shots"]) == len(saved) == len(st.plan) > 10
-    assert "done" in hub.sent[-1]
+    assert m["finished"] and m["schema"] == 1 and len(m["shots"]) == len(st.plan) > 10
+    assert len(saved) == len(st.plan) + 2                              # + ref_start, ref_end (lamp drift)
+    assert any("warm-up" in x for x in hub.sent) and "done" in hub.sent[-1]
 
 
 def test_station_stop_and_next(tmp_path, cfg):
@@ -237,8 +243,38 @@ def test_verify_pass_and_fail(tmp_path, cfg):
     for _ in range(100):
         st.tick()
     peak = min(st.plan, key=lambda p: abs(p["M3"] - p["M4"] / 2))
-    img = lambda p: np.full((30, 30), 200.0 if json.loads((st.run_dir / "manifest.json").read_text())["shots"][int(p.stem[4:])]["pose"] == peak else 50.0)
+    shots = json.loads((st.run_dir / "manifest.json").read_text())["shots"]
+    img = lambda p: np.full((30, 30), 200.0 if p.stem.startswith("img") and shots[int(p.stem[4:])]["pose"] == peak else 50.0)
     rep = verify(st.run_dir, cfg, read_image=img)
     assert rep["result"] == "PASS" and abs(rep["mirror_peak_error_deg"]) < 0.2
-    saved[0].unlink()
+    (st.run_dir / "img_0000.png").unlink()
     assert verify(st.run_dir, cfg, read_image=img)["result"] == "FAIL"
+
+
+def test_laser_repeatability_numbers():
+    from opengonio.plans.repeatability import laser_angle_deg, laser_limit_mm
+    lim = laser_limit_mm(0.1, 2000.0)
+    assert 6.9 < lim < 7.1                                  # 0.1 deg -> ~7 mm on a wall 2 m away
+    assert abs(laser_angle_deg(lim, 2000.0) - 0.1) < 1e-9
+
+
+def test_run_plan_and_curve(tmp_path, cfg):
+    import numpy as np
+    from opengonio.gantry.fluidnc import FluidNC, RecordingTransport
+    from opengonio.gantry.gantry import Gantry
+    from opengonio.plans import inplane
+    from opengonio.station import run_plan
+    from opengonio.verify import curve, verify
+    g = Gantry(cfg, FluidNC(RecordingTransport())); g.home()
+
+    class Cam:
+        def grab(self):
+            return b"x"
+    plan = inplane.mirror_sweep(30.0, span=1.0, step=0.5)
+    out = run_plan(g, Cam(), plan, tmp_path / "m", lambda p, img: p.write_bytes(img), "Mirror check 30",
+                   spectral=lambda: list(range(10)), sleep=lambda s: None)
+    assert (out / "spectral.csv").read_text().count("\n") == len(plan) + 1
+    img = lambda p: np.full((9, 9), 100.0)
+    assert verify(out, cfg, read_image=img)["result"] != "FAIL"
+    rows = curve(out, cfg, read_image=img).read_text().splitlines()
+    assert len(rows) == len(plan) + 1 and rows[0].startswith("i,M4,M3")

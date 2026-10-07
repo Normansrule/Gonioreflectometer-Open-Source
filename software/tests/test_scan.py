@@ -32,11 +32,12 @@ def test_plan_has_144_views_and_needs_m1_m2(cfg):
         rings_plan(cfg.with_phase(8))
 
 
-@pytest.mark.parametrize("elev", [0, 20, 40, 60, 80])
+@pytest.mark.parametrize("elev", [20, 35, 50, 65, 80])
 def test_camera_elevation_seen_from_object(cfg, elev):
     s = cfg.for_scan()
+    m2 = 90 - elev + s.camera_elevation_deg            # the scan camera sits 15 deg up
     for m1 in (-180, -45, 90):
-        assert camera_elevation_in_object(s, {"M3": 0, "M2": 90 - elev, "M1": m1}) == pytest.approx(elev, abs=1e-9)
+        assert camera_elevation_in_object(s, {"M3": 0, "M2": m2, "M1": m1}) == pytest.approx(elev, abs=1e-9)
 
 
 def test_poses_are_rigid_and_look_at_object(cfg):
@@ -138,9 +139,9 @@ def test_ply_writer(tmp_path):
 
 def test_plan_respects_camera_elevation(cfg):
     from dataclasses import replace
-    c10 = replace(cfg, camera_elevation_deg=10.0)
+    c10 = replace(cfg, scan={**cfg.scan, "camera_elevation_deg": 10.0})
     with pytest.raises(PlanError):                       # 0 deg ring would need M2 = 100
-        rings_plan(c10)
+        rings_plan(c10, [{"elevation_deg": 0, "count": 8}])
     rings = [{"elevation_deg": e, "count": 8} for e in (10, 30, 50, 70, 90)]
     for sp in rings_plan(c10, rings):
         assert camera_elevation_in_object(c10.for_scan(), sp.pose) == pytest.approx(sp.elevation_deg, abs=1e-9)
@@ -227,3 +228,14 @@ def test_project_behind_camera_is_nan(cfg):
     R, t = object_to_camera(s, {"M3": 0, "M2": 90, "M1": 0})
     uv, z = project(np.array([[0.0, 0.0, 0.0], -(R.T @ t) * 2]), K.K, R, t)
     assert not np.isnan(uv[0]).any() and np.isnan(uv[1]).all() and z[1] < 0
+
+
+def test_scan_camera_sees_over_measuring_camera(cfg):
+    from opengonio.scan.geometry import scan_view_clearance_mm
+    cl = scan_view_clearance_mm(cfg)
+    assert cl["line_of_sight_mm"] > 20 and cl["frame_edge_mm"] > 0          # measuring camera stays out of the picture
+    assert cfg.for_scan().camera["index"] != cfg.camera["index"]
+    from dataclasses import replace
+    low = replace(cfg, scan={**cfg.scan, "camera_elevation_deg": 3.0})
+    with pytest.raises(PlanError):
+        check_object(low.with_phase(9))

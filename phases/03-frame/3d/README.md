@@ -9,8 +9,12 @@ PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
 | FRM-09a | OG-40 adapter plate | [FRM-09a_og40_adapter.step](FRM-09a_og40_adapter.step) | [FRM-09a_og40_adapter.stl](FRM-09a_og40_adapter.stl) |
-| FRM-09b | Foot cup (print 4) | [FRM-09b_foot.step](FRM-09b_foot.step) | [FRM-09b_foot.stl](FRM-09b_foot.stl) |
-| FRM-09c | Ring scale, 90 deg (print 4) | [FRM-09c_protractor_segment.step](FRM-09c_protractor_segment.step) | [FRM-09c_protractor_segment.stl](FRM-09c_protractor_segment.stl) |
+| FRM-09b | Corner foot, screws on (print 4) | [FRM-09b_foot.step](FRM-09b_foot.step) | [FRM-09b_foot.stl](FRM-09b_foot.stl) |
+| FRM-09c | Ring scale, 80 deg (print 4: 20-340 deg) | [FRM-09c_protractor_segment.step](FRM-09c_protractor_segment.step) | [FRM-09c_protractor_segment.stl](FRM-09c_protractor_segment.stl) |
+| FRM-09d | 2020 saddle, screws on (print 2) | [FRM-09d_extrusion_saddle.step](FRM-09d_extrusion_saddle.step) | [FRM-09d_extrusion_saddle.stl](FRM-09d_extrusion_saddle.stl) |
+| FRM-09e | Post socket on the outrigger (print 2) | [FRM-09e_post_socket.step](FRM-09e_post_socket.step) | [FRM-09e_post_socket.stl](FRM-09e_post_socket.stl) |
+| FRM-09f | Outrigger end foot | [FRM-09f_end_foot.step](FRM-09f_end_foot.step) | [FRM-09f_end_foot.stl](FRM-09f_end_foot.stl) |
+| FRM-09g | 4 mm screw washers for the lazy Susan (8) | [FRM-09g_washers.step](FRM-09g_washers.step) | [FRM-09g_washers.stl](FRM-09g_washers.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
@@ -23,12 +27,8 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 | FRM-01 | Birch plywood 1/2 in, 2 x 2 ft | Custom - modelled in Onshape |
 | FRM-02 | 2020 V-slot 500 mm | Onshape Standard Content 2020 profile |
 | FRM-03 | M5 drop-in T-nut for 2020 | Onshape Standard Content |
-| FRM-04 | M8 tee nut, 4-prong | Model as 22 mm flange |
-| FRM-05 | M8 x 40 bolt + jam nut | Onshape Standard Content |
 | FRM-06 | Socket screw assortment M3/M4/M5 | Onshape Standard Content |
-| FRM-07 | M3 heat-set inserts (50) | 4.0 mm hole, 5.7 mm deep |
 | FRM-08 | 608-2RS bearings (10) | Onshape bearing generator |
-| FRM-10 | M4 tee nut, 4-prong | Onshape Standard Content |
-| FRM-11 | M5 tee nut, 4-prong | Onshape Standard Content |
+| FRM-12 | Wood screws #8 x 5/8 in, Type 17 point (100) | n/a |
 
 Design notes: [../design.md](../design.md).

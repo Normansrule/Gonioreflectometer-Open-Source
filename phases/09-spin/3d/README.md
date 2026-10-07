@@ -8,8 +8,7 @@ PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry
 
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| SPN-07a | Spin platter | [SPN-07a_spin_platter.step](SPN-07a_spin_platter.step) | [SPN-07a_spin_platter.stl](SPN-07a_spin_platter.stl) |
-| SPN-07b | GT2 80T pulley (4:1) | [SPN-07b_pulley_80T.step](SPN-07b_pulley_80T.step) | [SPN-07b_pulley_80T.stl](SPN-07b_pulley_80T.stl) |
+| SPN-07a | Spin platter: clamps the motor D-shaft (direct drive) | [SPN-07a_spin_platter.step](SPN-07a_spin_platter.step) | [SPN-07a_spin_platter.stl](SPN-07a_spin_platter.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
@@ -19,11 +18,8 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 | ID | Part | 3D model |
 |---|---|---|
-| SPN-01 | NEMA 17 stepper 59 Ncm 2 A | [link](https://www.omc-stepperonline.com/index.php?route=product/product/get_file&file=110/17HS19-2004S1.STEP) |
-| SPN-02 | GT2 6 mm closed belt 200 mm | Model as belt path in Onshape |
-| SPN-03 | GT2 20T pulley 5 mm bore | Not confirmed - 16 mm flange, 12.2 mm pitch dia |
+| SPN-01 | NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) | [link](https://www.omc-stepperonline.com/index.php?route=product/product/get_file&file=110/17HS19-2004S1.STEP) |
 | SPN-04 | Optical endstop TCST2103 module | Not confirmed - 33 x 11 mm PCB, 5.8 mm slot |
-| SPN-05 | 8 mm steel shaft 100 mm | Model as 8 x 100 mm rod |
 | SPN-06 | Axis fasteners (M3/M5 set) | Onshape Standard Content |
 
 Design notes: [../design.md](../design.md).
