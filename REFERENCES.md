@@ -1,6 +1,6 @@
 # References
 
-507 sources. IDs are cited in docs, code and the BOM `Refs` column; each phase README lists its IDs. Accessed 2026-10-03/07. All figures are original.
+510 sources. IDs are cited in docs, code and the BOM `Refs` column; each phase README lists its IDs. Accessed 2026-10-03/07. All figures are original.
 
 | Prefix | Topic |
 |---|---|
@@ -763,7 +763,10 @@
 | **L18** | Cree CXA1507 — [Newark](https://www.newark.com/cree-led/cxa1507-0000-000n0ye230g/led-array-cob-warm-wht-3000k-590lm/dp/49AC0147) | Rejected (35 V) |
 | **L19** | 24 V COB strip CRI 90 — [ledupdates](https://ledupdates.com/products/24v-cob-series-cri-90-4000k-natural-white-color-led-strip-light) | Rejected (roll price) |
 | **L20** | Edmund XP42 polarizer film — [link](https://www.edmundoptics.com/p/100-x-100mm-linear-polarizing-film-xp42-40/52988/) | Compared |
-| **L21** | Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) | COB holder (price to confirm) |
+| **L21** | Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) | First-draft COB holder: obsolete at Digi-Key (checked 2026-10-10) |
+| **L22** | Citizen CLU7A3-0403E1-303H7X5 — [Digi-Key](https://www.digikey.com/en/products/detail/citizen/CLU7A3-0403E1-303H7X5/17053751), [datasheet](https://ce.citizen.co.jp/cms/ce/lighting_led/dl_data/COB_High_Intensity_Type_Version4/datasheet/CLU7A3-0403E1_0824P-202110.pdf) | White COB: $5.91, CRI 97, 12.2 V, 4.2 mm LES, Tc ≤ 120 °C |
+| **L23** | TE LUMAWISE Z35 2213678-5 — [Digi-Key](https://www.digikey.com/en/products/detail/te-connectivity-amp-connectors/2213678-5/6174915), [Z35 overview](https://www.digikey.com/en/product-highlight/t/te-connectivity-amp/lumawise-led-holders-type-z35) | Solderless COB holder: $3.50, 13.5 mm boards (Citizen CLU700), Ø35 × 3.6 mm, poke-in 18–20 AWG |
+| **L24** | MEAN WELL LDH-45B-350 — [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/LDH-45B-350/7704773), [spec](https://files.trcelectronics.com/datasheets/ldh45.pdf) | Compared: 24 V boost driver for a 37 V COB; not needed with the 12 V CLU7A3 |
 
 ## Parts: mechanics and frame
 
@@ -791,7 +794,11 @@
 | **F10** | IRWIN VISE-GRIP 2078300 self-adjusting wire stripper 10–24 AWG — [Gexpro](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) | Tool |
 | **F11** | SparkFun 6 in digital calipers — [product](https://www.sparkfun.com/6-digital-calipers.html) | Tool |
 | **F12** | DIN 931 M8 hex bolts, partial thread — [M8 x 75](https://www.fastenersuperstore.com/products/276566/hex-cap-screws), [M8 x 35](https://www.fastenersuperstore.com/products/276362/hex-cap-screws) | Bolt axles (price to confirm) |
-| **F13** | M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) | Scan wedge (price to confirm) |
+| **F13** | M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) | Not used since the scan wedge became the tilted scan plate (kept so IDs stay stable) |
+| **F14** | Elegoo Centauri Carbon enclosed CoreXY printer — [All3DP, $300 launch](https://all3dp.com/4/elegoo-opens-preorders-for-300-centauri-carbon-3d-printer/), [Slickdeals $265.99](https://slickdeals.net/f/18984553-elegoo-centauri-carbon-corexy-fdm-3d-printer-265-99-30-shipping-fee); Bambu Lab P1S [$399](https://www.3dtested.com/3d-printing/grab-this-usd399-bambu-lab-p1s-3d-printer-back-down-to-a-record-low-price-for-the-new-year-save-usd300-on-high-speed-enclosed-printer-for-beginners-and-enthusiasts-alike) | Tool: ABS-capable printer |
+| **F15** | Screwdriver sets — [Home Depot](https://www.homedepot.com/b/Tools-Hand-Tools-Screwdrivers-Nut-Drivers-Screwdrivers-Screwdriver-Sets/philips-screwdriver/N-5yc1vZc998Z1z1lpee), [Husky 16-pc ~$15](https://slickdeals.net/f/18741004-husky-ratcheting-pivot-head-screwdriver-16-piece-14-88-fs-home-depot) | Tool |
+| **F16** | SUNLU ABS 1.75 mm 1 kg black — [listing](https://woodartsupply.com/products/sunlu-abs-filament-1-75mm-3d-printer-filament-highly-resistant-durable-heat-resistance-excellent-toughness-compatible-with-99-fdm-3d-printers-1kg-spool-2-2lbs-black) | Filament (price to confirm) |
+| **F17** | SUNLU ABS 1.75 mm black, 1 kg rolls, 3 kg minimum — [SUNLU store, $11.99/kg](https://store.sunlu.com/products/over-3kg-bundle-sale-abs-filament-1kg-roll) | Filament (checked 2026-10-09) |
 
 ## Parts: enclosure, calibration, multispectral
 
@@ -800,7 +807,7 @@
 | **E1** | Roc-lon blackout fabric — [Walmart](https://www.walmart.com/ip/Roc-lon-54-Blackout-White-Fabric-per-Yard/164714653) | $6.62 / yd |
 | **E2** | Protostar FlockBoard — [link](https://www.fpi-protostar.com/flockboard.htm); flocking — [First Light Optics](https://www.firstlightoptics.com/telescope-flocking-material/protostar-self-adhesive-hi-tack-flocking-material-1m-roll.html) | Backdrop upgrade |
 | **E3** | Oak dowel 1/2 x 36 in — [Home Depot](https://www.homedepot.com/p/Builder-s-Choice-1-2-in-x-36-in-Oak-Round-Dowel-HDDO1236/206184685) | $4.04 |
-| **E4** | PTFE plate — [OnlineMetals](https://www.onlinemetals.com/en/buy/plastic-sheet-plate-ptfe); [Online Metal Supply block](https://onlinemetalsupply.com/2-x-2-5-x-2-5-ptfe-teflon-plastic-sheet-white/) | $22.97 |
+| **E4** | PTFE (virgin) — [OnlineMetals sheet/plate list](https://www.onlinemetals.com/en/buy/plastic-sheet-plate-ptfe): 1/8 in 6 × 6 in $12.53, 3/8 in 6 × 6 in $22.97; [Online Metal Supply 2 × 2.5 × 2.5 in block](https://onlinemetalsupply.com/2-x-2-5-x-2-5-ptfe-teflon-plastic-sheet-white/) $23.48 | White tile (CAL-01) |
 | **E5** | Edmund #43-876 first-surface mirror — [link](https://www.edmundoptics.com/p/50-x-50mm-enhanced-aluminum-4-6lambda-mirror/5362); also [BMI Surplus](https://bmisurplus.com/product/first-surface-mirror-4-inch-square/), [firstsurfacemirror.com](https://www.firstsurfacemirror.com/product/4-x-4-1-4-wave-glass-first-surface-mirror-13-64-5mm-thickness/) | Mirror upgrade / price check |
 | **E6** | BC Precision 1 in G25 balls — [link](https://www.bcprecision.com/products/1-inch-chrome-steel-ball-bearings-g25) | $9.95 |
 | **E7** | Colour targets — [Calibrite CC Mini (B&H)](https://www.bhphotovideo.com/c/product/1649333-REG/calibrite_ccc_mini_colorchecker_classic_mini.html), [SpyderCHECKR 24 (B&H)](https://www.bhphotovideo.com/c/product/1070560-REG/datacolor_sck24_sypdercheckr_24.html) | Optional, borrow |

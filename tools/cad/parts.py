@@ -17,11 +17,14 @@ from pathlib import Path
 
 import cadquery as cq
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import stepio  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[2]
 
 # ---------------- PARAMETERS (mm) ----------------
 CLEAR = 0.2                       # print clearance; set from the tolerance coupon (M03)
-M3_TAP = 2.7                      # M3 screw self-taps into PETG (no heat-set inserts, no soldering iron); set from the coupon (M03)
+M3_TAP = 2.7                      # M3 screw self-taps into ABS (no heat-set inserts, no soldering iron); set from the coupon (M03)
 WOOD = 4.6                        # #8 wood screw clearance [F8]; 6 mm flanges so a 16 mm screw stays inside 12 mm plywood
 M2_5, M3, M4, M5, M8 = 2.9, 3.4, 4.5, 5.5, 8.5
 OG40 = 40.0                       # interface: 4 x M4 on a 40 mm square + 6.2 mm locator
@@ -48,8 +51,11 @@ def tolerance_coupon():
 
 
 # ---------------- 01 power ----------------
+BOX_H = 60.0                      # e-stop needs 48.7 mm behind the lid (IDEC YW, screw terminals + cover) + 6 mm wire bend
+
+
 def power_box():
-    L, W, H, t = 120.0, 80.0, 50.0, 3.2
+    L, W, H, t = 120.0, 80.0, BOX_H, 2.4                       # 6 perimeters of 0.4 mm: stiff enough in ABS
     b = cq.Workplane("XY").box(L, W, H, centered=(True, True, False)).faces(">Z").shell(-t)
     for sx in (-1, 1):
         for sy in (-1, 1):
@@ -91,18 +97,22 @@ def button_panel():
     return p
 
 
+PICO_PEG = 8.0                    # tray floor 3 + 5 mm under the Pico's component side (USB, BOOTSEL, debug header)
+
+
 def controller_tray():
     """Base for E4 + Pico. E4 holes from FYSETC "E4 V1.0B.step" [C1]: 4 x 3.2 mm on 83.6 x 60.6 mm."""
     t = cq.Workplane("XY").box(200, 130, 3, centered=(True, True, False))
     e4 = [(-50 + x, y) for x in (-41.8, 41.8) for y in (-30.3, 30.3)]                                  # measured from the vendor STEP
     pico = [(52 + x, -42 + y) for x in (-23.5, 23.5) for y in (-5.7, 5.7)]                            # 47 x 11.4 [C6]
     t = t.cut(cq.Workplane("XY").rect(82.5 + CLEAR, 55 + CLEAR).extrude(1).translate((52, 20, 2.01)))   # breadboard [P46] locator
+    t = t.cut(cq.Workplane("XY").rect(70, 46).extrude(3).translate((-50, 0, 0)))                         # window under the E4 (air, less ABS)
     for x, y in e4:
         t = t.union(cq.Workplane("XY").circle(3.5).extrude(9).translate((x, y, 0)))
         t = t.cut(cq.Workplane("XY").circle(M3_TAP / 2).extrude(9).translate((x, y, 3)))
-    for x, y in pico:                                                                                  # push-fit pegs through the Pico's 2.1 mm holes
-        t = t.union(cq.Workplane("XY").circle(2.5).extrude(7).translate((x, y, 0)))
-        t = t.union(cq.Workplane("XY").circle(0.95).extrude(2.5).translate((x, y, 7)))
+    for x, y in pico:                                  # push-fit pegs through the Pico's 2.1 mm holes; Pico H mounts components
+        t = t.union(cq.Workplane("XY").circle(2.5).extrude(PICO_PEG).translate((x, y, 0)))       # down, header pins UP, so the
+        t = t.union(cq.Workplane("XY").circle(0.95).extrude(2.5).translate((x, y, PICO_PEG)))     # jumpers plug in from above
     for x, y in ((92, 57), (-92, 57), (92, -57), (-92, -57)):                                       # corner bosses, 6 mm: 16 mm wood screws
         t = t.union(cq.Workplane("XY").circle(5).extrude(6).translate((x, y, 0)))                      # stay inside 12 mm plywood [F8]
         t = t.cut(cq.Workplane("XY").circle(WOOD / 2).extrude(6).translate((x, y, 0)))
@@ -122,7 +132,9 @@ def foot():
     """Corner foot: two #8 wood screws up into the plywood (6 mm under the heads). Flat, no levelling bolts:
     the optics are referenced to the board, not to gravity."""
     f = cq.Workplane("XY").box(50, 50, 12, centered=(True, True, False)).edges("|Z").fillet(6)
-    for x, y in ((-12, 12), (12, -12)):
+    f = f.cut(cq.Workplane("XY").rect(36, 36).extrude(8))                                          # hollow from below: 7 mm
+    for x, y in ((-12, 12), (12, -12)):                                                            # walls, 4 mm top
+        f = f.union(cq.Workplane("XY").circle(7).extrude(12).translate((x, y, 0)))                  # screw bosses
         f = f.cut(cq.Workplane("XY").circle(WOOD / 2).extrude(12).translate((x, y, 0)))
         f = f.cut(cq.Workplane("XY").circle(4.5).extrude(6).translate((x, y, 0)))                    # head pocket, 6 mm left above
     return f
@@ -139,14 +151,36 @@ def extrusion_saddle():
 
 
 def post_socket():
-    """Stands a 2020 post upright on the outrigger: straddles its top 14 mm (M5 x 10 sideways into a side-slot T-nut)
-    and holds the post in a socket (M5 x 10 into the post). Print 2: measuring camera (x = 380), scan camera (x = 658)."""
+    """Stands the 500 mm scan-camera post upright on the outrigger (x = 674.4): straddles its top 14 mm (M5 x 10
+    sideways into a side-slot T-nut) and holds the post in a socket (M5 x 10 into the post)."""
     s = cq.Workplane("XY").box(40, 32, 20, centered=(True, True, False))
     s = s.cut(cq.Workplane("XY").rect(40, 20.4).extrude(14))                                      # straddles the outrigger
     s = s.cut(cq.Workplane("XZ").circle(M5 / 2).extrude(20, both=True).translate((0, 0, 4)))      # into a side T-nut
     sock = cq.Workplane("XY").box(30, 30, 30, centered=(True, True, False)).translate((0, 0, 20))
     sock = sock.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(26).translate((0, 0, 24)))
     return s.union(sock).cut(cq.Workplane("YZ").circle(M5 / 2).extrude(40).translate((-20, 0, 38)))
+
+
+OUTRIGGER_X = (215.0, 715.0)      # 500 mm 2020 along +x, in the two saddles (x = 237, 282)
+
+
+def camera_pillar():
+    """Measuring-camera pillar (x = 391.8): straddles the outrigger like the post socket and rises as a printed 20 x 20
+    column to z 196, so nothing stands in the scan camera's line of sight (a 500 mm post here would cut through the
+    middle of its picture; its sight lines pass x = 392 above z 236). The camera plate's clamp slides down the column;
+    its M5 x 10 self-taps into the 4.2 mm pilot at the camera axis (z = 150); the optional spectral tube (SPC-03a)
+    clamps above it (pilot at z 181). Print standing up, brim on."""
+    base_z = 12.0                                                    # straddle bottom (outrigger 6..26 above the board)
+    s = cq.Workplane("XY").box(40, 32, 20, centered=(True, True, False))
+    s = s.cut(cq.Workplane("XY").rect(40, 20.4).extrude(14))                                      # straddles the outrigger
+    s = s.cut(cq.Workplane("XZ").circle(M5 / 2).extrude(20, both=True).translate((0, 0, 4)))      # into a side T-nut
+    top = 196.0 - base_z
+    col = cq.Workplane("XY").box(20, 20, top - 20, centered=(True, True, False)).translate((0, 0, 20))
+    col = col.union(cq.Workplane("XY").box(30, 30, 10, centered=(True, True, False)).translate((0, 0, 20)))   # foot fillet
+    col = col.faces(">Z").edges().chamfer(1.5)
+    for z in (150.0, 181.0):                                         # camera axis, spectral tube clamp
+        col = col.cut(cq.Workplane("XZ").circle(4.2 / 2).extrude(20, both=True).translate((0, 0, z - base_z)))
+    return s.union(col)
 
 
 def end_foot():
@@ -169,13 +203,13 @@ def washers():
 def protractor_segment():
     """80 deg scale segment for the ring (print 4: 20-100, 100-180, 180-260, 260-340 deg; the gap around 0 deg is the
     M4 motor and the arm's keep-out). Ticks every 5 deg, long ticks every 10 deg."""
-    r0, r1, span = 160.0, 175.0, 80
-    seg = cq.Workplane("XY").circle(r1).circle(r0).extrude(2.5)
+    r0, r1, span, th = 160.0, 175.0, 80, 2.0
+    seg = cq.Workplane("XY").circle(r1).circle(r0).extrude(th)
     wedge = cq.Workplane("XY").polyline([(0, 0), (300, 0), (300 * math.cos(math.radians(span)), 300 * math.sin(math.radians(span)))]).close().extrude(3)
     seg = seg.intersect(wedge)
     for a in range(0, span + 1, 5):
         ln = 9 if a % 10 == 0 else 5
-        tick = cq.Workplane("XY").rect(ln, 0.8).extrude(1).translate((r1 - ln / 2, 0, 1.6)).rotate((0, 0, 0), (0, 0, 1), a)
+        tick = cq.Workplane("XY").rect(ln, 0.8).extrude(1).translate((r1 - ln / 2, 0, th - 0.8)).rotate((0, 0, 0), (0, 0, 1), a)
         seg = seg.cut(tick)
     return seg
 
@@ -185,36 +219,45 @@ RIM_TEETH = 480                               # 24:1 with a 20T pinion meshing t
 RIM_R = RIM_TEETH * GT2_PITCH / (2 * math.pi)
 
 
-def rim_segment():
-    """1/8 of the belt rim: belt glued teeth-out in the groove. Print 8. Two radial M4 slots: bolt (M4 x 12 + nut)
-    through whichever lazy-Susan top-plate hole falls under a slot; the others are glued (CA) and held by the belt."""
-    seg = cq.Workplane("XY").circle(RIM_R + 1.0).circle(RIM_R - 22).extrude(9)
-    seg = seg.cut(cq.Workplane("XY").circle(RIM_R + 2).circle(RIM_R - 0.75).extrude(6.6).translate((0, 0, 1.2)))
+GT2_BACK = 0.38                               # GT2 belt back -> pitch line (1.38 thick - 0.75 tooth - 0.254 PLD)
+RIM_SEAT_R = RIM_R - GT2_BACK                 # belt back glued here (teeth out): its pitch line lands on RIM_R
+RIM_BODY_R = RIM_R - 2.5                      # the pinion's 16 mm flanges reach r = RIM_R - 1.6 at the mesh
+RIM_H, BAND_Z = 9.0, (1.5, 7.5)               # 6 mm belt band; belt edges line up with the band edges
+
+
+def rim_segment(inner: float = 22.0):
+    """1/8 of the belt rim. The GT2 belt is CA-glued teeth-out on a 6 mm band whose edges match the belt's; no lips,
+    so the 20T pinion's flanges pass above and below the band (lips would collide with them). Print 7 (+ the arm
+    segment LAR-08c). Two radial M4 slots: bolt (M4 x 16 + nut) through whichever top-plate hole falls under a slot;
+    CA-glue the rest; the belt ties the ring together."""
+    seg = cq.Workplane("XY").circle(RIM_BODY_R).circle(RIM_R - inner).extrude(RIM_H)
+    seg = seg.union(cq.Workplane("XY").circle(RIM_SEAT_R).circle(RIM_BODY_R - 1).extrude(BAND_Z[1] - BAND_Z[0]).translate((0, 0, BAND_Z[0])))
     wedge = cq.Workplane("XY").polyline([(0, 0), (300, 0), (300 * math.cos(math.radians(45)), 300 * math.sin(math.radians(45)))]).close().extrude(10)
     seg = seg.intersect(wedge)
     for a in (11.25, 33.75):                                                          # radial slots, r = RIM_R-20 .. RIM_R-6
-        sl = cq.Workplane("XY").slot2D(14 + M4, M4, 0).extrude(9).translate((RIM_R - 13, 0, 0))
+        sl = cq.Workplane("XY").slot2D(14 + M4, M4, 0).extrude(RIM_H).translate((RIM_R - 13, 0, 0))
         seg = seg.cut(sl.rotate((0, 0, 0), (0, 0, 1), a))
     return seg
 
 
-RING_MOTOR_R = RIM_R + 6.4 + 1.0                        # 20T pitch radius + belt: the pinion meshes with the rim belt
+RING_MOTOR_R = RIM_R + 20 * GT2_PITCH / (2 * math.pi)   # pitch circles touch: 20T pinion on the rim belt's pitch line
 
 
 def ring_motor_mount():
-    """M4 drive at angle 0 (+X, inside the arm's 20-340 deg keep-out). The base screws to the plywood OUTSIDE the
-    lazy Susan (r > 156); the motor plate cantilevers inward at z 25 above the rim. Motor hangs shaft-down, its
-    20T pulley meshes with the teeth-out rim belt at rim height. Radial slots set the mesh. Local x = radius - RING_MOTOR_R."""
-    pz, W = 25.0, 96.0
+    """M4 drive at angle 0 (+X). The base screws to the plywood OUTSIDE the lazy Susan (r > 156) through slots that
+    stay reachable from above; the 56 mm motor plate cantilevers inward at z 25 above the rim, narrow enough that the
+    arm segment clears it at the travel ends (lamp 20 / 324 deg = upright 35 / 339 deg). Motor stands on the plate, shaft down; its 20T pulley meshes
+    with the teeth-out rim belt at band height. Radial slots set the mesh. Local x = radius - RING_MOTOR_R."""
+    pz, WB, WP = 25.0, 96.0, 56.0
     x0 = 156.0 - RING_MOTOR_R                                   # base starts outside the lazy Susan
     x1 = 211.0 - RING_MOTOR_R                                   # ...and stops before saddle 1 (x = 214.5)
-    base = cq.Workplane("XY").box(x1 - x0, W, 6, centered=(False, True, False)).translate((x0, 0, 0))
-    for y in (-38, 38):
+    base = cq.Workplane("XY").box(x1 - x0, WB, 6, centered=(False, True, False)).translate((x0, 0, 0))
+    for y in (-38, 38):                                         # outside the plate: a screwdriver reaches them
         base = base.cut(cq.Workplane("XY").slot2D(x1 - x0 - 14, WOOD, 0).extrude(6).translate(((x0 + x1) / 2, y, 0)))
-    walls = cq.Workplane("XY").box(6, W, pz - 6, centered=(False, True, False)).translate((x1 - 6, 0, 6))
+    walls = cq.Workplane("XY").box(6, WP, pz - 6, centered=(False, True, False)).translate((x1 - 6, 0, 6))
     for s in (-1, 1):
-        walls = walls.union(cq.Workplane("XY").box(x1 - x0, 6, pz - 6, centered=(False, False, False)).translate((x0, s * W / 2 - (6 if s > 0 else 0), 6)))
-    plate = cq.Workplane("XY").box(x1 + 26, W, 5, centered=(False, True, False)).translate((-26, 0, pz))
+        walls = walls.union(cq.Workplane("XY").box(x1 - x0, 6, pz - 6, centered=(False, False, False)).translate((x0, s * WP / 2 - (6 if s > 0 else 0), 6)))
+    plate = cq.Workplane("XY").box(x1 + 26, WP, 5, centered=(False, True, False)).translate((-26, 0, pz))
     plate = plate.cut(cq.Workplane("XY").slot2D(NEMA17_BOSS + 8, NEMA17_BOSS, 0).extrude(5).translate((0, 0, pz)))
     for x in (-1, 1):
         for y in (-1, 1):
@@ -222,26 +265,35 @@ def ring_motor_mount():
     return base.union(walls).union(plate)
 
 
-def arm_bracket():
-    """Bolts to the lazy-Susan top plate with M4 x 12 + nuts through two long slots (fits any hole spacing 10-40 mm);
-    holds the 2020 light-arm upright. 50 mm wide so it never reaches the M4 motor at 0 deg (arm range 20-340)."""
-    b = cq.Workplane("XY").box(50, 40, 6, centered=(True, True, False))
-    for y in (-12, 12):
-        b = b.cut(cq.Workplane("XY").slot2D(30 + M4, M4, 0).extrude(6).translate((0, y, 0)))
-    sock = cq.Workplane("XY").box(30, 30, 30, centered=(True, True, False)).translate((0, 0, 6))
-    sock = sock.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(26).translate((0, 0, 10)))
-    sock = sock.cut(cq.Workplane("YZ").circle(M5 / 2).extrude(40).translate((-20, 0, 24)))
-    return b.union(sock)
+ARM_R = RIM_R - 16.0                          # light-arm upright centre radius (on the rim, inside the belt band)
+UPRIGHT_OFFSET = 36.0                         # upright stands this far BESIDE the lamp's beam line, not on it: a 20 mm
+                                              # upright on the beam line would shade the sample (beam bundle +-21 mm there)
+UPRIGHT_LEAD = math.degrees(math.asin(UPRIGHT_OFFSET / ARM_R))     # upright azimuth - lamp azimuth, 15.3 deg
+LAMP_ARM_X = -UPRIGHT_OFFSET + 22.0           # horizontal arm, measured from the beam line (cross-clamp pitch 22 mm)
+
+
+def arm_segment():
+    """Arm segment: one rim segment (same belt band and slots, wider inward) carrying the 2020 upright socket at its
+    middle (22.5 deg), so the arm needs no plate holes of its own and cannot collide with the rim. The socket is
+    turned by -UPRIGHT_LEAD so the cross clamp and the horizontal arm run parallel to the beam line (the upright
+    stands 36 mm beside it). Turn the rim so one slot lands on a top-plate hole: M4 x 16 + nut there, CA-glue the
+    whole underside."""
+    seg = rim_segment(inner=31.0)
+    sock = cq.Workplane("XY").box(30, 30, 30, centered=(True, True, False)).translate((0, 0, RIM_H))
+    sock = sock.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(26).translate((0, 0, RIM_H + 4)))
+    sock = sock.cut(cq.Workplane("XZ").circle(M5 / 2).extrude(40).translate((0, 20, RIM_H + 18)))      # M5 x 10 into a T-nut
+    sock = sock.rotate((0, 0, 0), (0, 0, 1), -UPRIGHT_LEAD).translate((ARM_R, 0, 0))
+    return seg.union(sock.rotate((0, 0, 0), (0, 0, 1), 22.5))
 
 
 def cross_clamp():
-    """Joins two 2020s at 90 deg (light-arm upright -> horizontal arm at lamp height): two crossed 20.4 channels,
-    M5 x 10 into a T-nut in each. Slide it to height, tighten."""
-    c = cq.Workplane("XY").box(32, 32, 52, centered=(True, True, False))
-    c = c.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(26))                                  # vertical channel (bottom half)
-    c = c.cut(cq.Workplane("XZ").rect(20.4, 20.4).extrude(20, both=True).translate((0, 0, 39)))  # horizontal channel (top)
-    c = c.cut(cq.Workplane("YZ").circle(M5 / 2).extrude(20).translate((6, 0, 13)))              # into the upright
-    return c.cut(cq.Workplane("XY").circle(M5 / 2).extrude(10).translate((0, 0, 42)))            # into the arm, from above
+    """Joins the light-arm upright and the horizontal arm side by side (channels 22 mm apart, not crossing), so the
+    500 mm upright runs straight through: slide the clamp to lamp height on an uncut upright. M5 x 10 into a T-nut in each."""
+    c = cq.Workplane("XY").box(54, 32, 32, centered=(True, True, False))
+    c = c.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(32).translate((-11, 0, 0)))               # upright, through (along z)
+    c = c.cut(cq.Workplane("XZ").rect(20.4, 20.4).extrude(20, both=True).translate((11, 0, 16)))     # arm, through (along y)
+    c = c.cut(cq.Workplane("YZ").circle(M5 / 2).extrude(10).translate((-27, 0, 16)))               # into the upright, from -x
+    return c.cut(cq.Workplane("XY").circle(M5 / 2).extrude(6).translate((11, 0, 26)))              # into the arm, from above
 
 
 # ---------------- 05/08/09 axes: bolts as axles (no shafts to cut, no flats to file) ----------------
@@ -418,66 +470,111 @@ def aperture_stop():
     return cq.Workplane("XY").circle(7).circle(1.0).extrude(1.2)
 
 
+CAM_PLATE, CAM_STANDOFF, CAM_BOARD, CAM_HOLDER, CAM_LENS_OUT = 4.0, 6.0, 1.6, 11.0, 7.0
+CAM_LENS_Z = CAM_PLATE + CAM_STANDOFF + CAM_BOARD + CAM_HOLDER + CAM_LENS_OUT   # plate back -> lens front, 29.6
+CAM_CLAMP = 24.4                                                                   # 2020 channel centre 12.2 behind the plate
+CAM_POST_OFFSET = CAM_CLAMP / 2 + CAM_LENS_Z                                       # post centre -> lens front, 41.8
+CAM_POST_X = 350.0 + CAM_POST_OFFSET                                               # measuring post: lens front at 350
+
+
+def _camera_face():
+    """Plate + 4 standoffs (6 mm: room for the board's back parts and a side-entry USB-C plug). Camera looks along +z."""
+    p = cq.Workplane("XY").box(50, 50, CAM_PLATE, centered=(True, True, False))
+    pts = [(sx * 17, sy * 17) for sx in (-1, 1) for sy in (-1, 1)]                                   # 34 mm square [K3]
+    for x, y in pts:
+        p = p.union(cq.Workplane("XY").circle(3).extrude(CAM_STANDOFF).translate((x, y, CAM_PLATE)))
+    p = p.cut(cq.Workplane("XY").pushPoints(pts).circle(1.1).extrude(CAM_PLATE + CAM_STANDOFF))       # M2.5 x 8 self-tap [CAM-07]
+    return p.cut(cq.Workplane("XY").circle(17 / 2).extrude(CAM_PLATE))                                # cable / back-part relief
+
+
+def _post_clamp(tilt: float = 0.0, off: float = CAM_CLAMP / 2):
+    """Clamp block behind the plate for a vertical 2020 post, channel centre `off` mm behind the plate back.
+    tilt > 0: the camera looks `tilt` deg down while the channel stays vertical (block rotated about the plate's
+    x axis, then trimmed at the plate back)."""
+    blk = cq.Workplane("XY").box(30, 40, off + 12.2 + 20, centered=(True, True, False)).translate((0, 0, -off - 12.2))
+    ch = cq.Workplane("XZ").rect(20.4, 20.4).extrude(40, both=True).translate((0, 0, -off))
+    m5 = cq.Workplane("YZ").circle(M5 / 2).extrude(30, both=True).translate((0, 0, -off))
+    rot = lambda w: w.rotate((0, 0, 0), (1, 0, 0), -tilt)
+    blk = rot(blk).intersect(cq.Workplane("XY").box(30, 80, 80, centered=(True, True, False)).translate((0, 0, -80)))
+    return blk.cut(rot(ch)).cut(rot(m5))
+
+
 def camera_plate():
-    """Arducam B0433 38 x 38 mm board, 34 mm hole square [K3]; clamps to the 2020 camera post."""
-    p = cq.Workplane("XY").box(50, 50, 4, centered=(True, True, False))
-    p = p.faces(">Z").workplane().rect(34, 34, forConstruction=True).vertices().hole(2.2)                # M2.5 x 8 self-tap [CAM-07]
-    p = p.faces(">Z").workplane().hole(17)
-    clamp = cq.Workplane("XY").box(30, 24, 22, centered=(True, False, False)).translate((0, -25 - 24, 0))
-    clamp = clamp.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(22).translate((0, -25 - 12, 0)))
-    return p.union(clamp).cut(cq.Workplane("XZ").circle(M5 / 2).extrude(-30).translate((0, -60, 11)))
+    """Arducam B0433 38 x 38 mm board on 4 x M2.5 x 8 self-tap into 6 mm standoffs. Clamp block behind grips a vertical
+    2020 post (M5 x 10 into a T-nut): the camera looks along +z, the post centre is CAM_POST_OFFSET = 41.8 mm behind
+    the lens front (measuring post at x = 391.8 for a 350 mm working distance)."""
+    return _camera_face().union(_post_clamp())
+
+
+HS_H, PAD_T, COB_H = 11.0, 0.25, 1.4          # LSR-03 heatsink, LSR-04 3M 8810 tape, LSR-01 Citizen CLU7A3 [L22]
+HOLDER_D, HOLDER_H, PRELOAD = 35.0, 3.6, 0.3  # LSR-06 TE Z35 2213678-5 [L23]; the stack stands 0.3 mm proud so the cap clamps it
+LAMP_POCKET = HS_H + HOLDER_H - PRELOAD       # lamp back face -> pocket front wall (the holder face bears on it)
+LAMP_COB_Z = HS_H - PRELOAD + PAD_T + COB_H   # lamp back face -> COB emitter: 300 mm from the zero point
+LAMP_EXIT_Z = 74.0                            # lamp back face -> exit aperture
 
 
 def lamp_tube():
-    """Lamp: rear square pocket for the 40 x 40 heatsink with the pre-wired COB holder [L21] in front of it,
-    a 50 mm tube with a 10 mm exit aperture and a 1 mm polarizer slot, and a 2020 clamp on top (M5 into a T-nut).
-    The cap (LSR-05b) presses heatsink + holder forward with 4 x M3 x 8 self-tap."""
+    """Lamp: rear square pocket for the 40 x 40 heatsink, a round seat in front of it that centres the TE Z35 COB holder [L23],
+    a 50 mm tube with a 10 mm exit aperture and a 1 mm polarizer slot, and a 2020 clamp on top (M5 into a T-nut),
+    offset sideways by LAMP_ARM_X (the arm runs 14 mm beside the beam line) so the beam axis passes through the zero point.
+    The cap (LSR-05b) presses heatsink + holder forward with 4 x M3 x 8 self-tap: the heatsink stops 0.5 mm short of the
+    seat's ledge, so all the clamp force goes through the holder onto the COB. A groove in the -y wall takes the two leads."""
     S = 48.0
     body = cq.Workplane("XY").box(S, S, 22, centered=(True, True, False))
-    body = body.cut(cq.Workplane("XY").rect(40.6, 40.6).extrude(20))                       # heatsink + holder pocket
+    body = body.cut(cq.Workplane("XY").rect(40.6, 40.6).extrude(HS_H - PRELOAD + 0.5))      # heatsink pocket
+    body = body.cut(cq.Workplane("XY").circle(HOLDER_D / 2 + 0.2).extrude(LAMP_POCKET))     # holder seat (centres the COB)
+    body = body.cut(cq.Workplane("XY").rect(6, 5.8).extrude(LAMP_POCKET).translate((0, -19.9, 0)))   # lead groove to the cap slot
     body = body.cut(cq.Workplane("XY").circle(12).extrude(22))                              # light through
     body = body.faces("<Z").workplane().pushPoints([(sx * 22, sy * 22) for sx in (-1, 1) for sy in (-1, 1)]).hole(M3_TAP, 10)
     tube = cq.Workplane("XY").circle(16).circle(13).extrude(50).translate((0, 0, 22))
     tube = tube.union(cq.Workplane("XY").circle(16).circle(5).extrude(2).translate((0, 0, 72)))
     tube = tube.cut(cq.Workplane("XY").box(40, 34, 1.2, centered=(False, True, False)).translate((-5, 0, 64)))
-    clamp = cq.Workplane("XY").box(30, 24, 22, centered=(True, False, False)).translate((0, S / 2, 0))
-    clamp = clamp.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(22).translate((0, S / 2 + 12, 0)))
-    clamp = clamp.cut(cq.Workplane("XZ").circle(M5 / 2).extrude(-30).translate((0, S / 2 + 10, 11)))
+    clamp = cq.Workplane("XY").box(30, 24, 22, centered=(True, False, False)).translate((LAMP_ARM_X, S / 2, 0))
+    clamp = clamp.cut(cq.Workplane("XY").rect(20.4, 20.4).extrude(22).translate((LAMP_ARM_X, S / 2 + 12, 0)))
+    clamp = clamp.cut(cq.Workplane("XZ").circle(M5 / 2).extrude(-30).translate((LAMP_ARM_X, S / 2 + 10, 11)))
     return body.union(tube).union(clamp)
 
 
 def lamp_cap():
-    """Back cap: 4 x M3 x 8 into the lamp body; slot for the holder leads; vents."""
+    """Back cap: 4 x M3 x 8 into the lamp body; slot over the body's lead groove; vents."""
     c = cq.Workplane("XY").box(48, 48, 3, centered=(True, True, False))
     c = c.faces(">Z").workplane().pushPoints([(sx * 22, sy * 22) for sx in (-1, 1) for sy in (-1, 1)]).hole(M3)
-    c = c.cut(cq.Workplane("XY").rect(12, 4).extrude(3).translate((0, -16, 0)))
+    c = c.cut(cq.Workplane("XY").rect(8, 2.8).extrude(3).translate((0, -21.5, 0)))
     for k in range(4):
         c = c.cut(cq.Workplane("XY").rect(24, 2.5).extrude(3).translate((0, -6 + 5 * k, 0)))
     return c
 
 
 # ---------------- 07 calibrate ----------------
+PTFE_SQ, PTFE_STACK = 50.0 + 1.0, 3 * 3.0       # 50 mm squares knife-cut from a 100 x 100 x 3 mm sheet (CAL-01), 3 stacked
+
+
 def ptfe_holder():
-    h = cq.Workplane("XY").box(70, 70, 12, centered=(True, True, False))
-    h = h.cut(cq.Workplane("XY").rect(50.5, 50.5).extrude(9.6).translate((0, 0, 2.4)))           # 3/8 in PTFE [E4]
-    return h.cut(cq.Workplane("XY").circle(8).extrude(12).translate((0, 33, 2.4)))                # finger notch
+    """White tile: 3 x 3 mm PTFE squares (9 mm: opaque like a 3/8 in plate), top face flush with the rim.
+    Corner reliefs take knife-cut corners; finger notch to lift the stack out."""
+    h = cq.Workplane("XY").box(60, 60, 2.4 + PTFE_STACK, centered=(True, True, False))
+    h = h.cut(cq.Workplane("XY").rect(PTFE_SQ, PTFE_SQ).extrude(PTFE_STACK).translate((0, 0, 2.4)))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            h = h.cut(cq.Workplane("XY").circle(1.5).extrude(PTFE_STACK).translate((sx * PTFE_SQ / 2, sy * PTFE_SQ / 2, 2.4)))
+    return h.cut(cq.Workplane("XY").circle(8).extrude(PTFE_STACK).translate((0, 28.5, 2.4)))       # finger notch
 
 
 def mirror_holder():
-    h = cq.Workplane("XY").box(70, 70, 8, centered=(True, True, False))
+    h = cq.Workplane("XY").box(60, 60, 8, centered=(True, True, False))
     return h.cut(cq.Workplane("XY").rect(50.5, 50.5).extrude(5).translate((0, 0, 3)))
 
 
 def ball_holder():
     """Two 1 in chrome balls 40 mm apart on conical seats [E6]."""
-    b = cq.Workplane("XY").box(80, 34, 14, centered=(True, True, False))
-    for x in (-20, 20):
-        b = b.cut(cq.Workplane("XY").sphere(12.7).translate((x, 0, 14 + 12.7 - 4.5)))
+    b = cq.Workplane("XY").box(66, 28, 14, centered=(True, True, False))
+    for x in (-20, 20):                                       # 90 deg cone, 22 mm at the top: the ball sits on a ring
+        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCone(2.0, 11.0, 9.0, cq.Vector(x, 0, 5))))   # 2 mm below the top
     return b
 
 
 def dowel_socket():
-    s = cq.Workplane("XY").circle(14).extrude(40).union(cq.Workplane("XY").box(50, 28, 5, centered=(True, True, False)))
+    s = cq.Workplane("XY").circle(10).extrude(40).union(cq.Workplane("XY").box(50, 24, 5, centered=(True, True, False)))   # 3.5 mm wall
     s = s.cut(cq.Workplane("XY").circle(6.45).extrude(36).translate((0, 0, 5)))                    # 1/2 in dowel [E3]
     return s.faces("<Z").workplane().pushPoints([(-19, 0), (19, 0)]).hole(M4)
 
@@ -499,7 +596,7 @@ def led_mast():
 
 def spectral_tube():
     """AS7341 breakout (25.4 x 17.8 mm, check holes) behind a 40 mm tube with a 3 mm aperture: ~4 deg field,
-    ~25 mm spot at 350 mm. Clamps to the 2020 camera post above the camera plate."""
+    ~25 mm spot at 350 mm. Clamps to the camera pillar (FRM-09h) above the camera plate (M5 into its z 181 pilot)."""
     base = cq.Workplane("XY").box(30, 24, 3, centered=(True, True, False))
     base = base.faces(">Z").workplane().pushPoints([(-10.15, 0), (10.15, 0)]).hole(M2_5)
     tube = cq.Workplane("XZ").circle(7).circle(5).extrude(-40).translate((0, 12, 10))
@@ -514,7 +611,11 @@ def spectral_tube():
 
 # ---------------- 11 scan ----------------
 def riser(h: float):
+    """Hollow riser: 3 mm tube, 6 mm top, 4 screw bosses (less ABS, same stiffness where it matters)."""
     r = cq.Workplane("XY").circle(25).extrude(h)
+    if h > 10:
+        r = r.cut(cq.Workplane("XY").circle(22).extrude(h - 6))
+        r = r.union(cq.Workplane("XY").polarArray(15, 45, 360, 4).circle(5).extrude(h - 6))
     r = r.cut(cq.Workplane("XY").circle(20).extrude(2).translate((0, 0, h - 2)))                   # object nest
     return r.faces("<Z").workplane().polarArray(15, 45, 360, 4).cboreHole(M3, 6, max(h - 6, 1))
 
@@ -522,20 +623,26 @@ def riser(h: float):
 SCAN_TILT = 15.0                  # scan camera looks 15 deg down (machine.yaml scan.camera_elevation_deg)
 
 
-def scan_camera_wedge():
-    """15 deg wedge between the camera plate (CAM-03b) and the second camera's board: the scan camera sits 168 mm
-    above the zero point at 650 mm and looks down over the measuring camera. Same 34 mm M2.5 square + lens hole;
-    use M2.5 x 20 screws."""
-    import math
-    t0, side = 3.0, 50.0
-    rise = side * math.tan(math.radians(SCAN_TILT))
-    w = (cq.Workplane("YZ").polyline([(-side / 2, 0), (side / 2, 0), (side / 2, t0), (-side / 2, t0 + rise)]).close()
-         .extrude(side / 2, both=True))
-    w = w.cut(cq.Workplane("XY").circle(8.5).extrude(t0 + rise + 2).translate((0, 0, -1)))          # lens
-    for sx in (-17, 17):
-        for sy in (-17, 17):
-            w = w.cut(cq.Workplane("XY").circle(M2_5 / 2).extrude(t0 + rise + 2).translate((sx, sy, -1)))
-    return w
+SCAN_CLAMP_OFF = 18.0             # the tilted plate's lower edge swings 6.5 mm back: post 18 mm behind the plate centre
+
+
+def _scan_post():
+    """Scan camera: lens front 650 mm from the zero point, looking SCAN_TILT down; the clamp channel is vertical and
+    SCAN_CLAMP_OFF behind the plate-back centre, horizontally. Returns (post x, lens-front z)."""
+    e = math.radians(SCAN_TILT)
+    lx, lz = 650 * math.cos(e), 150 + 650 * math.sin(e)
+    back_x = lx + CAM_LENS_Z * math.cos(e)                 # plate back centre, CAM_LENS_Z behind the lens front
+    return back_x + SCAN_CLAMP_OFF, lz
+
+
+SCAN_POST_X, SCAN_LENS_Z = _scan_post()
+END_FOOT_X = round(SCAN_POST_X - 20 - 20 - 6)       # just inside the scan post socket (the post overhangs it by ~45 mm)
+
+
+def scan_camera_plate():
+    """Second camera plate: the plate looks 15 deg down while its clamp stays vertical on the scan post (replaces the
+    old wedge; same M2.5 x 8 screws, 6 mm standoffs). Lens front 650 mm from the zero point, centre 168 mm above it."""
+    return _camera_face().union(_post_clamp(SCAN_TILT, SCAN_CLAMP_OFF))
 
 
 # ---------------- 15 standalone ----------------
@@ -560,12 +667,13 @@ PARTS = {   # id: (stage folder, file stem, function, what)
     "FRM-09b": ("03-frame", "foot", foot, "Corner foot, screws on (print 4)"),
     "FRM-09c": ("03-frame", "protractor_segment", protractor_segment, "Ring scale, 80 deg (print 4: 20-340 deg)"),
     "FRM-09d": ("03-frame", "extrusion_saddle", extrusion_saddle, "2020 saddle, screws on (print 2)"),
-    "FRM-09e": ("03-frame", "post_socket", post_socket, "Post socket on the outrigger (print 2)"),
+    "FRM-09e": ("03-frame", "post_socket", post_socket, "Scan-post socket on the outrigger"),
+    "FRM-09h": ("03-frame", "camera_pillar", camera_pillar, "Measuring-camera pillar on the outrigger"),
     "FRM-09f": ("03-frame", "end_foot", end_foot, "Outrigger end foot"),
     "FRM-09g": ("03-frame", "washers", washers, "4 mm screw washers for the lazy Susan (8)"),
-    "LAR-08a": ("04-light-arm", "rim_segment", rim_segment, "Belt rim segment (print 8)"),
+    "LAR-08a": ("04-light-arm", "rim_segment", rim_segment, "Belt rim segment (print 7)"),
     "LAR-08b": ("04-light-arm", "ring_motor_mount", ring_motor_mount, "M4 motor mount at 0 deg, pinion meshes the rim"),
-    "LAR-08c": ("04-light-arm", "arm_bracket", arm_bracket, "Light-arm bracket (slotted, M4 + nuts)"),
+    "LAR-08c": ("04-light-arm", "arm_segment", arm_segment, "Arm segment: rim segment + 2020 upright socket"),
     "LAR-08e": ("04-light-arm", "cross_clamp", cross_clamp, "2020 cross clamp: upright to horizontal arm"),
     "TBL-07a": ("05-table", "table_drum", table_drum, "Table drum: 100T teeth, 608 seats, OG-40 top"),
     "TBL-07b": ("05-table", "home_flag", home_flag, "Home flag (print 3: table, tilt, spin)"),
@@ -590,7 +698,7 @@ PARTS = {   # id: (stage folder, file stem, function, what)
     "SCN-03a": ("11-scan-capture", "riser_20", lambda: riser(20), "Riser 20 mm"),
     "SCN-03b": ("11-scan-capture", "riser_40", lambda: riser(40), "Riser 40 mm"),
     "SCN-03c": ("11-scan-capture", "riser_60", lambda: riser(60), "Riser 60 mm"),
-    "SCN-03d": ("11-scan-capture", "scan_camera_wedge_15", scan_camera_wedge, "15 deg wedge for the scan camera"),
+    "SCN-03d": ("11-scan-capture", "scan_camera_plate_15", scan_camera_plate, "Scan camera plate, looks 15 deg down"),
     "STA-07a": ("15-standalone", "pi_zero_mount", pi_mount, "Pi Zero 2 W mount"),
 }
 
@@ -605,7 +713,11 @@ def build(only: str | None = None) -> list[Path]:
         shape = fn()
         for ext in ("step", "stl"):
             path = d / f"{pid}_{stem}.{ext}"
-            cq.exporters.export(shape, str(path), tolerance=0.05, angularTolerance=0.2) if ext == "stl" else cq.exporters.export(shape, str(path))
+            if ext == "stl":
+                cq.exporters.export(shape, str(path), tolerance=0.05, angularTolerance=0.2)
+            else:
+                cq.exporters.export(shape, str(path))
+                stepio.stabilise(path)
             out.append(path)
         bb = shape.val().BoundingBox()
         print(f"{pid:8} {stage:16} {stem:22} {bb.xlen:6.1f} x {bb.ylen:6.1f} x {bb.zlen:5.1f} mm")

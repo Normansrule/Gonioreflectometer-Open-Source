@@ -28,11 +28,11 @@ uart1:
 axes:
   shared_stepper_disable_pin: gpio.25:high
 
-  x:                        # M4 light arm: 24:1 ring, range 20..340 deg
+  x:                        # M4 light arm: 24:1 ring, range 20..324 deg
     steps_per_mm: 213.333
     max_rate_mm_per_min: 900
     acceleration_mm_per_sec2: 30
-    max_travel_mm: 320
+    max_travel_mm: 304
     soft_limits: true
     homing:
       cycle: 0              # homed explicitly with $HX by the laptop (M4 first)

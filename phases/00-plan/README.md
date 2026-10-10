@@ -4,6 +4,8 @@
 
 <img src="../../docs/assets/architecture.svg" width="100%" alt="Plan">
 
+$31.98 · total so far $31.98 / $630
+
 [Design](design.md) · [Research](research.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M01 · Read and decide
@@ -88,13 +90,13 @@ Optional: sketch photo as `phases/00-plan/sketch.jpg`. Tick the boxes; `make don
 
 1. Read each part's *why* line in `PARTS.md`.
 2. Tick `[x]` the parts you agree with; `status: have` for ones you own; `status: swap` + `note:` for ones you want changed; `status: skip` for ones you won't use.
-3. Tools: set `have` on each TLS row (00 · Tools) you own. Optional kits: tick the SPC rows (spectral, +$17), MSK rows (colour bands + polarizers, +$30), CAM-04/05 (second camera: no camera moves, +$81), CAL-03 (chrome balls, +$10), ENC-01/03 (drape, only if M21.2 fails) and STA rows (standalone, +$38) only if you want them.
+3. Tools: tick the TLS rows (00 · Plan) you will buy (they have their own total); `have` only for ones you really own. Optional kits: tick the SPC rows (spectral, +$17), MSK rows (colour bands + polarizers, +$30), CAM-04/05 (second camera: no camera moves, +$81), CAL-03 (chrome balls, +$10), ENC-01/03 (drape, only if M21.2 fails) and STA rows (standalone, +$38) only if you want them.
 4. Commit (*Commit changes* on GitHub, or `make publish m="M01.4 parts decided"` locally).
 
 #### Verify
 
 - [ ] Stages 01–03 headings in `PARTS.md` read `N/N decided` (nothing left `suggested`).
-- [ ] Summary table: *Still to buy* core ≤ $450; `make check` prints four `OK`.
+- [ ] Summary table: *Still to buy* core ≤ the cap (`HARD_CAP` in `tools/bom_check.py`, $630); `make check` prints four `OK`.
 
 #### If a check fails
 
@@ -212,9 +214,26 @@ This is exactly stage 07 on real hardware. Tick the boxes; `make done id=M02.4`.
 
 ## M03 · CAD and printer ready
 
-Printed parts fit first time. · 0/3 steps done · ~1.2 h hands-on · ~1 wk
+Printed parts fit first time. · 0/4 steps done · ~1.8 h hands-on · ~1 wk
 
-### M03.1 Onshape document
+### M03.1 Order the printer, filament and first tools
+
+**Time** 30 min (+ shipping 3–10 days) · **Needs** `PARTS.md` → 00 · Plan
+
+#### Do
+
+1. Order TLS-01 (enclosed printer for ABS), FIL-01 (black ABS 1 kg), TLS-03 hex keys, TLS-06 calipers, plus FRM-06 (M3/M4/M5 screws) and FRM-08 (608 bearings) for the fit test; set them `ordered` with `paid:` in `PARTS.md`.
+2. No printer? Skip TLS-01 and send the STL files to a print service or makerspace in black ABS; tell them the settings in M03.3.
+
+#### Verify
+
+- [ ] `python tools/bom_check.py` shows the tools total; TLS-01, FIL-01, TLS-03, TLS-06, FRM-06, FRM-08 are `ordered`.
+
+#### Record
+
+Commit the dated BOM.
+
+### M03.2 Onshape document
 
 **Time** 30 min · **Needs** free Onshape account
 
@@ -222,10 +241,12 @@ Printed parts fit first time. · 0/3 steps done · ~1.2 h hands-on · ~1 wk
 
 1. Create document **OpenGonio**; add Variable Studio `OG globals` with the values in `phases/00-plan/design.md` → Onshape set-up.
 2. Insert → Import `phases/00-plan/3d/PLAN-01_tolerance_coupon.step`.
+3. Import `cad/assembly/opengonio_assembly.step` (whole machine, every part has a model; `cad/README.md` lists them). Real vendor models: `bash scripts/get_cad.sh` → `cad/vendor/`.
 
 #### Verify
 
 - [ ] Coupon imports as one solid (Parts list: 1 part, not a mesh).
+- [ ] The assembly opens with the plywood, lazy Susan, arm, table and both cameras in place.
 
 #### If a check fails
 
@@ -235,28 +256,30 @@ Printed parts fit first time. · 0/3 steps done · ~1.2 h hands-on · ~1 wk
 
 Onshape link under Onshape set-up in `phases/00-plan/design.md`; commit.
 
-### M03.2 Print the coupon
+### M03.3 Print the coupon
 
-**Time** 15 min (+ print 1.5 h) · **Needs** TLS-01 3D printer · PETG
+**Time** 15 min (+ print 1.5 h) · **Needs** TLS-01 enclosed printer · FIL-01 black ABS · a ventilated room
 
 #### Do
 
-1. Slice `phases/00-plan/3d/PLAN-01_tolerance_coupon.stl`: PETG, 0.2 mm layers, 4 walls, 25 % infill, no supports.
-2. Print; let it cool on the bed.
+1. Slice `phases/00-plan/3d/PLAN-01_tolerance_coupon.stl`: ABS, nozzle 250 °C, bed 100 °C, door closed, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % infill, no supports.
+2. Print; let it cool in the closed printer for 10 min (ABS warps if cooled fast).
 
 #### Verify
 
-- [ ] Holes round (no elephant foot at the bottom layer); calipers: coupon length within ±0.3 mm of the model.
+- [ ] Corners flat on the bed (no lifting); holes round; calipers: coupon length 100.0 ± 0.3 mm.
 
 #### If a check fails
 
-- Bottom flare: lower the first-layer squish or enable elephant-foot compensation (0.2 mm).
+- Short (ABS shrinks ~0.5–0.8 %): set the slicer's XY shrinkage compensation to 100 × 100 / measured length %, reprint.
+- Corners lift: clean the bed, add a 5 mm brim, keep the door shut.
+- Bottom flare: elephant-foot compensation 0.2 mm.
 
 #### Record
 
-Tick the boxes; `make done id=M03.2`.
+Tick the boxes; `make done id=M03.3`.
 
-### M03.3 Set clearances
+### M03.4 Set clearances
 
 **Time** 30 min · **Needs** 5 × M3 × 10 from FRM-06 · FRM-08 608 bearings (3) · TLS-03 hex key 2.5 mm · TLS-06 calipers
 
@@ -281,6 +304,8 @@ Tick the boxes; `make done id=M03.2`.
 
 #### Record
 
-Commit: `make publish m="M03.3 clearances set"`.
+Commit: `make publish m="M03.4 clearances set"`.
 
-[Sources](../../REFERENCES.md): R1 · R2 · R5 · R6 · R7 · R8 · R24 · R27 · R30 · R47 · R50 · R56 · R63 · R64 · R68 · R69 · R79 · R80 · S3 · S18 · S20 · G1 · G2 · G6 · G7 · G33 · G35 · G36 · G38 · T1 · T4 · T11 · T17 · T35 · T38 · T40 · V19 · V20 · N6 · N12 · N14 · N50 · H28 · H29 · H35 · H44 · H56 · H57 · H58 · H60 · P1 · P15 · P17 · P23 · P31 · P32 · C3 · K1 · K5 · K19 · L1 · L4 · L9 · L18 · F9 · F10 · F11 · E5
+> **Safety:** ABS gives off fumes (styrene) while printing: enclosed printer, door shut, in a ventilated room you don't sleep in; open the door only after it cools.
+
+[Sources](../../REFERENCES.md): R1 · R2 · R5 · R6 · R7 · R8 · R24 · R27 · R30 · R47 · R50 · R56 · R63 · R64 · R68 · R69 · R79 · R80 · S3 · S18 · S20 · G1 · G2 · G6 · G7 · G33 · G35 · G36 · G38 · T1 · T4 · T11 · T17 · T35 · T38 · T40 · V19 · V20 · N6 · N12 · N14 · N50 · H28 · H29 · H35 · H44 · H56 · H57 · H58 · H60 · P1 · P15 · P17 · P23 · P31 · P32 · C3 · K1 · K5 · K19 · L1 · L4 · L9 · L18 · L21 · L22 · L23 · F9 · F10 · F11 · F14 · F15 · F17 · E5

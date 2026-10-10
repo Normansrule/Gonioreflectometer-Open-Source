@@ -27,7 +27,7 @@ J1 = PWR-03 jack adapter (screw block), fuse = PWR-04 inline holder with 3.15 A 
 
 | Part | Source |
 |---|---|
-| Box 120 × 80 × 50, lid (PWR-18) | `tools/cad/parts.py`: shell 3.2 mm, M3 self-tap posts (`M3_TAP`), 6 mm floor bosses for #8 wood screws, jack slot (lid holds the adapter), black-wire and red-wire (J3) slots, Ø22.3 e-stop hole in lid |
+| Box 120 × 80 × 60, lid (PWR-18) | `tools/cad/parts.py`: walls 2.4 mm (60 mm tall: the e-stop's contact block reaches 48.7 mm below the lid), lid 3.2 mm, M3 self-tap posts (`M3_TAP`), 6 mm floor bosses for #8 wood screws, jack slot (lid holds the adapter), black-wire and red-wire (J3) slots, Ø22.3 e-stop hole in lid |
 | Adapter GST60A24 | STEP on [Mouser](https://www.mouser.com/ProductDetail/MEAN-WELL/GST60A24-P1J?qs=odmYgEirbwyH6XaEPxnETQ%3D%3D) [P1] |
 | Jack adapter, e-stop | model from the product pages [P45][P16] |
 

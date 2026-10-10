@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | Job | 10-band spectrum of the spot at the zero point; the camera keeps doing images |
-| Mount | `3d/SPC-03a_spectral_tube` on the camera post, above the lens; 3 mm aperture, ~4° field, ~25 mm spot |
+| Mount | `3d/SPC-03a_spectral_tube` on the camera pillar (FRM-09h) above the lens, M5 × 10 into its z 181 pilot; 3 mm aperture, ~4° field, ~25 mm spot |
 | Wiring | SDA → Pico GP16, SCL → GP17, VIN → 3V3, GND (shares the OLED bus; address 0x39) |
 | Read | hub `SPEC?` → `SPEC f1..f8 clear nir`; `opengonio capture … --spectral` writes `spectral.csv` |
 | Geometry | `spectral.elevation_deg` = atan(height above camera axis / 350) in `machine.yaml` |
@@ -18,7 +18,7 @@
 (fill in)
 
 
-- 8 narrow-band LEDs (~420–660 nm) on a ring at the top of a 40° mast on the light arm; one band on at a time [N37].
+- 7 narrow-band LEDs (450, 465, 520, ≈ 590, ≈ 605, 620, 660 nm; pre-soldered leads, no solder) in 7 of the 8 slots of a ring at the top of a 40° mast on the light arm; one band on at a time [N37].
 - One NLDD-350H, supply switched by E4 GPIO4 (`M62 P1`); band chosen by Pico GP8–15 → ULN2803A.
 - The 40° mast also gives photometric stereo its non-coplanar lights (Phase 11–12).
 - Polarizer film in the lamp slot; rotatable disc on the lens [V49][V51].

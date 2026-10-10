@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/02.svg" width="100%" alt="Steps of stage 02">
 
-$70.59 · total so far $140.92 / $450
+$79.68 · total so far $216.02 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
@@ -212,7 +212,7 @@ Boards boxed; links, homing, e-stop sense and heat tested. · 0/5 steps done · 
 #### Do
 
 1. Print `CTL-10a_button_panel.stl`, `CTL-10b_controller_tray.stl`.
-2. Drive M3 × 8 into the 4 E4 standoffs once; mount the E4 (holes 83.6 × 60.6 mm). Press the Pico H's corner holes over the tray pegs.
+2. Drive M3 × 8 into the 4 E4 standoffs once; mount the E4 (holes 83.6 × 60.6 mm). Turn the Pico H components-down (header pins up) and press its corner holes over the tray pegs (it was flashed in M09.1).
 3. Breadboard: peel its backing, stick it in the recess. Keypads: peel and stick into the panel recesses, tails through the slots.
 
 #### Verify

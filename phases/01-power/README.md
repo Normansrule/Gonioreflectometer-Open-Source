@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/power-flow.svg" width="100%" alt="Power box">
 
-$70.33 · total so far $70.33 / $450
+$104.36 · total so far $136.34 / $630
 
 [Design](design.md) · [Research](research.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
@@ -19,8 +19,8 @@ Everything for the power box on the bench. · 0/3 steps done · ~1.1 h hands-on 
 #### Do
 
 1. Order every stage-01 part ticked `[x]` (status `agreed`), using its link.
-2. Also order FRM-06 (M3/M4/M5 screws): the box needs them now.
-3. Tools: set `have` on the TLS rows you own; buy the multimeter (TLS-05) and wire stripper (TLS-04) now if you don't.
+2. FRM-06 screws were ordered in M03.1; the box uses them.
+3. Tools: order the TLS rows (00 · Plan; their own total, not in the machine total): multimeter (TLS-05) and wire stripper (TLS-04) are needed now; the printer and ABS were ordered in M03.1.
 4. In `PARTS.md` set each ordered part to `status: ordered` and fill `paid:`.
 
 #### Verify
@@ -38,11 +38,11 @@ Commit the dated BOM.
 
 ### M04.2 Print the box
 
-**Time** 15 min (+ print 5 h) · **Needs** PETG
+**Time** 15 min (+ print 5 h) · **Needs** FIL-01 ABS · TLS-01 enclosed printer
 
 #### Do
 
-1. Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl`: PETG, 0.2 mm, 4 walls, 30 % infill.
+1. Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl`: ABS (settings from M03.3, brim on), 0.2 mm, 4 walls, 30 % infill.
 
 #### Verify
 

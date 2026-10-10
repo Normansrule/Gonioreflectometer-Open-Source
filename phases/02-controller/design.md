@@ -89,7 +89,7 @@ opengonio panel                              # buttons drive the machine
 
 | Part | Source |
 |---|---|
-| Case + keypad panel (CTL-10) | `tools/cad/parts.py`: E4 standoffs (M3 self-tap on 83.6 × 60.6 mm), Pico push-fit pegs (47 × 11.4, through the Ø2.1 holes), breadboard recess, 2 keypad recesses + tail slots, 4 corner bosses for #8 wood screws |
+| Case + keypad panel (CTL-10) | `tools/cad/parts.py`: E4 standoffs (M3 self-tap on 83.6 × 60.6 mm), Pico push-fit pegs (47 × 11.4, through the Ø2.1 holes; 8 mm tall: the Pico H mounts **components down, header pins up**, so jumpers plug in from above — flash it with BOOTSEL before mounting, later updates go over USB), window under the E4, breadboard recess, 2 keypad recesses + tail slots, 4 corner bosses for #8 wood screws |
 | Pico | [STEP](https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip) [C6] |
 | FYSETC E4 | `E4 V1.0B.step` in the [hardware folder](https://github.com/FYSETC/FYSETC-E4/tree/main/hardware) [C1]: board 96 × 68 mm, 4 × Ø3.2 holes on 83.6 × 60.6 mm |
 

@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/05.svg" width="100%" alt="Steps of stage 05">
 
-$18.38 · total so far $261.77 / $450
+$23.56 · total so far $386.08 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -138,7 +138,7 @@ JSON in phases/05-table/design.md → Results.
 #### Verify
 
 - [ ] First move runs.
-- [ ] Second prints `refused: M4=10.0 outside [20.0, 340.0]` and nothing moves.
+- [ ] Second prints `refused: M4=10.0 outside [20.0, 324.0]` and nothing moves.
 
 #### Record
 

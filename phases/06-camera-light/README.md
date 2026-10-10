@@ -4,13 +4,13 @@
 
 <img src="../../docs/assets/brdf-lobe.svg" width="100%" alt="Camera and light">
 
-$98.36 · total so far $360.13 / $450
+$118.20 · total so far $504.28 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M17 · Camera sees the zero point
 
-Sharp, fixed-exposure image centred on the sample. · 0/5 steps done · ~2.8 h hands-on · ~2 wk
+Sharp, fixed-exposure image centred on the sample. · 0/5 steps done · ~3 h hands-on · ~2 wk
 
 ### M17.1 Camera reaches the software
 
@@ -39,17 +39,19 @@ Which setup you use in phases/06-camera-light/design.md → Results.
 
 ### M17.2 Mount
 
-**Time** 1 h (+ print 1 h) · **Needs** CAM-01 camera · CAM-02 lens · CAM-03 prints
+**Time** 1.25 h (+ print 1 h) · **Needs** CAM-01 camera · CAM-02 lens · CAM-03 prints · TLS-09 utility knife + 400-grit paper
 
 #### Do
 
 1. Order the stage-06 parts ticked in `PARTS.md`, plus CAL-01 PTFE, CAL-02 mirror (stage 07): M17.5–M19 use them. Print `CAM-03a_aperture_stop_f8.stl`, `CAM-03b_camera_plate.stl`, `CAL-06a/b` holders.
-2. Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 2.2 mm holes.
-3. Camera on the post: lens front 350 mm from the zero point; aperture stop in front of the lens.
+2. Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 6 mm standoffs.
+3. Plate on the camera pillar: slide its clamp down to the pilot hole, M5 × 10 self-taps into it; aperture stop in front of the lens.
+4. White tile (CAL-01): mark one 100 × 100 mm PTFE sheet into four 50 mm squares (lines at 50 mm both ways); cut each line with the utility knife against a straight edge, 4–6 light passes, never through in one go. Stack 3 squares (9 mm) in the `CAL-06a` holder; sand the top one with 400 grit in circles until evenly matte; blow off the dust, don't touch the face.
 
 #### Verify
 
 - [ ] Tape measure zero point → lens front: 350 ± 2 mm; camera axis level (phone level app on the plate).
+- [ ] PTFE stack sits flush with the holder rim; no shiny patches on the top face.
 
 #### Record
 
@@ -86,7 +88,7 @@ Image as `phases/06-camera-light/focus.jpg`.
 
 #### If a check fails
 
-- Off-centre: shim the camera plate or slide it on the post.
+- Off-centre: shim the camera board on its standoffs (paper or tape layers), or the plate's clamp on the pillar.
 
 #### Record
 
@@ -119,17 +121,19 @@ Light switches from the laptop, stays cool and steady. · 0/3 steps done · ~1.6
 
 ### M18.1 Lamp assembly
 
-**Time** 1 h (+ print 2 h) · **Needs** LSR-01 COB · LSR-06 holder · LSR-02 driver · LSR-03 heatsink · LSR-04 pad · LSR-05 print · PWR-20 lever connectors
+**Time** 1 h (+ print 2 h) · **Needs** LSR-01 COB · LSR-06 holder · LSR-02 driver · LSR-03 heatsink · LSR-04 tape · LSR-05 print · PWR-15 18 AWG offcuts (2 × 15 cm) · PWR-20 lever connectors · TLS-04 stripper
 
 #### Do
 
-1. Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. COB in the pre-wired holder (LSR-06); thermal pad on the heatsink; holder + COB + heatsink into the body's square pocket, leads out of the cap slot; cap on with 4 × M3 × 8.
-2. Lamp clamp onto the horizontal arm (M5 × 10 + T-nut), aperture facing the zero point.
-3. Driver (LSR-02) pins into the breadboard. +Vin row ← 24 V sense row; −Vin row → E4 HE0 `−` (cut jumper under the screw).
-4. Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–340°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to the holder's red (+) / black (−).
+1. Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. Strip one end of a 15 cm red and a 15 cm black 18 AWG lead (PWR-15) to the length in the holder's instruction sheet; push red into the holder's `+` poke-in, black into `−`.
+2. Holder face-down in the body's round seat, wire entries toward the lead groove (the side away from the clamp), leads along the groove. COB into the holder's square seat, light-emitting face down through the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M3 × 8, leads through its slot; tighten evenly until the heatsink no longer turns.
+3. Lamp clamp onto the horizontal arm (M5 × 10 + T-nut), aperture facing the zero point.
+4. Driver (LSR-02) pins into the breadboard. +Vin row ← 24 V sense row; −Vin row → E4 HE0 `−` (cut jumper under the screw).
+5. Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to the lamp's red (+) / black (−) lead.
 
 #### Verify
 
+- [ ] Each lead holds when tugged (poke-in locked).
 - [ ] Polarity checked with the meter before power: +Vo row → red lead beeps.
 
 #### Record
@@ -254,4 +258,4 @@ Two real materials measured and pictured. · 0/2 steps done · ~40 min hands-on 
 
 > **Safety:** Don't stare into the lamp.
 
-[Sources](../../REFERENCES.md): R1 · G12 · T32 · V1 · V2 · V3 · V4 · V5 · V7 · V8 · V9 · N3 · N11 · N24 · N25 · N45 · N46 · N47 · H13 · H14 · H15 · H49 · K1 · K2 · K3 · K4 · K5 · K6 · K23 · L1 · L2 · L3 · L4 · L5 · L6 · L7 · L21 · F13
+[Sources](../../REFERENCES.md): R1 · G12 · T32 · V1 · V2 · V3 · V4 · V5 · V7 · V8 · V9 · N3 · N11 · N24 · N25 · N45 · N46 · N47 · H13 · H14 · H15 · H49 · K1 · K2 · K3 · K4 · K5 · K6 · K23 · L4 · L5 · L6 · L7 · L21 · L22 · L23

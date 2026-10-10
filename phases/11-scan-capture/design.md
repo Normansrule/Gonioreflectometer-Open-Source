@@ -23,7 +23,7 @@ Fasteners: M3 × 8 × 2, M5 × 10 + T-nut × 1. Optics: [optics.md](../06-camera
 
 | Part | Source |
 |---|---|
-| Risers 20/40/60 mm, 15° scan-camera wedge (SCN-03) | Onshape `SCN` |
+| Risers 20/40/60 mm (hollow), scan camera plate looking 15° down on the vertical post (SCN-03) | `tools/cad/parts.py` |
 
 ## Results
 

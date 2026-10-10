@@ -4,6 +4,7 @@
 stages:
 - folder: 00-plan
   title: Plan
+  safety: 'ABS gives off fumes (styrene) while printing: enclosed printer, door shut, in a ventilated room you don''t sleep in; open the door only after it cools.'
 - folder: 01-power
   title: Power box
   safety: Mains stays inside the certified adapter. Plug in with the e-stop pressed; unplug before touching any screw terminal.
@@ -104,12 +105,12 @@ milestones:
     do:
     - Read each part's *why* line in `PARTS.md`.
     - 'Tick `[x]` the parts you agree with; `status: have` for ones you own; `status: swap` + `note:` for ones you want changed; `status: skip` for ones you won''t use.'
-    - 'Tools: set `have` on each TLS row (00 · Tools) you own. Optional kits: tick the SPC rows (spectral, +$17), MSK rows (colour bands + polarizers, +$30), CAM-04/05 (second camera: no camera moves, +$81),
-      CAL-03 (chrome balls, +$10), ENC-01/03 (drape, only if M21.2 fails) and STA rows (standalone, +$38) only if you want them.'
+    - 'Tools: tick the TLS rows (00 · Plan) you will buy (they have their own total); `have` only for ones you really own. Optional kits: tick the SPC rows (spectral, +$17), MSK rows (colour bands + polarizers,
+      +$30), CAM-04/05 (second camera: no camera moves, +$81), CAL-03 (chrome balls, +$10), ENC-01/03 (drape, only if M21.2 fails) and STA rows (standalone, +$38) only if you want them.'
     - Commit (*Commit changes* on GitHub, or `make publish m="M01.4 parts decided"` locally).
     verify:
     - Stages 01–03 headings in `PARTS.md` read `N/N decided` (nothing left `suggested`).
-    - 'Summary table: *Still to buy* core ≤ $450; `make check` prints four `OK`.'
+    - 'Summary table: *Still to buy* core ≤ the cap (`HARD_CAP` in `tools/bom_check.py`, $630); `make check` prints four `OK`.'
     fail:
     - 'A line stays `suggested` after ticking: the box must read `[x]` with no space inside.'
     - '`swap` parts: tell me the replacement, or add it with `python tools/new.py part …`, then `skip` the old one.'
@@ -197,6 +198,19 @@ milestones:
   weeks: 1
   steps:
   - id: M03.1
+    title: Order the printer, filament and first tools
+    time: 30 min
+    wait: shipping 3–10 days
+    needs:
+    - '`PARTS.md` → 00 · Plan'
+    do:
+    - Order TLS-01 (enclosed printer for ABS), FIL-01 (black ABS 1 kg), TLS-03 hex keys, TLS-06 calipers, plus FRM-06 (M3/M4/M5 screws) and FRM-08 (608 bearings) for the fit test; set them `ordered` with
+      `paid:` in `PARTS.md`.
+    - No printer? Skip TLS-01 and send the STL files to a print service or makerspace in black ABS; tell them the settings in M03.3.
+    verify:
+    - '`python tools/bom_check.py` shows the tools total; TLS-01, FIL-01, TLS-03, TLS-06, FRM-06, FRM-08 are `ordered`.'
+    record: Commit the dated BOM.
+  - id: M03.2
     title: Onshape document
     time: 30 min
     needs:
@@ -204,27 +218,32 @@ milestones:
     do:
     - Create document **OpenGonio**; add Variable Studio `OG globals` with the values in `phases/00-plan/design.md` → Onshape set-up.
     - Insert → Import `phases/00-plan/3d/PLAN-01_tolerance_coupon.step`.
+    - 'Import `cad/assembly/opengonio_assembly.step` (whole machine, every part has a model; `cad/README.md` lists them). Real vendor models: `bash scripts/get_cad.sh` → `cad/vendor/`.'
     verify:
     - 'Coupon imports as one solid (Parts list: 1 part, not a mesh).'
+    - The assembly opens with the plywood, lazy Susan, arm, table and both cameras in place.
     fail:
     - 'Imported as a mesh: you picked the .stl; import the .step.'
     record: Onshape link under Onshape set-up in `phases/00-plan/design.md`; commit.
-  - id: M03.2
+  - id: M03.3
     title: Print the coupon
     time: 15 min
     wait: print 1.5 h
     needs:
-    - TLS-01 3D printer
-    - PETG
+    - TLS-01 enclosed printer
+    - FIL-01 black ABS
+    - a ventilated room
     do:
-    - 'Slice `phases/00-plan/3d/PLAN-01_tolerance_coupon.stl`: PETG, 0.2 mm layers, 4 walls, 25 % infill, no supports.'
-    - Print; let it cool on the bed.
+    - 'Slice `phases/00-plan/3d/PLAN-01_tolerance_coupon.stl`: ABS, nozzle 250 °C, bed 100 °C, door closed, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % infill, no supports.'
+    - Print; let it cool in the closed printer for 10 min (ABS warps if cooled fast).
     verify:
-    - 'Holes round (no elephant foot at the bottom layer); calipers: coupon length within ±0.3 mm of the model.'
+    - 'Corners flat on the bed (no lifting); holes round; calipers: coupon length 100.0 ± 0.3 mm.'
     fail:
-    - 'Bottom flare: lower the first-layer squish or enable elephant-foot compensation (0.2 mm).'
-    record: Tick the boxes; `make done id=M03.2`.
-  - id: M03.3
+    - 'Short (ABS shrinks ~0.5–0.8 %): set the slicer''s XY shrinkage compensation to 100 × 100 / measured length %, reprint.'
+    - 'Corners lift: clean the bed, add a 5 mm brim, keep the door shut.'
+    - 'Bottom flare: elephant-foot compensation 0.2 mm.'
+    record: Tick the boxes; `make done id=M03.3`.
+  - id: M03.4
     title: Set clearances
     time: 30 min
     needs:
@@ -245,7 +264,7 @@ milestones:
     fail:
     - 'Every screw spins loose: print 10 °C hotter (better layer bonding) and reprint the coupon.'
     - '`make parts` import error: the cadquery install failed; re-run the pip line and read its last error.'
-    record: 'Commit: `make publish m="M03.3 clearances set"`.'
+    record: 'Commit: `make publish m="M03.4 clearances set"`.'
 - id: M04
   stage: 01-power
   title: Order power parts
@@ -262,8 +281,8 @@ milestones:
     - '`PARTS.md` → 00 · Tools'
     do:
     - Order every stage-01 part ticked `[x]` (status `agreed`), using its link.
-    - 'Also order FRM-06 (M3/M4/M5 screws): the box needs them now.'
-    - 'Tools: set `have` on the TLS rows you own; buy the multimeter (TLS-05) and wire stripper (TLS-04) now if you don''t.'
+    - FRM-06 screws were ordered in M03.1; the box uses them.
+    - 'Tools: order the TLS rows (00 · Plan; their own total, not in the machine total): multimeter (TLS-05) and wire stripper (TLS-04) are needed now; the printer and ABS were ordered in M03.1.'
     - 'In `PARTS.md` set each ordered part to `status: ordered` and fill `paid:`.'
     verify:
     - Stage 01 in `PARTS.md` has no `agreed` or `suggested` parts left; *Paid so far* went up.
@@ -276,9 +295,10 @@ milestones:
     time: 15 min
     wait: print 5 h
     needs:
-    - PETG
+    - FIL-01 ABS
+    - TLS-01 enclosed printer
     do:
-    - 'Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl`: PETG, 0.2 mm, 4 walls, 30 % infill.'
+    - 'Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl`: ABS (settings from M03.3, brim on), 0.2 mm, 4 walls, 30 % infill.'
     verify:
     - Walls not split; the Ø22.3 e-stop hole in the lid is round (calipers 22.2–22.5 mm).
     fail:
@@ -582,7 +602,7 @@ milestones:
     - PWR-19 breadboard
     do:
     - Print `CTL-10a_button_panel.stl`, `CTL-10b_controller_tray.stl`.
-    - Drive M3 × 8 into the 4 E4 standoffs once; mount the E4 (holes 83.6 × 60.6 mm). Press the Pico H's corner holes over the tray pegs.
+    - Drive M3 × 8 into the 4 E4 standoffs once; mount the E4 (holes 83.6 × 60.6 mm). Turn the Pico H components-down (header pins up) and press its corner holes over the tray pegs (it was flashed in M09.1).
     - 'Breadboard: peel its backing, stick it in the recess. Keypads: peel and stick into the panel recesses, tails through the slots.'
     verify:
     - E4 sits flat on all four standoffs; USB ports reachable through the slots.
@@ -678,9 +698,9 @@ milestones:
     time: 30 min
     wait: print 4 h
     needs:
-    - TLS-08 paper printer
+    - TLS-08 paper printing
     - tape
-    - PETG
+    - FIL-01 ABS
     do:
     - Print `phases/03-frame/placement-template.svg` at 100 % in poster/tile mode; tape the tiles on the crosses.
     - Print 4 × `FRM-09b_foot.stl`, 2 × `FRM-09d_extrusion_saddle.stl`.
@@ -711,7 +731,7 @@ milestones:
 - id: M12
   stage: 03-frame
   title: Assemble the frame
-  goal: Board on feet with outrigger, camera post, scales and boxes.
+  goal: Board on feet with outrigger, camera pillar and post, scales and boxes.
   weeks: 1
   steps:
   - id: M12.1
@@ -730,24 +750,26 @@ milestones:
     - 'Rocks: the table isn''t flat; fold paper under the short foot. (No levelling needed: the optics reference the board, not gravity.)'
     record: Tick the boxes; `make done id=M12.1`.
   - id: M12.2
-    title: Outrigger and camera posts
+    title: Outrigger, camera pillar and scan post
     time: 45 min
     wait: print 3 h
     needs:
-    - 3 × FRM-02 2020
-    - 9 × FRM-03 T-nuts
-    - 9 × M5 × 10
-    - FRM-09e post sockets (2)
+    - 2 × FRM-02 2020 (outrigger + scan post)
+    - 7 × FRM-03 T-nuts
+    - 7 × M5 × 10
+    - FRM-09e post socket
+    - FRM-09h camera pillar
     - FRM-09f end foot
     - TLS-07 tape + phone level app
     do:
     - Print 2 × `FRM-09e_post_socket.stl` and 1 × `FRM-09f_end_foot.stl`.
-    - Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under the far end.
+    - Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under it at x = 628 (just inside the scan post).
     - M5 × 10 through each saddle wall and the end foot into the T-nuts; tighten.
-    - Post sockets on the outrigger at x = 380 (measuring camera) and x = 658 (scan camera); a 2020 post in each (M5 × 10 + T-nut).
+    - 'Camera pillar (FRM-09h) on the outrigger at x = 391.8 (measuring camera: lens front lands at 350); post socket at x = 674.4 with the 500 mm scan post (M5 × 10 + T-nut each). No tall post at the measuring
+      camera: it would stand in the scan camera''s view.'
     verify:
     - 'Posts vertical: phone level app on two faces reads 90.0 ± 0.5°.'
-    - Post centres 380 ± 1 and 658 ± 2 mm from the board centre (tape).
+    - Pillar and post centres 391.8 ± 1 and 674.4 ± 2 mm from the board centre (tape); pillar's M5 pilot at 150 ± 1 mm above the board.
     - Outrigger level end to end (phone level app ±0.5°).
     fail:
     - 'Far end low: the end foot is 30 mm for 12 mm feet + 12 mm plywood + 6 mm saddle; shim it.'
@@ -763,7 +785,7 @@ milestones:
     - Print 4 × `FRM-09c_protractor_segment.stl` (80° each).
     - Stick them end to end around the ring circle from 20° to 340° (0° = +X, toward the camera; the gap is the M4 motor).
     verify:
-    - The 20° and 340° ends sit symmetric about the line board centre → camera post (string line).
+    - The 20° and 340° ends sit symmetric about the line board centre → camera pillar (string line).
     record: Tick the boxes; `make done id=M12.3`.
   - id: M12.4
     title: Mount the boxes
@@ -804,9 +826,10 @@ milestones:
     time: 15 min
     wait: print 9 h
     needs:
-    - PETG
+    - FIL-01 ABS
     do:
-    - Print 8 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08c_arm_bracket.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl` (8 washers).
+    - Print 7 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08c_arm_segment.stl` (the 8th rim segment, with the upright socket), 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl`
+      (8 washers).
     verify:
     - Segments butt into a closed ring on the table (no gap > 0.5 mm).
     record: Tick the boxes; `make done id=M13.2`.
@@ -817,14 +840,15 @@ milestones:
     - LAR-01 lazy Susan
     - LAR-03 belt
     - FRM-12 wood screws + 4 mm printed washers
-    - M4 × 12 + nuts (FRM-06)
+    - M4 × 16 + nuts (FRM-06)
     - TLS-09 CA glue
     - TLS-04 cutter
     do:
     - 'Lazy Susan centred on the template circle; #8 wood screws through its bottom-plate holes, each through a 4 mm printed washer (the steel plate is thin: without the washer the 16 mm screw pokes through
       the plywood).'
-    - 'Rim segments on the top plate: M4 × 12 + nut through every slot that lands on a plate hole; CA-glue the others to the plate.'
-    - Glue the GT2 belt teeth-out into the groove, ends butted, no gap; it ties the segments together.
+    - 'Rim segments + the arm segment on the top plate, closed ring: turn the ring so an arm-segment slot lands on a plate hole; M4 × 16 + nut through every slot that lands on a hole; CA-glue the rest (the
+      arm segment''s whole underside).'
+    - CA-glue the GT2 belt teeth-out on the 6 mm band, its edges flush with the band's edges, ends butted, no gap; it ties the segments together.
     verify:
     - 'Count the belt teeth: equals `RIM_TEETH` ± 1.'
     - No tooth step at the joint (run a fingernail over it).
@@ -842,7 +866,7 @@ milestones:
     - 4 × M3 × 8
     - FRM-12 wood screws
     do:
-    - Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt.
+    - Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt (its flanges pass above and below the band).
     - Mount on its template outline at 0° (+X), base outside the lazy Susan; slide it in until the pulley meshes the rim belt fully, then screw the base down (2 screws in the slots).
     verify:
     - Pulley teeth engage the rim belt across its full width; turning the ring by hand turns the motor, no skipped tooth.
@@ -853,17 +877,17 @@ milestones:
     title: Arm
     time: 45 min
     needs:
-    - LAR-08c bracket
+    - LAR-08c arm segment (in the ring)
     - 2 × FRM-02 2020 (upright + arm)
     - LAR-08e cross clamp
-    - M4 × 12 + nuts
+    - M4 × 16 + nuts
     - LSR-05 lamp body (stage 06, or a dummy)
     do:
-    - 'Arm bracket on the top plate at r ≈ 140 mm: M4 × 12 + nuts through its slots and two plate holes.'
-    - 2020 upright in the bracket socket (M5 × 10 + T-nut). Cross clamp on the upright; horizontal 2020 arm in its top channel pointing outward, so the lamp centre will sit 300 mm from the zero point at
-      zero-point height (150 mm).
+    - The upright stands in the arm segment's socket, 36 mm beside the lamp's beam line (so it never shades the sample).
+    - 2020 upright in the socket (M5 × 10 + T-nut). Cross clamp on the upright (the uncut 500 mm upright runs straight through it); horizontal 2020 arm in its side channel, parallel to the beam line, pointing
+      outward; the lamp's clamp is offset so its beam centre passes through the zero point, 300 mm out, at 150 mm.
     verify:
-    - 'Turning by hand 20 → 340°: no tight spot, no skipped tooth; the bracket never touches the motor.'
+    - 'Turning by hand 20 → 324°: no tight spot, no skipped tooth; the arm segment and upright never touch the motor plate.'
     - 'Lamp position: 300 ± 2 mm from the zero point, height 150 ± 2 mm.'
     record: Commit.
 - id: M14
@@ -1035,7 +1059,7 @@ milestones:
     - '`opengonio move M4=10`'
     verify:
     - First move runs.
-    - 'Second prints `refused: M4=10.0 outside [20.0, 340.0]` and nothing moves.'
+    - 'Second prints `refused: M4=10.0 outside [20.0, 324.0]` and nothing moves.'
     record: Commit `make publish m="M16 table done"`.
 - id: M17
   stage: 06-camera-light
@@ -1063,18 +1087,22 @@ milestones:
     record: Which setup you use in phases/06-camera-light/design.md → Results.
   - id: M17.2
     title: Mount
-    time: 1 h
+    time: 1.25 h
     wait: print 1 h
     needs:
     - CAM-01 camera
     - CAM-02 lens
     - CAM-03 prints
+    - TLS-09 utility knife + 400-grit paper
     do:
     - 'Order the stage-06 parts ticked in `PARTS.md`, plus CAL-01 PTFE, CAL-02 mirror (stage 07): M17.5–M19 use them. Print `CAM-03a_aperture_stop_f8.stl`, `CAM-03b_camera_plate.stl`, `CAL-06a/b` holders.'
-    - 'Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 2.2 mm holes.'
-    - 'Camera on the post: lens front 350 mm from the zero point; aperture stop in front of the lens.'
+    - 'Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 6 mm standoffs.'
+    - 'Plate on the camera pillar: slide its clamp down to the pilot hole, M5 × 10 self-taps into it; aperture stop in front of the lens.'
+    - 'White tile (CAL-01): mark one 100 × 100 mm PTFE sheet into four 50 mm squares (lines at 50 mm both ways); cut each line with the utility knife against a straight edge, 4–6 light passes, never through
+      in one go. Stack 3 squares (9 mm) in the `CAL-06a` holder; sand the top one with 400 grit in circles until evenly matte; blow off the dust, don''t touch the face.'
     verify:
     - 'Tape measure zero point → lens front: 350 ± 2 mm; camera axis level (phone level app on the plate).'
+    - PTFE stack sits flush with the holder rim; no shiny patches on the top face.
     record: Tick the boxes; `make done id=M17.2`.
   - id: M17.3
     title: Focus
@@ -1097,7 +1125,7 @@ milestones:
     verify:
     - Within ±15 px of the image centre (= ±0.5 mm).
     fail:
-    - 'Off-centre: shim the camera plate or slide it on the post.'
+    - 'Off-centre: shim the camera board on its standoffs (paper or tape layers), or the plate''s clamp on the pillar.'
     record: Offset (px) in design.md.
   - id: M17.5
     title: Lock exposure and colour
@@ -1127,17 +1155,22 @@ milestones:
     - LSR-06 holder
     - LSR-02 driver
     - LSR-03 heatsink
-    - LSR-04 pad
+    - LSR-04 tape
     - LSR-05 print
+    - PWR-15 18 AWG offcuts (2 × 15 cm)
     - PWR-20 lever connectors
+    - TLS-04 stripper
     do:
-    - Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. COB in the pre-wired holder (LSR-06); thermal pad on the heatsink; holder + COB + heatsink into the body's square pocket, leads out of the cap slot;
-      cap on with 4 × M3 × 8.
+    - Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. Strip one end of a 15 cm red and a 15 cm black 18 AWG lead (PWR-15) to the length in the holder's instruction sheet; push red into the holder's `+` poke-in,
+      black into `−`.
+    - Holder face-down in the body's round seat, wire entries toward the lead groove (the side away from the clamp), leads along the groove. COB into the holder's square seat, light-emitting face down through
+      the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M3 × 8, leads through its slot; tighten evenly until the heatsink no longer turns.
     - Lamp clamp onto the horizontal arm (M5 × 10 + T-nut), aperture facing the zero point.
     - Driver (LSR-02) pins into the breadboard. +Vin row ← 24 V sense row; −Vin row → E4 HE0 `−` (cut jumper under the screw).
-    - Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–340°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to
-      the holder's red (+) / black (−).
+    - Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to
+      the lamp's red (+) / black (−) lead.
     verify:
+    - Each lead holds when tugged (poke-in locked).
     - 'Polarity checked with the meter before power: +Vo row → red lead beeps.'
     record: Tick the boxes; `make done id=M18.1`.
   - id: M18.2
@@ -1618,7 +1651,7 @@ milestones:
     - 2 × M2.5 screws
     do:
     - Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it.
-    - Clamp it on the camera post just above the camera; aim at the zero point.
+    - Clamp it on the camera pillar just above the camera (M5 × 10 into the z 181 pilot); aim at the zero point.
     verify:
     - 'Looking down the tube: the zero point is centred.'
     record: Tick the boxes; `make done id=M29.1`.
@@ -1676,7 +1709,7 @@ milestones:
     - MSK-06 prints
     do:
     - Print `MSK-06a_led_ring.stl`, `MSK-06b_led_mast.stl`.
-    - 8 pre-wired LED stars on the ring, thermal pad, wavelength written next to each.
+    - 7 pre-wired LED stars in slots 1–7 of the ring (slot 8 spare), thermal pad, wavelength written next to each.
     verify:
     - Ring on the mast at 40° elevation (angle gauge).
     record: Tick the boxes; `make done id=M30.1`.
@@ -1723,28 +1756,27 @@ milestones:
   weeks: 1
   steps:
   - id: M31.1
-    title: Print risers and wedge
+    title: Print risers and scan plate
     time: 10 min
     wait: print 3 h
     needs:
     - SCN-03 prints
-    - a second CAM-03b camera plate
     do:
-    - Print `SCN-03a/b/c` risers, `SCN-03d_scan_camera_wedge_15.stl` and a second `CAM-03b_camera_plate.stl` + `CAM-03a_aperture_stop_f8.stl`.
+    - Print `SCN-03a/b/c` risers, `SCN-03d_scan_camera_plate_15.stl` and a second `CAM-03a_aperture_stop_f8.stl`.
     verify:
     - Risers sit flat on the platter.
-    - 'Wedge: thin end 3 mm, thick end 16.4 mm (calipers).'
+    - 'Scan plate: its face leans 15° to its clamp channel (phone level app: 75° on the face with the channel vertical).'
     record: Tick the boxes; `make done id=M31.1`.
   - id: M31.2
     title: Mount the scan camera
     time: 45 min
     needs:
-    - scan post at x = 658 (M12.2)
-    - CAM-08 M2.5 × 20 screws
+    - scan post at x = 674.4 (M12.2)
+    - 4 × M2.5 × 8 (CAM-08, or the CAM-07 screws moving with the camera)
     - CAM-04 camera + CAM-05 lens (optional kit), or the measuring camera moved here
     do:
-    - The scan post stands on the outrigger at x = 658 mm (650 mm × cos 15° + 30) since M12.2.
-    - 'Camera plate on the post, wedge between plate and board (thick end down): lens centre 168 mm above the zero point, looking 15° down.'
+    - The scan post stands on the outrigger at x = 674.4 mm since M12.2 (lens 650 mm from the zero point, 15° down).
+    - 'Camera board on the scan plate''s standoffs (4 × M2.5 × 8); plate on the post: lens centre 168 mm above the zero point (318 mm above the board), looking 15° down.'
     - Focus on the zero point (M17.3 method) and lock the lens; aperture stop on.
     - Plug it in; `machine.yaml` → `scan.camera_index` = its index (usually 1); `opengonio scan plan`.
     verify:

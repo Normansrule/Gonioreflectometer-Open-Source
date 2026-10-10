@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Check every phases/*/bom.csv and the $450 total; draw docs/assets/budget.svg.
+"""Check every phases/*/bom.csv and the machine total against HARD_CAP; draw docs/assets/budget.svg.
 Fill `Paid USD` as you buy (shipping included): the summary then shows planned vs actually spent.
 
     python tools/bom_check.py            # check + chart
-    python tools/bom_check.py --strict   # also fail if the total > HARD_CAP ($450)
+    python tools/bom_check.py --strict   # also fail if the total > HARD_CAP
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -21,8 +21,8 @@ SVG = ROOT / "docs" / "assets" / "budget.svg"
 REFS = ROOT / "REFERENCES.md"
 COLUMNS = ["ID", "Type", "Part", "Use", "Requirement", "Qty", "Maker", "Part number", "Supplier", "Link", "Unit USD",
            "Total USD", "STEP", "CAD license", "Notes", "Own", "Price", "Refs", "Paid USD", "Status"]
-TYPES = {"Purchase", "Print", "Owned", "Optional"}
-HARD_CAP = 450.0
+TYPES = {"Purchase", "Print", "Owned", "Optional", "Tool"}   # Tool: bought once, kept; own total, not in the machine cap
+HARD_CAP = 630.0   # raised from $450 on 2026-10-09: parts only from Digi-Key, Amazon, Adafruit
 
 
 def load() -> dict[str, list[dict]]:
@@ -72,7 +72,7 @@ def validate(boms: dict[str, list[dict]]) -> list[str]:
                 errs.append(f"{i}: Status must be suggested/agreed/ordered/have/swap/skip (set it in PARTS.md)")
             if r["Own"] not in {"Y", "N"}:
                 errs.append(f"{i}: Own must be Y/N")
-            if r["Type"] == "Purchase" and not r["Price"].startswith(("checked", "estimate")):
+            if r["Type"] in ("Purchase", "Tool") and not r["Price"].startswith(("checked", "estimate")):
                 errs.append(f"{i}: Price must be 'checked …' or 'estimate'")
             for ref in filter(None, (x.strip() for x in r["Refs"].split(","))):
                 if ref != "-" and ref not in known:
@@ -153,6 +153,8 @@ def main(argv=None) -> int:
     for k, v in kits.items():
         print(f"{'+ ' + k:<18} ${v:>7.2f}   optional, not in the total")
     print(f"{'minus have + kits':<18} ${own + sum(kits.values()):>7.2f}")
+    tools = sum(float(r["Total USD"]) for rows in boms.values() for r in rows if r["Type"] == "Tool")
+    print(f"{'tools (separate)':<18} ${tools:>7.2f}   bought once, kept; not in the machine total")
     paid = [(float(r["Paid USD"]), float(r["Total USD"])) for rows in boms.values() for r in rows if r["Paid USD"]]
     if paid:
         print(f"{'spent so far':<18} ${sum(p for p, _ in paid):>7.2f}   on {len(paid)} rows planned at ${sum(t for _, t in paid):.2f}")

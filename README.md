@@ -2,7 +2,7 @@
 
 # Gonioreflectometer-Open-Source
 
-Measures how materials reflect light, then scans objects in 3D. Runs from a laptop, or on its own with buttons and a Pi Zero. $428.39 total (cap $450). **No soldering, drilling, sawing or crimping:** a 3D printer, screwdrivers, a wire stripper and a multimeter are the whole tool kit. Based on Ansari-Asl et al. 2024 [R1]. This README is the main guide; every section links to the files you need.
+Measures how materials reflect light, then scans objects in 3D. Runs from a laptop, or on its own with buttons and a Pi Zero. $576.06 total (cap $630). **No soldering, drilling, sawing or crimping:** a 3D printer, screwdrivers, a wire stripper, a utility knife and a multimeter are the whole tool kit. Based on Ansari-Asl et al. 2024 [R1]. This README is the main guide; every section links to the files you need.
 
 [Interactive simulator](docs/index.html) (drag to orbit, build stage by stage, click parts, pick materials) · [Papers (PDF)](papers/) · [All references](REFERENCES.md)
 
@@ -40,7 +40,7 @@ Every step (= one GitHub issue) is **Time · Needs** → **Do** (numbered action
 
 | Axis | Moves | Range | Drive | Step (1/16) | Built in |
 |---|---|---|---|---|---|
-| M4 | light arm around the sample | 20–340° | GT2 belt on 12 in ring, 24:1 | 0.0047° | stage 04 |
+| M4 | light arm around the sample | 20–324° | GT2 belt on 12 in ring, 24:1 | 0.0047° | stage 04 |
 | M3 | table (sample yaw) | ±180° | 20T → 100T, 5:1 | 0.0225° | stage 05 |
 | M2 | sample tilt (yoke) | ±90° | 20T → 100T, 5:1 | 0.0225° | stage 08 |
 | M1 | sample spin (platter) | ±180° | direct drive (pancake motor), 1/64 microstep | 0.028° | stage 09 |
@@ -61,7 +61,7 @@ Measuring camera fixed on +X at 350 mm; scan camera fixed at 650 mm, 15° up, lo
 ## Stages and milestones
 
 <!-- next:start -->
-**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 139 steps done
+**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 140 steps done
 <!-- next:end -->
 
 18 stages, 48 milestones; each step is one GitHub issue: **Time · Needs → Do → Verify → If a check fails → Record**. Finished a step? `make done id=M05.1` closes its issue and ticks it here, in the stage checklist and in the figures.
@@ -73,18 +73,18 @@ Each stage folder: `README.md` (checklist) · `design.md` · `research.md` · `b
 <!-- phases:start -->
 | # | Stage | Milestones | Hours | Done | Cost |
 |---:|---|---|---:|---:|---:|
-| 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | 6.2 h | 0/11 | — |
-| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Wire the power box, M06 First power-on | 3 h | 0/9 | $70 |
-| 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Keypads work with the laptop, M10 Controller box closed | 4.8 h | 0/13 | $71 |
-| 03 | [Frame](phases/03-frame/) | M11 Place the base mounts, M12 Assemble the frame | 3.3 h | 0/7 | $61 |
-| 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | 5.4 h | 0/9 | $41 |
-| 05 | [Table (M3)](phases/05-table/) | M15 Table axis built, M16 Table homes and repeats | 3.2 h | 0/7 | $18 |
-| 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | 5.5 h | 0/11 | $98 |
-| 07 | [Calibrate → game material](phases/07-calibrate/) | M21 Dark box, M22 Camera response and angle calibration, M23 Brightness calibration, M24 First game material | 4.8 h | 0/11 | $34 |
-| 08 | [Tilt (M2)](phases/08-tilt/) | M25 Tilt yoke built and homed, M26 Full isotropic scan | 3.8 h | 0/8 | $19 |
-| 09 | [Spin (M1)](phases/09-spin/) | M27 Spin wired and homed, M28 Anisotropic material measured | 2.2 h | 0/5 | $11 |
+| 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | 6.7 h | 0/12 | $32 |
+| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Wire the power box, M06 First power-on | 3 h | 0/9 | $104 |
+| 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Keypads work with the laptop, M10 Controller box closed | 4.8 h | 0/13 | $80 |
+| 03 | [Frame](phases/03-frame/) | M11 Place the base mounts, M12 Assemble the frame | 3.3 h | 0/7 | $72 |
+| 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | 5.4 h | 0/9 | $75 |
+| 05 | [Table (M3)](phases/05-table/) | M15 Table axis built, M16 Table homes and repeats | 3.2 h | 0/7 | $24 |
+| 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | 5.8 h | 0/11 | $118 |
+| 07 | [Calibrate → game material](phases/07-calibrate/) | M21 Dark box, M22 Camera response and angle calibration, M23 Brightness calibration, M24 First game material | 4.8 h | 0/11 | $40 |
+| 08 | [Tilt (M2)](phases/08-tilt/) | M25 Tilt yoke built and homed, M26 Full isotropic scan | 3.8 h | 0/8 | $17 |
+| 09 | [Spin (M1)](phases/09-spin/) | M27 Spin wired and homed, M28 Anisotropic material measured | 2.2 h | 0/5 | $12 |
 | 10 | [Colour add-ons (optional)](phases/10-color/) | M29 Spectral sensor (optional kit), M30 LED bank and polarizers (optional kit) | 5.5 h | 0/8 | — |
-| 11 | [3D scan: capture](phases/11-scan-capture/) | M31 Scan hardware, M32 Camera position calibrated, M33 First full scan | 2.5 h | 0/7 | $4 |
+| 11 | [3D scan: capture](phases/11-scan-capture/) | M31 Scan hardware, M32 Camera position calibrated, M33 First full scan | 2.5 h | 0/7 | $3 |
 | 12 | [3D scan: mesh](phases/12-scan-mesh/) | M34 Quick 3D preview, M35 Full mesh | 2.2 h | 0/6 | — |
 | 13 | [Material on the 3D model](phases/13-object-material/) | M36 Textures on the mesh, M37 Object in a game engine | 6 h | 0/4 | — |
 | 14 | [Laptop app](phases/14-laptop-app/) | M38 Control page, M39 Presets and resume | 16 h | 0/6 | — |
@@ -102,7 +102,7 @@ Each issue holds Do / Verify / Record; click *open* for the full steps.
 |---|---|---|
 | M01 · Read and decide | M01.1 Get the papers (20 min) · M01.2 Read R1 (2 h) · M01.3 Explore the simulator (30 min) · M01.4 Decide the parts (45 min) | [open](phases/00-plan/README.md#m01--read-and-decide) |
 | M02 · Software runs on the laptop | M02.1 Install (20 min) · M02.2 Dry run (10 min) · M02.3 Simulated machine (20 min) · M02.4 Practice a full measurement (30 min) | [open](phases/00-plan/README.md#m02--software-runs-on-the-laptop) |
-| M03 · CAD and printer ready | M03.1 Onshape document (30 min) · M03.2 Print the coupon (15 min) · M03.3 Set clearances (30 min) | [open](phases/00-plan/README.md#m03--cad-and-printer-ready) |
+| M03 · CAD and printer ready | M03.1 Order the printer, filament and first tools (30 min) · M03.2 Onshape document (30 min) · M03.3 Print the coupon (15 min) · M03.4 Set clearances (30 min) | [open](phases/00-plan/README.md#m03--cad-and-printer-ready) |
 | M04 · Order power parts | M04.1 Order (30 min) · M04.2 Print the box (15 min) · M04.3 Check parts (20 min) | [open](phases/01-power/README.md#m04--order-power-parts) |
 | M05 · Wire the power box | M05.1 Box hardware (20 min) · M05.2 Main wiring (45 min) · M05.3 Checks with power off (10 min) | [open](phases/01-power/README.md#m05--wire-the-power-box) |
 | M06 · First power-on | M06.1 First 24 V and polarity (15 min) · M06.2 E-stop and unplug (10 min) · M06.3 Heat (15 min) | [open](phases/01-power/README.md#m06--first-power-on) |
@@ -111,12 +111,12 @@ Each issue holds Do / Verify / Record; click *open* for the full steps.
 | M09 · Keypads work with the laptop | M09.1 Hub firmware (15 min) · M09.2 Wire the keypads (30 min) · M09.3 Panel drives the motor (20 min) | [open](phases/02-controller/README.md#m09--keypads-work-with-the-laptop) |
 | M10 · Controller box closed | M10.1 Print and mount (30 min) · M10.2 WiFi and Bluetooth (30 min) · M10.3 Flags and homing (30 min) · M10.4 E-stop sense on the breadboard (30 min) · M10.5 Heat (10 min) | [open](phases/02-controller/README.md#m10--controller-box-closed) |
 | M11 · Place the base mounts | M11.1 Order frame parts (20 min) · M11.2 Print the template and mounts (30 min) · M11.3 Screw down the mounts (45 min) | [open](phases/03-frame/README.md#m11--place-the-base-mounts) |
-| M12 · Assemble the frame | M12.1 Feet (15 min) · M12.2 Outrigger and camera posts (45 min) · M12.3 Protractor scales (30 min) · M12.4 Mount the boxes (15 min) | [open](phases/03-frame/README.md#m12--assemble-the-frame) |
+| M12 · Assemble the frame | M12.1 Feet (15 min) · M12.2 Outrigger, camera pillar and scan post (45 min) · M12.3 Protractor scales (30 min) · M12.4 Mount the boxes (15 min) | [open](phases/03-frame/README.md#m12--assemble-the-frame) |
 | M13 · Ring drive built | M13.1 Measure and set the rim (30 min) · M13.2 Print ring parts (15 min) · M13.3 Lazy Susan, rim and belt (1.25 h) · M13.4 Motor (30 min) · M13.5 Arm (45 min) | [open](phases/04-light-arm/README.md#m13--ring-drive-built) |
 | M14 · Light arm homes and repeats | M14.1 Home switch (45 min) · M14.2 Config and homing (20 min) · M14.3 Angle check (20 min) · M14.4 Repeatability (45 min) | [open](phases/04-light-arm/README.md#m14--light-arm-homes-and-repeats) |
 | M15 · Table axis built | M15.1 Print table parts (10 min) · M15.2 Fixed axle and drum (45 min) · M15.3 Drive belt (30 min) | [open](phases/05-table/README.md#m15--table-axis-built) |
 | M16 · Table homes and repeats | M16.1 Flag and homing (30 min) · M16.2 Angle check (15 min) · M16.3 Repeatability (45 min) · M16.4 Both axes and collision guard (15 min) | [open](phases/05-table/README.md#m16--table-homes-and-repeats) |
-| M17 · Camera sees the zero point | M17.1 Camera reaches the software (30 min) · M17.2 Mount (1 h) · M17.3 Focus (30 min) · M17.4 Centre (15 min) · M17.5 Lock exposure and colour (30 min) | [open](phases/06-camera-light/README.md#m17--camera-sees-the-zero-point) |
+| M17 · Camera sees the zero point | M17.1 Camera reaches the software (30 min) · M17.2 Mount (1.25 h) · M17.3 Focus (30 min) · M17.4 Centre (15 min) · M17.5 Lock exposure and colour (30 min) | [open](phases/06-camera-light/README.md#m17--camera-sees-the-zero-point) |
 | M18 · Lamp on and safe | M18.1 Lamp assembly (1 h) · M18.2 Switch and heat (20 min) · M18.3 Warm-up time (15 min) | [open](phases/06-camera-light/README.md#m18--lamp-on-and-safe) |
 | M19 · Mirror test | M19.1 Mirror sweeps (30 min) | [open](phases/06-camera-light/README.md#m19--mirror-test) |
 | M20 · First reflectance curves | M20.1 Paper (20 min) · M20.2 Glossy plastic (20 min) | [open](phases/06-camera-light/README.md#m20--first-reflectance-curves) |
@@ -130,7 +130,7 @@ Each issue holds Do / Verify / Record; click *open* for the full steps.
 | M28 · Anisotropic material measured | M28.1 Spin sweep (30 min) · M28.2 Anisotropic set (10 min) · M28.3 Why it needs 4 angles (15 min) | [open](phases/09-spin/README.md#m28--anisotropic-material-measured) |
 | M29 · Spectral sensor (optional kit) | M29.1 Mount (30 min) · M29.2 Wire and read (20 min) · M29.3 Aim angle (10 min) · M29.4 Spectral curves (45 min) | [open](phases/10-color/README.md#m29--spectral-sensor-optional-kit) |
 | M30 · LED bank and polarizers (optional kit) | M30.1 Print and fit LEDs (2 h) · M30.2 Driver wiring (1 h) · M30.3 Band test (15 min) · M30.4 Polarizers (30 min) | [open](phases/10-color/README.md#m30--led-bank-and-polarizers-optional-kit) |
-| M31 · Scan hardware | M31.1 Print risers and wedge (10 min) · M31.2 Mount the scan camera (45 min) · M31.3 Putty hold (S3) (20 min) | [open](phases/11-scan-capture/README.md#m31--scan-hardware) |
+| M31 · Scan hardware | M31.1 Print risers and scan plate (10 min) · M31.2 Mount the scan camera (45 min) · M31.3 Putty hold (S3) (20 min) | [open](phases/11-scan-capture/README.md#m31--scan-hardware) |
 | M32 · Camera position calibrated | M32.1 ChArUco board (20 min) · M32.2 Calibrate (30 min) | [open](phases/11-scan-capture/README.md#m32--camera-position-calibrated) |
 | M33 · First full scan | M33.1 Background pass (10 min) · M33.2 Cube scan (15 min) | [open](phases/11-scan-capture/README.md#m33--first-full-scan) |
 | M34 · Quick 3D preview | M34.1 Visual hull (15 min) · M34.2 Look at it (15 min) | [open](phases/12-scan-mesh/README.md#m34--quick-3d-preview) |
@@ -157,31 +157,31 @@ Each issue holds Do / Verify / Record; click *open* for the full steps.
 **Your working parts list: [PARTS.md](PARTS.md).** Every part I suggested, with why. Tick the ones you agree with, mark `have` / `ordered` / `swap` / `skip`, write `paid:` and notes, right on GitHub (open it → ✏️ → *Commit changes*). The *parts-sync* action then updates the parts lists, budget and checklists.
 
 <!-- budget:start -->
-| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided |
-|---:|---:|---:|---:|---:|
-| $428.39 | $382.01 | $46.38 | $0.00 | 11/111 parts |
+| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided | Tools to buy (kept, separate) |
+|---:|---:|---:|---:|---:|---:|
+| $576.06 | $576.06 | $0.00 | $0.00 | 0/112 parts | $417.80 |
 
-Optional spectral sensor +$16.95 · Optional standalone kit +$38.00 · Optional no-switching camera kit +$80.99 · Optional colour kit (bands + polarizers) +$29.56
+Optional spectral sensor +$19.90 · Optional standalone kit +$71.68 · Optional no-switching camera kit +$90.10 · Optional colour kit (bands + polarizers) +$93.01
 <!-- budget:end -->
 
-Cheapest options, prices checked 2026-10-04. Per-stage specs: `phases/NN/bom.csv` · check: `python3 tools/bom_check.py --strict`.
+Every part comes from **Digi-Key, Amazon or Adafruit** (cheapest listing that meets the spec; packs shared across rows). Adafruit and some Digi-Key prices checked 2026-10-09; Amazon prices are estimates (`Price` = estimate) until checked at checkout. Per-stage specs: `phases/NN/bom.csv` · check: `python3 tools/bom_check.py --strict`.
 
 ## Tools and joins
 
-Everything is built with these tools; the parts were picked so nothing needs a soldering iron, drill, saw, crimper or heat-set inserts. They are rows `TLS-01`–`TLS-10` in [PARTS.md](PARTS.md) (mark `have`).
+Nothing is assumed owned except a laptop: the tools are rows `TLS-01`–`TLS-10` with prices, a separate total from the machine's (printer $279 of it; a print service or makerspace replaces it). Prints are black ABS, which needs an enclosed printer and a ventilated room. The parts were picked so nothing needs a soldering iron, drill, saw, crimper or heat-set inserts. Mark them `have` / `ordered` in [PARTS.md](PARTS.md).
 
-| Tool | Used for | Example (cheap) |
+| Tool | Used for | Amazon pick (row in PARTS.md; prices are estimates) |
 |---|---|---|
-| 3D printer (PETG, bed ≥ 220 × 220 mm) | every printed part | — |
-| Screwdrivers: Phillips #2, flat 2–3 mm | wood screws; screw terminals | — |
-| Hex keys 1.5–4 mm | socket and grub screws (often in the screw kit FRM-06) | — |
-| Wire stripper / cutter 10–24 AWG | strip 11 mm for lever connectors; cut jumpers and belt | [IRWIN 2078300](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) [F10] |
-| Multimeter with temperature probe | every electrical check; LED, driver and box temperatures | [AstroAI DM6000AR](https://www.astroai.com/digital-multimeter-6000-counts-dm6000ar/ap/100019) [F9] |
-| Digital calipers 150 mm | print fit, coupon, positions | [SparkFun 6 in](https://www.sparkfun.com/6-digital-calipers.html) [F11] |
-| Tape measure + phone level app | camera distance; level and square checks | — |
-| Paper printer at 100 % (or a print shop) | placement template, ChArUco boards, focus grid | — |
-| 13 mm spanner or adjustable wrench | M8 nuts on the table axle and tilt stub axles | — |
-| CA glue + double-sided tape | rim belt, scales | — |
+| Enclosed 3D printer for ABS (≥ 220 × 220 × 200 mm) | every printed part (black ABS) | [Elegoo Centauri 2](https://www.amazon.com/dp/B0GZYZY956) (TLS-01, $279.00), or a print service |
+| Screwdrivers: Phillips #2, flat 2–3 mm | wood screws; screw terminals | [10-pc magnetic, 5 Phillips + 5 slotted](https://www.amazon.com/dp/B07RFD9JWZ) (TLS-02, $9.99) |
+| Hex keys 1.5–4 mm | socket and grub screws | [9-pc metric ball-end 1.5–10 mm](https://www.amazon.com/dp/B0CJBRYQF3) (TLS-03, $9.99) |
+| Wire stripper / cutter 10–24 AWG | strip 11 mm for lever connectors; cut jumpers and belt | [Self-adjusting stripper 10–24 AWG](https://www.amazon.com/dp/B07TS6KCXD) (TLS-04, $10.49) |
+| Multimeter with temperature probe | every electrical check; LED, driver and box temperatures | [TRMS 6000-count, temperature](https://www.amazon.com/dp/B071JL6LLL) (TLS-05, $34.99) |
+| Digital calipers 150 mm | print fit, coupon, positions | [150 mm digital caliper, stainless](https://www.amazon.com/dp/B0D2386QN9) (TLS-06, $14.59) |
+| Tape measure + phone level app | camera distance; level and square checks | [3 m stainless tape measure](https://www.amazon.com/dp/B0BRFTX359) (TLS-07, $1.48) |
+| Paper printer at 100 % (or a print shop) | placement template, ChArUco boards, focus grid | print shop or library (TLS-08) |
+| 13 mm spanner or adjustable wrench | M8 nuts on the table axle and tilt stub axles | [13 mm combination wrench 18283](https://www.amazon.com/dp/B00Q01OBLC) (TLS-10, $7.00) |
+| CA glue, double-sided tape, utility knife, 400-grit paper | rim belt, scales; cut (4–6 light passes) and sand the 3 mm PTFE white tile | four Amazon listings (TLS-09) |
 
 | Join | How, without solder or drilling | Parts |
 |---|---|---|
@@ -190,7 +190,7 @@ Everything is built with these tools; the parts were picked so nothing needs a s
 | Wire to a pin | jumper wire (cut one in half for pin → bare wire); XH leads crimped on both ends for endstops; PH→XH cables for motors | CTL-07 [C10], CTL-06, CTL-11 [C11] |
 | Small parts (opto, resistor, LED driver, ULN2803A) | push into the breadboard | PWR-19 [P46] |
 | Boards | Pico H and Pi Zero 2 WH come with headers soldered | CTL-02 [C8], STA-01 |
-| COB LED | clamps into a pre-wired holder | LSR-06 [L21] |
+| COB LED | sits in a solderless holder with poke-in wire terminals; the lamp cap clamps it | LSR-06 [L23] |
 | Printed part to plywood | #8 Type 17 wood screws start without a pilot hole; [placement template](phases/03-frame/placement-template.svg) shows where | FRM-12 [F8] |
 | Screw into a printed part | M3 self-taps into 2.7 mm holes (`M3_TAP`, set from the coupon) | FRM-06 |
 | Axles | M8 bolts instead of shafts: the table drum turns on two 608s around a fixed bolt (one nut clamps the inner races); the tilt cradle turns on two stub bolts; spin is direct drive. No shaft to cut, no flat to file | TBL-05, TLT-05, SPN-01 |
@@ -201,7 +201,18 @@ Trade-off: the solderless power box has no reverse-polarity MOSFET, surge diode 
 
 <img src="docs/assets/parts.png" width="100%" alt="All printed parts">
 
-Every stage has `3d/`: each printed part as **STEP** (imports into Onshape as an editable solid: Insert → Import) and **STL** (for the slicer), plus `3d/README.md` listing bought parts and their vendor models.
+**Every part has a 3D model in the repo** — list and status per part: [cad/README.md](cad/README.md).
+
+| Folder | What |
+|---|---|
+| `phases/NN/3d/` | printed parts: **STEP** (Onshape: Insert → Import, editable solid) and **STL** (slicer) |
+| [`cad/bought/`](cad/bought) | dummy models of every bought part at true size (motors, boards, bearings, belts, camera, lens…) |
+| [`cad/open/`](cad/open) | real open-licence models (Adafruit MIT, KiCad CC-BY-SA + exception) |
+| [`cad/assembly/opengonio_assembly.step`](cad/assembly) | the whole machine, one STEP: import this into Onshape to start |
+| `cad/vendor/` (not committed) | real vendor models: `bash scripts/get_cad.sh` |
+| [`cad/PRINT.md`](cad/PRINT.md) | print list: how many of each, size vs build volume, ≈ grams of ABS (core ≈ 1.0 kg) |
+
+`make cad` regenerates dummies + assembly and runs `make cad-check` (no collisions across every axis' travel, clear sight lines from both cameras and the lamp to the sample); `make cad-zip` packs every STEP into `dist/opengonio-cad.zip` (one Onshape import).
 
 <!-- parts:start -->
 | Stage | Printed parts (STL) |
@@ -209,20 +220,20 @@ Every stage has `3d/`: each printed part as **STEP** (imports into Onshape as an
 | [00 Plan](phases/00-plan/3d/) | [PLAN-01](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) tolerance coupon |
 | [01 Power box](phases/01-power/3d/) | [PWR-18a](phases/01-power/3d/PWR-18a_power_box.stl) power box · [PWR-18b](phases/01-power/3d/PWR-18b_power_lid.stl) power lid |
 | [02 Controller and buttons](phases/02-controller/3d/) | [CTL-10a](phases/02-controller/3d/CTL-10a_button_panel.stl) button panel · [CTL-10b](phases/02-controller/3d/CTL-10b_controller_tray.stl) controller tray |
-| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/FRM-09c_protractor_segment.stl) protractor segment · [FRM-09d](phases/03-frame/3d/FRM-09d_extrusion_saddle.stl) extrusion saddle · [FRM-09e](phases/03-frame/3d/FRM-09e_post_socket.stl) post socket · [FRM-09f](phases/03-frame/3d/FRM-09f_end_foot.stl) end foot · [FRM-09g](phases/03-frame/3d/FRM-09g_washers.stl) washers |
-| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl) ring motor mount · [LAR-08c](phases/04-light-arm/3d/LAR-08c_arm_bracket.stl) arm bracket · [LAR-08e](phases/04-light-arm/3d/LAR-08e_cross_clamp.stl) cross clamp |
+| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/FRM-09c_protractor_segment.stl) protractor segment · [FRM-09d](phases/03-frame/3d/FRM-09d_extrusion_saddle.stl) extrusion saddle · [FRM-09e](phases/03-frame/3d/FRM-09e_post_socket.stl) post socket · [FRM-09f](phases/03-frame/3d/FRM-09f_end_foot.stl) end foot · [FRM-09g](phases/03-frame/3d/FRM-09g_washers.stl) washers · [FRM-09h](phases/03-frame/3d/FRM-09h_camera_pillar.stl) camera pillar |
+| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl) ring motor mount · [LAR-08c](phases/04-light-arm/3d/LAR-08c_arm_segment.stl) arm segment · [LAR-08e](phases/04-light-arm/3d/LAR-08e_cross_clamp.stl) cross clamp |
 | [05 Table (M3)](phases/05-table/3d/) | [TBL-07a](phases/05-table/3d/TBL-07a_table_drum.stl) table drum · [TBL-07b](phases/05-table/3d/TBL-07b_home_flag.stl) home flag · [TBL-07c](phases/05-table/3d/TBL-07c_table_motor_bracket.stl) table motor bracket · [TBL-07d](phases/05-table/3d/TBL-07d_table_post.stl) table post · [TBL-07f](phases/05-table/3d/TBL-07f_spacers.stl) spacers |
 | [06 Camera and light](phases/06-camera-light/3d/) | [CAM-03a](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) aperture stop f8 · [CAM-03b](phases/06-camera-light/3d/CAM-03b_camera_plate.stl) camera plate · [LSR-05a](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) lamp tube · [LSR-05b](phases/06-camera-light/3d/LSR-05b_lamp_cap.stl) lamp cap |
 | [07 Calibrate → game material](phases/07-calibrate/3d/) | [CAL-06a](phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl) ptfe holder · [CAL-06b](phases/07-calibrate/3d/CAL-06b_mirror_holder.stl) mirror holder · [CAL-06c](phases/07-calibrate/3d/CAL-06c_ball_holder.stl) ball holder · [ENC-04a](phases/07-calibrate/3d/ENC-04a_dowel_socket.stl) dowel socket |
 | [08 Tilt (M2)](phases/08-tilt/3d/) | [TLT-07a](phases/08-tilt/3d/TLT-07a_tilt_yoke.stl) tilt yoke · [TLT-07b](phases/08-tilt/3d/TLT-07b_pulley_100T.stl) pulley 100T · [TLT-07c](phases/08-tilt/3d/TLT-07c_tilt_cradle.stl) tilt cradle |
 | [09 Spin (M1)](phases/09-spin/3d/) | [SPN-07a](phases/09-spin/3d/SPN-07a_spin_platter.stl) spin platter |
 | [10 Colour add-ons (optional)](phases/10-color/3d/) | [MSK-06a](phases/10-color/3d/MSK-06a_led_ring.stl) led ring · [MSK-06b](phases/10-color/3d/MSK-06b_led_mast.stl) led mast · [SPC-03a](phases/10-color/3d/SPC-03a_spectral_tube.stl) spectral tube |
-| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/SCN-03d_scan_camera_wedge_15.stl) scan camera wedge 15 |
+| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.stl) scan camera plate 15 |
 | [15 Standalone (no laptop)](phases/15-standalone/3d/) | [STA-07a](phases/15-standalone/3d/STA-07a_pi_zero_mount.stl) pi zero mount |
 <!-- parts:end -->
 
 - **Starter geometry, generated:** `python tools/cad/parts.py` (CadQuery; parameters at the top). Print the [tolerance coupon](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) first and set `CLEAR` / `M3_TAP`.
-- **Vendor models:** `bash scripts/get_cad.sh` → `phases/NN/3d/vendor/` (not committed).
+- **Vendor models:** `bash scripts/get_cad.sh` → `cad/vendor/` (not committed); browser-only downloads: `bash scripts/get_cad.sh --from /mnt/c/Users/aleks/Downloads`.
 - **Base:** [1:1 placement template](phases/03-frame/placement-template.svg) (print at 100 %, check the 100 mm bar; screws go through the paper) · [placement map](phases/03-frame/design.md).
 - **Wiring:** [power netlist](phases/01-power/design.md) · [controller pins](phases/02-controller/design.md) · [standalone wiring](phases/15-standalone/design.md).
 - **Onshape:** [set-up steps](phases/00-plan/design.md#onshape-set-up) — import the STEP files, edit, export STEP + STL back.
@@ -516,7 +527,7 @@ Rules that keep it simple:
 - **Go back:** `git checkout v0.6` returns to the state when stage 06 passed (`git checkout main` to return).
 - **Every step has a time and a pass number:** `make check` rejects a step without Do / Verify, with a malformed `time`, or with `TODO` left in it.
 - **Milestone IDs never change** once published: new ones get the next free number, so GitHub issue history stays attached.
-- **`make check`** lists every problem in one place: milestone format, parts lists, the $450 cap, reference IDs, broken links, machine and calibration config.
+- **`make check`** lists every problem in one place: milestone format, parts lists, the budget cap, reference IDs, broken links, machine and calibration config.
 - **Measurement data** goes in `data/<job>/`: `manifest.json`, `curve.csv` and `spectral.csv` are committed; images stay local.
 
 ## Repository map
@@ -524,7 +535,7 @@ Rules that keep it simple:
 ```
 README.md            this guide
 PARTS.md             your working parts list: decisions, paid, notes (edit on GitHub)
-Makefile             make help · setup · build · parts · check · test · all · sim · next · done · release · publish
+Makefile             make help · setup · build · parts · cad · cad-check · cad-zip · check · test · all · sim · next · done · release · publish
 REFERENCES.md        487 sources (also listed below)
 phases/NN-name/      one folder per stage
   README.md          checklist: Do / Verify / Record (generated)
@@ -532,7 +543,8 @@ phases/NN-name/      one folder per stage
   research.md        why (requirements, methods)
   bom.csv            parts to buy, prices, links
   test.csv           test log you fill in
-  3d/                printed parts: .step (Onshape) + .stl (slicer); vendor/ = downloaded models
+  3d/                printed parts: .step (Onshape) + .stl (slicer)
+cad/                README.md (model per part) · PRINT.md (print list) · bought/ dummies · open/ open models · assembly/ whole machine · vendor/ (local)
 firmware/            FluidNC config (E4) · MicroPython hub (Pico)
 software/            opengonio: control, capture, calibration, simulator, scanning
   config/            machine.yaml (built) · calibration.yaml (measured)
@@ -547,7 +559,7 @@ data/                measurement jobs: manifest.json, curve.csv, spectral.csv (i
 
 ## References
 
-507 sources, grouped by ID prefix; IDs are cited throughout the repo. Full table with "used for": [REFERENCES.md](REFERENCES.md).
+514 sources, grouped by ID prefix; IDs are cited throughout the repo. Full table with "used for": [REFERENCES.md](REFERENCES.md).
 
 <!-- refs:start -->
 ### Primary design references
@@ -1196,7 +1208,10 @@ data/                measurement jobs: manifest.json, curve.csv, spectral.csv (i
 - **L18** Cree CXA1507 — [Newark](https://www.newark.com/cree-led/cxa1507-0000-000n0ye230g/led-array-cob-warm-wht-3000k-590lm/dp/49AC0147) — *Rejected (35 V)*
 - **L19** 24 V COB strip CRI 90 — [ledupdates](https://ledupdates.com/products/24v-cob-series-cri-90-4000k-natural-white-color-led-strip-light) — *Rejected (roll price)*
 - **L20** Edmund XP42 polarizer film — [link](https://www.edmundoptics.com/p/100-x-100mm-linear-polarizing-film-xp42-40/52988/) — *Compared*
-- **L21** Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) — *COB holder (price to confirm)*
+- **L21** Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) — *First-draft COB holder: obsolete at Digi-Key (checked 2026-10-10)*
+- **L22** Citizen CLU7A3-0403E1-303H7X5 — [Digi-Key](https://www.digikey.com/en/products/detail/citizen/CLU7A3-0403E1-303H7X5/17053751), [datasheet](https://ce.citizen.co.jp/cms/ce/lighting_led/dl_data/COB_High_Intensity_Type_Version4/datasheet/CLU7A3-0403E1_0824P-202110.pdf) — *White COB: $5.91, CRI 97, 12.2 V, 4.2 mm LES, Tc ≤ 120 °C*
+- **L23** TE LUMAWISE Z35 2213678-5 — [Digi-Key](https://www.digikey.com/en/products/detail/te-connectivity-amp-connectors/2213678-5/6174915), [Z35 overview](https://www.digikey.com/en/product-highlight/t/te-connectivity-amp/lumawise-led-holders-type-z35) — *Solderless COB holder: $3.50, 13.5 mm boards (Citizen CLU700), Ø35 × 3.6 mm, poke-in 18–20 AWG*
+- **L24** MEAN WELL LDH-45B-350 — [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/LDH-45B-350/7704773), [spec](https://files.trcelectronics.com/datasheets/ldh45.pdf) — *Compared: 24 V boost driver for a 37 V COB; not needed with the 12 V CLU7A3*
 
 ### Parts: mechanics and frame
 
@@ -1222,14 +1237,18 @@ data/                measurement jobs: manifest.json, curve.csv, spectral.csv (i
 - **F10** IRWIN VISE-GRIP 2078300 self-adjusting wire stripper 10–24 AWG — [Gexpro](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) — *Tool*
 - **F11** SparkFun 6 in digital calipers — [product](https://www.sparkfun.com/6-digital-calipers.html) — *Tool*
 - **F12** DIN 931 M8 hex bolts, partial thread — [M8 x 75](https://www.fastenersuperstore.com/products/276566/hex-cap-screws), [M8 x 35](https://www.fastenersuperstore.com/products/276362/hex-cap-screws) — *Bolt axles (price to confirm)*
-- **F13** M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) — *Scan wedge (price to confirm)*
+- **F13** M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) — *Not used since the scan wedge became the tilted scan plate (kept so IDs stay stable)*
+- **F14** Elegoo Centauri Carbon enclosed CoreXY printer — [All3DP, $300 launch](https://all3dp.com/4/elegoo-opens-preorders-for-300-centauri-carbon-3d-printer/), [Slickdeals $265.99](https://slickdeals.net/f/18984553-elegoo-centauri-carbon-corexy-fdm-3d-printer-265-99-30-shipping-fee); Bambu Lab P1S [$399](https://www.3dtested.com/3d-printing/grab-this-usd399-bambu-lab-p1s-3d-printer-back-down-to-a-record-low-price-for-the-new-year-save-usd300-on-high-speed-enclosed-printer-for-beginners-and-enthusiasts-alike) — *Tool: ABS-capable printer*
+- **F15** Screwdriver sets — [Home Depot](https://www.homedepot.com/b/Tools-Hand-Tools-Screwdrivers-Nut-Drivers-Screwdrivers-Screwdriver-Sets/philips-screwdriver/N-5yc1vZc998Z1z1lpee), [Husky 16-pc ~$15](https://slickdeals.net/f/18741004-husky-ratcheting-pivot-head-screwdriver-16-piece-14-88-fs-home-depot) — *Tool*
+- **F16** SUNLU ABS 1.75 mm 1 kg black — [listing](https://woodartsupply.com/products/sunlu-abs-filament-1-75mm-3d-printer-filament-highly-resistant-durable-heat-resistance-excellent-toughness-compatible-with-99-fdm-3d-printers-1kg-spool-2-2lbs-black) — *Filament (price to confirm)*
+- **F17** SUNLU ABS 1.75 mm black, 1 kg rolls, 3 kg minimum — [SUNLU store, $11.99/kg](https://store.sunlu.com/products/over-3kg-bundle-sale-abs-filament-1kg-roll) — *Filament (checked 2026-10-09)*
 
 ### Parts: enclosure, calibration, multispectral
 
 - **E1** Roc-lon blackout fabric — [Walmart](https://www.walmart.com/ip/Roc-lon-54-Blackout-White-Fabric-per-Yard/164714653) — *$6.62 / yd*
 - **E2** Protostar FlockBoard — [link](https://www.fpi-protostar.com/flockboard.htm); flocking — [First Light Optics](https://www.firstlightoptics.com/telescope-flocking-material/protostar-self-adhesive-hi-tack-flocking-material-1m-roll.html) — *Backdrop upgrade*
 - **E3** Oak dowel 1/2 x 36 in — [Home Depot](https://www.homedepot.com/p/Builder-s-Choice-1-2-in-x-36-in-Oak-Round-Dowel-HDDO1236/206184685) — *$4.04*
-- **E4** PTFE plate — [OnlineMetals](https://www.onlinemetals.com/en/buy/plastic-sheet-plate-ptfe); [Online Metal Supply block](https://onlinemetalsupply.com/2-x-2-5-x-2-5-ptfe-teflon-plastic-sheet-white/) — *$22.97*
+- **E4** PTFE (virgin) — [OnlineMetals sheet/plate list](https://www.onlinemetals.com/en/buy/plastic-sheet-plate-ptfe): 1/8 in 6 × 6 in $12.53, 3/8 in 6 × 6 in $22.97; [Online Metal Supply 2 × 2.5 × 2.5 in block](https://onlinemetalsupply.com/2-x-2-5-x-2-5-ptfe-teflon-plastic-sheet-white/) $23.48 — *White tile (CAL-01)*
 - **E5** Edmund #43-876 first-surface mirror — [link](https://www.edmundoptics.com/p/50-x-50mm-enhanced-aluminum-4-6lambda-mirror/5362); also [BMI Surplus](https://bmisurplus.com/product/first-surface-mirror-4-inch-square/), [firstsurfacemirror.com](https://www.firstsurfacemirror.com/product/4-x-4-1-4-wave-glass-first-surface-mirror-13-64-5mm-thickness/) — *Mirror upgrade / price check*
 - **E6** BC Precision 1 in G25 balls — [link](https://www.bcprecision.com/products/1-inch-chrome-steel-ball-bearings-g25) — *$9.95*
 - **E7** Colour targets — [Calibrite CC Mini (B&H)](https://www.bhphotovideo.com/c/product/1649333-REG/calibrite_ccc_mini_colorchecker_classic_mini.html), [SpyderCHECKR 24 (B&H)](https://www.bhphotovideo.com/c/product/1070560-REG/datacolor_sck24_sypdercheckr_24.html) — *Optional, borrow*

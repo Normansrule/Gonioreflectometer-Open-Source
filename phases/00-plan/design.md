@@ -10,7 +10,7 @@ Camera fixed, sample turns on three axes, light turns on an arm; all meet at one
 
 | Axis | Moves | Range | Drive | Step | Phase |
 |---|---|---|---|---|---|
-| M4 | Light arm around the sample | 20–340° | belt on 12 in ring, ~24:1 | 0.0047° | 04 |
+| M4 | Light arm around the sample | 20–324° | belt on 12 in ring, ~24:1 | 0.0047° | 04 |
 | M3 | Table (vertical axis) | ±180° | 5:1 belt | 0.0225° | 05 |
 | M2 | Tilt | ±90° | 5:1 belt | 0.0225° | 08 |
 | M1 | Spin | ±180° | direct drive (pancake motor), 1/64 microstep | 0.028° | 09 |
@@ -52,9 +52,10 @@ Origin = sample surface. +Z up. Camera on +X (350 mm; 650 mm for scans). Light a
 ## Onshape set-up
 
 1. Create one document, **OpenGonio**, with a Variable Studio `OG globals`: `#clear` `#og40` `#cam_d`=350 `#scan_d`=650 `#light_d`=300 `#zero_h`=150 `#ring_r`=140.
-2. Import the starter parts: **Insert → Import** each `phases/NN/3d/*.step` (or drag them in). STEP arrives as editable solids; STL would arrive as a fixed mesh.
-3. One Part Studio per stage; name parts by BOM ID (e.g. `PWR-18a`). One assembly with the zero point as origin; run interference check.
-4. Release: export STEP + STL back into that stage's `3d/`, commit with `bash scripts/update.sh "…"`.
+2. Import the whole machine: **Create → Import** `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, every STEP at once). Origin = plywood top under the zero point (zero point at z = 150 mm), +X toward the camera, +Z up. Printed parts are black, bought parts are dummies (tan) — [cad/README.md](../../cad/README.md) lists the model for every part.
+3. Import the starter parts you edit: **Insert → Import** each `phases/NN/3d/*.step`. STEP arrives as editable solids; STL would arrive as a fixed mesh. Real vendor models (`bash scripts/get_cad.sh` → `cad/vendor/`) replace dummies at the same origin.
+4. One Part Studio per stage; name parts by BOM ID (e.g. `PWR-18a`). Run interference check on the assembly.
+5. Release: export STEP + STL back into that stage's `3d/`, commit with `bash scripts/update.sh "…"`.
 
 Or edit the numbers in `tools/cad/parts.py` and run `python tools/cad/parts.py` to regenerate every file.
 

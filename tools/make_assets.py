@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "software" / "src"))
 from opengonio.brdf.models import ggx_brdf, sph_to_vec  # noqa: E402
 sys.path.insert(0, str(ROOT / "tools"))
 import machine3d as m3d  # noqa: E402
+import bom_check  # noqa: E402
 
 FONT = "Segoe UI,Helvetica,Arial,sans-serif"
 BG, PANEL, LINE, TXT, MUTED = "#0d1117", "#161b22", "#30363d", "#f0f6fc", "#8b949e"
@@ -35,7 +36,7 @@ def hero() -> str:
     poses, active = m3d.demo_poses()
     body = f"""<text x="56" y="150" class="t b" font-size="40">Gonioreflectometer</text>
 <text x="56" y="196" class="t b" font-size="40">Open-Source</text>
-<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">material capture + 3D scanner · under $450</text>
+<text x="58" y="236" fill="{ORANGE}" font-size="18" class="b">material capture + 3D scanner · under ${bom_check.HARD_CAP:.0f}</text>
 <text x="58" y="266" class="m" font-size="15">sample turns, tilts, spins · light circles · camera fixed</text>
 <text x="58" y="340" class="m" font-size="12">after Ansari-Asl et al. 2024 [R1]</text>
 {m3d.machine(m3d.View(720, 250, 0.72), poses, active, labels=(1010, 60))}"""

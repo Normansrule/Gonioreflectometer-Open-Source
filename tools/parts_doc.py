@@ -97,14 +97,19 @@ def apply(decisions: dict[str, dict]) -> dict[str, list[dict]]:
 
 
 def to_buy(r: dict) -> bool:
+    """Machine parts still to buy (tools are counted separately: see to_buy_tool)."""
     return (r["Type"] == "Purchase" and r["Status"] in ("suggested", "agreed")) or \
         (r["Type"] == "Optional" and r["Status"] == "agreed")
+
+
+def to_buy_tool(r: dict) -> bool:
+    return r["Type"] == "Tool" and r["Status"] in ("suggested", "agreed")
 
 
 def render(boms: dict[str, list[dict]]) -> str:
     titles = stage_titles()
     allrows = [r for rows in boms.values() for r in rows]
-    buyable = [r for r in allrows if r["Type"] in ("Purchase", "Optional")]
+    buyable = [r for r in allrows if r["Type"] in ("Purchase", "Optional", "Tool")]
     tot = lambda rows: sum(float(r["Total USD"]) for r in rows)  # noqa: E731
     by = {s: [r for r in buyable if r["Status"] == s] for s in STATUSES}
     paid = sum(float(r["Paid USD"]) for r in allrows if r["Paid USD"])
@@ -122,18 +127,20 @@ def render(boms: dict[str, list[dict]]) -> str:
            "- **Must meet** = what any substitute has to match (rating, size, focal length, …), so you can buy elsewhere safely. "
            "Pictures are drawings of the kind of part; the buy link shows the real product.", "",
            "<!-- parts-summary -->",
-           "| Status | Parts | Core USD | Optional USD |", "|---|---:|---:|---:|"]
+           "| Status | Parts | Core USD | Optional USD | Tools USD |", "|---|---:|---:|---:|---:|"]
     core = lambda rows: [r for r in rows if r["Type"] == "Purchase"]  # noqa: E731
     opt = lambda rows: [r for r in rows if r["Type"] == "Optional"]  # noqa: E731
+    tl = lambda rows: [r for r in rows if r["Type"] == "Tool"]  # noqa: E731
     for s in STATUSES:
-        out.append(f"| {s} | {len(by[s])} | ${tot(core(by[s])):.2f} | ${tot(opt(by[s])):.2f} |")
-    left = [r for r in buyable if to_buy(r)]
-    out += [f"| **Still to buy** | {len(left)} | **${tot(core(left)):.2f}** | **${tot(opt(left)):.2f}** |",
-            f"| Paid so far | | ${paid:.2f} | |",
-            f"| Plan: every core part bought (cap ${bom_check.HARD_CAP:.0f}) | | ${plan:.2f} | |", "",
-            "Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optional parts you `agreed` to.", ""]
+        out.append(f"| {s} | {len(by[s])} | ${tot(core(by[s])):.2f} | ${tot(opt(by[s])):.2f} | ${tot(tl(by[s])):.2f} |")
+    left = [r for r in buyable if to_buy(r) or to_buy_tool(r)]
+    out += [f"| **Still to buy** | {len(left)} | **${tot(core(left)):.2f}** | **${tot(opt(left)):.2f}** | **${tot(tl(left)):.2f}** |",
+            f"| Paid so far | | ${paid:.2f} | | |",
+            f"| Plan: every core part bought (cap ${bom_check.HARD_CAP:.0f}) | | ${plan:.2f} | | |", "",
+            "Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optional parts you `agreed` to. "
+            "Tools are bought once and kept: they have their own total and are not in the machine cap.", ""]
     for stage, rows in boms.items():
-        buy = [r for r in rows if r["Type"] in ("Purchase", "Optional")]
+        buy = [r for r in rows if r["Type"] in ("Purchase", "Optional", "Tool")]
         prn = [r for r in rows if r["Type"] in ("Print", "Owned")]
         n_dec = sum(r["Status"] != "suggested" for r in rows)
         out += [f"## {stage[:2]} · {titles.get(stage, stage)}", "",
@@ -146,7 +153,7 @@ def render(boms: dict[str, list[dict]]) -> str:
             price = (f"{qty} × ${float(r['Unit USD']):.2f} = ${float(r['Total USD']):.2f}" if float(r["Unit USD"])
                      else "tool you supply" if r["ID"].startswith("TLS-") else "you supply" if r["Type"] == "Owned"
                      else "$0 (in another row)" if r["Type"] in ("Purchase", "Optional") else r["Type"].lower())
-            kind = " · optional" if r["Type"] == "Optional" else " · print" if r["Type"] == "Print" else ""
+            kind = " · optional" if r["Type"] == "Optional" else " · print" if r["Type"] == "Print" else " · tool" if r["Type"] == "Tool" else ""
             out.append(f"- [{'x' if r['Status'] in CHECKED else ' '}] **{r['ID']}** {r['Part']} — {price}{kind}{link} · status: {r['Status']}")
             why = r["Use"] + (f" · {r['Notes']}" if r["Notes"] else "")
             files = f" · files: [{r['STEP'].split(';')[0].strip()}](phases/{stage}/{r['STEP'].split(';')[0].strip()})" \
@@ -155,7 +162,7 @@ def render(boms: dict[str, list[dict]]) -> str:
                        f"**Qty {r['Qty']}** · **Must meet:** {r.get('Requirement', '')}{files}")
             out.append(f"  - *why:* {why}")
             out.append(f"  - note: {r.get('_note', '')}".rstrip())
-            if r["Type"] in ("Purchase", "Optional"):
+            if r["Type"] in ("Purchase", "Optional", "Tool"):
                 out.append(f"  - paid: {r['Paid USD']}".rstrip())
         out.append("")
     return "\n".join(out).rstrip() + "\n"
@@ -181,11 +188,12 @@ def main(argv=None) -> int:
                 "standalone kit": [r for r in rows if r["ID"].startswith("STA-") and r["Type"] == "Optional"],
                 "no-switching camera kit": [r for r in rows if r["ID"] in ("CAM-04", "CAM-05")],
                 "colour kit (bands + polarizers)": [r for r in rows if r["ID"].startswith("MSK-") and r["Type"] == "Optional"]}
-        body = (f"| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided |\n|---:|---:|---:|---:|---:|\n"
+        tools = [r for r in rows if r["Type"] == "Tool"]
+        body = (f"| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided | Tools to buy (kept, separate) |\n|---:|---:|---:|---:|---:|---:|\n"
                 f"| ${f(core):.2f} | ${f([r for r in rows if to_buy(r)]):.2f} | "
                 f"${f([r for r in core if r['Status'] in ('have', 'ordered')]):.2f} | "
                 f"${sum(float(r['Paid USD']) for r in rows if r['Paid USD']):.2f} | "
-                f"{sum(r['Status'] != 'suggested' for r in rows)}/{len(rows)} parts |\n\n"
+                f"{sum(r['Status'] != 'suggested' for r in rows)}/{len(rows)} parts | ${f([r for r in tools if to_buy_tool(r)]):.2f} |\n\n"
                 + " · ".join(f"Optional {k} +${f(v):.2f}" for k, v in kits.items()))
         t = re.sub(r"\$\d+\.\d\d total \(cap \$\d+\)", f"${f(core):.2f} total (cap ${bom_check.HARD_CAP:.0f})", t)   # intro line
         head, rest = t.split("<!-- budget:start -->", 1)

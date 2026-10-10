@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/axes.svg" width="100%" alt="Frame">
 
-$61.07 · total so far $201.99 / $450
+$71.96 · total so far $287.98 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -30,7 +30,7 @@ Commit `PARTS.md`.
 
 ### M11.2 Print the template and mounts
 
-**Time** 30 min (+ print 4 h) · **Needs** TLS-08 paper printer · tape · PETG
+**Time** 30 min (+ print 4 h) · **Needs** TLS-08 paper printing · tape · FIL-01 ABS
 
 #### Do
 
@@ -75,7 +75,7 @@ Photo `phases/03-frame/base.jpg`; commit.
 
 ## M12 · Assemble the frame
 
-Board on feet with outrigger, camera post, scales and boxes. · 0/4 steps done · ~1.8 h hands-on · ~1 wk
+Board on feet with outrigger, camera pillar and post, scales and boxes. · 0/4 steps done · ~1.8 h hands-on · ~1 wk
 
 ### M12.1 Feet
 
@@ -99,21 +99,21 @@ Board on feet with outrigger, camera post, scales and boxes. · 0/4 steps done �
 
 Tick the boxes; `make done id=M12.1`.
 
-### M12.2 Outrigger and camera posts
+### M12.2 Outrigger, camera pillar and scan post
 
-**Time** 45 min (+ print 3 h) · **Needs** 3 × FRM-02 2020 · 9 × FRM-03 T-nuts · 9 × M5 × 10 · FRM-09e post sockets (2) · FRM-09f end foot · TLS-07 tape + phone level app
+**Time** 45 min (+ print 3 h) · **Needs** 2 × FRM-02 2020 (outrigger + scan post) · 7 × FRM-03 T-nuts · 7 × M5 × 10 · FRM-09e post socket · FRM-09h camera pillar · FRM-09f end foot · TLS-07 tape + phone level app
 
 #### Do
 
 1. Print 2 × `FRM-09e_post_socket.stl` and 1 × `FRM-09f_end_foot.stl`.
-2. Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under the far end.
+2. Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under it at x = 628 (just inside the scan post).
 3. M5 × 10 through each saddle wall and the end foot into the T-nuts; tighten.
-4. Post sockets on the outrigger at x = 380 (measuring camera) and x = 658 (scan camera); a 2020 post in each (M5 × 10 + T-nut).
+4. Camera pillar (FRM-09h) on the outrigger at x = 391.8 (measuring camera: lens front lands at 350); post socket at x = 674.4 with the 500 mm scan post (M5 × 10 + T-nut each). No tall post at the measuring camera: it would stand in the scan camera's view.
 
 #### Verify
 
 - [ ] Posts vertical: phone level app on two faces reads 90.0 ± 0.5°.
-- [ ] Post centres 380 ± 1 and 658 ± 2 mm from the board centre (tape).
+- [ ] Pillar and post centres 391.8 ± 1 and 674.4 ± 2 mm from the board centre (tape); pillar's M5 pilot at 150 ± 1 mm above the board.
 - [ ] Outrigger level end to end (phone level app ±0.5°).
 
 #### If a check fails
@@ -135,7 +135,7 @@ Tick the boxes; `make done id=M12.2`.
 
 #### Verify
 
-- [ ] The 20° and 340° ends sit symmetric about the line board centre → camera post (string line).
+- [ ] The 20° and 340° ends sit symmetric about the line board centre → camera pillar (string line).
 
 #### Record
 

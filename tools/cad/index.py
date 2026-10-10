@@ -5,12 +5,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
 import csv
 import io
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import catalog  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 REG = dict((m[0], (m[1], m[2], m[3])) for m in re.findall(
     r'"([A-Z]+-\d+[a-z]?)": \("([\w-]+)", "(\w+)", [^,]+(?:\([^)]*\))?, "([^"]+)"\)', (ROOT / "tools/cad/parts.py").read_text()))
-PRINT_NOTE = "PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first."
+PRINT_NOTE = ("Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, "
+              "brim on tall or long parts, no supports unless noted; XY shrink compensation from the coupon (M03.3). "
+              "Ventilate the room (ABS fumes). Counts and grams: [cad/PRINT.md](../../../cad/PRINT.md). v0 geometry: measure your parts first.")
 
 
 def stage_index(stage: Path) -> str:
@@ -29,14 +35,19 @@ def stage_index(stage: Path) -> str:
     if bom.exists():
         rows = [r for r in csv.DictReader(bom.open(encoding="utf-8")) if r["Type"] in ("Purchase", "Optional")]
         if rows:
-            out += ["## Bought parts", "", "`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).", "",
-                    "| ID | Part | 3D model |", "|---|---|---|"]
+            out += ["## Bought parts", "", "Every bought part has a model in the repo (dummy in `cad/bought/` or open model in `cad/open/`; "
+                    "list: [cad/README.md](../../../cad/README.md)). `bash scripts/get_cad.sh` saves the real vendor models into `cad/vendor/` "
+                    "(not committed: vendor licences).", "",
+                    "| ID | Part | In the repo | Real model |", "|---|---|---|---|"]
+            al = catalog.aliases()
             for r in rows:
+                files = catalog.classify(stage.name, r, al)[0]
+                here = "<br>".join(f"[`{f.name}`](../../../{f.relative_to(ROOT).as_posix()})" for f in files) or "—"
                 cad = r["STEP"] or "—"
                 url = re.search(r"https?://\S+", cad)
                 if url:
                     cad = f"[link]({url.group(0).rstrip(').,')})" + (" " + cad.replace(url.group(0), "").strip(" :-") if cad.replace(url.group(0), "").strip(" :-") else "")
-                out.append(f"| {r['ID']} | {r['Part']} | {cad} |")
+                out.append(f"| {r['ID']} | {r['Part']} | {here} | {cad} |")
             out.append("")
     out += ["Design notes: [../design.md](../design.md).", ""]
     return "\n".join(out)

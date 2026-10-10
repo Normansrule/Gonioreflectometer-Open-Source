@@ -2,7 +2,7 @@
 
 ## Print
 
-PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
+Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, brim on tall or long parts, no supports unless noted; XY shrink compensation from the coupon (M03.3). Ventilate the room (ABS fumes). Counts and grams: [cad/PRINT.md](../../../cad/PRINT.md). v0 geometry: measure your parts first.
 
 **STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
 
@@ -17,19 +17,19 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
+Every bought part has a model in the repo (dummy in `cad/bought/` or open model in `cad/open/`; list: [cad/README.md](../../../cad/README.md)). `bash scripts/get_cad.sh` saves the real vendor models into `cad/vendor/` (not committed: vendor licences).
 
-| ID | Part | 3D model |
-|---|---|---|
-| ENC-01 | Blackout fabric 54 in (2 yd) | n/a |
-| ENC-02 | Black felt sheet | n/a |
-| ENC-03 | Poplar dowel 1/2 in x 36 in | n/a |
-| CAL-01 | PTFE sheet 6 x 6 x 0.375 in | n/a |
-| CAL-02 | Glass mirror tile ~50 mm | n/a |
-| CAL-03 | Chrome steel ball 1 in G25 (2) | 25.4 mm sphere |
-| CAL-04 | ChArUco print + picture-frame glass | n/a |
-| CAL-05 | Colour target (ColorChecker Mini or similar) | n/a |
-| ENC-05 | Flocked light-trap sheet 17.5 x 15 in, self-adhesive | n/a |
-| CAL-07 | 18 % grey card + white card set (8 x 10 in) | n/a |
+| ID | Part | In the repo | Real model |
+|---|---|---|---|
+| ENC-01 | Blackout fabric, black (2 units) | [`ENC-01_blackout_fabric_2yd.step`](../../../cad/bought/ENC-01_blackout_fabric_2yd.step) | None published - use the dummy (fabric) |
+| ENC-02 | Black felt sheet | [`ENC-02_felt_9x12in.step`](../../../cad/bought/ENC-02_felt_9x12in.step) | None published - use the dummy (sheet) |
+| ENC-03 | Dowels 1/2 x 36 in (10) | [`ENC-03_dowel_half_in_36in.step`](../../../cad/bought/ENC-03_dowel_half_in_36in.step) | None published - use the dummy (dowel) |
+| CAL-01 | PTFE sheets 100 x 100 x 3 mm (2): white tile = 3 stacked 50 mm squares | [`CAL-01_ptfe_tile_50mm_3x3mm.step`](../../../cad/bought/CAL-01_ptfe_tile_50mm_3x3mm.step) | None published - use the dummy (stack of three 50 mm squares) |
+| CAL-02 | Glass mirror tile ~50 mm | [`CAL-02_mirror_tile_50mm.step`](../../../cad/bought/CAL-02_mirror_tile_50mm.step) | None published - use the dummy (tile) |
+| CAL-03 | Chrome steel ball 1 in G25 (2) | [`CAL-03_chrome_ball_1in.step`](../../../cad/bought/CAL-03_chrome_ball_1in.step) | None published - use the dummy (25.4 mm sphere) |
+| CAL-04 | ChArUco print + picture-frame glass | [`CAL-04_charuco_glass_4x6in.step`](../../../cad/bought/CAL-04_charuco_glass_4x6in.step) | None published - use the dummy (print + glass) |
+| CAL-05 | Colour target (ColorChecker Mini or similar) | [`CAL-05_colorchecker_mini.step`](../../../cad/bought/CAL-05_colorchecker_mini.step) | None published - use the dummy |
+| ENC-05 | Flocked light-trap sheet, self-adhesive | [`ENC-05_flock_sheet.step`](../../../cad/bought/ENC-05_flock_sheet.step) | None published - use the dummy (sheet) |
+| CAL-07 | 18 % grey card + white card set (8 x 10 in) | [`CAL-07_grey_card_8x10in.step`](../../../cad/bought/CAL-07_grey_card_8x10in.step) | None published - use the dummy (card) |
 
 Design notes: [../design.md](../design.md).

@@ -67,7 +67,7 @@ scan:                           # 3D photo scanner (stage 11): second camera fix
     - {elevation_deg: 65, count: 24}
     - {elevation_deg: 80, count: 12}
   ps_band: 3                    # LED bank band used for photometric stereo (one band = one albedo)
-  ps_m4_deg: [40, 100, 160, 220, 280, 330]
+  ps_m4_deg: [40, 100, 160, 220, 280, 320]
 
 axes:
   M4:
@@ -75,7 +75,7 @@ axes:
     fluidnc_axis: X
     phase: 4
     min_deg: 20.0
-    max_deg: 340.0
+    max_deg: 324.0            # the upright stands 15.3 deg beyond the lamp (off the beam line); it clears the motor to here
     home_deg: 20.0              # switch at the near-camera end; roller-lever safety switch just beyond
     gear_ratio: 24.0            # ring rim pitch diameter / 20T pulley (set from CAD)
   M3:

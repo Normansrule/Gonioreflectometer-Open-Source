@@ -2,7 +2,7 @@
 
 ## Print
 
-PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
+Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, brim on tall or long parts, no supports unless noted; XY shrink compensation from the coupon (M03.3). Ventilate the room (ABS fumes). Counts and grams: [cad/PRINT.md](../../../cad/PRINT.md). v0 geometry: measure your parts first.
 
 **STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
 
@@ -16,16 +16,16 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
+Every bought part has a model in the repo (dummy in `cad/bought/` or open model in `cad/open/`; list: [cad/README.md](../../../cad/README.md)). `bash scripts/get_cad.sh` saves the real vendor models into `cad/vendor/` (not committed: vendor licences).
 
-| ID | Part | 3D model |
-|---|---|---|
-| MSK-01 | Narrow-band star LEDs (8 bands, ~420-660 nm) | n/a |
-| MSK-02 | Constant-current driver 350 mA | Mean Well 3D OUTLINE (not downloaded) |
-| MSK-03 | Darlington array 8-ch | DIP-18 model |
-| MSK-04 | Heatsink 40 mm (from LSR-03 pack) | Block model |
-| MSK-05 | Linear polarizer film 10 x 10 cm (10) | n/a |
-| SPC-01 | AS7341 10-band spectral sensor breakout (STEMMA QT) | — |
-| SPC-02 | JST-SH 4-pin to female jumper cable 150 mm | — |
+| ID | Part | In the repo | Real model |
+|---|---|---|---|
+| MSK-01 | Narrow-band 3 W star LEDs, pre-soldered leads (7 bands, 450–660 nm) | [`MSK-01_star_led_20mm.step`](../../../cad/bought/MSK-01_star_led_20mm.step) | None published - use the dummy (20 mm star LED) |
+| MSK-02 | Constant-current driver 350 mA | [`LSR-02_meanwell_nldd_350h.step`](../../../cad/bought/LSR-02_meanwell_nldd_350h.step) | [link](https://www.meanwellusa.com/) (search NLDD-H → 3D STEP) |
+| MSK-03 | Darlington array 8-ch | [`MSK-03_kicad_DIP-18_W7.62mm_uln2803a.step`](../../../cad/open/MSK-03_kicad_DIP-18_W7.62mm_uln2803a.step) | cad/open/MSK-03_kicad_DIP-18_W7.62mm_uln2803a.step |
+| MSK-04 | Heatsink 40 mm (from LSR-03 pack) | [`LSR-03_heatsink_40x40x11.step`](../../../cad/bought/LSR-03_heatsink_40x40x11.step) | None published - use the dummy (generic heatsink) |
+| MSK-05 | Linear polarizer film 10 x 10 cm (10) | [`MSK-05_polarizer_film_100mm.step`](../../../cad/bought/MSK-05_polarizer_film_100mm.step) | None published - use the dummy (film) |
+| SPC-01 | AS7341 10-band spectral sensor breakout (STEMMA QT) | [`SPC-01_adafruit_4698_as7341.step`](../../../cad/open/SPC-01_adafruit_4698_as7341.step) | cad/open/SPC-01_adafruit_4698_as7341.step |
+| SPC-02 | JST-SH 4-pin to female jumper cable 150 mm | [`SPC-02_jst_sh_cable.step`](../../../cad/bought/SPC-02_jst_sh_cable.step) | None published - use the dummy (cable) |
 
 Design notes: [../design.md](../design.md).

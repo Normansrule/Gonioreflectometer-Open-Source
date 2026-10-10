@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Vendor 3D models from the STEP column of phases/*/bom.csv -> phases/NN/3d/vendor/ (git-ignored).
+# Vendor 3D models from the STEP column of phases/*/bom.csv -> cad/vendor/ (git-ignored: vendor licences).
 #   bash scripts/get_cad.sh                                        download files, clone GitHub folders
 #   bash scripts/get_cad.sh --from /mnt/c/Users/aleks/Downloads    pick up files you saved in a browser
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -11,7 +11,7 @@ import csv, glob, os, re, shutil, subprocess
 src = os.environ.get("FROM", "")
 manual = []
 for bom in sorted(glob.glob("phases/*/bom.csv")):
-    vend = f"phases/{bom.split('/')[1]}/3d/vendor"
+    vend = "cad/vendor"
     for r in csv.DictReader(open(bom, encoding="utf-8")):
         for url in re.findall(r"https?://[^\s;)]+", r["STEP"]):
             gh = re.match(r"https://github\.com/([^/]+/[^/]+?)(?:/tree/[^/]+/(.+))?/?$", url)

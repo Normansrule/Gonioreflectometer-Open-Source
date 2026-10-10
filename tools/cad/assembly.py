@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""Whole machine as ONE STEP assembly -> cad/assembly/opengonio_assembly.step (Onshape: Insert -> Import, or drag in;
+it arrives as an Assembly with every part separate and named by BOM ID).
+
+Printed parts come from tools/cad/parts.py, bought parts from the dummies in tools/cad/bought.py (envelopes: swap in
+vendor models from cad/README.md). Pose shown: M4 = 90 deg (light arm on +Y), M3 = 0, M2 = 90 deg (platter face up).
+Frame: origin under the zero point on the plywood top, +X toward the camera, z up; zero point at (0, 0, 150).
+Positions are v0 (from the docs and the CAD constants); expect to nudge some by a few mm.
+SPDX-License-Identifier: CERN-OHL-S-2.0
+"""
+from __future__ import annotations
+
+import math
+import sys
+from pathlib import Path
+
+import cadquery as cq
+from OCP.gp import gp_Trsf
+from OCP.TopLoc import TopLoc_Location
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bought as B  # noqa: E402
+import stepio  # noqa: E402
+import parts as P  # noqa: E402
+
+OUT = ROOT / "cad" / "assembly" / "opengonio_assembly.step"
+PRINT, BUY, OPT = cq.Color(0.12, 0.12, 0.13), cq.Color(0.75, 0.55, 0.25), cq.Color(0.5, 0.5, 0.55)
+
+
+def orient(shape, z_to=(0, 0, 1), y_to=(0, 1, 0), t=(0, 0, 0)):
+    """Rigid transform: local +z -> z_to, local +y -> y_to (both unit, perpendicular), then translate by t."""
+    z = cq.Vector(*z_to).normalized()
+    y = cq.Vector(*y_to).normalized()
+    x = y.cross(z)
+    tr = gp_Trsf()
+    tr.SetValues(x.x, y.x, z.x, float(t[0]), x.y, y.y, z.y, float(t[1]), x.z, y.z, z.z, float(t[2]))
+    s = shape.val() if hasattr(shape, "val") else shape
+    if isinstance(s, cq.Workplane):
+        s = s.val()
+    if not isinstance(s, cq.Shape):
+        s = cq.Compound.makeCompound(list(shape.vals()))
+    return s.moved(cq.Location(TopLoc_Location(tr)))
+
+
+def rot_z(shape, deg, t=(0, 0, 0)):
+    s = shape.val() if hasattr(shape, "val") else shape
+    return s.rotate(cq.Vector(0, 0, 0), cq.Vector(0, 0, 1), deg).translate(cq.Vector(*t))
+
+
+GROUPS: dict[str, str] = {}   # part name -> what moves it: fixed, arm (M4, about z), table (M3, about z), tilt (M2, about y at z 150)
+
+
+def build() -> cq.Assembly:
+    a = cq.Assembly(name="OpenGonio")
+    n = {}
+    GROUPS.clear()
+
+    def add(name, shape, color, g="fixed"):
+        n[name] = n.get(name, 0) + 1
+        full = f"{name}_{n[name]}" if n[name] > 1 or name in ("FRM-09b", "LAR-08a", "FRM-09c", "FRM-09d", "FRM-09e", "FRM-02") else name
+        a.add(shape, name=full, color=color)
+        GROUPS[full] = g
+
+    Z = P.TABLE_Z
+    # ---- frame
+    add("FRM-01_plywood", orient(B.box(610, 610, 12), t=(0, 0, -12)), BUY)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            add("FRM-09b", orient(P.foot(), t=(sx * 280, sy * 280, -24)), PRINT)
+    for x in (237, 282):
+        add("FRM-09d", orient(P.extrusion_saddle(), t=(x, 0, 0)), PRINT)
+    add("FRM-02", orient(B.vslot(500), z_to=(1, 0, 0), y_to=(0, 1, 0), t=(P.OUTRIGGER_X[0], 0, 16)), BUY)  # outrigger
+    add("FRM-09f_end_foot", orient(P.end_foot(), t=(P.END_FOOT_X, 0, -24)), PRINT)
+    add("FRM-09h_camera_pillar", orient(P.camera_pillar(), t=(P.CAM_POST_X, 0, 12)), PRINT)            # measuring camera
+    add("FRM-09e", orient(P.post_socket(), t=(P.SCAN_POST_X, 0, 12)), PRINT)
+    add("FRM-02", orient(B.vslot(500), t=(P.SCAN_POST_X, 0, 36)), BUY)                                    # scan post
+    for k in range(4):
+        add("FRM-09c", rot_z(P.protractor_segment(), 20 + 80 * k), PRINT)
+    # ---- power and controller
+    add("PWR-18a_power_box", orient(P.power_box(), t=(220, -220, 0)), PRINT)
+    add("PWR-18b_power_lid", orient(P.power_lid(), t=(220, -220, P.BOX_H)), PRINT)
+    add("PWR-13_estop", orient(B.estop(), t=(220, -220, P.BOX_H + 3.2)), BUY)
+    add("CTL-10b_controller_tray", orient(P.controller_tray(), t=(-190, 220, 0)), PRINT)
+    add("CTL-01_fysetc_e4", orient(B.e4_board(), t=(-190 - 50, 220, 9)), BUY)
+    add("CTL-02_pico_h", orient(B.pico_h(), z_to=(0, 0, -1), t=(-190 + 52, 220 - 42, P.PICO_PEG + 1.0)), BUY)   # pins up
+    # ---- light arm (M4 = 90 deg: arm on +Y)
+    add("LAR-01_lazy_susan", orient(B.lazy_susan()), BUY)
+    lead = P.UPRIGHT_LEAD                                                       # lamp on +Y; upright 15.3 deg further on
+    rim0 = 90 + lead - 22.5                                                     # arm segment centred on the upright
+    for k in range(1, 8):
+        add("LAR-08a", rot_z(P.rim_segment(), rim0 + 45 * k, (0, 0, 8)), PRINT, g="arm")
+    add("LAR-08c_arm_segment", rot_z(P.arm_segment(), rim0, (0, 0, 8)), PRINT, g="arm")
+    R = P.RING_MOTOR_R
+    add("LAR-08b_ring_motor_mount", orient(P.ring_motor_mount(), t=(R, 0, 0)), PRINT)
+    add("LAR-02_motor_M4", orient(B.nema17(48, 24), z_to=(0, 0, -1), y_to=(0, 1, 0), t=(R, 0, 30)), BUY)
+    add("LAR-04_pulley_M4", orient(B.gt2_20t(), t=(R, 0, 8)), BUY)
+    ux, uy = -P.UPRIGHT_OFFSET, math.sqrt(P.ARM_R ** 2 - P.UPRIGHT_OFFSET ** 2)  # upright beside the beam line (x = 0)
+    add("FRM-02", orient(B.vslot(500), t=(ux, uy, 8 + P.RIM_H + 4)), BUY, g="arm")                    # upright
+    arm_z = 150 + 48 / 2 + 12                                                                           # lamp clamp channel centre
+    add("LAR-08e_cross_clamp", orient(P.cross_clamp(), t=(ux + 11, uy, arm_z - 16)), PRINT, g="arm")
+    add("FRM-02", orient(B.vslot(500), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(P.LAMP_ARM_X, uy, arm_z)), BUY, g="arm")   # horizontal arm
+    ly = 300.0 + P.LAMP_COB_Z                                                    # back face: COB 300 mm from the zero point
+    lamp = dict(z_to=(0, -1, 0), y_to=(0, 0, 1), t=(0, ly, 150))                     # beam axis through the zero point
+    add("LSR-05a_lamp", orient(P.lamp_tube(), **lamp), PRINT, g="arm")
+    add("LSR-05b_lamp_cap", orient(P.lamp_cap(), z_to=(0, -1, 0), y_to=(0, 0, 1), t=(0, ly + 3, 150)), PRINT, g="arm")
+    hs = ly - (P.HS_H - P.PRELOAD)                                                   # heatsink front face (stack clamped)
+    add("LSR-03_heatsink", orient(B.heatsink(), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(0, hs, 150)), BUY, g="arm")
+    add("LSR-06_holder", orient(B.cob_holder(), z_to=(0, -1, 0), y_to=(0, 0, 1), t=(0, hs, 150)), BUY, g="arm")
+    add("LSR-01_cob", orient(B.cob_clu7a3(), z_to=(0, -1, 0), y_to=(0, 0, 1), t=(0, hs - P.PAD_T, 150)), BUY, g="arm")
+    # ---- table (M3 = 0)
+    add("TBL-07d_table_post", orient(P.table_post()), PRINT)
+    add("TBL-05_axle_bolt", orient(B.bolt(8, 75, 13, 5.3, True)), BUY)
+    add("TBL-07a_table_drum", orient(P.table_drum(), t=(0, 0, Z["drum"])), PRINT, g="table")
+    for zz in (Z["b1"], Z["b2"]):
+        add("FRM-08_608", orient(B.cyl(22, 7).cut(B.cyl(8, 7)), t=(0, 0, zz)), BUY, g="table")
+    add("TBL-07c_table_motor_bracket", orient(P.table_motor_bracket(), t=(-P.TABLE_BELT_C, 0, 0)), PRINT)
+    add("TBL-01_motor_M3", orient(B.nema17(48, 24), t=(-P.TABLE_BELT_C, 0, 48)), BUY)
+    add("TBL-03_pulley_M3", orient(B.gt2_20t(), t=(-P.TABLE_BELT_C, 0, 53.7)), BUY)
+    add("TBL-02_belt_232", orient(B.belt_loop(6.37, 31.83, P.TABLE_BELT_C), t=(-P.TABLE_BELT_C, 0, Z["drum"] + 1.2)), BUY)
+    # ---- tilt (yoke arms along Y) + spin, M2 = 90 deg: platter face up
+    yz = Z["hub_top"]
+    add("TLT-07a_tilt_yoke", rot_z(P.tilt_yoke(), 90, (0, 0, yz)), PRINT, g="table")
+    add("TLT-07c_tilt_cradle", rot_z(P.tilt_cradle(), 90, (0, 0, 150 + P.SPIN["motor_face"])), PRINT, g="tilt")
+    add("SPN-07a_spin_platter", orient(P.spin_platter(), t=(0, 0, 150 - P.SPIN["platter"])), PRINT, g="tilt")
+    add("SPN-01_motor_M1", orient(B.nema17(21.5, 20), t=(0, 0, 150 + P.SPIN["motor_face"])), BUY, g="tilt")
+    ya = P.YOKE_INNER / 2
+    add("TLT-01_motor_M2", orient(B.nema17(48, 24), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(0, ya, yz + P.YOKE_SEAT + P.TILT_BELT_C)), BUY, g="table")
+    add("TLT-07b_pulley_100T", orient(P.gt2_pulley(100), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(0, ya + 13, 150)), PRINT, g="tilt")
+    for s in (-1, 1):
+        add("TLT-05_stub_bolt", orient(B.bolt(8, 35, 13, 5.3, True), z_to=(0, -s, 0), y_to=(0, 0, 1), t=(0, s * (ya + 12 + 1 + 9.4 + 5.3), 150)), BUY, g="tilt")
+        add("FRM-08_608", orient(B.cyl(22, 7).cut(B.cyl(8, 7)), z_to=(0, s, 0), y_to=(0, 0, 1), t=(0, s * (ya + 12 - 7.2), 150)), BUY, g="table")
+    # ---- cameras (look along -X at the zero point); lens front 350 (measuring) / 650 mm at 15 deg down (scan)
+    def camera(plate, tag, view, up, back):
+        """plate back centre at `back`, camera looking along `view`."""
+        f = dict(z_to=view, y_to=up)
+        at = lambda d: tuple(back[i] + d * view[i] for i in range(3))
+        add(f"CAM-03b_camera_plate{tag}" if not tag else "SCN-03d_scan_camera_plate", orient(plate, t=back, **f), PRINT)
+        z_board = P.CAM_PLATE + P.CAM_STANDOFF
+        add(f"CAM-0{1 if not tag else 4}_camera{tag}", orient(B.camera_b0433(), t=at(z_board), **f), BUY)
+        add(f"CAM-0{2 if not tag else 5}_lens{tag}", orient(B.lens_m12(), t=at(P.CAM_LENS_Z - 17.0), **f), BUY)
+    camera(P.camera_plate(), "", (-1, 0, 0), (0, 0, 1), (P.CAM_POST_X - P.CAM_CLAMP / 2, 0, 150))
+    e = math.radians(P.SCAN_TILT)
+    camera(P.scan_camera_plate(), "_scan", (-math.cos(e), 0, -math.sin(e)), (-math.sin(e), 0, math.cos(e)),
+           (P.SCAN_POST_X - P.SCAN_CLAMP_OFF, 0, P.SCAN_LENS_Z + P.CAM_LENS_Z * math.sin(e)))
+    return a
+
+
+STAMP = OUT.with_name("inputs.sha256")      # the STEP writer orders colour records differently each run, so the
+                                           # file is only rewritten when the CAD sources change (or with --force)
+
+
+def inputs_hash() -> str:
+    import hashlib
+    h = hashlib.sha256()
+    for f in ("parts.py", "bought.py", "assembly.py"):
+        h.update((Path(__file__).resolve().parent / f).read_bytes())
+    return h.hexdigest()
+
+
+def main() -> int:
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    digest = inputs_hash()
+    if "--force" not in sys.argv and OUT.exists() and STAMP.exists() and STAMP.read_text().strip() == digest:
+        print(f"{OUT.relative_to(ROOT)} up to date (CAD sources unchanged; --force to rebuild)")
+        return 0
+    a = build()
+    a.save(str(OUT), exportType="STEP")
+    stepio.stabilise(OUT)
+    STAMP.write_text(digest + "\n")
+    print(f"{len(a.children)} parts -> {OUT.relative_to(ROOT)} ({OUT.stat().st_size / 1e6:.1f} MB)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

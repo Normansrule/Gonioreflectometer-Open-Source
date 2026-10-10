@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/15.svg" width="100%" alt="Steps of stage 15">
 
-Optional kit $38.00 (not in the $450 total)
+Optional kit $71.68 (not in the $630 total)
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 

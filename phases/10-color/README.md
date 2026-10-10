@@ -15,7 +15,7 @@ Colour spectrum of the spot at the zero point; camera stays for images. · 0/4 s
 #### Do
 
 1. Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it.
-2. Clamp it on the camera post just above the camera; aim at the zero point.
+2. Clamp it on the camera pillar just above the camera (M5 × 10 into the z 181 pilot); aim at the zero point.
 
 #### Verify
 
@@ -92,7 +92,7 @@ Ratios in design.md; commit.
 #### Do
 
 1. Print `MSK-06a_led_ring.stl`, `MSK-06b_led_mast.stl`.
-2. 8 pre-wired LED stars on the ring, thermal pad, wavelength written next to each.
+2. 7 pre-wired LED stars in slots 1–7 of the ring (slot 8 spare), thermal pad, wavelength written next to each.
 
 #### Verify
 

@@ -101,7 +101,7 @@ def test_light_cannot_reach_camera(cfg):
 
 
 def test_path_through_camera_rejected(cfg):
-    assert path_is_safe(cfg, {"M4": 30}, {"M4": 330})[0]       # goes round the back
+    assert path_is_safe(cfg, {"M4": 30}, {"M4": 320})[0]       # goes round the back
     assert not path_is_safe(cfg, {"M4": 30}, {"M4": 5})[0]
 
 

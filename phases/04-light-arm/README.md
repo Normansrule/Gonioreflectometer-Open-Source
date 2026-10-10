@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/04.svg" width="100%" alt="Steps of stage 04">
 
-$41.40 · total so far $243.39 / $450
+$74.54 · total so far $362.52 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -31,11 +31,11 @@ Plate Ø, `RIM_TEETH`, `gear_ratio` in phases/04-light-arm/design.md → Results
 
 ### M13.2 Print ring parts
 
-**Time** 15 min (+ print 9 h) · **Needs** PETG
+**Time** 15 min (+ print 9 h) · **Needs** FIL-01 ABS
 
 #### Do
 
-1. Print 8 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08c_arm_bracket.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl` (8 washers).
+1. Print 7 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08c_arm_segment.stl` (the 8th rim segment, with the upright socket), 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl` (8 washers).
 
 #### Verify
 
@@ -47,13 +47,13 @@ Tick the boxes; `make done id=M13.2`.
 
 ### M13.3 Lazy Susan, rim and belt
 
-**Time** 1.25 h · **Needs** LAR-01 lazy Susan · LAR-03 belt · FRM-12 wood screws + 4 mm printed washers · M4 × 12 + nuts (FRM-06) · TLS-09 CA glue · TLS-04 cutter
+**Time** 1.25 h · **Needs** LAR-01 lazy Susan · LAR-03 belt · FRM-12 wood screws + 4 mm printed washers · M4 × 16 + nuts (FRM-06) · TLS-09 CA glue · TLS-04 cutter
 
 #### Do
 
 1. Lazy Susan centred on the template circle; #8 wood screws through its bottom-plate holes, each through a 4 mm printed washer (the steel plate is thin: without the washer the 16 mm screw pokes through the plywood).
-2. Rim segments on the top plate: M4 × 12 + nut through every slot that lands on a plate hole; CA-glue the others to the plate.
-3. Glue the GT2 belt teeth-out into the groove, ends butted, no gap; it ties the segments together.
+2. Rim segments + the arm segment on the top plate, closed ring: turn the ring so an arm-segment slot lands on a plate hole; M4 × 16 + nut through every slot that lands on a hole; CA-glue the rest (the arm segment's whole underside).
+3. CA-glue the GT2 belt teeth-out on the 6 mm band, its edges flush with the band's edges, ends butted, no gap; it ties the segments together.
 
 #### Verify
 
@@ -75,7 +75,7 @@ Tooth count in design.md.
 
 #### Do
 
-1. Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt.
+1. Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt (its flanges pass above and below the band).
 2. Mount on its template outline at 0° (+X), base outside the lazy Susan; slide it in until the pulley meshes the rim belt fully, then screw the base down (2 screws in the slots).
 
 #### Verify
@@ -92,16 +92,16 @@ Tick the boxes; `make done id=M13.4`.
 
 ### M13.5 Arm
 
-**Time** 45 min · **Needs** LAR-08c bracket · 2 × FRM-02 2020 (upright + arm) · LAR-08e cross clamp · M4 × 12 + nuts · LSR-05 lamp body (stage 06, or a dummy)
+**Time** 45 min · **Needs** LAR-08c arm segment (in the ring) · 2 × FRM-02 2020 (upright + arm) · LAR-08e cross clamp · M4 × 16 + nuts · LSR-05 lamp body (stage 06, or a dummy)
 
 #### Do
 
-1. Arm bracket on the top plate at r ≈ 140 mm: M4 × 12 + nuts through its slots and two plate holes.
-2. 2020 upright in the bracket socket (M5 × 10 + T-nut). Cross clamp on the upright; horizontal 2020 arm in its top channel pointing outward, so the lamp centre will sit 300 mm from the zero point at zero-point height (150 mm).
+1. The upright stands in the arm segment's socket, 36 mm beside the lamp's beam line (so it never shades the sample).
+2. 2020 upright in the socket (M5 × 10 + T-nut). Cross clamp on the upright (the uncut 500 mm upright runs straight through it); horizontal 2020 arm in its side channel, parallel to the beam line, pointing outward; the lamp's clamp is offset so its beam centre passes through the zero point, 300 mm out, at 150 mm.
 
 #### Verify
 
-- [ ] Turning by hand 20 → 340°: no tight spot, no skipped tooth; the bracket never touches the motor.
+- [ ] Turning by hand 20 → 324°: no tight spot, no skipped tooth; the arm segment and upright never touch the motor plate.
 - [ ] Lamp position: 300 ± 2 mm from the zero point, height 150 ± 2 mm.
 
 #### Record

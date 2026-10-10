@@ -2,7 +2,7 @@
 
 ## Print
 
-PETG, 0.2 mm layers, 4 walls, 25 % gyroid, no supports unless noted. v0 geometry: measure your parts first.
+Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, brim on tall or long parts, no supports unless noted; XY shrink compensation from the coupon (M03.3). Ventilate the room (ABS fumes). Counts and grams: [cad/PRINT.md](../../../cad/PRINT.md). v0 geometry: measure your parts first.
 
 **STEP** imports into Onshape as an editable solid (Insert → Import). **STL** is a mesh for the slicer.
 
@@ -14,16 +14,16 @@ Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
 ## Bought parts
 
-`bash scripts/get_cad.sh` saves vendor models into `vendor/` (not committed: vendor licences).
+Every bought part has a model in the repo (dummy in `cad/bought/` or open model in `cad/open/`; list: [cad/README.md](../../../cad/README.md)). `bash scripts/get_cad.sh` saves the real vendor models into `cad/vendor/` (not committed: vendor licences).
 
-| ID | Part | 3D model |
-|---|---|---|
-| STA-01 | Raspberry Pi Zero 2 WH (header soldered) | [link](https://datasheets.raspberrypi.com/rpizero2/raspberry-pi-zero-2-w-mechanical-drawing.pdf) |
-| STA-02 | microSD card 32 GB | — |
-| STA-03 | Buck converter 24 V to 5 V 3 A | — |
-| STA-04 | Micro-USB OTG adapter | — |
-| STA-05 | SSD1306 OLED 0.96 in I2C 128x64 | — |
-| STA-06 | Jumper wires female-female (10) | — |
-| STA-08 | USB-A to micro-B data cable 1 m | n/a |
+| ID | Part | In the repo | Real model |
+|---|---|---|---|
+| STA-01 | Raspberry Pi Zero 2 WH (header soldered) | [`STA-01_pi_zero_2wh.step`](../../../cad/bought/STA-01_pi_zero_2wh.step) | [link](https://www.snapeda.com/parts/RASPBERRY%20PI%20ZERO%202%20W/Raspberry%20Pi/view-part/) (free login); outline = Pi Zero W |
+| STA-02 | microSD card 32 GB | [`STA-02_microsd_card.step`](../../../cad/bought/STA-02_microsd_card.step) | None published - use the dummy (microSD) |
+| STA-03 | Buck converter 24 V to 5 V 3 A | [`STA-03_buck_lm2596_display.step`](../../../cad/bought/STA-03_buck_lm2596_display.step) | None published - use the dummy (generic LM2596 board) |
+| STA-04 | Micro-USB OTG adapter | [`STA-04_otg_adapter.step`](../../../cad/bought/STA-04_otg_adapter.step) | None published - use the dummy (adapter) |
+| STA-05 | SSD1306 OLED 0.96 in I2C 128x64 | [`STA-05_ssd1306_oled_096in.step`](../../../cad/bought/STA-05_ssd1306_oled_096in.step) | None published - use the dummy (generic SSD1306 board) |
+| STA-06 | Jumper wires female-female (10) | [`STA-06_jumper_wire_ff.step`](../../../cad/bought/STA-06_jumper_wire_ff.step) | None published - use the dummy (wire) |
+| STA-08 | USB-A to micro-B data cable 1 m | [`STA-08_adafruit_592_microusb_cable.step`](../../../cad/open/STA-08_adafruit_592_microusb_cable.step)<br>[`STA-08_usb_cable_micro_b.step`](../../../cad/bought/STA-08_usb_cable_micro_b.step) | cad/open/STA-08_adafruit_592_microusb_cable.step |
 
 Design notes: [../design.md](../design.md).

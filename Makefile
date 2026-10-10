@@ -3,10 +3,10 @@
 PY := $(shell [ -x .venv/bin/python ] && echo .venv/bin/python || echo python3)
 m ?= update
 
-.PHONY: help setup build check test parts publish all sim release done next
+.PHONY: help setup build check test parts cad cad-check cad-zip publish all sim release done next
 
 help:            ## list commands
-	@grep -E '^[a-z]+:.*## ' Makefile | sed 's/:.*## /\t/'
+	@grep -E '^[a-z-]+:.*## ' Makefile | sed 's/:.*## /\t/'
 
 setup:           ## once: .venv with the software, tests and tools
 	python3 -m venv .venv
@@ -24,12 +24,28 @@ build:           ## regenerate checklists, README tables, figures, budgets, 3D i
 	$(PY) tools/make_assets.py > /dev/null
 	$(PY) tools/cad/placement_template.py > /dev/null
 	$(PY) tools/cad/index.py
+	$(PY) tools/cad/catalog.py
 
 parts:           ## regenerate every printed part (STEP + STL) and the parts picture (needs cadquery)
 	$(PY) tools/cad/parts.py
 	$(PY) tools/cad/index.py
 	$(PY) tools/cad/gallery.py
 	$(PY) tools/part_images.py --stl
+	$(PY) tools/cad/printability.py
+
+cad:             ## dummy models of bought parts (cad/bought), whole-machine assembly STEP, cad/README.md, clash check (needs cadquery)
+	$(PY) tools/cad/bought.py
+	$(PY) tools/cad/assembly.py
+	$(PY) tools/cad/catalog.py
+	$(PY) tools/cad/interference.py
+
+cad-check:       ## interference check of the assembly: shown pose + every axis across its travel (needs cadquery)
+	$(PY) tools/cad/interference.py
+
+cad-zip:         ## every STEP (printed + bought + open + assembly) in dist/opengonio-cad.zip, for Onshape import
+	mkdir -p dist && rm -f dist/opengonio-cad.zip
+	$(PY) -m zipfile -c dist/opengonio-cad.zip cad/README.md cad/bought cad/open cad/assembly $$(ls phases/*/3d/*.step)
+	@echo "dist/opengonio-cad.zip ($$(du -h dist/opengonio-cad.zip | cut -f1))"
 
 check:           ## milestones, parts lists, budget, references, links, machine config
 	$(PY) tools/check.py

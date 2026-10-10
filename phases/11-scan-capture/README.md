@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/scanner.svg" width="100%" alt="3D scan: capture">
 
-$4.49 · total so far $428.39 / $450
+$3.33 · total so far $576.06 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
@@ -12,18 +12,18 @@ $4.49 · total so far $428.39 / $450
 
 Scan camera fixed at 650 mm, object held securely; nothing on the measuring side moves. · 0/3 steps done · ~1.2 h hands-on · ~1 wk
 
-### M31.1 Print risers and wedge
+### M31.1 Print risers and scan plate
 
-**Time** 10 min (+ print 3 h) · **Needs** SCN-03 prints · a second CAM-03b camera plate
+**Time** 10 min (+ print 3 h) · **Needs** SCN-03 prints
 
 #### Do
 
-1. Print `SCN-03a/b/c` risers, `SCN-03d_scan_camera_wedge_15.stl` and a second `CAM-03b_camera_plate.stl` + `CAM-03a_aperture_stop_f8.stl`.
+1. Print `SCN-03a/b/c` risers, `SCN-03d_scan_camera_plate_15.stl` and a second `CAM-03a_aperture_stop_f8.stl`.
 
 #### Verify
 
 - [ ] Risers sit flat on the platter.
-- [ ] Wedge: thin end 3 mm, thick end 16.4 mm (calipers).
+- [ ] Scan plate: its face leans 15° to its clamp channel (phone level app: 75° on the face with the channel vertical).
 
 #### Record
 
@@ -31,12 +31,12 @@ Tick the boxes; `make done id=M31.1`.
 
 ### M31.2 Mount the scan camera
 
-**Time** 45 min · **Needs** scan post at x = 658 (M12.2) · CAM-08 M2.5 × 20 screws · CAM-04 camera + CAM-05 lens (optional kit), or the measuring camera moved here
+**Time** 45 min · **Needs** scan post at x = 674.4 (M12.2) · 4 × M2.5 × 8 (CAM-08, or the CAM-07 screws moving with the camera) · CAM-04 camera + CAM-05 lens (optional kit), or the measuring camera moved here
 
 #### Do
 
-1. The scan post stands on the outrigger at x = 658 mm (650 mm × cos 15° + 30) since M12.2.
-2. Camera plate on the post, wedge between plate and board (thick end down): lens centre 168 mm above the zero point, looking 15° down.
+1. The scan post stands on the outrigger at x = 674.4 mm since M12.2 (lens 650 mm from the zero point, 15° down).
+2. Camera board on the scan plate's standoffs (4 × M2.5 × 8); plate on the post: lens centre 168 mm above the zero point (318 mm above the board), looking 15° down.
 3. Focus on the zero point (M17.3 method) and lock the lens; aperture stop on.
 4. Plug it in; `machine.yaml` → `scan.camera_index` = its index (usually 1); `opengonio scan plan`.
 
@@ -150,4 +150,4 @@ Tick the boxes; `make done id=M33.1`.
 
 Folder name in phases/11-scan-capture/design.md → Results.
 
-[Sources](../../REFERENCES.md): S9 · S12 · S14 · S20 · G4 · G39 · V7 · V8 · V9 · V10 · V11 · V12 · V13 · V14 · V15 · V16 · V17 · V18 · V25 · V27 · V30 · V48 · V50 · V51 · V53 · V54 · V55 · H49 · K1 · K2 · K5
+[Sources](../../REFERENCES.md): S9 · S12 · S14 · S20 · G4 · G39 · V7 · V8 · V9 · V10 · V11 · V12 · V13 · V14 · V15 · V16 · V17 · V18 · V25 · V27 · V30 · V48 · V50 · V51 · V53 · V54 · V55 · H49 · K1 · K2 · K5 · K23
