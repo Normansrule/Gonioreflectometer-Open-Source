@@ -130,6 +130,12 @@ def references() -> list[str]:
 
 
 # ---------------- bill of materials ----------------
+try:
+    import PIL  # noqa: F401  (openpyxl needs Pillow to embed pictures)
+    PIL_OK = True
+except ImportError:
+    PIL_OK = False
+
 def bom() -> list[str]:
     """One workbook (Excel, Google Sheets, LibreOffice): summary with formulas, every part with picture and links."""
     import catalog
@@ -165,7 +171,7 @@ def bom() -> list[str]:
                 if f:
                     ws.cell(i, col).hyperlink = f"{REPO}/{rel(f)}?raw=true"
             png = ROOT / "docs" / "assets" / "parts" / f"{step.stem}.png" if step else None
-            if png and png.exists():
+            if png and png.exists() and PIL_OK:
                 img = XLImage(str(png))
                 img.width = img.height = 48
                 ws.add_image(img, f"D{i}")
@@ -239,12 +245,10 @@ def wiki_book() -> list[str]:
         deterministic_zip(out[0])
         if have("xelatex"):
             pdf = d / "opengonio-wiki.pdf"
-            old = pdf.read_bytes() if pdf.exists() else b""
             pandoc(str(src), "-f", "markdown-raw_html", "-o", str(pdf), "--pdf-engine=xelatex", *meta,
                    "-V", "mainfont=DejaVu Serif", "-V", "monofont=DejaVu Sans Mono", "-V", "geometry:margin=2cm",
                    "-V", "colorlinks=true", "-V", "fontsize=10pt")
-            if old and pdf_norm(old) == pdf_norm(pdf.read_bytes()):
-                pdf.write_bytes(old)                         # only dates / ID differ: keep the committed file
+            fix_pdf_id(pdf)
             out.append(pdf)
     finally:
         src.unlink()
@@ -275,6 +279,14 @@ def glb_scale(path: Path, k: float) -> None:
     js += b" " * (-len(js) % 4)
     rest = b[20 + jlen:]
     path.write_bytes(struct.pack("<4sII", b"glTF", 2, 12 + 8 + len(js) + len(rest)) + struct.pack("<I4s", len(js), b"JSON") + js + rest)
+
+
+def fix_pdf_id(path: Path) -> None:
+    """xdvipdfmx derives the trailer ID from pandoc's random temp folder: replace it, same length, with a content hash."""
+    import hashlib
+    b = path.read_bytes()
+    h = hashlib.md5(pdf_norm(b)).hexdigest().encode()
+    path.write_bytes(re.sub(rb"/ID\s*\[<[0-9a-fA-F]{32}><[0-9a-fA-F]{32}>\]", b"/ID[<" + h + b"><" + h + b">]", b, count=1))
 
 
 def pdf_norm(b: bytes) -> bytes:
@@ -314,6 +326,8 @@ def main() -> int:
         sheets = bom()
     except ImportError:
         sheets = ["(bom skipped: pip install openpyxl, or make setup)"]
+    if not PIL_OK:
+        sheets.append("(no pictures in the workbook: pip install pillow)")
     done = [paper_docx(), overleaf_zip(), *references(), *sheets, *wiki_book()] + (cad() if a.cad else [])
     print("exports: " + " · ".join(done))
     return 0

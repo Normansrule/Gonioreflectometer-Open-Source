@@ -39,6 +39,9 @@ make -s build >/dev/null 2>&1 || echo "note: make build failed (run: make setup)
 make -s paper >/dev/null 2>&1 || echo "note: paper not built (needs latexmk + biber: see paper/README.md)"   # commit a fresh PDF
 git add -A
 git diff --cached --quiet && echo "nothing new to commit" || git commit -qm "$MSG"
+if [ -z "${NO_CI:-}" ]; then                                         # same checks as GitHub, on a clean clone
+  bash scripts/ci_local.sh || { echo "checks failed: not pushed. Fix and re-run, or NO_CI=1 bash scripts/update.sh \"$MSG\" to push anyway"; exit 1; }
+fi
 git push -q origin HEAD
 bash scripts/publish_wiki.sh 2>/dev/null || echo "note: wiki not published (create the first wiki page on GitHub once)"
 echo "pushed: $(git log -1 --format='%h %s')"

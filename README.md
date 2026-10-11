@@ -511,6 +511,7 @@ Exports are regenerated (`make export`; on GitHub by the *docs* workflow after e
 ```bash
 make setup && source .venv/bin/activate     # once; `source …` again in every new terminal
 make all                                     # build + check + tests
+make ci                                      # replay the GitHub checks on a clean clone (before pushing)
 make sim                                     # simulated machine: mirror → calibrate → dark → gamma → white → matte → drift → fit; ends "ALL PASS"
 opengonio check-pose M4=60 M3=30             # angles + collision check for one pose
 opengonio --sim plastic capture inplane --step 10 --out data/sim/plastic && opengonio curve data/sim/plastic
@@ -802,7 +803,7 @@ Rules that keep it simple:
 README.md            this guide
 CLAUDE.md            rules for AI agents: update + build + commit the PDF after every change
 PARTS.md             your working parts list: decisions, paid, notes (edit on GitHub)
-Makefile             make help · setup · build · parts · cad · cad-check · cad-zip · check · test · paper · all · sim · next · done · release · publish
+Makefile             make help · setup · build · parts · cad · cad-check · cad-zip · check · test · paper · export · ci · all · sim · next · done · release · publish
 REFERENCES.md        487 sources (also listed below)
 phases/NN-name/      one folder per stage
   README.md          checklist: Do / Verify / Record (generated)

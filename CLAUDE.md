@@ -3,7 +3,9 @@
 ## After every change
 1. `make all` (build, checks, tests, paper, exports). Fix failures before committing.
 2. CAD changed: `make parts` and/or `make cad` first (STEP/STL, pictures, clash check, paper figures).
-3. Commit everything, including `paper/build/opengonio.pdf` and `exports/`, then push to the remote (`bash scripts/update.sh "msg"` or `git push`).
+3. Commit everything, including `paper/build/opengonio.pdf` and `exports/`.
+4. `make ci` (replays the GitHub checks in a clean clone of HEAD); fix and recommit until it passes.
+5. Push (`bash scripts/update.sh "msg"` or `git push`).
 
 ## Sources of truth (edit these; the rest is generated)
 - Parts: `phases/*/bom.csv` → README bill of materials, PARTS.md, budget, paper tables.
