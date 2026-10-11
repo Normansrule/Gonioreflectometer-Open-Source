@@ -2,19 +2,14 @@ name: ci
 on: [push, pull_request]
 jobs:
   checks:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -e "./software[dev]" pyyaml numpy openpyxl pillow
-      - name: Checks and tests
-        run: set -o pipefail; make check test 2>&1 | tee /tmp/ci.out
+      - run: pip install -e "./software[dev]" pyyaml numpy
+      - run: make check test
       - name: Generated files are up to date
         run: |
-          set -o pipefail
-          make build 2>&1 | tee /tmp/ci.out
+          make build
           git diff --quiet || { git diff --stat; echo "::warning::generated files differ: run make (after a PARTS.md edit on GitHub, parts-sync commits them)"; }
-      - name: Show the error
-        if: failure()
-        run: tail -n 15 /tmp/ci.out | sed 's/^/::error::/'

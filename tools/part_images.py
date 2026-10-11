@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Pictures for PARTS.md (original drawings, no vendor photos): one line icon per kind of bought part,
-a rendered thumbnail of every printed part (orange) and of every bought part's 3D model (blue-grey) from its STL
-(parts more than 4 x longer than wide are drawn shortened, like a broken view).
+and a rendered thumbnail of every printed part from its STL.
 
     python tools/part_images.py           icons -> docs/assets/parts/icon-*.svg
-    python tools/part_images.py --stl     also thumbnails -> docs/assets/parts/<file stem>.png (needs numpy-stl, matplotlib)
+    python tools/part_images.py --stl     also thumbnails -> docs/assets/parts/<ID>.png (needs numpy-stl, matplotlib)
 
 The store page behind each part's buy link has the real product photo.
 SPDX-License-Identifier: GPL-3.0-or-later
@@ -136,21 +135,15 @@ def write_thumbs() -> int:
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
     from stl import mesh
     n = 0
-    files = [(f, (0.94, 0.53, 0.24)) for f in sorted(glob.glob(str(ROOT / "phases/*/3d/*.stl")))]
-    files += [(f, (0.55, 0.68, 0.85)) for f in sorted(glob.glob(str(ROOT / "cad/bought/*.stl")))]
-    for f, (cr, cg, cb) in files:
-        v = mesh.Mesh.from_file(f).vectors.copy()
-        mn, ext = v.reshape(-1, 3).min(0), np.ptp(v.reshape(-1, 3), 0)
-        k, second = int(ext.argmax()), np.sort(ext)[-2]
-        if ext[k] > 4 * second > 0:                     # long part (cable, belt, extrusion): draw it shortened
-            v[..., k] = mn[k] + (v[..., k] - mn[k]) * (4 * second / ext[k])
+    for f in sorted(glob.glob(str(ROOT / "phases/*/3d/*.stl"))):
+        v = mesh.Mesh.from_file(f).vectors
         fig = plt.figure(figsize=(1.6, 1.6), facecolor=BG)
         ax = fig.add_subplot(projection="3d")
         ax.set_facecolor(BG)
         nrm = np.cross(v[:, 1] - v[:, 0], v[:, 2] - v[:, 0])
         nrm /= np.linalg.norm(nrm, axis=1)[:, None] + 1e-9
         shade = 0.35 + 0.65 * np.clip(nrm @ np.array([0.4, -0.5, 0.77]), 0, 1)
-        ax.add_collection3d(Poly3DCollection(v, facecolors=np.c_[cr * shade, cg * shade, cb * shade, np.ones_like(shade)]))
+        ax.add_collection3d(Poly3DCollection(v, facecolors=np.c_[0.94 * shade, 0.53 * shade, 0.24 * shade, np.ones_like(shade)]))
         mn, mx = v.reshape(-1, 3).min(0), v.reshape(-1, 3).max(0)
         c, r = (mn + mx) / 2, (mx - mn).max() / 2
         ax.set_xlim(c[0] - r, c[0] + r); ax.set_ylim(c[1] - r, c[1] + r); ax.set_zlim(c[2] - r, c[2] + r)
@@ -166,4 +159,4 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--stl", action="store_true")
     a = ap.parse_args()
-    print(f"{write_icons()} icons" + (f", {write_thumbs()} thumbnails (printed + bought)" if a.stl else "") + f" -> {OUT.relative_to(ROOT)}")
+    print(f"{write_icons()} icons" + (f", {write_thumbs()} printed-part thumbnails" if a.stl else "") + f" -> {OUT.relative_to(ROOT)}")

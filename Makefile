@@ -3,14 +3,14 @@
 PY := $(shell [ -x .venv/bin/python ] && echo .venv/bin/python || echo python3)
 m ?= update
 
-.PHONY: help setup build check test parts cad cad-check cad-zip publish all sim release done next paper export ci
+.PHONY: help setup build check test parts cad cad-check cad-zip publish all sim release done next
 
 help:            ## list commands
 	@grep -E '^[a-z-]+:.*## ' Makefile | sed 's/:.*## /\t/'
 
 setup:           ## once: .venv with the software, tests and tools
 	python3 -m venv .venv
-	.venv/bin/pip install -q -e "./software[dev]" pyyaml numpy openpyxl pillow
+	.venv/bin/pip install -q -e "./software[dev]" pyyaml numpy
 	@echo "done. optional for 3D parts: .venv/bin/pip install cadquery numpy-stl matplotlib"
 
 build:           ## regenerate checklists, README tables, figures, budgets, 3D index (+ apply PARTS.md decisions)
@@ -25,8 +25,6 @@ build:           ## regenerate checklists, README tables, figures, budgets, 3D i
 	$(PY) tools/cad/placement_template.py > /dev/null
 	$(PY) tools/cad/index.py
 	$(PY) tools/cad/catalog.py
-	$(PY) tools/bom_readme.py
-	$(PY) tools/refs_bib.py
 
 parts:           ## regenerate every printed part (STEP + STL) and the parts picture (needs cadquery)
 	$(PY) tools/cad/parts.py
@@ -34,16 +32,11 @@ parts:           ## regenerate every printed part (STEP + STL) and the parts pic
 	$(PY) tools/cad/gallery.py
 	$(PY) tools/part_images.py --stl
 	$(PY) tools/cad/printability.py
-	$(PY) tools/bom_readme.py
 
 cad:             ## dummy models of bought parts (cad/bought), whole-machine assembly STEP, cad/README.md, clash check (needs cadquery)
-	$(PY) tools/cad/bought.py > /dev/null
-	$(PY) tools/part_images.py --stl
+	$(PY) tools/cad/bought.py
 	$(PY) tools/cad/assembly.py
-	$(PY) tools/paper_assets.py --figures
-	$(PY) tools/exports.py --cad
 	$(PY) tools/cad/catalog.py
-	$(PY) tools/bom_readme.py
 	$(PY) tools/cad/interference.py
 
 cad-check:       ## interference check of the assembly: shown pose + every axis across its travel (needs cadquery)
@@ -60,21 +53,7 @@ check:           ## milestones, parts lists, budget, references, links, machine 
 test:            ## software tests
 	$(PY) -m pytest -q software
 
-paper:           ## paper/build/opengonio.pdf (LaTeX + biber; skipped if latexmk is missing)
-	$(PY) tools/refs_bib.py > /dev/null
-	$(PY) tools/paper_assets.py
-	@if command -v latexmk > /dev/null && command -v biber > /dev/null; then \
-	  cd paper && SOURCE_DATE_EPOCH=$$(git log -1 --format=%ct -- . ':!build' ':!generated' ':!figures' ':!references.bib' ../REFERENCES.md ../tools 2>/dev/null || echo 0) FORCE_SOURCE_DATE=1 latexmk -g -r latexmkrc -interaction=nonstopmode -halt-on-error -quiet opengonio.tex > build.log 2>&1 \
-	  && echo "paper/build/opengonio.pdf" || (tail -30 build.log; exit 1); \
-	else echo "paper: skipped (sudo apt install latexmk biber texlive-publishers texlive-bibtex-extra texlive-latex-extra)"; fi
-
-export:          ## exports/: Word + Overleaf paper, Zotero refs, Excel BOM, wiki PDF/Word (needs pandoc; see exports/README.md)
-	$(PY) tools/exports.py
-
-ci:              ## replay the GitHub checks (clean clone, fresh venv) before pushing; tests HEAD
-	bash scripts/ci_local.sh
-
-all: build check test paper export   ## everything before a commit
+all: build check test   ## everything before a commit
 
 sim:             ## simulated machine: capture -> verify -> calibrate -> curve, ends with ALL PASS
 	$(PY) -m opengonio.cli sim-demo --out data/sim

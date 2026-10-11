@@ -26,10 +26,10 @@
 
 | ID | Source | Used for |
 |---|---|---|
-| **R5** | P. Debevec, J. Malik, "Recovering High Dynamic Range Radiance Maps from Photographs," *Proc. SIGGRAPH ’97*, 1997 — [PDF](https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf), [ACM](https://dl.acm.org/doi/10.1145/258734.258884) | Camera response + HDR for 8-bit UVC frames |
-| **R6** | B. Walter, S. Marschner, H. Li, K. Torrance, "Microfacet Models for Refraction through Rough Surfaces," *EGSR*, 2007 (bibliographic; not fetched) | GGX distribution |
-| **R7** | C. Schlick, "An Inexpensive BRDF Model for Physically-based Rendering," *Computer Graphics Forum* 13(3), 1994 (bibliographic; cited via [R2]) | Schlick Fresnel |
-| **R8** | R. Cook, K. Torrance, "A Reflectance Model for Computer Graphics," *ACM TOG* 1(1), 1982 (bibliographic; cited via [R2]) | Cook-Torrance colour shift |
+| **R5** | P. Debevec, J. Malik, "Recovering High Dynamic Range Radiance Maps from Photographs," SIGGRAPH 1997 — [PDF](https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf), [ACM](https://dl.acm.org/doi/10.1145/258734.258884) | Camera response + HDR for 8-bit UVC frames |
+| **R6** | B. Walter, S. Marschner, H. Li, K. Torrance, "Microfacet Models for Refraction through Rough Surfaces," EGSR 2007 (bibliographic; not fetched) | GGX distribution |
+| **R7** | C. Schlick, "An Inexpensive BRDF Model for Physically-based Rendering," Computer Graphics Forum 13(3), 1994 (bibliographic; cited via [R2]) | Schlick Fresnel |
+| **R8** | R. Cook, K. Torrance, "A Reflectance Model for Computer Graphics," ACM TOG 1(1), 1982 (bibliographic; cited via [R2]) | Cook-Torrance colour shift |
 | **R9** | C. Ericson, *Real-Time Collision Detection*, Morgan Kaufmann, 2005, §5.1.9 (bibliographic) | Segment-segment distance in the collision model |
 
 ## Other rigs and data

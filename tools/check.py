@@ -84,13 +84,11 @@ def check_refs_and_links() -> list[str]:
     for f in md_files():
         t = f.read_text(encoding="utf-8")
         rel = f.relative_to(ROOT)
-        if rel.parts[:2] == ("wiki", "src"):          # templates: {{REPO}} and wiki pages resolve after tools/refs_bib.py
-            continue
         if f.name != "REFERENCES.md" and f != ROOT / "README.md":
             for r in sorted(set(re.findall(r"\[([A-Z]\d{1,3})\](?!\()", t)) - known):
                 errs.append(f"{rel}: cites [{r}], not in REFERENCES.md")
         for link in re.findall(r"\]\(([^)\s]+)\)", t) + re.findall(r'src="([^"]+)"', t):
-            path = link.split("#")[0].split("?")[0]
+            path = link.split("#")[0]
             if path and not link.startswith(("http", "mailto")) and not (f.parent / path).exists():
                 errs.append(f"{rel}: broken link {link}")
     return errs
