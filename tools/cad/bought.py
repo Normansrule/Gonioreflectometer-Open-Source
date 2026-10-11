@@ -328,8 +328,11 @@ def build(only: str | None = None) -> list[Path]:
         if only and pid != only:
             continue
         path = OUT / f"{pid}_{stem}.step"
-        cq.exporters.export(fn(), str(path))
+        shape = fn()
+        cq.exporters.export(shape, str(path))
         stepio.stabilise(path)
+        # STL beside the STEP: preview on GitHub, slicers, mesh tools (coarse: it is an envelope)
+        cq.exporters.export(shape, str(path.with_suffix(".stl")), tolerance=0.1, angularTolerance=0.3)
         out.append(path)
     return out
 

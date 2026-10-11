@@ -21,3 +21,8 @@ data/**/*.jpg
 data/**/*.npy
 # simulator runs (make sim)
 data/sim/
+# paper: keep only the built PDF
+!paper/build/
+paper/build/*
+!paper/build/*.pdf
+paper/build.log

@@ -1,0 +1,34 @@
+# After a push that changes the paper, references, parts or wiki sources (including edits made on github.com):
+# rebuild paper/build/opengonio.pdf and exports/ (Word, Overleaf zip, Zotero, Excel BOM, wiki PDF), commit them back.
+name: docs
+on:
+  push:
+    branches: [main]
+    paths: ["paper/*.tex", "REFERENCES.md", "phases/*/bom.csv", "PARTS.md", "wiki/src/**", "tools/**", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: {group: docs, cancel-in-progress: true}
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: LaTeX + pandoc
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends latexmk biber texlive-publishers texlive-bibtex-extra \
+            texlive-latex-extra texlive-xetex lmodern fonts-dejavu pandoc
+      - run: pip install -e "./software[dev]" pyyaml numpy openpyxl
+      - run: make build paper export
+      - name: Commit PDFs and exports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A paper/build/opengonio.pdf paper/generated paper/references.bib exports wiki README.md
+          git diff --cached --quiet || { git commit -m "Rebuild paper PDF and exports"; git pull --rebase -q; git push; }
+      - uses: actions/upload-artifact@v4
+        with: {name: opengonio-docs, path: "paper/build/opengonio.pdf\nexports/**"}

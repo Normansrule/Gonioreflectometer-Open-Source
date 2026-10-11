@@ -1,0 +1,3220 @@
+TY  - JOUR
+ID  - R1
+AU  - Ansari-Asl, M.
+AU  - Barbieri, M.
+AU  - Obein, G.
+AU  - Hardeberg, J. Y.
+TI  - Optical and electromechanical design and implementation of an advanced multispectral device to capture material appearance
+T2  - Journal of Imaging
+PY  - 2024
+VL  - 10
+IS  - 3
+DO  - 10.3390/jimaging10030055
+SP  - 55
+ER  - 
+
+TY  - BOOK
+ID  - R2
+AU  - Hanrahan, P.
+TI  - Reflection models I: Ideal materials
+PY  - 2016
+ER  - 
+
+TY  - ELEC
+ID  - R3
+TI  - Stanford spherical gantry
+UR  - https://graphics.stanford.edu/projects/gantry/
+ER  - 
+
+TY  - ELEC
+ID  - R4
+TI  - Stanford spherical gantry specifications
+UR  - https://graphics.stanford.edu/projects/gantry/design/specifications.html
+ER  - 
+
+TY  - CPAPER
+ID  - R5
+AU  - Debevec, P.
+AU  - Malik, J.
+TI  - Recovering high dynamic range radiance maps from photographs
+T2  - Proc. SIGGRAPH ’97
+PY  - 1997
+UR  - https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf
+ER  - 
+
+TY  - CPAPER
+ID  - R6
+AU  - Walter, B.
+AU  - Marschner, S.
+AU  - Li, H.
+AU  - Torrance, K.
+TI  - Microfacet models for refraction through rough surfaces
+T2  - Eurographics symposium on rendering
+PY  - 2007
+ER  - 
+
+TY  - JOUR
+ID  - R7
+AU  - Schlick, C.
+TI  - An inexpensive BRDF model for physically-based rendering
+T2  - Computer Graphics Forum
+PY  - 1994
+VL  - 13
+IS  - 3
+ER  - 
+
+TY  - JOUR
+ID  - R8
+AU  - Cook, R.
+AU  - Torrance, K.
+TI  - A reflectance model for computer graphics
+T2  - ACM Transactions on Graphics
+PY  - 1982
+VL  - 1
+IS  - 1
+ER  - 
+
+TY  - BOOK
+ID  - R9
+AU  - Ericson, C.
+TI  - Real-time collision detection
+PY  - 2005
+PB  - Morgan Kaufmann
+ER  - 
+
+TY  - ELEC
+ID  - R10
+TI  - Cornell gonioreflectometer
+UR  - http://w1.graphics.cornell.edu/research/measure/gonio.html
+ER  - 
+
+TY  - ELEC
+ID  - R11
+TI  - S. Westin et al., cornell three-axis gonioreflectometer, SPIE 5878-29
+UR  - https://www.graphics.cornell.edu/~westin/SPIE_5878-29_Gonio.pdf
+ER  - 
+
+TY  - ELEC
+ID  - R12
+TI  - Cornell measurement data
+UR  - https://www.graphics.cornell.edu/online/measurements/
+ER  - 
+
+TY  - ELEC
+ID  - R13
+TI  - MERL BRDF database
+UR  - https://www.merl.com/brdf/
+ER  - 
+
+TY  - ELEC
+ID  - R14
+TI  - W. Matusik et al., MERL TR2003-83
+UR  - https://www.merl.com/publications/docs/TR2003-83.pdf
+ER  - 
+
+TY  - GEN
+ID  - R15
+AU  - Dupuy, J.
+AU  - Jakob, W.
+TI  - An adaptive parameterization for efficient material acquisition and rendering
+PY  - 2018
+UR  - https://rgl.epfl.ch/publications/Dupuy2018Adaptive
+ER  - 
+
+TY  - ELEC
+ID  - R16
+TI  - RGL-EPFL material database
+UR  - https://rgl.epfl.ch/pages/lab/material-database
+ER  - 
+
+TY  - ELEC
+ID  - R17
+TI  - J. Filip et al., specular BRDF with a goniometer, 2017
+PY  - 2017
+UR  - https://staff.utia.cas.cz/filip/papers/filip17brdf.pdf
+ER  - 
+
+TY  - ELEC
+ID  - R18
+TI  - UTIA BTF database
+UR  - https://btf.utia.cas.cz/?faq=
+ER  - 
+
+TY  - ELEC
+ID  - R19
+TI  - X-rite TAC7
+UR  - https://www.xrite.com/categories/appearance/tac7
+ER  - 
+
+TY  - ELEC
+ID  - R37
+TI  - F. Schröder, master’s thesis, 2019
+PY  - 2019
+UR  - https://f-schroeder.github.io/publication/masterthesis/
+ER  - 
+
+TY  - ELEC
+ID  - R38
+TI  - GatherLab/goniometer
+UR  - https://github.com/GatherLab/Goniometer
+ER  - 
+
+TY  - ELEC
+ID  - R39
+TI  - X-rite TAC7 user guide
+UR  - https://www.xrite.com/-/media/xrite/files/manuals_and_userguides/t/tac7_user_guide_en.pdf
+ER  - 
+
+TY  - ELEC
+ID  - R40
+TI  - X-rite PANTORA
+UR  - https://www.xrite.com/pantora-software
+ER  - 
+
+TY  - ELEC
+ID  - S1
+TI  - COLMAP output format
+UR  - https://colmap.github.io/format.html
+ER  - 
+
+TY  - GEN
+ID  - S2
+AU  - COLMAP FAQ
+TI  - Reconstruct sparse/dense model from known camera poses
+UR  - https://colmap.github.io/faq.html
+ER  - 
+
+TY  - GEN
+ID  - S3
+AU  - Schönberger, J. L.
+AU  - Frahm, J.-M.
+TI  - Structure-from-motion revisited
+PY  - 2016
+DO  - 10.1007/978-3-319-46487-9_31
+ER  - 
+
+TY  - JOUR
+ID  - S4
+AU  - Woodham, R. J.
+TI  - Photometric method for determining surface orientation from multiple images
+T2  - Optical Engineering
+PY  - 1980
+VL  - 19
+IS  - 1
+DO  - 10.1117/12.7972479
+ER  - 
+
+TY  - JOUR
+ID  - S5
+AU  - Laurentini, A.
+TI  - The visual hull concept for silhouette-based image understanding
+T2  - IEEE Transactions on Pattern Analysis and Machine Intelligence
+PY  - 1994
+VL  - 16
+IS  - 2
+DO  - 10.1109/34.273735
+ER  - 
+
+TY  - JOUR
+ID  - S6
+AU  - Szeliski, R.
+TI  - Rapid octree construction from image sequences
+T2  - CVGIP: Image Understanding
+PY  - 1993
+VL  - 58
+IS  - 1
+UR  - https://www.sciencedirect.com/science/article/abs/pii/S1049966083710296
+ER  - 
+
+TY  - JOUR
+ID  - S7
+AU  - Kutulakos, K. N.
+AU  - Seitz, S. M.
+TI  - A theory of shape by space carving
+T2  - International Journal of Computer Vision
+PY  - 2000
+DO  - 10.1023/A:1008191222954
+ER  - 
+
+TY  - ELEC
+ID  - S8
+TI  - MVTec HALCON ‘photometric_stereo‘ reference
+UR  - https://www.mvtec.com/doc/halcon/13/en/photometric_stereo.html
+ER  - 
+
+TY  - GEN
+ID  - S9
+AU  - Fitzgibbon, A. W.
+AU  - Cross, G.
+AU  - Zisserman, A.
+TI  - Automatic 3D model construction for turn-table sequences
+PY  - 1998
+DO  - 10.1007/3-540-49437-5_11
+ER  - 
+
+TY  - ELEC
+ID  - S10
+TI  - Meshroom / AliceVision
+UR  - https://alicevision.org/
+ER  - 
+
+TY  - ELEC
+ID  - S11
+TI  - OpenCV ‘solvePnP‘
+UR  - https://docs.opencv.org/4.13.0/d5/d1f/calib3d_solvePnP.html
+ER  - 
+
+TY  - ELEC
+ID  - S12
+TI  - OpenCV ChArUco calibration
+UR  - https://docs.opencv.org/4.13.0/da/d13/tutorial_aruco_calibration.html
+ER  - 
+
+TY  - JOUR
+ID  - S13
+AU  - Schnieders, D.
+AU  - Wong, K.-Y. K.
+TI  - Camera and light calibration from reflections on a sphere
+T2  - Computer Vision and Image Understanding
+PY  - 2013
+UR  - https://www.sciencedirect.com/science/article/abs/pii/S1077314213001082
+ER  - 
+
+TY  - JOUR
+ID  - S14
+AU  - Yu
+AU  - Chen
+AU  - Da
+TI  - Geometric calibration for photometric stereo under near-field point light sources using spheres
+T2  - Optics & Laser Technology
+PY  - 2025
+VL  - 180
+UR  - https://www.sciencedirect.com/science/article/pii/S0030399224010156
+ER  - 
+
+TY  - GEN
+ID  - S15
+AU  - Goldman, D. B.
+AU  - Curless, B.
+AU  - Hertzmann, A.
+AU  - Seitz, S. M.
+TI  - Shape and spatially-varying BRDFs from photometric stereo
+PY  - 2005
+DO  - 10.1109/ICCV.2005.219
+ER  - 
+
+TY  - ELEC
+ID  - S16
+TI  - Blender manual: PLY, OBJ, glTF 2.0, formats
+UR  - https://docs.blender.org/manual/en/latest/files/import_export/ply.html
+ER  - 
+
+TY  - ELEC
+ID  - S17
+TI  - OpenMVS
+UR  - https://github.com/cdcseacave/openMVS
+ER  - 
+
+TY  - ELEC
+ID  - S18
+TI  - RealityScan (formerly RealityCapture)
+UR  - https://www.realityscan.com/license
+ER  - 
+
+TY  - ELEC
+ID  - S19
+TI  - QuakeHold! Museum putty
+UR  - https://www.sosproducts.com/quakehold-museum-putty-p/64810.htm
+ER  - 
+
+TY  - ELEC
+ID  - S20
+TI  - Loctite fun-tak 2 oz
+UR  - https://www.staples.com/Loctite-Fun-Tak-2-oz-Mounting-Adhesive-Putty-1270884/product_1480018
+ER  - 
+
+TY  - JOUR
+ID  - G1
+AU  - Nicodemus, F. E.
+AU  - Richmond, J. C.
+AU  - Hsia, J. J.
+AU  - Ginsberg, I. W.
+AU  - Limperis, T.
+TI  - Geometrical considerations and nomenclature for reflectance
+T2  - NBS Monograph
+PY  - 1977
+VL  - 160
+DO  - 10.6028/NBS.MONO.160
+ER  - 
+
+TY  - BOOK
+ID  - G2
+AU  - Dorsey, J.
+AU  - Rushmeier, H.
+AU  - Sillion, F.
+TI  - Digital modeling of material appearance
+PY  - 2008
+PB  - Morgan Kaufmann
+UR  - https://booksite.elsevier.com/samplechapters/9780122211812/Sample_Chapters/01~Front_Matter.pdf
+ER  - 
+
+TY  - JOUR
+ID  - G3
+AU  - Guarnera, D.
+AU  - Guarnera, G. C.
+AU  - Ghosh, A.
+AU  - Denk, C.
+AU  - Glencross, M.
+TI  - BRDF representation and acquisition
+T2  - Computer Graphics Forum
+PY  - 2016
+VL  - 35
+IS  - 2
+DO  - 10.1111/cgf.12867
+SP  - 625-650
+ER  - 
+
+TY  - CPAPER
+ID  - G4
+AU  - Weinmann, M.
+AU  - Klein, R.
+TI  - Advances in geometry and reflectance acquisition (course notes)
+T2  - SIGGRAPH asia 2015 courses
+PY  - 2015
+DO  - 10.1145/2818143.2818165
+ER  - 
+
+TY  - JOUR
+ID  - G5
+AU  - Filip, J.
+AU  - Haindl, M.
+TI  - Bidirectional texture function modeling: A state of the art survey
+T2  - IEEE Transactions on Pattern Analysis and Machine Intelligence
+PY  - 2009
+VL  - 31
+IS  - 11
+DO  - 10.1109/TPAMI.2008.246
+ER  - 
+
+TY  - JOUR
+ID  - G6
+AU  - Zou, Y.
+AU  - Zhang, L.
+AU  - Zhang, J.
+AU  - Li, B.
+AU  - Lv, X.
+TI  - Developmental trends in the application and measurement of the bidirectional reflection distribution function
+T2  - Sensors
+PY  - 2022
+VL  - 22
+IS  - 5
+DO  - 10.3390/s22051739
+SP  - 1739
+ER  - 
+
+TY  - CPAPER
+ID  - G7
+AU  - Obein, G.
+TI  - The measurement of appearance
+T2  - Proc. Int. School of physics "enrico fermi"
+PY  - 2021
+DO  - 10.3254/ENFI210025
+ER  - 
+
+TY  - JOUR
+ID  - G8
+AU  - Murray-Coleman, J. F.
+AU  - Smith, A. M.
+TI  - The automated measurement of BRDFs and their application to luminaire modeling
+T2  - Journal of the Illuminating Engineering Society
+PY  - 1990
+VL  - 19
+DO  - 10.1080/00994480.1990.10747944
+SP  - 87-99
+ER  - 
+
+TY  - JOUR
+ID  - G9
+AU  - Ward, G. J.
+TI  - Measuring and modeling anisotropic reflection
+T2  - ACM SIGGRAPH Computer Graphics
+PY  - 1992
+VL  - 26
+IS  - 2
+DO  - 10.1145/142920.134078
+SP  - 265-272
+ER  - 
+
+TY  - JOUR
+ID  - G10
+AU  - White, D. R.
+AU  - Saunders, P.
+AU  - Bonsey, S. J.
+AU  - Ven, J.
+AU  - Edgar, H.
+TI  - Reflectometer for measuring the bidirectional reflectance of rough surfaces
+T2  - Applied Optics
+PY  - 1998
+VL  - 37
+IS  - 16
+DO  - 10.1364/AO.37.003450
+SP  - 3450-3454
+ER  - 
+
+TY  - JOUR
+ID  - G11
+AU  - Dana, K. J.
+AU  - Ginneken, B.
+AU  - Nayar, S. K.
+AU  - Koenderink, J. J.
+TI  - Reflectance and texture of real-world surfaces
+T2  - ACM Transactions on Graphics
+PY  - 1999
+VL  - 18
+IS  - 1
+DO  - 10.1145/300776.300778
+SP  - 1-34
+ER  - 
+
+TY  - JOUR
+ID  - G12
+AU  - Marschner, S. R.
+AU  - Westin, S. H.
+AU  - Lafortune, E. P. F.
+AU  - Torrance, K. E.
+TI  - Image-based bidirectional reflectance distribution function measurement
+T2  - Applied Optics
+PY  - 2000
+VL  - 39
+IS  - 16
+DO  - 10.1364/AO.39.002592
+SP  - 2592-2600
+ER  - 
+
+TY  - JOUR
+ID  - G13
+AU  - Han, J. Y.
+AU  - Perlin, K.
+TI  - Measuring bidirectional texture reflectance with a kaleidoscope
+T2  - ACM Transactions on Graphics
+PY  - 2003
+VL  - 22
+IS  - 3
+DO  - 10.1145/882262.882341
+ER  - 
+
+TY  - JOUR
+ID  - G14
+AU  - Dana, K. J.
+AU  - Wang, J.
+TI  - Device for convenient measurement of spatially varying bidirectional reflectance
+T2  - Journal of the Optical Society of America A
+PY  - 2004
+VL  - 21
+IS  - 1
+DO  - 10.1364/JOSAA.21.000001
+SP  - 1-12
+ER  - 
+
+TY  - CPAPER
+ID  - G15
+AU  - Matusik, W.
+AU  - Pfister, H.
+AU  - Brand, M.
+AU  - McMillan, L.
+TI  - Efficient isotropic BRDF measurement
+T2  - Proc. 14th eurographics workshop on rendering
+PY  - 2003
+UR  - https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading
+ER  - 
+
+TY  - CPAPER
+ID  - G16
+AU  - Ngan, A.
+AU  - Durand, F.
+AU  - Matusik, W.
+TI  - Experimental analysis of BRDF models
+T2  - Eurographics symposium on rendering
+PY  - 2005
+UR  - https://diglib.eg.org/items/b3a3223e-ad94-4366-8ae7-fce371c08d04
+ER  - 
+
+TY  - CPAPER
+ID  - G17
+AU  - Ben-Ezra, M.
+AU  - Wang, J.
+AU  - Wilburn, B.
+AU  - Li, X.
+AU  - Ma, L.
+TI  - An LED-only BRDF measurement device
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2008
+DO  - 10.1109/CVPR.2008.4587766
+ER  - 
+
+TY  - JOUR
+ID  - G18
+AU  - Kurt, M.
+AU  - Szirmay-Kalos, L.
+AU  - Křivánek, J.
+TI  - An anisotropic BRDF model for fitting and Monte Carlo rendering
+T2  - ACM SIGGRAPH Computer Graphics
+PY  - 2010
+VL  - 44
+IS  - 1
+DO  - 10.1145/1722991.1722996
+SP  - 1-15
+ER  - 
+
+TY  - JOUR
+ID  - G19
+AU  - Sole, A.
+AU  - Farup, I.
+AU  - Nussbaum, P.
+AU  - Tominaga, S.
+TI  - Evaluating an image-based bidirectional reflectance distribution function measurement setup
+T2  - Applied Optics
+PY  - 2018
+VL  - 57
+IS  - 8
+DO  - 10.1364/AO.57.001918
+SP  - 1918-1928
+ER  - 
+
+TY  - BOOK
+ID  - G20
+AU  - Sole, A.
+TI  - Image-based bidirectional reflectance measurement of non-diffuse and gonio-chromatic materials
+PY  - 2019
+PB  - PhD thesis
+UR  - https://www.ntnu.edu/colourlab/phd-theses
+ER  - 
+
+TY  - BOOK
+ID  - G21
+AU  - Barnes, P. Y.
+AU  - Early, E. A.
+AU  - Parr, A. C.
+TI  - NIST measurement services: Spectral reflectance
+PY  - 1998
+UR  - https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication250-48.pdf
+ER  - 
+
+TY  - JOUR
+ID  - G22
+AU  - Proctor, J. E.
+AU  - Barnes, P. Y.
+TI  - NIST high accuracy reference reflectometer-spectrophotometer
+T2  - Journal of Research of the National Institute of Standards and Technology
+PY  - 1996
+VL  - 101
+IS  - 5
+UR  - https://nvlpubs.nist.gov/nistpubs/jres/101/5/j5proc.pdf
+SP  - 619
+ER  - 
+
+TY  - JOUR
+ID  - G23
+AU  - Patrick, H.
+AU  - Cooksey, C.
+AU  - Germer, T. A.
+AU  - Nadal, M. E.
+AU  - Zarobila, C.
+TI  - Bidirectional reflectance capabilities of the NIST robotic optical scattering instrument
+T2  - Applied Optics
+PY  - 2021
+VL  - 60
+IS  - 28
+DO  - 10.1364/AO.435117
+SP  - 8774
+ER  - 
+
+TY  - CPAPER
+ID  - G24
+AU  - Durell, C.
+AU  - Scharpf, D.
+AU  - McKee, G.
+AU  - L’Heureux, M.
+AU  - Georgiev, G.
+AU  - Obein, G.
+AU  - Cooksey, C.
+TI  - Creation and validation of sintered PTFE BRDF targets & standards
+T2  - Proceedings of SPIE
+PY  - 2015
+UR  - https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=919590
+ER  - 
+
+TY  - CHAP
+ID  - G25
+AU  - Höpe, A.
+AU  - Hünerhoff, D.
+AU  - Hauer, K.-O.
+TI  - Robot-based gonioreflectometer
+T2  - Industrial robotics: Programming, simulation and applications
+PY  - 2006
+PB  - (ed. L. K. Huat)
+UR  - https://cdn.intechopen.com/pdfs/284/InTech-Robot_based_gonioreflectometer.pdf
+SP  - 624-632
+ER  - 
+
+TY  - JOUR
+ID  - G26
+AU  - Höpe, A.
+AU  - Hauer, K.-O.
+TI  - Three-dimensional appearance characterization of diffuse standard reflection materials
+T2  - Metrologia
+PY  - 2010
+VL  - 47
+IS  - 3
+DO  - 10.1088/0026-1394/47/3/021
+SP  - 295
+ER  - 
+
+TY  - JOUR
+ID  - G27
+AU  - Höpe, A.
+AU  - others
+TI  - ARGon3: ’3D appearance robot-based gonioreflectometer’ at PTB
+T2  - Review of Scientific Instruments
+PY  - 2012
+VL  - 83
+IS  - 4
+UR  - https://pubs.aip.org/aip/rsi/article/83/4/045102/355039/ARGon3-3D-appearance-robot-based
+SP  - 045102
+ER  - 
+
+TY  - CPAPER
+ID  - G28
+AU  - Höpe, A.
+AU  - others
+TI  - Multidimensional reflectometry for industry (xD-reflect) an European research project
+T2  - Proceedings of SPIE
+PY  - 2014
+DO  - 10.1117/12.2035981
+ER  - 
+
+TY  - JOUR
+ID  - G29
+AU  - Molloy, E.
+AU  - Patrick, H.
+AU  - Hauer, K.-O.
+AU  - Hünerhoff, D.
+AU  - Quast, T.
+TI  - Comparison of bidirectional reflectance distribution function scales over the hemisphere
+T2  - Applied Optics
+PY  - 2026
+VL  - 65
+IS  - 18
+DO  - 10.1364/AO.603369
+SP  - 6358-6365
+ER  - 
+
+TY  - CPAPER
+ID  - G30
+AU  - Le Breton, R.
+AU  - Ged, G.
+AU  - Obein, G.
+TI  - Out of plane BRDF measurement at LNE-cnam using ’ConDOR’ our primary goniospectrophotometer
+T2  - Proc. 28th CIE session
+PY  - 2015
+UR  - https://inm.cnam.fr/gael-obein-71373.kjsp
+ER  - 
+
+TY  - JOUR
+ID  - G31
+AU  - Saha, D.
+AU  - Gevaux, L.
+AU  - Frisvad, J. R.
+AU  - Obein, G.
+TI  - Bidirectional reflectance measurements over a micrometric surface area using a goniospectrophotometer
+T2  - Review of Scientific Instruments
+PY  - 2024
+VL  - 95
+IS  - 5
+DO  - 10.1063/5.0193490
+SP  - 055114
+ER  - 
+
+TY  - ELEC
+ID  - G32
+TI  - RGL-EPFL, customized PAB pgII gonio-photometer (instrument page)
+UR  - https://rgl.epfl.ch/pages/lab/pgII
+ER  - 
+
+TY  - CPAPER
+ID  - G33
+AU  - Ansari-Asl, M.
+AU  - Barbieri, M.
+AU  - Obein, G.
+AU  - Hardeberg, J. Y.
+TI  - Advancing material appearance measurement: A cost-effective multispectral imaging system for capturing SVBRDF and BTF
+T2  - London imaging meeting
+PY  - 2023
+DO  - 10.2352/lim.2023.4.1.25
+ER  - 
+
+TY  - JOUR
+ID  - G34
+AU  - Ansari-Asl, M.
+AU  - Thomas, J.-B.
+AU  - Hardeberg, J. Y.
+TI  - Camera response function assessment in multispectral HDR imaging
+T2  - IS&T Electronic Imaging (Color Imaging XXVII)
+PY  - 2022
+VL  - 141
+DO  - 10.2352/EI.2022.34.15.COLOR-141
+ER  - 
+
+TY  - BOOK
+ID  - G35
+AU  - Ansari-Asl, M.
+TI  - Development of a multispectral camera-based device for goniometric acquisition of spatially varying reflectance properties
+PY  - 2026
+PB  - PhD thesis
+UR  - https://www.ntnu.edu/colourlab/phd-theses
+ER  - 
+
+TY  - JOUR
+ID  - G36
+AU  - Sole, A.
+AU  - Gigilashvili, D.
+AU  - Midtfjord, H.
+AU  - Guarnera, D.
+AU  - Guarnera, G. C.
+AU  - Thomas, J.-B.
+AU  - Hardeberg, J. Y.
+TI  - On the acquisition and reproduction of material appearance
+T2  - CCIW 2019
+PY  - 2019
+VL  - 11418
+DO  - 10.1007/978-3-030-13940-7_3
+SP  - 26-38
+ER  - 
+
+TY  - JOUR
+ID  - G37
+AU  - Chitnis, S.
+AU  - Sole, A.
+AU  - Chandran, S.
+TI  - Spectral bidirectional reflectance distribution function simplification
+T2  - Journal of Imaging
+PY  - 2025
+VL  - 11
+IS  - 1
+DO  - 10.3390/jimaging11010018
+SP  - 18
+ER  - 
+
+TY  - JOUR
+ID  - G38
+AU  - Filip, J.
+AU  - Vávra, R.
+AU  - Krupička, M.
+TI  - Rapid material appearance acquisition using consumer hardware
+T2  - Sensors
+PY  - 2014
+VL  - 14
+IS  - 10
+DO  - 10.3390/s141019785
+SP  - 19785-19805
+ER  - 
+
+TY  - CPAPER
+ID  - G39
+AU  - Lyngby, R. A.
+AU  - Matthiassen, J. B.
+AU  - Frisvad, J. R.
+AU  - Dahl, A. B.
+AU  - Aanæs, H.
+TI  - Using a robotic arm for measuring BRDFs
+T2  - SCIA 2019
+PY  - 2019
+DO  - 10.1007/978-3-030-20205-7_16
+ER  - 
+
+TY  - JOUR
+ID  - G40
+AU  - Riviere, J.
+AU  - Peers, P.
+AU  - Ghosh, A.
+TI  - Mobile surface reflectometry
+T2  - Computer Graphics Forum
+PY  - 2016
+VL  - 35
+DO  - 10.1111/cgf.12719
+SP  - 191-202
+ER  - 
+
+TY  - CPAPER
+ID  - G41
+AU  - Ghosh, A.
+AU  - Chen, T.
+AU  - Peers, P.
+AU  - Wilson, C. A.
+AU  - Debevec, P.
+TI  - Estimating specular roughness and anisotropy from second order spherical gradient illumination
+T2  - Eurographics symposium on rendering
+PY  - 2009
+UR  - https://www.cs.wm.edu/~ppeers/publications/Ghosh2009ESR/Ghosh_EGSR2009.pdf
+ER  - 
+
+TY  - CPAPER
+ID  - G42
+AU  - Ghosh, A.
+AU  - Chen, T.
+AU  - Peers, P.
+AU  - Wilson, C. A.
+AU  - Debevec, P.
+TI  - Circularly polarized spherical illumination reflectometry
+T2  - ACM SIGGRAPH asia
+PY  - 2010
+UR  - https://vgl.ict.usc.edu/Research/CPSIR/
+ER  - 
+
+TY  - JOUR
+ID  - G43
+AU  - Chen, G.
+AU  - Dong, Y.
+AU  - Peers, P.
+AU  - Zhang, J.
+AU  - Tong, X.
+TI  - Reflectance scanning: Estimating shading frame and BRDF with generalized linear light sources
+T2  - ACM Transactions on Graphics
+PY  - 2014
+VL  - 33
+IS  - 4
+DO  - 10.1145/2601097.2601180
+ER  - 
+
+TY  - JOUR
+ID  - G44
+AU  - Aittala, M.
+AU  - Weyrich, T.
+AU  - Lehtinen, J.
+TI  - Practical SVBRDF capture in the frequency domain
+T2  - ACM Transactions on Graphics
+PY  - 2013
+VL  - 32
+IS  - 4
+DO  - 10.1145/2461912.2461978
+ER  - 
+
+TY  - JOUR
+ID  - G45
+AU  - Baek, S.-H.
+AU  - Zeltner, T.
+AU  - Ku, H.
+AU  - Hwang, I.
+AU  - Tong, X.
+AU  - Jakob, W.
+AU  - Kim, M. H.
+TI  - Image-based acquisition and modeling of polarimetric reflectance
+T2  - ACM Transactions on Graphics
+PY  - 2020
+VL  - 39
+IS  - 4
+DO  - 10.1145/3386569.3392387
+SP  - 139
+ER  - 
+
+TY  - JOUR
+ID  - G46
+AU  - Nielsen, J. B.
+AU  - Jensen, H. W.
+AU  - Ramamoorthi, R.
+TI  - On optimal, minimal BRDF sampling for reflectance acquisition
+T2  - ACM Transactions on Graphics
+PY  - 2015
+VL  - 34
+IS  - 6
+UR  - https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading
+SP  - 186
+ER  - 
+
+TY  - JOUR
+ID  - G47
+AU  - Vávra, R.
+AU  - Filip, J.
+TI  - Minimal sampling for effective acquisition of anisotropic BRDFs
+T2  - Computer Graphics Forum
+PY  - 2016
+VL  - 35
+IS  - 7
+UR  - https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading
+SP  - 299-309
+ER  - 
+
+TY  - JOUR
+ID  - G48
+AU  - Vávra, R.
+AU  - Filip, J.
+TI  - Adaptive slices for acquisition of anisotropic BRDF
+T2  - Computational Visual Media
+PY  - 2018
+VL  - 4
+IS  - 1
+DO  - 10.1007/s41095-017-0099-z
+SP  - 55-69
+ER  - 
+
+TY  - JOUR
+ID  - G49
+AU  - Schwartz, C.
+AU  - Sarlette, R.
+AU  - Weinmann, M.
+AU  - Rump, M.
+AU  - Klein, R.
+TI  - Design and implementation of practical bidirectional texture function measurement devices focusing on the developments at the university of Bonn
+T2  - Sensors
+PY  - 2014
+VL  - 14
+IS  - 5
+DO  - 10.3390/s140507753
+SP  - 7753-7819
+ER  - 
+
+TY  - CPAPER
+ID  - G50
+AU  - Schwartz, C.
+AU  - Sarlette, R.
+AU  - Weinmann, M.
+AU  - Klein, R.
+TI  - DOME II: A parallelized BTF acquisition system
+T2  - Eurographics workshop on material appearance modeling
+PY  - 2013
+DO  - 10.2312/MAM.MAM2013.025-031
+ER  - 
+
+TY  - GEN
+ID  - G51
+AU  - Matusik, W.
+AU  - Pfister, H.
+AU  - Brand, M.
+AU  - McMillan, L.
+TI  - BRDF database – bidirectional reflectance distribution function
+PY  - 2023
+DO  - 10.5281/zenodo.8101681
+ER  - 
+
+TY  - JOUR
+ID  - G52
+AU  - Lanevski, D.
+AU  - others
+TI  - Machine-readable universal data format for bidirectional reflectance distribution function and BiRDview—an open-source web-based application for viewing and comparing bidirectional reflectance data
+T2  - Color Research & Application
+PY  - 2022
+DO  - 10.1002/col.22790
+ER  - 
+
+TY  - JOUR
+ID  - T1
+AU  - Kajiya, J. T.
+TI  - The rendering equation
+T2  - Proc. SIGGRAPH ’86, Computer Graphics
+PY  - 1986
+VL  - 20
+IS  - 4
+DO  - 10.1145/15922.15902
+SP  - 143-150
+ER  - 
+
+TY  - BOOK
+ID  - T2
+AU  - Pharr, M.
+AU  - Jakob, W.
+AU  - Humphreys, G.
+TI  - Physically based rendering: From theory to implementation
+PY  - 2023
+UR  - https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading
+ER  - 
+
+TY  - GEN
+ID  - T3
+AU  - Veach, E.
+TI  - Robust Monte Carlo methods for light transport simulation
+PY  - 1997
+UR  - https://graphics.stanford.edu/papers/veach_thesis/thesis-bw.pdf
+ER  - 
+
+TY  - JOUR
+ID  - T4
+AU  - Weyrich, T.
+AU  - Lawrence, J.
+AU  - Lensch, H. P. A.
+AU  - Rusinkiewicz, S.
+AU  - Zickler, T.
+TI  - Principles of appearance acquisition and representation
+T2  - Foundations and Trends in Computer Graphics and Vision
+PY  - 2009
+VL  - 4
+IS  - 2
+DO  - 10.1561/0600000022
+SP  - 75-191
+ER  - 
+
+TY  - GEN
+ID  - T5
+AU  - Montes, R.
+AU  - Ureña, C.
+TI  - An overview of BRDF models
+PY  - 2012
+UR  - https://digibug.ugr.es/bitstream/handle/10481/19751/rmontes_LSI-2012-001TR.pdf
+ER  - 
+
+TY  - JOUR
+ID  - T6
+AU  - Nimier-David, M.
+AU  - Vicini, D.
+AU  - Zeltner, T.
+AU  - Jakob, W.
+TI  - Mitsuba 2: A retargetable forward and inverse renderer
+T2  - ACM Transactions on Graphics
+PY  - 2019
+VL  - 38
+IS  - 6
+DO  - 10.1145/3355089.3356498
+SP  - 203
+ER  - 
+
+TY  - GEN
+ID  - T7
+AU  - Mitsuba 3 documentation
+TI  - BSDFs
+UR  - https://mitsuba.readthedocs.io/en/stable/src/generated/plugins_bsdfs.html
+ER  - 
+
+TY  - JOUR
+ID  - T8
+AU  - Phong, B. T.
+TI  - Illumination for computer generated pictures
+T2  - Communications of the ACM
+PY  - 1975
+VL  - 18
+IS  - 6
+DO  - 10.1145/360825.360839
+SP  - 311-317
+ER  - 
+
+TY  - CPAPER
+ID  - T9
+AU  - Blinn, J. F.
+TI  - Models of light reflection for computer synthesized pictures
+T2  - Proc. SIGGRAPH ’77
+PY  - 1977
+DO  - 10.1145/563858.563893
+ER  - 
+
+TY  - JOUR
+ID  - T10
+AU  - Torrance, K. E.
+AU  - Sparrow, E. M.
+TI  - Theory for off-specular reflection from roughened surfaces
+T2  - Journal of the Optical Society of America
+PY  - 1967
+VL  - 57
+IS  - 9
+DO  - 10.1364/JOSA.57.001105
+SP  - 1105-1114
+ER  - 
+
+TY  - JOUR
+ID  - T11
+AU  - Trowbridge, T. S.
+AU  - Reitz, K. P.
+TI  - Average irregularity representation of a rough surface for ray reflection
+T2  - Journal of the Optical Society of America
+PY  - 1975
+VL  - 65
+IS  - 5
+DO  - 10.1364/JOSA.65.000531
+SP  - 531-536
+ER  - 
+
+TY  - JOUR
+ID  - T12
+AU  - Smith, B. G.
+TI  - Geometrical shadowing of a random rough surface
+T2  - IEEE Transactions on Antennas and Propagation
+PY  - 1967
+VL  - 15
+IS  - 5
+UR  - https://ui.adsabs.harvard.edu/abs/1967ITAP...15..668S/abstract
+SP  - 668-671
+ER  - 
+
+TY  - CPAPER
+ID  - T13
+AU  - Oren, M.
+AU  - Nayar, S. K.
+TI  - Generalization of Lambert’s reflectance model
+T2  - Proc. SIGGRAPH ’94
+PY  - 1994
+DO  - 10.1145/192161.192213
+ER  - 
+
+TY  - CPAPER
+ID  - T14
+AU  - Lafortune, E. P. F.
+AU  - Foo, S.-C.
+AU  - Torrance, K. E.
+AU  - Greenberg, D. P.
+TI  - Non-linear approximation of reflectance functions
+T2  - Proc. SIGGRAPH ’97
+PY  - 1997
+DO  - 10.1145/258734.258801
+ER  - 
+
+TY  - JOUR
+ID  - T15
+AU  - Ashikhmin, M.
+AU  - Shirley, P.
+TI  - An anisotropic Phong BRDF model
+T2  - Journal of Graphics Tools
+PY  - 2000
+VL  - 5
+IS  - 2
+DO  - 10.1080/10867651.2000.10487522
+SP  - 25-32
+ER  - 
+
+TY  - CPAPER
+ID  - T16
+AU  - Rusinkiewicz, S.
+TI  - A new change of variables for efficient BRDF representation
+T2  - Rendering techniques ’98
+PY  - 1998
+DO  - 10.1007/978-3-7091-6453-2_2
+ER  - 
+
+TY  - JOUR
+ID  - T17
+AU  - Heitz, E.
+TI  - Understanding the masking-shadowing function in microfacet-based BRDFs
+T2  - Journal of Computer Graphics Techniques
+PY  - 2014
+VL  - 3
+IS  - 2
+UR  - https://jcgt.org/published/0003/02/03/paper.pdf
+SP  - 48-107
+ER  - 
+
+TY  - JOUR
+ID  - T18
+AU  - Heitz, E.
+AU  - Eon, E.
+TI  - Importance sampling microfacet-based BSDFs using the distribution of visible normals
+T2  - Computer Graphics Forum
+PY  - 2014
+VL  - 33
+IS  - 4
+DO  - 10.1111/cgf.12417
+SP  - 103-112
+ER  - 
+
+TY  - JOUR
+ID  - T19
+AU  - Heitz, E.
+TI  - Sampling the GGX distribution of visible normals
+T2  - Journal of Computer Graphics Techniques
+PY  - 2018
+VL  - 7
+IS  - 4
+UR  - https://jcgt.org/published/0007/04/01/paper.pdf
+SP  - 1-13
+ER  - 
+
+TY  - JOUR
+ID  - T20
+AU  - Dupuy, J.
+AU  - Benyoub, A.
+TI  - Sampling visible GGX normals with spherical caps
+T2  - Computer Graphics Forum
+PY  - 2023
+VL  - 42
+IS  - 8
+DO  - 10.1111/cgf.14867
+ER  - 
+
+TY  - JOUR
+ID  - T21
+AU  - Heitz, E.
+AU  - Hanika, J.
+AU  - Eon, E.
+AU  - Dachsbacher, C.
+TI  - Multiple-scattering microfacet BSDFs with the Smith model
+T2  - ACM Transactions on Graphics
+PY  - 2016
+VL  - 35
+IS  - 4
+DO  - 10.1145/2897824.2925943
+SP  - 58
+ER  - 
+
+TY  - GEN
+ID  - T22
+AU  - Turquin, E.
+TI  - Practical multiple scattering compensation for microfacet models
+PY  - 2019
+UR  - https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf
+ER  - 
+
+TY  - JOUR
+ID  - T23
+AU  - Bagher, M. M.
+AU  - Soler, C.
+AU  - Holzschuch, N.
+TI  - Accurate fitting of measured reflectances using a shifted gamma micro-facet distribution
+T2  - Computer Graphics Forum
+PY  - 2012
+VL  - 31
+IS  - 4
+UR  - https://inria.hal.science/hal-00702304
+ER  - 
+
+TY  - JOUR
+ID  - T24
+AU  - Ribardière, M.
+AU  - Bringier, B.
+AU  - Meneveaux, D.
+AU  - Simonot, L.
+TI  - STD: Student’s t-distribution of slopes for microfacet based BSDFs
+T2  - Computer Graphics Forum
+PY  - 2017
+VL  - 36
+IS  - 2
+DO  - 10.1111/cgf.13137
+ER  - 
+
+TY  - JOUR
+ID  - T25
+AU  - Löw, J.
+AU  - Kronander, J.
+AU  - Ynnerman, A.
+AU  - Unger, J.
+TI  - BRDF models for accurate and efficient rendering of glossy surfaces
+T2  - ACM Transactions on Graphics
+PY  - 2012
+VL  - 31
+IS  - 1
+DO  - 10.1145/2077341.2077350
+SP  - 9
+ER  - 
+
+TY  - JOUR
+ID  - T26
+AU  - Dupuy, J.
+AU  - Heitz, E.
+AU  - Iehl, J.-C.
+AU  - Poulin, P.
+AU  - Ostromoukhov, V.
+TI  - Extracting microfacet-based BRDF parameters from arbitrary materials with power iterations
+T2  - Computer Graphics Forum
+PY  - 2015
+VL  - 34
+IS  - 4
+DO  - 10.1111/cgf.12675
+SP  - 21-30
+ER  - 
+
+TY  - JOUR
+ID  - T27
+AU  - Lavoué, G.
+AU  - Bonneel, N.
+AU  - Farrugia, J.-P.
+AU  - Soler, C.
+TI  - Perceptual quality of BRDF approximations: Dataset and metrics
+T2  - Computer Graphics Forum
+PY  - 2021
+VL  - 40
+IS  - 2
+DO  - 10.1111/cgf.142636
+ER  - 
+
+TY  - JOUR
+ID  - T28
+AU  - Kavoosighafi, B.
+AU  - others
+TI  - Perceived quality of BRDF models
+T2  - Computer Graphics Forum
+PY  - 2025
+DO  - 10.1111/cgf.70162
+ER  - 
+
+TY  - JOUR
+ID  - T29
+AU  - Sztrajman, A.
+AU  - Rainer, G.
+AU  - Ritschel, T.
+AU  - Weyrich, T.
+TI  - Neural BRDF representation and importance sampling
+T2  - Computer Graphics Forum
+PY  - 2021
+VL  - 40
+DO  - 10.1111/cgf.14335
+ER  - 
+
+TY  - BOOK
+ID  - T30
+AU  - Born, M.
+AU  - Wolf, E.
+TI  - Principles of optics
+PY  - 2019
+UR  - https://www.cambridge.org/9781108477437
+ER  - 
+
+TY  - JOUR
+ID  - T31
+AU  - Gulbrandsen, O.
+TI  - Artist friendly metallic Fresnel
+T2  - Journal of Computer Graphics Techniques
+PY  - 2014
+VL  - 3
+IS  - 4
+UR  - https://jcgt.org/published/0003/04/03/paper.pdf
+SP  - 64-72
+ER  - 
+
+TY  - JOUR
+ID  - T32
+AU  - Polyanskiy, M. N.
+TI  - Refractiveindex.info database of optical constants
+T2  - Scientific Data
+PY  - 2024
+VL  - 11
+DO  - 10.1038/s41597-023-02898-2
+SP  - 94
+ER  - 
+
+TY  - JOUR
+ID  - T33
+AU  - Burley, B.
+TI  - Physically-based shading at Disney
+T2  - Practical Physically Based Shading in Film and Game Production
+PY  - 2012
+UR  - https://static1.squarespace.com/static/58586fa5ebbd1a60e7d76d3e/t/593a3afa46c3c4a376d779f6/1496988449807/s2012_pbs_disney_brdf_notes_v2.pdf
+ER  - 
+
+TY  - GEN
+ID  - T34
+AU  - Burley, B.
+TI  - Extending the Disney BRDF to a BSDF with integrated subsurface scattering
+PY  - 2015
+UR  - https://blog.selfshadow.com/publications/s2015-shading-course/burley/s2015_pbs_disney_bsdf_notes.pdf
+ER  - 
+
+TY  - JOUR
+ID  - T35
+AU  - Karis, B.
+TI  - Real shading in Unreal engine 4
+T2  - Physically Based Shading in Theory and Practice
+PY  - 2013
+UR  - https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+ER  - 
+
+TY  - GEN
+ID  - T36
+AU  - Lagarde, S.
+AU  - Rousiers, C.
+TI  - Moving Frostbite to physically based rendering 3.0
+PY  - 2014
+UR  - https://seblagarde.wordpress.com/wp-content/uploads/2015/07/course_notes_moving_frostbite_to_pbr_v3.pdf
+ER  - 
+
+TY  - GEN
+ID  - T37
+AU  - Kulla, C.
+AU  - Conty, A.
+TI  - Revisiting physically based shading at Imageworks
+PY  - 2017
+UR  - https://blog.selfshadow.com/publications/s2017-shading-course/imageworks/s2017_pbs_imageworks_slides_v2.pdf
+ER  - 
+
+TY  - JOUR
+ID  - T38
+AU  - Hoffman, N.
+TI  - Physics and math of shading
+T2  - Physically Based Shading in Theory and Practice
+PY  - 2015
+UR  - https://blog.selfshadow.com/publications/s2015-shading-course/hoffman/s2015_pbs_physics_math_slides.pdf
+ER  - 
+
+TY  - GEN
+ID  - T39
+AU  - Guy, R.
+AU  - Agopian, M.
+TI  - Physically based rendering in Filament
+UR  - https://google.github.io/filament/Filament.md.html
+ER  - 
+
+TY  - BOOK
+ID  - T40
+AU  - Khronos Group
+TI  - glTF 2.0 specification
+UR  - https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#metallic-roughness-material
+ER  - 
+
+TY  - ELEC
+ID  - T41
+TI  - Khronos, KHR_materials_anisotropy
+UR  - https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_anisotropy/README.md
+ER  - 
+
+TY  - ELEC
+ID  - T42
+TI  - Khronos, KHR_materials_sheen, KHR_materials_clearcoat
+UR  - https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_sheen/README.md
+ER  - 
+
+TY  - ELEC
+ID  - T43
+TI  - Khronos, KHR_materials_specular, KHR_materials_ior
+UR  - https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_specular/README.md
+ER  - 
+
+TY  - ELEC
+ID  - T44
+TI  - Khronos, KHR_texture_transform
+UR  - https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_transform/README.md
+ER  - 
+
+TY  - ELEC
+ID  - T45
+TI  - Khronos, glTF sample viewer
+UR  - https://github.com/KhronosGroup/glTF-Sample-Viewer
+ER  - 
+
+TY  - GEN
+ID  - T46
+AU  - Epic Games
+TI  - Physically based materials in Unreal engine
+UR  - https://dev.epicgames.com/documentation/en-us/unreal-engine/physically-based-materials-in-unreal-engine
+ER  - 
+
+TY  - ELEC
+ID  - T47
+TI  - Unity, HDRP "lit shader"
+UR  - https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@14.0/manual/Lit-Shader.html
+ER  - 
+
+TY  - GEN
+ID  - T48
+AU  - Blender Manual
+TI  - Principled BSDF
+UR  - https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/principled.html
+ER  - 
+
+TY  - BOOK
+ID  - T49
+AU  - Georgiev, I.
+AU  - Portsmouth, J.
+AU  - Andersson, Z.
+AU  - Herubel, A.
+AU  - King, A.
+AU  - Ogaki, S.
+AU  - Servant, F.
+TI  - Autodesk standard surface
+UR  - https://autodesk.github.io/standard-surface/
+ER  - 
+
+TY  - JOUR
+ID  - T50
+AU  - Andersson, Z.
+AU  - Edmondson, P.
+AU  - Guertault, J.
+AU  - Herubel, A.
+AU  - Kutz, P.
+AU  - Machizaud, A.
+AU  - Portsmouth, J.
+AU  - Servant, F.
+AU  - Stone, J.
+TI  - OpenPBR surface: An open shading model for physically based materials
+T2  - DigiPro 2025
+PY  - 2025
+DO  - 10.1145/3744199.3744632
+ER  - 
+
+TY  - ELEC
+ID  - T51
+TI  - ASWF, MaterialX specification and physically based shading nodes
+UR  - https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.PBRSpec.md
+ER  - 
+
+TY  - JOUR
+ID  - T52
+AU  - Smits, B.
+TI  - An RGB-to-spectrum conversion for reflectances
+T2  - Journal of Graphics Tools
+PY  - 1999
+VL  - 4
+IS  - 4
+DO  - 10.1080/10867651.1999.10487511
+SP  - 11-22
+ER  - 
+
+TY  - JOUR
+ID  - T53
+AU  - Jakob, W.
+AU  - Hanika, J.
+TI  - A low-dimensional function space for efficient spectral upsampling
+T2  - Computer Graphics Forum
+PY  - 2019
+VL  - 38
+IS  - 2
+DO  - 10.1111/cgf.13626
+SP  - 147-155
+ER  - 
+
+TY  - JOUR
+ID  - T54
+AU  - Peters, C.
+AU  - Merzbach, S.
+AU  - Hanika, J.
+AU  - Dachsbacher, C.
+TI  - Using moments to represent bounded signals for spectral rendering
+T2  - ACM Transactions on Graphics
+PY  - 2019
+VL  - 38
+IS  - 4
+DO  - 10.1145/3306346.3322964
+SP  - 136
+ER  - 
+
+TY  - JOUR
+ID  - T55
+AU  - Wilkie, A.
+AU  - Nawaz, S.
+AU  - Droske, M.
+AU  - Weidlich, A.
+AU  - Hanika, J.
+TI  - Hero wavelength spectral sampling
+T2  - Computer Graphics Forum
+PY  - 2014
+VL  - 33
+IS  - 4
+DO  - 10.1111/cgf.12419
+SP  - 123-131
+ER  - 
+
+TY  - JOUR
+ID  - V1
+AU  - Zhang, Z.
+TI  - A flexible new technique for camera calibration
+T2  - IEEE Transactions on Pattern Analysis and Machine Intelligence
+PY  - 2000
+VL  - 22
+IS  - 11
+DO  - 10.1109/34.888718
+SP  - 1330-1334
+ER  - 
+
+TY  - JOUR
+ID  - V2
+AU  - Tsai, R. Y.
+TI  - A versatile camera calibration technique for high-accuracy 3D machine vision metrology using off-the-shelf TV cameras and lenses
+T2  - IEEE Journal of Robotics and Automation
+PY  - 1987
+VL  - 3
+IS  - 4
+DO  - 10.1109/JRA.1987.1087109
+SP  - 323-344
+ER  - 
+
+TY  - CPAPER
+ID  - V3
+AU  - Heikkilä, J.
+AU  - Silvén, O.
+TI  - A four-step camera calibration procedure with implicit image correction
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 1997
+DO  - 10.1109/CVPR.1997.609468
+SP  - 1106-1112
+ER  - 
+
+TY  - JOUR
+ID  - V4
+AU  - Brown, D. C.
+TI  - Close-range camera calibration
+T2  - Photogrammetric Engineering
+PY  - 1971
+VL  - 37
+IS  - 8
+UR  - https://www.semanticscholar.org/paper/Close-Range-Camera-Calibration-Brown/1150007b62a3c7dac99c2c8f85c63bfab74891af
+SP  - 855-866
+ER  - 
+
+TY  - GEN
+ID  - V5
+AU  - Bouguet, J.-Y.
+TI  - Camera calibration toolbox for Matlab
+PY  - 2022
+DO  - 10.22002/D1.20164
+ER  - 
+
+TY  - CPAPER
+ID  - V6
+AU  - Schöps, T.
+AU  - Larsson, V.
+AU  - Pollefeys, M.
+AU  - Sattler, T.
+TI  - Why having 10,000 parameters in your camera model is better than twelve
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2020
+UR  - https://openaccess.thecvf.com/content_CVPR_2020/html/Schops_Why_Having_10000_Parameters_in_Your_Camera_Model_Is_Better_CVPR_2020_paper.html
+ER  - 
+
+TY  - JOUR
+ID  - V7
+AU  - Garrido-Jurado, S.
+AU  - Muñoz-Salinas, R.
+AU  - Madrid-Cuevas, F. J.
+AU  - Marín-Jiménez, M. J.
+TI  - Automatic generation and detection of highly reliable fiducial markers under occlusion
+T2  - Pattern Recognition
+PY  - 2014
+VL  - 47
+IS  - 6
+DO  - 10.1016/j.patcog.2014.01.005
+SP  - 2280-2292
+ER  - 
+
+TY  - BOOK
+ID  - V8
+AU  - Hartley, R.
+AU  - Zisserman, A.
+TI  - Multiple view geometry in computer vision
+PY  - 2004
+DO  - 10.1017/CBO9780511811685
+ER  - 
+
+TY  - BOOK
+ID  - V9
+AU  - Szeliski, R.
+TI  - Computer vision: Algorithms and applications
+PY  - 2022
+DO  - 10.1007/978-3-030-34372-9
+ER  - 
+
+TY  - JOUR
+ID  - V10
+AU  - Tsai, R. Y.
+AU  - Lenz, R. K.
+TI  - A new technique for fully autonomous and efficient 3D robotics hand/eye calibration
+T2  - IEEE Transactions on Robotics and Automation
+PY  - 1989
+VL  - 5
+IS  - 3
+DO  - 10.1109/70.34770
+SP  - 345-358
+ER  - 
+
+TY  - JOUR
+ID  - V11
+AU  - Park, F. C.
+AU  - Martin, B. J.
+TI  - Robot sensor calibration: Solving AX=XB on the Euclidean group
+T2  - IEEE Transactions on Robotics and Automation
+PY  - 1994
+VL  - 10
+IS  - 5
+DO  - 10.1109/70.326576
+SP  - 717-721
+ER  - 
+
+TY  - JOUR
+ID  - V12
+AU  - Daniilidis, K.
+TI  - Hand-eye calibration using dual quaternions
+T2  - International Journal of Robotics Research
+PY  - 1999
+VL  - 18
+IS  - 3
+DO  - 10.1177/02783649922066213
+SP  - 286-298
+ER  - 
+
+TY  - JOUR
+ID  - V13
+AU  - Zhuang, H.
+AU  - Roth, Z. S.
+AU  - Sudhakar, R.
+TI  - Simultaneous robot/world and tool/flange calibration by solving homogeneous transformation equations of the form AX=YB
+T2  - IEEE Transactions on Robotics and Automation
+PY  - 1994
+VL  - 10
+IS  - 4
+DO  - 10.1109/70.313105
+SP  - 549-554
+ER  - 
+
+TY  - JOUR
+ID  - V14
+AU  - Dornaika, F.
+AU  - Horaud, R.
+TI  - Simultaneous robot-world and hand-eye calibration
+T2  - IEEE Transactions on Robotics and Automation
+PY  - 1998
+VL  - 14
+IS  - 4
+DO  - 10.1109/70.704233
+SP  - 617-622
+ER  - 
+
+TY  - JOUR
+ID  - V15
+AU  - Shah, M.
+TI  - Solving the robot-world/hand-eye calibration problem using the Kronecker product
+T2  - Journal of Mechanisms and Robotics
+PY  - 2013
+VL  - 5
+IS  - 3
+DO  - 10.1115/1.4024473
+SP  - 031007
+ER  - 
+
+TY  - JOUR
+ID  - V16
+AU  - Tabb, A.
+AU  - Ahmad Yousef, K. M.
+TI  - Solving the robot-world hand-eye(s) calibration problem with iterative methods
+T2  - Machine Vision and Applications
+PY  - 2017
+DO  - 10.1007/s00138-017-0841-7
+ER  - 
+
+TY  - JOUR
+ID  - V17
+AU  - Ali, I.
+AU  - Suominen, O.
+AU  - Gotchev, A.
+AU  - Ruiz Morales, E.
+TI  - Methods for simultaneous robot-world-hand–eye calibration: A comparative study
+T2  - Sensors
+PY  - 2019
+VL  - 19
+IS  - 12
+DO  - 10.3390/s19122837
+SP  - 2837
+ER  - 
+
+TY  - ELEC
+ID  - V18
+TI  - OpenCV, camera calibration and 3D reconstruction (‘calibrateHandEye‘, ‘calibrateRobotWorldHandEye‘)
+UR  - https://docs.opencv.org/4.13.0/d9/d0c/group__calib3d.html
+ER  - 
+
+TY  - CPAPER
+ID  - V19
+AU  - Mitsunaga, T.
+AU  - Nayar, S. K.
+TI  - Radiometric self calibration
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 1999
+DO  - 10.1109/CVPR.1999.786966
+SP  - 374-380
+ER  - 
+
+TY  - JOUR
+ID  - V20
+AU  - Robertson, M. A.
+AU  - Borman, S.
+AU  - Stevenson, R. L.
+TI  - Estimation-theoretic approach to dynamic range enhancement using multiple exposures
+T2  - Journal of Electronic Imaging
+PY  - 2003
+VL  - 12
+IS  - 2
+DO  - 10.1117/1.1557695
+SP  - 219-228
+ER  - 
+
+TY  - CPAPER
+ID  - V21
+AU  - Grossberg, M. D.
+AU  - Nayar, S. K.
+TI  - What is the space of camera response functions?
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2003
+DO  - 10.1109/TPAMI.2004.88
+ER  - 
+
+TY  - CPAPER
+ID  - V22
+AU  - Hasinoff, S. W.
+AU  - Durand, F.
+AU  - Freeman, W. T.
+TI  - Noise-optimal capture for high dynamic range photography
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2010
+DO  - 10.1109/CVPR.2010.5540167
+SP  - 553-560
+ER  - 
+
+TY  - CPAPER
+ID  - V23
+AU  - Granados, M.
+AU  - Ajdin, B.
+AU  - Wand, M.
+AU  - Theobalt, C.
+AU  - Seidel, H.-P.
+AU  - Lensch, H. P. A.
+TI  - Optimal HDR reconstruction with linear digital cameras
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2010
+UR  - https://vcai.mpi-inf.mpg.de/projects/opthdr/
+ER  - 
+
+TY  - BOOK
+ID  - V24
+AU  - Reinhard, E.
+AU  - Ward, G.
+AU  - Pattanaik, S.
+AU  - Debevec, P.
+AU  - Heidrich, W.
+AU  - Myszkowski, K.
+TI  - High dynamic range imaging: Acquisition, display, and image-based lighting
+PY  - 2010
+UR  - https://www.oreilly.com/library/view/high-dynamic-range/9780123749147/
+ER  - 
+
+TY  - JOUR
+ID  - V25
+AU  - Hertzmann, A.
+AU  - Seitz, S. M.
+TI  - Example-based photometric stereo: Shape reconstruction with general, varying BRDFs
+T2  - IEEE Transactions on Pattern Analysis and Machine Intelligence
+PY  - 2005
+VL  - 27
+IS  - 8
+DO  - 10.1109/TPAMI.2005.158
+SP  - 1254-1264
+ER  - 
+
+TY  - JOUR
+ID  - V26
+AU  - Basri, R.
+AU  - Jacobs, D.
+AU  - Kemelmacher, I.
+TI  - Photometric stereo with general, unknown lighting
+T2  - International Journal of Computer Vision
+PY  - 2007
+VL  - 72
+IS  - 3
+DO  - 10.1007/s11263-006-8815-7
+SP  - 239-257
+ER  - 
+
+TY  - JOUR
+ID  - V27
+AU  - Ackermann, J.
+AU  - Goesele, M.
+TI  - A survey of photometric stereo techniques
+T2  - Foundations and Trends in Computer Graphics and Vision
+PY  - 2015
+VL  - 9
+DO  - 10.1561/0600000065
+ER  - 
+
+TY  - CPAPER
+ID  - V28
+AU  - Shi, B.
+AU  - others
+TI  - A benchmark dataset and evaluation for non-Lambertian and uncalibrated photometric stereo
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2016
+UR  - https://openaccess.thecvf.com/content_cvpr_2016/html/Shi_A_Benchmark_Dataset_CVPR_2016_paper.html
+ER  - 
+
+TY  - JOUR
+ID  - V29
+AU  - Mecca, R.
+AU  - Wetzler, A.
+AU  - Bruckstein, A. M.
+AU  - Kimmel, R.
+TI  - Near field photometric stereo with point light sources
+T2  - SIAM Journal on Imaging Sciences
+PY  - 2014
+VL  - 7
+IS  - 4
+DO  - 10.1137/140968100
+SP  - 2732-2770
+ER  - 
+
+TY  - JOUR
+ID  - V30
+AU  - Quéau, Y.
+AU  - Durix, B.
+AU  - Wu, T.
+AU  - Cremers, D.
+AU  - Lauze, F.
+AU  - Durou, J.-D.
+TI  - LED-based photometric stereo: Modeling, calibration and numerical solution
+T2  - Journal of Mathematical Imaging and Vision
+PY  - 2018
+VL  - 60
+IS  - 3
+DO  - 10.1007/s10851-017-0761-1
+SP  - 313-340
+ER  - 
+
+TY  - CPAPER
+ID  - V31
+AU  - Logothetis, F.
+AU  - Quéau, Y.
+AU  - Mecca, R.
+AU  - Cipolla, R.
+TI  - Semi-calibrated near-light photometric stereo
+T2  - SSVM
+PY  - 2017
+DO  - 10.1007/978-3-319-58771-4_52
+ER  - 
+
+TY  - CPAPER
+ID  - V32
+AU  - Santo, H.
+AU  - Waechter, M.
+AU  - Matsushita, Y.
+TI  - Deep near-light photometric stereo for spatially varying reflectances
+T2  - European conference on computer vision
+PY  - 2020
+DO  - 10.1007/978-3-030-58598-3_9
+ER  - 
+
+TY  - CPAPER
+ID  - V33
+AU  - Papadhimitri, T.
+AU  - Favaro, P.
+TI  - A new perspective on uncalibrated photometric stereo
+T2  - Proceedings of the IEEE conference on computer vision and pattern recognition
+PY  - 2013
+UR  - https://openaccess.thecvf.com/content_cvpr_2013/papers/Papadhimitri_A_New_Perspective_2013_CVPR_paper.pdf
+ER  - 
+
+TY  - CPAPER
+ID  - V34
+AU  - Ikehata, S.
+TI  - CNN-PS: CNN-based photometric stereo for general non-convex surfaces
+T2  - European conference on computer vision
+PY  - 2018
+DO  - 10.1007/978-3-030-01267-0_1
+ER  - 
+
+TY  - JOUR
+ID  - V35
+AU  - Quéau, Y.
+AU  - Durou, J.-D.
+AU  - Aujol, J.-F.
+TI  - Normal integration: A survey
+T2  - Journal of Mathematical Imaging and Vision
+PY  - 2018
+VL  - 60
+IS  - 4
+DO  - 10.1007/s10851-017-0773-x
+SP  - 576-593
+ER  - 
+
+TY  - JOUR
+ID  - V36
+AU  - Nehab, D.
+AU  - Rusinkiewicz, S.
+AU  - Davis, J.
+AU  - Ramamoorthi, R.
+TI  - Efficiently combining positions and normals for precise 3D geometry
+T2  - ACM Transactions on Graphics
+PY  - 2005
+VL  - 24
+IS  - 3
+UR  - https://gfx.cs.princeton.edu/pubs/Nehab_2005_ECP/index.php
+ER  - 
+
+TY  - JOUR
+ID  - V37
+AU  - Snavely, N.
+AU  - Seitz, S. M.
+AU  - Szeliski, R.
+TI  - Photo tourism: Exploring photo collections in 3D
+T2  - ACM Transactions on Graphics
+PY  - 2006
+VL  - 25
+IS  - 3
+DO  - 10.1145/1141911.1141964
+SP  - 835-846
+ER  - 
+
+TY  - JOUR
+ID  - V38
+AU  - Furukawa, Y.
+AU  - Ponce, J.
+TI  - Accurate, dense, and robust multiview stereopsis
+T2  - IEEE Transactions on Pattern Analysis and Machine Intelligence
+PY  - 2010
+VL  - 32
+IS  - 8
+DO  - 10.1109/TPAMI.2009.161
+SP  - 1362-1376
+ER  - 
+
+TY  - JOUR
+ID  - V39
+AU  - Furukawa, Y.
+AU  - Hernández, C.
+TI  - Multi-view stereo: A tutorial
+T2  - Foundations and Trends in Computer Graphics and Vision
+PY  - 2015
+VL  - 9
+DO  - 10.1561/0600000052
+ER  - 
+
+TY  - CPAPER
+ID  - V40
+AU  - Griwodz, C.
+AU  - others
+TI  - AliceVision meshroom: An open-source 3D reconstruction pipeline
+T2  - Proc. ACM MMSys
+PY  - 2021
+DO  - 10.1145/3458305.3478443
+ER  - 
+
+TY  - CPAPER
+ID  - V41
+AU  - Matusik, W.
+AU  - Buehler, C.
+AU  - Raskar, R.
+AU  - Gortler, S. J.
+AU  - McMillan, L.
+TI  - Image-based visual hulls
+T2  - Proc. SIGGRAPH
+PY  - 2000
+DO  - 10.1145/344779.344951
+ER  - 
+
+TY  - JOUR
+ID  - V42
+AU  - Hernández Esteban, C.
+AU  - Schmitt, F.
+TI  - Silhouette and stereo fusion for 3D object modeling
+T2  - Computer Vision and Image Understanding
+PY  - 2004
+VL  - 96
+IS  - 3
+UR  - https://www.sciencedirect.com/science/article/abs/pii/S1077314204000542
+SP  - 367-392
+ER  - 
+
+TY  - CPAPER
+ID  - V43
+AU  - Lorensen, W. E.
+AU  - Cline, H. E.
+TI  - Marching cubes: A high resolution 3D surface construction algorithm
+T2  - Proc. SIGGRAPH
+PY  - 1987
+DO  - 10.1145/37401.37422
+ER  - 
+
+TY  - CPAPER
+ID  - V44
+AU  - Curless, B.
+AU  - Levoy, M.
+TI  - A volumetric method for building complex models from range images
+T2  - Proc. SIGGRAPH
+PY  - 1996
+DO  - 10.1145/237170.237269
+ER  - 
+
+TY  - CPAPER
+ID  - V45
+AU  - Kazhdan, M.
+AU  - Bolitho, M.
+AU  - Hoppe, H.
+TI  - Poisson surface reconstruction
+T2  - Eurographics symposium on geometry processing
+PY  - 2006
+UR  - https://diglib.eg.org/items/245d6ba1-0209-4365-a4a4-16ce46421620
+ER  - 
+
+TY  - JOUR
+ID  - V46
+AU  - Kazhdan, M.
+AU  - Hoppe, H.
+TI  - Screened Poisson surface reconstruction
+T2  - ACM Transactions on Graphics
+PY  - 2013
+VL  - 32
+IS  - 3
+DO  - 10.1145/2487228.2487237
+SP  - 29
+ER  - 
+
+TY  - GEN
+ID  - V47
+AU  - Zhou, Q.-Y.
+AU  - Park, J.
+AU  - Koltun, V.
+TI  - Open3D: A modern library for 3D data processing
+PY  - 2018
+UR  - https://arxiv.org/abs/1801.09847
+ER  - 
+
+TY  - CPAPER
+ID  - V48
+AU  - Debevec, P.
+AU  - Hawkins, T.
+AU  - Tchou, C.
+AU  - Duiker, H.-P.
+AU  - Sarokin, W.
+AU  - Sagar, M.
+TI  - Acquiring the reflectance field of a human face
+T2  - Proc. SIGGRAPH
+PY  - 2000
+DO  - 10.1145/344779.344855
+ER  - 
+
+TY  - CPAPER
+ID  - V49
+AU  - Ma, W.-C.
+AU  - Hawkins, T.
+AU  - Peers, P.
+AU  - Chabert, C.-F.
+AU  - Weiss, M.
+AU  - Debevec, P.
+TI  - Rapid acquisition of specular and diffuse normal maps from polarized spherical gradient illumination
+T2  - Eurographics symposium on rendering
+PY  - 2007
+UR  - https://diglib.eg.org/items/da04b92c-39fe-41d1-a658-a8535521521c
+ER  - 
+
+TY  - JOUR
+ID  - V50
+AU  - Ghosh, A.
+AU  - Fyffe, G.
+AU  - Tunwattanapong, B.
+AU  - Busch, J.
+AU  - Yu, X.
+AU  - Debevec, P.
+TI  - Multiview face capture using polarized spherical gradient illumination
+T2  - ACM Transactions on Graphics
+PY  - 2011
+VL  - 30
+IS  - 6
+DO  - 10.1145/2070781.2024163
+ER  - 
+
+TY  - JOUR
+ID  - V51
+AU  - Nayar, S. K.
+AU  - Fang, X.-S.
+AU  - Boult, T.
+TI  - Separation of reflection components using color and polarization
+T2  - International Journal of Computer Vision
+PY  - 1997
+VL  - 21
+IS  - 3
+DO  - 10.1023/A:1007937815113
+SP  - 163-186
+ER  - 
+
+TY  - JOUR
+ID  - V52
+AU  - Wolff, L. B.
+TI  - Polarization-based material classification from specular reflection
+T2  - IEEE Transactions on Pattern Analysis and Machine Intelligence
+PY  - 1990
+VL  - 12
+IS  - 11
+DO  - 10.1109/34.61705
+SP  - 1059-1071
+ER  - 
+
+TY  - ELEC
+ID  - V53
+TI  - OpenScan (Raspberry Pi photogrammetry scanner)
+UR  - https://openscan.eu/pages/openscan-mini
+ER  - 
+
+TY  - ELEC
+ID  - V54
+TI  - FabScan, media computing group, RWTH aachen university
+UR  - https://hci.rwth-aachen.de/fabscan
+ER  - 
+
+TY  - ELEC
+ID  - V55
+TI  - BQ ciclop scanner + horus software
+UR  - https://github.com/bqlabs/ciclop
+ER  - 
+
+TY  - JOUR
+ID  - V56
+AU  - Lévy, B.
+AU  - Petitjean, S.
+AU  - Ray, N.
+AU  - Maillot, J.
+TI  - Least squares conformal maps for automatic texture atlas generation
+T2  - ACM Transactions on Graphics
+PY  - 2002
+VL  - 21
+IS  - 3
+DO  - 10.1145/566654.566590
+SP  - 362-371
+ER  - 
+
+TY  - ELEC
+ID  - V57
+TI  - Xatlas, mesh parameterization / UV unwrapping library
+UR  - https://github.com/jpcy/xatlas
+ER  - 
+
+TY  - CPAPER
+ID  - V58
+AU  - Waechter, M.
+AU  - Moehrle, N.
+AU  - Goesele, M.
+TI  - Let there be color! Large-scale texturing of 3D reconstructions
+T2  - European conference on computer vision
+PY  - 2014
+DO  - 10.1007/978-3-319-10602-1_54
+ER  - 
+
+TY  - GEN
+ID  - N1
+AU  - ASTM International
+TI  - Standard practice for goniometric optical scatter measurements
+PY  - 2019
+UR  - https://store.astm.org/e2387-19.html
+ER  - 
+
+TY  - GEN
+ID  - N2
+AU  - ASTM International
+TI  - Standard practice for angle resolved optical scatter measurements on specular or diffuse surfaces
+PY  - 2003
+UR  - https://www.astm.org/DATABASE.CART/WITHDRAWN/E1392.htm
+ER  - 
+
+TY  - GEN
+ID  - N3
+AU  - ASTM International
+TI  - Standard practice for goniophotometry of objects and materials
+PY  - 2005
+UR  - https://store.astm.org/e0167-96.html
+ER  - 
+
+TY  - GEN
+ID  - N4
+AU  - ASTM International
+TI  - Standard test method for specular gloss
+UR  - https://store.astm.org/standards/d523
+ER  - 
+
+TY  - GEN
+ID  - N5
+AU  - ASTM International
+TI  - Standard test methods for measurement of gloss of high-gloss surfaces by abridged goniophotometry
+PY  - 2023
+UR  - https://store.astm.org/standards/e430
+ER  - 
+
+TY  - GEN
+ID  - N6
+AU  - ASTM International
+TI  - Standard terminology of appearance
+PY  - 2025
+DO  - 10.1520/E0284-25
+ER  - 
+
+TY  - GEN
+ID  - N7
+AU  - ASTM International
+TI  - Standard practice for specifying the geometry of multiangle spectrophotometers
+PY  - 2026
+UR  - https://store.astm.org/standards/e2175
+ER  - 
+
+TY  - GEN
+ID  - N8
+AU  - ASTM International
+TI  - Standard test method for multiangle color measurement of metal flake pigmented materials
+PY  - 2025
+DO  - 10.1520/E2194-14R25
+ER  - 
+
+TY  - GEN
+ID  - N9
+AU  - ASTM International
+TI  - Standard practice for obtaining spectrometric data for object-color evaluation
+PY  - 2023
+UR  - https://store.astm.org/standards/e1164
+ER  - 
+
+TY  - ELEC
+ID  - N10
+TI  - ISO, "paints and varnishes
+UR  - https://www.iso.org/standard/56807.html
+ER  - 
+
+TY  - JOUR
+ID  - N11
+AU  - Nadal, M. E.
+AU  - Thompson, E. A.
+TI  - NIST reference goniophotometer for specular gloss measurements
+T2  - Journal of Coatings Technology
+PY  - 2001
+VL  - 73
+IS  - 917
+UR  - https://www.paint.org/wp-content/uploads/2021/09/jctJUNE01-Nadal.pdf
+SP  - 73-80
+ER  - 
+
+TY  - BOOK
+ID  - N12
+AU  - CIE
+TI  - A framework for the measurement of visual appearance
+PY  - 2006
+UR  - https://cie.co.at/publications/framework-measurement-visual-appearance
+ER  - 
+
+TY  - BOOK
+ID  - N13
+AU  - CIE
+TI  - Colorimetry, 4th edition
+PY  - 2018
+DO  - 10.25039/TR.015.2018
+ER  - 
+
+TY  - BOOK
+ID  - N14
+AU  - CIE
+TI  - ILV: International lighting vocabulary, 2nd edition
+PY  - 2020
+DO  - 10.25039/S017.2020
+ER  - 
+
+TY  - BOOK
+ID  - N15
+AU  - CIE
+TI  - Method of measuring and specifying colour rendering properties of light sources
+PY  - 1995
+UR  - https://cie.co.at/publications/method-measuring-and-specifying-colour-rendering-properties-light-sources
+ER  - 
+
+TY  - BOOK
+ID  - N16
+AU  - CIE
+TI  - CIE 2017 colour fidelity index for accurate scientific use
+PY  - 2017
+DO  - 10.25039/TR.224.2017
+ER  - 
+
+TY  - ELEC
+ID  - N17
+TI  - K. A. G. Smet, CRI_CIE_rf_2017 calculator (MATLAB/excel)
+UR  - https://github.com/ksmet1977/CRI_CIE_Rf_2017
+ER  - 
+
+TY  - BOOK
+ID  - N18
+AU  - IES
+TI  - Technical memorandum: IES method for evaluating light source color rendition
+UR  - https://store.ies.org/product/technical-memorandum-ies-method-for-evaluating-light-source-color-rendition/?v=eb65bcceaa5f
+ER  - 
+
+TY  - CPAPER
+ID  - N19
+AU  - Royer, M. P.
+TI  - Analysis of color rendition specification criteria
+T2  - Proceedings of SPIE
+PY  - 2019
+UR  - https://www.energy.gov/cmei/ssl/articles/analysis-color-rendition-specification-criteria
+ER  - 
+
+TY  - JOUR
+ID  - N20
+AU  - Ohno, Y.
+TI  - Spectral design considerations for white LED color rendering
+T2  - Optical Engineering
+PY  - 2005
+VL  - 44
+IS  - 11
+DO  - 10.1117/1.2130694
+ER  - 
+
+TY  - BOOK
+ID  - N21
+AU  - Wyszecki, G.
+AU  - Stiles, W. S.
+TI  - Color science: Concepts and methods, quantitative data and formulae
+PY  - 1982
+DO  - 10.1002/col.5080080421
+ER  - 
+
+TY  - BOOK
+ID  - N22
+AU  - Fairchild, M. D.
+TI  - Color appearance models
+PY  - 2013
+DO  - 10.1002/9781118653128
+ER  - 
+
+TY  - BOOK
+ID  - N23
+AU  - Hunt, R. W. G.
+AU  - Pointer, M. R.
+TI  - Measuring colour
+PY  - 2011
+DO  - 10.1002/9781119975595
+ER  - 
+
+TY  - BOOK
+ID  - N24
+AU  - EMVA
+TI  - Standard 1288: Standard for characterization of image sensors and cameras
+PY  - 2021
+UR  - https://www.emva.org/standards-technology/emva-1288/
+ER  - 
+
+TY  - ELEC
+ID  - N25
+TI  - ISO, "photography
+UR  - https://www.iso.org/standard/79169.html
+ER  - 
+
+TY  - ELEC
+ID  - N26
+TI  - ISO, "photography
+UR  - https://www.iso.org/standard/82233.html
+ER  - 
+
+TY  - ELEC
+ID  - N27
+TI  - ISO, "graphic technology and photography
+UR  - https://www.iso.org/standard/35835.html
+ER  - 
+
+TY  - ELEC
+ID  - N28
+TI  - IEC, "multimedia systems and equipment
+UR  - https://webstore.ansi.org/standards/iec/iec61966ed1999
+ER  - 
+
+TY  - ELEC
+ID  - N29
+TI  - M. Stokes, M. Anderson, S. Chandrasekar, R. Motta, "a standard default color space for the internet
+UR  - https://www.w3.org/Graphics/Color/sRGB.html
+ER  - 
+
+TY  - JOUR
+ID  - N30
+AU  - Weidner, V. R.
+AU  - Hsia, J. J.
+TI  - Reflection properties of pressed polytetrafluoroethylene powder
+T2  - Journal of the Optical Society of America
+PY  - 1981
+VL  - 71
+IS  - 7
+DO  - 10.1364/JOSA.71.000856
+SP  - 856-861
+ER  - 
+
+TY  - JOUR
+ID  - N31
+AU  - Weidner, V. R.
+AU  - Hsia, J. J.
+AU  - Adams, B.
+TI  - Laboratory intercomparison study of pressed polytetrafluoroethylene powder reflectance standards
+T2  - Applied Optics
+PY  - 1985
+VL  - 24
+IS  - 14
+DO  - 10.1364/AO.24.002225
+SP  - 2225
+ER  - 
+
+TY  - GEN
+ID  - N32
+AU  - Hsia, J. J.
+AU  - Barnes, P. Y.
+TI  - 45°/0° reflectance factors of pressed polytetrafluoroethylene (PTFE) powder
+PY  - 1995
+DO  - 10.6028/NIST.TN.1413
+ER  - 
+
+TY  - GEN
+ID  - N33
+AU  - Barnes, P. Y.
+AU  - Early, E. A.
+AU  - Parr, A. C.
+TI  - Spectral reflectance
+PY  - 1998
+DO  - 10.6028/NIST.SP.250-48
+ER  - 
+
+TY  - BOOK
+ID  - N34
+AU  - Labsphere
+TI  - Technical guide: Reflectance materials and coatings
+UR  - https://www.systems-eng.co.jp/dcms_media/other/Guide_Reflectance_Materials_Coatings.pdf
+ER  - 
+
+TY  - CHAP
+ID  - N35
+AU  - Springsteen, A.
+TI  - Reflectance spectroscopy: An overview of classification and techniques
+T2  - Applied spectroscopy: A compact reference for practitioners
+PY  - 1998
+PB  - Academic Press
+DO  - 10.1016/B978-012764070-9/50008-1
+SP  - 193-224
+ER  - 
+
+TY  - CHAP
+ID  - N36
+AU  - Springsteen, A.
+TI  - Standards for reflectance measurements
+T2  - Applied spectroscopy: A compact reference for practitioners
+PY  - 1998
+PB  - Academic Press
+DO  - 10.1016/B978-012764070-9/50010-X
+SP  - 247-267
+ER  - 
+
+TY  - CPAPER
+ID  - N37
+AU  - Park, J.-I.
+AU  - Lee, M.-H.
+AU  - Grossberg, M. D.
+AU  - Nayar, S. K.
+TI  - Multispectral imaging using multiplexed illumination
+T2  - Proceedings of the IEEE international conference on computer vision
+PY  - 2007
+DO  - 10.1109/ICCV.2007.4409090
+SP  - 1-8
+ER  - 
+
+TY  - JOUR
+ID  - N38
+AU  - Shrestha, R.
+AU  - Hardeberg, J. Y.
+TI  - Multispectral imaging using LED illumination and an RGB camera
+T2  - Color and Imaging Conference
+PY  - 2013
+VL  - 21
+IS  - 1
+DO  - 10.2352/CIC.2013.21.1.art00003
+SP  - 8-13
+ER  - 
+
+TY  - JOUR
+ID  - N39
+AU  - Shrestha, R.
+AU  - Hardeberg, J. Y.
+TI  - Evaluation and comparison of multispectral imaging systems
+T2  - Color and Imaging Conference
+PY  - 2014
+VL  - 22
+IS  - 1
+DO  - 10.2352/CIC.2014.22.1.art00018
+ER  - 
+
+TY  - JOUR
+ID  - N40
+AU  - Shrestha, R.
+AU  - Hardeberg, J. Y.
+TI  - How are LED illumination based multispectral imaging systems influenced by different factors?
+T2  - ICISP 2014
+PY  - 2014
+VL  - 61
+DO  - 10.1007/978-3-319-07998-1_8
+SP  - 61-71
+ER  - 
+
+TY  - JOUR
+ID  - N41
+AU  - Imai, F. H.
+AU  - Berns, R. S.
+AU  - Tzeng, D.-Y.
+TI  - A comparative analysis of spectral reflectance estimated in various spaces using a trichromatic camera system
+T2  - Journal of Imaging Science and Technology
+PY  - 2000
+VL  - 44
+IS  - 4
+DO  - 10.2352/J.ImagingSci.Technol.2000.44.4.art00003
+SP  - 280-287
+ER  - 
+
+TY  - JOUR
+ID  - N42
+AU  - Imai, F. H.
+AU  - Rosen, M. R.
+AU  - Berns, R. S.
+TI  - Comparison of spectrally narrow-band capture versus wide-band with a priori sample analysis for spectral reflectance estimation
+T2  - Color and Imaging Conference
+PY  - 2000
+VL  - 8
+IS  - 1
+DO  - 10.2352/CIC.2000.8.1.art00043
+SP  - 234-241
+ER  - 
+
+TY  - BOOK
+ID  - N43
+AU  - Hardeberg, J. Y.
+TI  - Acquisition and reproduction of color images: Colorimetric and multispectral approaches
+PY  - 2001
+DO  - 10.1002/col.10073
+ER  - 
+
+TY  - JOUR
+ID  - N44
+AU  - Hardeberg, J. Y.
+TI  - Filter selection for multispectral color image acquisition
+T2  - Journal of Imaging Science and Technology
+PY  - 2004
+VL  - 48
+IS  - 2
+DO  - 10.2352/J.ImagingSci.Technol.2004.48.2.art00005
+ER  - 
+
+TY  - BOOK
+ID  - N45
+AU  - Kingslake, R.
+AU  - Johnson, R. B.
+TI  - Lens design fundamentals
+PY  - 2010
+DO  - 10.1016/B978-0-12-374301-5.00008-5
+ER  - 
+
+TY  - BOOK
+ID  - N46
+AU  - Goodman, J. W.
+TI  - Introduction to Fourier optics
+PY  - 2017
+DO  - 10.1063/1.3035549
+ER  - 
+
+TY  - GEN
+ID  - N47
+AU  - IEC
+TI  - Photobiological safety of lamps and lamp systems
+DO  - 10.3403/30149289
+ER  - 
+
+TY  - ELEC
+ID  - N48
+TI  - ISO, "safety of machinery
+DO  - 10.3403/30265059
+ER  - 
+
+TY  - ELEC
+ID  - N49
+TI  - IEC, "safety of machinery
+DO  - 10.3403/30238348
+ER  - 
+
+TY  - ELEC
+ID  - N50
+TI  - ISO, "safety of machinery
+DO  - 10.3403/30201665
+ER  - 
+
+TY  - ELEC
+ID  - N51
+TI  - IEC, "audio/video, information and communication technology equipment
+DO  - 10.3403/30347376U
+ER  - 
+
+TY  - GEN
+ID  - H1
+AU  - Analog Devices (Trinamic)
+TI  - TMC2209 datasheet
+UR  - https://www.analog.com/media/en/technical-documentation/data-sheets/tmc2209_datasheet_rev1.09.pdf
+ER  - 
+
+TY  - GEN
+ID  - H2
+AU  - Analog Devices (Trinamic)
+TI  - AN-002: Parameterization of StallGuard2 & CoolStep
+UR  - https://www.analog.com/en/resources/app-notes/an-002.html
+ER  - 
+
+TY  - GEN
+ID  - H3
+AU  - Dwersteg (Analog Devices/Trinamic), B.
+TI  - AN-026: Programmable adaptive microstep table
+UR  - https://www.analog.com/en/resources/app-notes/an-026.html
+ER  - 
+
+TY  - GEN
+ID  - H4
+AU  - Marlin Firmware
+TI  - Trinamic drivers
+UR  - https://marlinfw.org/docs/hardware/tmc_drivers.html
+ER  - 
+
+TY  - GEN
+ID  - H5
+AU  - Espressif Systems
+TI  - ESP32 technical reference manual
+UR  - https://documentation.espressif.com/esp32_technical_reference_manual_en.pdf
+ER  - 
+
+TY  - GEN
+ID  - H6
+AU  - Espressif Systems
+TI  - ESP32 series datasheet
+UR  - https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf
+ER  - 
+
+TY  - GEN
+ID  - H7
+AU  - Raspberry Pi Ltd
+TI  - RP2040 datasheet
+UR  - https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+ER  - 
+
+TY  - GEN
+ID  - H8
+AU  - Raspberry Pi Ltd
+TI  - Raspberry Pi Pico-series Python SDK: A MicroPython environment for Raspberry Pi microcontrollers
+UR  - https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-python-sdk.pdf
+ER  - 
+
+TY  - GEN
+ID  - H9
+AU  - Sharp Corporation
+TI  - PC817XxNSZ1B series
+PY  - 2018
+UR  - https://global.sharp/products/device/lineup/data/pdf/datasheet/PC817XxNSZ1B_e.pdf
+ER  - 
+
+TY  - GEN
+ID  - H10
+AU  - Texas Instruments
+TI  - ULN200x, ULQ200x high-voltage, high-current darlington transistor arrays
+PY  - 2025
+UR  - https://www.ti.com/lit/gpn/ULN2003A
+ER  - 
+
+TY  - GEN
+ID  - H11
+AU  - Vishay Semiconductors
+TI  - TCST2103, TCST2202, TCST2300: Transmissive optical sensor with phototransistor output
+UR  - https://www.vishay.com/docs/81147/tcst2103.pdf
+ER  - 
+
+TY  - GEN
+ID  - H12
+AU  - ams AG (ams OSRAM)
+TI  - AS5600 – 12-bit programmable contactless potentiometer
+PY  - 2014
+UR  - https://www.mouser.com/pdfdocs/AMS_AS5600_Datasheet_EN.PDF
+ER  - 
+
+TY  - GEN
+ID  - H13
+AU  - Sony Semiconductor Solutions
+TI  - IMX477-AACK: Diagonal 7.857 mm (type 1/2.3) 12.3 mega-pixel CMOS image sensor
+PY  - 2018
+UR  - https://www.sony-semicon.com/files/62/pdf/p-13_IMX477-AACK_Flyer.pdf
+ER  - 
+
+TY  - GEN
+ID  - H14
+AU  - USB Implementers Forum
+TI  - Video class v1.5 document set
+PY  - 2012
+UR  - https://www.usb.org/document-library/video-class-v15-document-set
+ER  - 
+
+TY  - GEN
+ID  - H15
+AU  - Linux kernel documentation
+TI  - The linux USB video class (UVC) driver
+UR  - https://www.kernel.org/doc/html/latest/userspace-api/media/drivers/uvcvideo.html
+ER  - 
+
+TY  - GEN
+ID  - H16
+AU  - Gates Corporation
+TI  - PowerGrip GT2 belt drives – drive design manual
+UR  - https://docs.rs-online.com/5016/0900766b8002d3b7.pdf
+ER  - 
+
+TY  - GEN
+ID  - H17
+AU  - Gates Corporation
+TI  - Light power & precision drive design manual
+UR  - https://www.gates.com/content/dam/documents-library/catalogs/light-power-and-precision-manual.pdf
+ER  - 
+
+TY  - GEN
+ID  - H18
+AU  - Prusa Research
+TI  - Adjusting belt tension (CORE one/+, CORE one INDX, CORE one L/+)
+UR  - https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048
+ER  - 
+
+TY  - GEN
+ID  - H19
+AU  - Oriental Motor USA
+TI  - Stepper motor basics
+UR  - https://www.orientalmotor.com/stepper-motors/technology/stepper-motor-basics.html
+ER  - 
+
+TY  - JOUR
+ID  - H20
+AU  - Walter, M.
+TI  - How accurate is microstepping really?
+T2  - Hackaday
+PY  - 2016
+VL  - 29
+UR  - https://hackaday.com/2016/08/29/how-accurate-is-microstepping-really/
+ER  - 
+
+TY  - GEN
+ID  - H21
+AU  - Fritz Faulhaber GmbH, Dr.
+TI  - Stepper motor technical note: Microstepping myths and realities
+UR  - https://www.faulhaber.com/fileadmin/user_upload/Support/dff_200276_whitepaper_microstepping_8cb.pdf
+ER  - 
+
+TY  - GEN
+ID  - H22
+AU  - Zaber Technologies
+TI  - Microstepping tutorial
+UR  - https://www.zaber.com/technical-articles/microstepping-tutorial
+ER  - 
+
+TY  - JOUR
+ID  - H23
+AU  - Chang, C.
+AU  - Tran, T.
+TI  - Mastering precision: Understanding microstepping in motion control
+T2  - Analog Dialogue
+PY  - 2025
+VL  - 59
+IS  - 2
+UR  - https://www.analog.com/en/resources/analog-dialogue/articles/mastering-precision-understanding-microstepping.html
+ER  - 
+
+TY  - GEN
+ID  - H24
+AU  - Grbl project (gnea)
+TI  - An open source, embedded, high performance g-code-parser and CNC milling controller
+UR  - https://github.com/gnea/grbl
+ER  - 
+
+TY  - GEN
+ID  - H25
+AU  - grblHAL
+TI  - grblHAL core code and master wiki
+UR  - https://github.com/grblHAL/core
+ER  - 
+
+TY  - GEN
+ID  - H26
+AU  - LinuxCNC
+TI  - Homing configuration
+UR  - https://linuxcnc.org/docs/html/config/ini-homing.html
+ER  - 
+
+TY  - GEN
+ID  - H27
+AU  - Kramer, T. R.
+AU  - Proctor, F. M.
+AU  - Messina, E. R.
+TI  - The NIST RS274NGC interpreter – version 3
+PY  - 2000
+UR  - https://www.nist.gov/publications/nist-rs274ngc-interpreter-version-3
+ER  - 
+
+TY  - JOUR
+ID  - H28
+AU  - Pearce, J. M.
+TI  - Building research equipment with free, open-source hardware
+T2  - Science
+PY  - 2012
+VL  - 337
+IS  - 6100
+DO  - 10.1126/science.1228183
+SP  - 1303-1304
+ER  - 
+
+TY  - BOOK
+ID  - H29
+AU  - Pearce, J. M.
+TI  - Open-source lab: How to build your own hardware and reduce research costs
+PY  - 2014
+PB  - Elsevier
+DO  - 10.1016/C2012-0-07249-3
+ER  - 
+
+TY  - JOUR
+ID  - H30
+AU  - Jones, R.
+AU  - Haufe, P.
+AU  - Sells, E.
+AU  - Iravani, P.
+AU  - Olliver, V.
+AU  - Palmer, C.
+AU  - Bowyer, A.
+TI  - RepRap – the replicating rapid prototyper
+T2  - Robotica
+PY  - 2011
+VL  - 29
+IS  - 1
+DO  - 10.1017/S026357471000069X
+SP  - 177-191
+ER  - 
+
+TY  - GEN
+ID  - H31
+AU  - Open Source Hardware Association
+TI  - Open source hardware (OSHW) definition 1.0
+UR  - https://oshwa.org/definition/
+ER  - 
+
+TY  - GEN
+ID  - H32
+AU  - CERN
+TI  - CERN open hardware licence version 2
+UR  - https://www.ohwr.org/cernohl
+ER  - 
+
+TY  - GEN
+ID  - H33
+AU  - Gathering for Open Science Hardware
+TI  - GOSH manifesto
+UR  - https://openhardware.science/gosh-manifesto/
+ER  - 
+
+TY  - JOUR
+ID  - H34
+AU  - Bonvoisin, J.
+AU  - Mies, R.
+AU  - Boujut, J.-F.
+AU  - Stark, R.
+TI  - What is the ’source’ of open source hardware?
+T2  - Journal of Open Hardware
+PY  - 2017
+VL  - 1
+IS  - 1
+DO  - 10.5334/joh.7
+ER  - 
+
+TY  - JOUR
+ID  - H35
+AU  - Collins, J. T.
+AU  - Knapper, J.
+AU  - Stirling, J.
+AU  - …
+AU  - Bowman, R.
+TI  - Robotic microscopy for everyone: The OpenFlexure microscope
+T2  - Biomedical Optics Express
+PY  - 2020
+VL  - 11
+IS  - 5
+DO  - 10.1364/BOE.385729
+SP  - 2447-2460
+ER  - 
+
+TY  - GEN
+ID  - H36
+AU  - Elsevier
+TI  - Guide for authors – HardwareX
+DO  - 10.5281/zenodo.5078227
+ER  - 
+
+TY  - JOUR
+ID  - H37
+AU  - Toschke, Y.
+AU  - Klenen, J.
+AU  - Imlau, M.
+TI  - Open photonics: An integrated approach for building a 3D-printed motorized rotation stage system
+T2  - HardwareX
+PY  - 2024
+VL  - 20
+DO  - 10.1016/j.ohx.2024.e00577
+SP  - e00577
+ER  - 
+
+TY  - JOUR
+ID  - H38
+AU  - Schneidereit, D.
+AU  - Kraus, L.
+AU  - Meier, J. C.
+AU  - Friedrich, O.
+AU  - Gilbert, D. F.
+TI  - Step-by-step guide to building an inexpensive 3D printed motorized positioning stage for automated high-content screening microscopy
+T2  - Biosensors and Bioelectronics
+PY  - 2017
+VL  - 92
+DO  - 10.1016/j.bios.2016.10.078
+SP  - 472-481
+ER  - 
+
+TY  - JOUR
+ID  - H39
+AU  - Hietanen, I.
+AU  - Heikkinen, I. T. S.
+AU  - Savin, H.
+AU  - Pearce, J. M.
+TI  - Approaches to open source 3-D printable probe positioners and micromanipulators for probe stations
+T2  - HardwareX
+PY  - 2018
+DO  - 10.1016/j.ohx.2018.e00042
+ER  - 
+
+TY  - JOUR
+ID  - H40
+AU  - Salazar-Vazquez, J.
+AU  - Mendez-Vazquez, A.
+TI  - A plug-and-play hyperspectral imaging sensor using low-cost equipment
+T2  - HardwareX
+PY  - 2020
+DO  - 10.1016/j.ohx.2019.e00087
+ER  - 
+
+TY  - JOUR
+ID  - H41
+AU  - Dhankania, K. C.
+AU  - Pearce, J. M.
+TI  - Open source laboratory sample rotator mixer and shaker
+T2  - HardwareX
+PY  - 2016
+UR  - http://www.sciencedirect.com/science/article/pii/S2468067216300049
+ER  - 
+
+TY  - GEN
+ID  - H42
+AU  - Public Lab
+TI  - Desktop spectrometry kit 3.0
+UR  - https://publiclab.org/wiki/desktop-spectrometry-kit-3-0
+ER  - 
+
+TY  - ELEC
+ID  - H43
+TI  - KiCad EDA
+UR  - https://kicad.org/
+ER  - 
+
+TY  - GEN
+ID  - H44
+AU  - GitHub Docs
+TI  - REST API endpoints for milestones
+UR  - https://docs.github.com/en/rest/issues/milestones
+ER  - 
+
+TY  - GEN
+ID  - H45
+AU  - GitHub Docs
+TI  - Configuring a publishing source for your GitHub pages site
+UR  - https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+ER  - 
+
+TY  - ELEC
+ID  - H46
+TI  - Python software foundation, Python language and standard library
+UR  - https://www.python.org
+ER  - 
+
+TY  - JOUR
+ID  - H47
+AU  - Harris, C. R.
+AU  - Millman, K. J.
+AU  - Walt, S. J.
+AU  - others
+TI  - Array programming with NumPy
+T2  - Nature
+PY  - 2020
+VL  - 585
+DO  - 10.1038/s41586-020-2649-2
+SP  - 357-362
+ER  - 
+
+TY  - JOUR
+ID  - H48
+AU  - Virtanen, P.
+AU  - Gommers, R.
+AU  - Oliphant, T. E.
+AU  - others
+TI  - SciPy 1.0: Fundamental algorithms for scientific computing in Python
+T2  - Nature Methods
+PY  - 2020
+VL  - 17
+DO  - 10.1038/s41592-019-0686-2
+SP  - 261-272
+ER  - 
+
+TY  - JOUR
+ID  - H49
+AU  - Bradski, G.
+TI  - The OpenCV library
+T2  - Dr. Dobb’s Journal of Software Tools
+PY  - 2000
+UR  - https://github.com/opencv/opencv/wiki/CiteOpenCV
+ER  - 
+
+TY  - ELEC
+ID  - H50
+TI  - PyYAML (YAML parser and emitter for Python)
+UR  - https://pyyaml.org/
+ER  - 
+
+TY  - ELEC
+ID  - H51
+TI  - Raspberry Pi Zero 2 W
+UR  - https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/
+ER  - 
+
+TY  - ELEC
+ID  - H52
+TI  - Micropython-lib SSD1306 driver
+UR  - https://github.com/micropython/micropython-lib/tree/master/micropython/drivers/display/ssd1306
+ER  - 
+
+TY  - ELEC
+ID  - H53
+TI  - Raspberry Pi configuration, ‘raspi-config‘ and UART
+UR  - https://www.raspberrypi.com/documentation/computers/configuration.html
+ER  - 
+
+TY  - ELEC
+ID  - H54
+TI  - Usbipd-win
+UR  - https://github.com/dorssel/usbipd-win
+ER  - 
+
+TY  - ELEC
+ID  - H55
+TI  - MicroPython ‘machine.UART‘
+UR  - https://docs.micropython.org/en/latest/library/machine.UART.html
+ER  - 
+
+TY  - ELEC
+ID  - H56
+TI  - CadQuery 2.x, parametric CAD in Python
+UR  - https://pypi.org/project/cadquery/
+ER  - 
+
+TY  - ELEC
+ID  - H57
+TI  - Numpy-stl
+UR  - https://pypi.org/project/numpy-stl/
+ER  - 
+
+TY  - ELEC
+ID  - H58
+TI  - Matplotlib
+UR  - https://matplotlib.org/
+ER  - 
+
+TY  - ELEC
+ID  - H59
+TI  - Ams AS7341 11-channel spectral sensor; adafruit breakout #4698
+UR  - https://www.adafruit.com/product/4698
+ER  - 
+
+TY  - ELEC
+ID  - H60
+TI  - W3C, portable network graphics (PNG) specification
+UR  - https://www.w3.org/TR/png/
+ER  - 

@@ -36,9 +36,11 @@ if [ -z "${NO_GITHUB:-}" ]; then        # closed issues -> .github/progress.json
   .venv/bin/python tools/roadmap.py --progress --repo "$REPO" >/dev/null 2>&1 || echo "note: progress not refreshed (offline?)"
 fi
 make -s build >/dev/null 2>&1 || echo "note: make build failed (run: make setup)"   # keep generated files in step
+make -s paper >/dev/null 2>&1 || echo "note: paper not built (needs latexmk + biber: see paper/README.md)"   # commit a fresh PDF
 git add -A
 git diff --cached --quiet && echo "nothing new to commit" || git commit -qm "$MSG"
 git push -q origin HEAD
+bash scripts/publish_wiki.sh 2>/dev/null || echo "note: wiki not published (create the first wiki page on GitHub once)"
 echo "pushed: $(git log -1 --format='%h %s')"
 
 if [ -z "${NO_GITHUB:-}" ]; then

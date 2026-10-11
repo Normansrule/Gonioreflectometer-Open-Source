@@ -165,7 +165,7 @@ def main() -> int:
         print(f"{OUT.relative_to(ROOT)} up to date (CAD sources unchanged; --force to rebuild)")
         return 0
     a = build()
-    a.save(str(OUT), exportType="STEP")
+    a.export(str(OUT), exportType="STEP")
     stepio.stabilise(OUT)
     STAMP.write_text(digest + "\n")
     print(f"{len(a.children)} parts -> {OUT.relative_to(ROOT)} ({OUT.stat().st_size / 1e6:.1f} MB)")
