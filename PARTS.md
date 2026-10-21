@@ -13,21 +13,21 @@ Your decisions on every part I suggested. **Edit this file** (on GitHub: open it
 <!-- parts-summary -->
 | Status | Parts | Core USD | Optional USD | Tools USD |
 |---|---:|---:|---:|---:|
-| suggested | 96 | $576.06 | $408.64 | $417.80 |
+| suggested | 84 | $524.12 | $425.58 | $469.76 |
 | agreed | 0 | $0.00 | $0.00 | $0.00 |
-| ordered | 0 | $0.00 | $0.00 | $0.00 |
+| ordered | 4 | $44.98 | $0.00 | $0.00 |
 | have | 0 | $0.00 | $0.00 | $0.00 |
 | swap | 0 | $0.00 | $0.00 | $0.00 |
 | skip | 0 | $0.00 | $0.00 | $0.00 |
-| **Still to buy** | 72 | **$576.06** | **$0.00** | **$417.80** |
+| **Still to buy** | 60 | **$524.12** | **$0.00** | **$469.76** |
 | Paid so far | | $0.00 | | |
-| Plan: every core part bought (cap $630) | | $576.06 | | |
+| Plan: every core part bought (cap $630) | | $569.10 | | |
 
 Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optional parts you `agreed` to. Tools are bought once and kept: they have their own total and are not in the machine cap.
 
 ## 00 · Plan
 
-0/11 decided · still to buy $31.98 · [bom.csv](phases/00-plan/bom.csv) · [checklist](phases/00-plan/README.md)
+0/12 decided · still to buy $63.96 · [bom.csv](phases/00-plan/bom.csv) · [checklist](phases/00-plan/README.md)
 
 - [ ] **TLS-01** Enclosed FDM 3D printer for ABS (Elegoo Centauri 2) — 1 × $279.00 = $279.00 · tool · [buy at amazon.com](https://www.amazon.com/dp/B0GZYZY956) · status: suggested
   - <img src="docs/assets/parts/icon-printer.svg" width="64" height="64" alt="TLS-01"> **Qty 1** · **Must meet:** Enclosed FDM printer, hot end ≥ 260 °C, heated bed ≥ 100 °C, build volume ≥ 220 × 220 × 200 mm (the tilt yoke is 175 mm tall)
@@ -35,13 +35,13 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **TLS-02** Screwdriver set (Phillips #1/#2 + flat 2–3 mm) — 1 × $9.99 = $9.99 · tool · [buy at amazon.com](https://www.amazon.com/dp/B07RFD9JWZ) · status: suggested
-  - <img src="docs/assets/parts/icon-screwdriver.svg" width="64" height="64" alt="TLS-02"> **Qty 1** · **Must meet:** Phillips #2 (wood screws), flat 2–3 mm (screw terminals)
-  - *why:* Wood screws, terminal screws
+  - <img src="docs/assets/parts/icon-screwdriver.svg" width="64" height="64" alt="TLS-02"> **Qty 1** · **Must meet:** Phillips #1/#2 (e-stop, switch), flat 2–3 mm (screw terminals)
+  - *why:* Terminal screws, lever connectors
   - note:
   - paid:
 - [ ] **TLS-03** Hex keys 1.5 / 2 / 2.5 / 3 / 4 mm — 1 × $9.99 = $9.99 · tool · [buy at amazon.com](https://www.amazon.com/dp/B0CJBRYQF3) · status: suggested
-  - <img src="docs/assets/parts/icon-hexkey.svg" width="64" height="64" alt="TLS-03"> **Qty 1** · **Must meet:** Metric hex keys 1.5–4 mm (often in the FRM-06 kit)
-  - *why:* Socket screws, grub screws, pulleys
+  - <img src="docs/assets/parts/icon-hexkey.svg" width="64" height="64" alt="TLS-03"> **Qty 1** · **Must meet:** Metric hex keys 1.5–4 mm (1.5 mm for every M2 screw; often in the FRM-06 kit)
+  - *why:* M2 socket screws (1.5 mm), M3 motor screws (2.5 mm), pulley grubs
   - note:
   - paid:
 - [ ] **TLS-04** Wire stripper / cutter 10–24 AWG — 1 × $10.49 = $10.49 · tool · [buy at amazon.com](https://www.amazon.com/dp/B07TS6KCXD) · status: suggested
@@ -64,9 +64,9 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Camera distance, level checks
   - note:
   - paid:
-- [ ] **TLS-08** Paper printing at 100 % (print shop or library) — 1 × $5.00 = $5.00 · tool · status: suggested
-  - <img src="docs/assets/parts/icon-paper.svg" width="64" height="64" alt="TLS-08"> **Qty 1** · **Must meet:** Prints at 100 % scale (or use a print shop)
-  - *why:* Placement template, ChArUco boards, focus grid · A service, not a store item. Placement template (4 tiles), ChArUco boards, focus grid.
+- [ ] **TLS-08** Inkjet printer, US Letter, prints at 100 % — 1 × $49.99 = $49.99 · tool · [buy at amazon.com](https://www.amazon.com/dp/B0GKJZ864R) · status: suggested
+  - <img src="docs/assets/parts/icon-printer.svg" width="64" height="64" alt="TLS-08"> **Qty 1** · **Must meet:** Prints Letter paper at 100 % (Actual size); any inkjet or laser
+  - *why:* Placement template, ChArUco boards, focus grid · Prints the placement template (4 tiles), ChArUco boards, focus grid and protractor. Print dialog: Actual size / 100 %; check the 100 mm bar.
   - note:
   - paid:
 - [ ] **TLS-09** CA glue, double-sided tape, utility knife, 400-grit sandpaper — 1 × $29.28 = $29.28 · tool · [buy at amazon.com](https://www.amazon.com/dp/B00I4CWHD4) · status: suggested
@@ -79,54 +79,54 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* M8 nuts and bolt heads: table axle, tilt stub axles
   - note:
   - paid:
-- [ ] **FIL-01** ABS filament 1.75 mm, black, 1 kg (2 spools) — 2 × $15.99 = $31.98 · [buy at amazon.com](https://www.amazon.com/dp/B0DDPSXDHG) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FIL-01"> **Qty 2** · **Must meet:** ABS, 1.75 mm ± 0.03, black (matte if available), sealed with desiccant; ≥ 2 kg so a failed print never stops the build
-  - *why:* All printed parts: core ≈ 1.0 kg (cad/PRINT.md) + reprints + optional kits; black so nothing glints near the optics · Core prints ≈ 1.0 kg (cad/PRINT.md); the second spool covers reprints and kits.
+- [ ] **TLS-11** Printer paper, Letter, 500 sheets — 1 × $6.97 = $6.97 · tool · [buy at amazon.com](https://www.amazon.com/dp/B01FV0F8H8) · status: suggested
+  - <img src="docs/assets/parts/icon-paper.svg" width="64" height="64" alt="TLS-11"> **Qty 1** · **Must meet:** Plain matte white paper, 8.5 × 11 in
+  - *why:* Template, ChArUco boards, focus grid · For the TLS-08 printer.
+  - note:
+  - paid:
+- [ ] **FIL-01** ABS filament 1.75 mm, black, 1 kg (4 spools) — 4 × $15.99 = $63.96 · [buy at amazon.com](https://www.amazon.com/dp/B0DDPSXDHG) · status: suggested
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FIL-01"> **Qty 4** · **Must meet:** ABS, 1.75 mm ± 0.03, black (matte if available), sealed with desiccant; ≥ 4 kg so a failed print never stops the build
+  - *why:* All printed parts: core ≈ 2.7 kg with the printed deck (cad/PRINT.md) + reprints; black so nothing glints near the optics · Core prints ≈ 2.7 kg (cad/PRINT.md: the 9 deck tiles are half of it); the 4th spool covers reprints and kits.
   - note:
   - paid:
 
 ## 01 · Power box
 
-0/12 decided · still to buy $104.36 · [bom.csv](phases/01-power/bom.csv) · [checklist](phases/01-power/README.md)
+0/10 decided · still to buy $131.06 · [bom.csv](phases/01-power/bom.csv) · [checklist](phases/01-power/README.md)
 
-- [ ] **PWR-01** AC adapter 24 V 2.5 A 60 W — 1 × $35.26 = $35.26 · [buy at digikey.com](https://www.digikey.com/en/products/detail/mean-well-usa-inc/GST60A24-P1J/7703715) · status: suggested
-  - <img src="docs/assets/parts/icon-psu.svg" width="64" height="64" alt="PWR-01"> **Qty 1** · **Must meet:** 24 V DC ±5 %, ≥ 2.5 A (60 W), certified (UL/IEC 62368-1), 5.5 × 2.1 mm centre-positive plug
-  - *why:* Single certified wall supply · Digi-Key qty-1 price via Octopart. Level VI, UL62368-1, 90.5 %. Plug 5.5/2.1 mm.
+- [ ] **PWR-21** 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS) — 1 × $41.99 = $41.99 · [buy at amazon.com](https://www.amazon.com/dp/B0FHPST5TP) · status: suggested
+  - <img src="docs/assets/parts/icon-battery.svg" width="64" height="64" alt="PWR-21"> **Qty 1** · **Must meet:** Assembled 6S Li-ion pack (18–25.2 V), ≥ 5 Ah, built-in protection board (BMS: over-charge, over-discharge, over-current, short circuit) rated ≥ 5 A continuous, bare red/black leads; no cell assembly
+  - *why:* The battery: runs the machine; charged over USB-C (PWR-27 + PWR-29) · Label: input 25.2 V 2 A max, output 22–25 V 10 A max; 21700 cells; 78 × 50 × 72 mm (listing, measure on arrival). Charged to 24.0 V by PWR-29. The included 25.2 V wall charger is not used: it fills to 25.2 V, above the motor board's 24 V rating. Charge on a hard surface; M06 checks pack temperature.
   - note:
   - paid:
-- [ ] **PWR-02** IEC C13 mains cord — 1 × $3.14 = $3.14 · [buy at amazon.com](https://www.amazon.com/dp/B07F7NLCL8) · status: suggested
-  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="PWR-02"> **Qty 1** · **Must meet:** IEC C13 to your wall plug (US: NEMA 5-15P), 18 AWG, ≥ 10 A
-  - *why:* Adapter has a C14 inlet; cord sold separately
+- [ ] **PWR-27** USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals — 1 × $9.99 = $9.99 · [buy at amazon.com](https://www.amazon.com/dp/B0HHNFY7HT) · status: suggested
+  - <img src="docs/assets/parts/icon-psu.svg" width="64" height="64" alt="PWR-27"> **Qty 1** · **Must meet:** USB-C Power Delivery (PD) trigger (sink) board, 20 V selectable without soldering (DIP switch or button), screw-terminal output, ≥ 2 A
+  - *why:* USB-C input: asks the USB-C charger for 20 V and feeds the charging module · Plug a USB-C charger ≥ 30 W (the laptop's, or any USB-C PD charger with a 20 V profile) into it. Falls back to 5 V if the charger can't give 20 V: the charging module then does nothing (input below 5.5 V).
   - note:
   - paid:
-- [ ] **PWR-03** DC jack to screw-terminal adapter 2.1 mm — 1 × $2.00 = $2.00 · [buy at adafruit.com](https://www.adafruit.com/product/368) · status: suggested
-  - <img src="docs/assets/parts/icon-jack.svg" width="64" height="64" alt="PWR-03"> **Qty 1** · **Must meet:** Female 5.5 × 2.1 mm barrel jack with a 2-screw terminal block marked + / −, centre-positive, ≥ 3 A
-  - *why:* Adapter plug in; wires clamp under screws (no solder) · Held in the box-wall slot by the lid. Tighten each screw on twisted, stripped wire.
+- [ ] **PWR-29** DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W) — 1 × $16.99 = $16.99 · [buy at amazon.com](https://www.amazon.com/dp/B07VNDGFT6) · status: suggested
+  - <img src="docs/assets/parts/icon-psu.svg" width="64" height="64" alt="PWR-29"> **Qty 1** · **Must meet:** Step-up/step-down DC-DC with constant-voltage and constant-current (current-limit) settings, input covering 20 V, output to ≥ 25 V, ≥ 30 W, output anti-backflow (no reverse current into it), screw terminals
+  - *why:* Charges the pack from USB-C: 20 V in → 24.0 V, 1.0 A limited; its LCD shows pack voltage and charge current · Set once with the pack disconnected: output 24.00 V (4.0 V per cell: keeps the motor board at its 24 V rating and is gentler on the cells), current limit 1.000 A (24 W, about 27 W from the USB-C charger). Listing: reverse-input and output anti-backflow protection, over-current, over-temperature. Size 72 × 59 × 32 mm with case (maker page).
   - note:
   - paid:
-- [ ] **PWR-04** Inline 5 x 20 mm fuse holder — 1 × $4.00 = $4.00 · [buy at digikey.com](https://www.digikey.com/en/products/detail/littelfuse-inc/01500274Z/29453) · status: suggested
-  - <img src="docs/assets/parts/icon-fuse.svg" width="64" height="64" alt="PWR-04"> **Qty 1** · **Must meet:** Inline holder for 5 × 20 mm fuses, ≥ 5 A, with 18 AWG wire leads (no solder: leads go into screw terminals)
-  - *why:* Input fuse holder
+- [ ] **PWR-04** Inline 5 x 20 mm fuse holder, 16 AWG (2-pack) — 1 × $6.19 = $6.19 · [buy at amazon.com](https://www.amazon.com/dp/B07SM5YJ97) · status: suggested
+  - <img src="docs/assets/parts/icon-fuse.svg" width="64" height="64" alt="PWR-04"> **Qty 1** · **Must meet:** Inline holder for 5 × 20 mm fuses, ≥ 5 A, with wire leads (16 AWG); leads go into lever connectors (no solder)
+  - *why:* Battery fuse (pack + lead) · Second holder spare. The box cradle takes bodies up to Ø14 mm.
   - note:
   - paid:
-- [ ] **PWR-05** Fuse 3.15 A time-lag 5 x 20 mm — 2 × $1.56 = $3.12 · [buy at digikey.com](https://www.digikey.com/en/products/detail/littelfuse-inc/02183-15MXP/777620) · status: suggested
-  - <img src="docs/assets/parts/icon-fuse.svg" width="64" height="64" alt="PWR-05"> **Qty 2** · **Must meet:** 5 × 20 mm glass fuse, 3.15 A, time-lag (T / slow-blow), 250 V
-  - *why:* Input over-current protection · 0218 series = time-lag.
+- [ ] **PWR-05** Fuse 3.15 A time-lag 5 x 20 mm — 1 × $10.99 = $10.99 · [buy at amazon.com](https://www.amazon.com/dp/B00Y3OJUFK) · status: suggested
+  - <img src="docs/assets/parts/icon-fuse.svg" width="64" height="64" alt="PWR-05"> **Qty 1** · **Must meet:** 5 × 20 mm glass fuse, 3.15 A, time-lag (T / slow-blow), 250 V
+  - *why:* Battery over-current protection (short anywhere after the pack) · Check the marking says T (time-lag / slow-blow), not F. 1 fitted + 4 spare.
   - note:
   - paid:
-- [ ] **PWR-10** Optocoupler LTV-817 / PC817 (DIP-4) — 1 × $0.39 = $0.39 · [buy at digikey.com](https://www.digikey.com/en/products/detail/liteon/LTV-817/385836) · status: suggested
-  - <img src="docs/assets/parts/icon-chip.svg" width="64" height="64" alt="PWR-10"> **Qty 1** · **Must meet:** Optocoupler, DIP-4 (fits a breadboard), current-transfer ratio ≥ 50 % at 2 mA (PC817)
-  - *why:* Isolated e-stop sense (plugs into the breadboard) · The Sharp PC817 is out of stock at Digi-Key; LTV-817 is pin- and spec-compatible.
+- [ ] **PWR-28** Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack) — 1 × $8.99 = $8.99 · [buy at amazon.com](https://www.amazon.com/dp/B09JP4JKY6) · status: suggested
+  - <img src="docs/assets/parts/icon-estop.svg" width="64" height="64" alt="PWR-28"> **Qty 1** · **Must meet:** 22 mm panel emergency stop, latching (twist to release), ≥ 1 normally-closed contact rated ≥ 24 V DC / 3 A, screw terminals (no solder)
+  - *why:* Cuts the battery to the motion board; also the off switch · Contacts rated 660 V / 10 A (AC). Wire the NC contact (normally closed). Second switch spare.
   - note:
   - paid:
-- [ ] **PWR-11** Resistors 10k (2) — 2 × $0.10 = $0.20 · [buy at digikey.com](https://www.digikey.com/en/products/detail/stackpole-electronics-inc/CF14JT10K0/1741265) · status: suggested
-  - <img src="docs/assets/parts/icon-resistor.svg" width="64" height="64" alt="PWR-11"> **Qty 2** · **Must meet:** 10 kΩ, ¼ W, ≤ 5 %, axial (legs push into the breadboard)
-  - *why:* Opto LED current (2.3 mA at 24 V); spare
-  - note:
-  - paid:
-- [ ] **PWR-13** Emergency stop 22 mm latching, 1 NC — 1 × $30.87 = $30.87 · [buy at digikey.com](https://www.digikey.com/en/products/detail/apem-inc/YW1B-V4E01R/15216547) · status: suggested
-  - <img src="docs/assets/parts/icon-estop.svg" width="64" height="64" alt="PWR-13"> **Qty 1** · **Must meet:** 22 mm panel emergency stop, latching (twist to release), ≥ 1 normally-closed contact rated ≥ 24 V DC / 3 A, screw terminals (no solder)
-  - *why:* Cuts 24 V to the motion board · Digi-Key qty-1 price via Octopart. Screw terminals: 2 stripped wires may share one screw (twist them together). Also the machine's off switch.
+- [ ] **PWR-10** Optocoupler module PC817, 24 V input, screw terminals (2-pack) — 1 × $6.99 = $6.99 · [buy at amazon.com](https://www.amazon.com/dp/B0B5382ZT7) · status: suggested
+  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="PWR-10"> **Qty 1** · **Must meet:** 1-channel PC817 isolation module, 24 V input version (works from 18–24 V), 3.3–5 V output side, screw terminals: no breadboard, no solder
+  - *why:* Isolated motion-power sense to the ESP32-S3 hub (resistor on the board) · 66 x 16.5 x 12 mm; sits in a locating frame on the controller tray (double-sided tape). Second module spare.
   - note:
   - paid:
 - [ ] **PWR-15** 18 AWG silicone wire red/black, 1 m pair — 1 × $7.98 = $7.98 · [buy at amazon.com](https://www.amazon.com/dp/B01708AYYQ) · status: suggested
@@ -134,48 +134,33 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Power wiring
   - note:
   - paid:
-- [ ] **PWR-19** Half-size breadboard (400 points) — 1 × $4.95 = $4.95 · [buy at adafruit.com](https://www.adafruit.com/product/64) · status: suggested
-  - <img src="docs/assets/parts/icon-breadboard.svg" width="64" height="64" alt="PWR-19"> **Qty 1** · **Must meet:** Solderless breadboard, ≥ 400 tie points, 2.54 mm, adhesive back
-  - *why:* E-stop sense (PC817 + 10k) and lamp driver without solder · Stuck in the controller case. Low-current parts only (≤ 0.5 A); the 24 V motor feed never goes through it.
-  - note:
-  - paid:
-- [ ] **PWR-20** Lever wire connectors, WAGO 221 assortment (12) — 1 × $12.45 = $12.45 · [buy at amazon.com](https://www.amazon.com/dp/B0CJ5QF4Z2) · status: suggested
-  - <img src="docs/assets/parts/icon-lever.svg" width="64" height="64" alt="PWR-20"> **Qty 1** · **Must meet:** Lever splicing connectors for 24–12 AWG stranded and solid wire, 2/3/5-way, ≥ 20 A (WAGO 221-412/413/415)
-  - *why:* Every bare-wire join: no solder, no crimp, no heat-shrink
+- [ ] **PWR-20** Lever wire connectors, WAGO 221 assortment (28) — 1 × $20.95 = $20.95 · [buy at amazon.com](https://www.amazon.com/dp/B0CJ5QF3VX) · status: suggested
+  - <img src="docs/assets/parts/icon-lever.svg" width="64" height="64" alt="PWR-20"> **Qty 1** · **Must meet:** Lever splicing connectors for 24–12 AWG stranded and solid wire (fine-stranded down to 0.14 mm²), 2/3/5-way, ≥ 20 A (WAGO 221-412/413/415): ≥ 6 × 2-way, 5 × 3-way, 2 × 5-way
+  - *why:* Every bare-wire join: no solder, no crimp, no heat-shrink · Uses (README → Wiring): BAT+ 221-2401; FUSED, GND, MOT+, MOT− and keypad GND 221-413 (FUSED and GND become 221-415 in stage 15); lamp leads 2 × 221-412; M1 pancake splice 4 × 221-412 (motor leads ~26 AWG: only the 221-41x take fine-stranded 0.14 mm²). The 12-pc set has 3 × 221-412: too few for the splice.
   - note:
   - paid:
 - [ ] **PWR-18** Power box + lid — print · print · status: suggested
   - <img src="docs/assets/parts/PWR-18a_power_box.png" width="64" height="64" alt="PWR-18"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/PWR-18a_power_box.step](phases/01-power/3d/PWR-18a_power_box.step)
-  - *why:* Houses power parts; OG-40 mount · ~80 g ABS.
+  - *why:* Houses battery, charging module, USB-C input, fuse and e-stop; OG-40 mount · Box + lid ABS weight: see cad/PRINT.md. The USB-C trigger faces a wall opening: plug in the charger with the lid closed.
   - note:
 
 ## 02 · Controller and buttons
 
-0/11 decided · still to buy $79.68 · [bom.csv](phases/02-controller/bom.csv) · [checklist](phases/02-controller/README.md)
+0/10 decided · still to buy $70.84 · [bom.csv](phases/02-controller/bom.csv) · [checklist](phases/02-controller/README.md)
 
-- [ ] **CTL-01** FYSETC E4 (ESP32, 4x TMC2209, WiFi + Bluetooth) — 1 × $40.99 = $40.99 · [buy at amazon.com](https://www.amazon.com/dp/B0FGVCX2HN) · status: suggested
-  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="CTL-01"> **Qty 1** · **Must meet:** ESP32 board supported by FluidNC with 4 TMC2209 drivers on UART, 12–24 V input, WiFi + Bluetooth (FYSETC E4)
-  - *why:* Motion controller running FluidNC; USB / WiFi / BT to the laptop · Sold by a third-party seller, not FYSETC. Alternative: https://www.amazon.com/dp/B0HD7N6LL1 ($55.74). USB-B port (see CTL-03).
+- [ ] **CTL-01** BIGTREETECH SKR Pico V1.0 (RP2040, 4 × TMC2209 UART, USB-C) — 1 × $35.99 = $35.99 · [buy at amazon.com](https://www.amazon.com/dp/B09MYKL9MP) · status: suggested
+  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="CTL-01"> **Qty 1** · **Must meet:** Board with 4 TMC2209 drivers on UART, USB-C, 12–24 V input, ≥ 4 endstop inputs, supported by grblHAL (BTT SKR Pico 1.0 board map)
+  - *why:* Motion controller running grblHAL; USB-C to the laptop · Sold by BIGTREETECH. 85 × 56 mm, 4 × Ø2.7 holes on 58 × 49 mm (maker STEP). Drivers: X = M4, Y = M3, Z1 = M2, E = M1; endstops X/Y/Z/E0-STOP (signal, GND, 5 V). grblHAL from the Web Builder (scripts/controller.sh flash). Fan advised above 0.8 A per motor (CTL-08). Replaces the FYSETC E4 (USB-B, 3 endstop inputs).
   - note:
   - paid:
-- [ ] **CTL-02** Raspberry Pi Pico H (headers soldered) — 1 × $5.00 = $5.00 · [buy at digikey.com](https://www.digikey.com/en/products/detail/raspberry-pi/SC0917/16608257) · status: suggested
-  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="CTL-02"> **Qty 1** · **Must meet:** RP2040 Raspberry Pi Pico with factory-soldered 2.54 mm headers (Pico H; Pico WH also fine), runs MicroPython
-  - *why:* Buttons, e-stop sense, LED bank · Adafruit 5525 is out of stock.
+- [ ] **CTL-03** USB-A to USB-C data cables, 3 ft (2-pack) — 1 × $8.99 = $8.99 · [buy at amazon.com](https://www.amazon.com/dp/B07DD5YHMH) · status: suggested
+  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="CTL-03"> **Qty 1** · **Must meet:** USB-A (or USB-C) to USB-C data cable (not charge-only), ≤ 2 m; one per board
+  - *why:* Laptop to SKR Pico and laptop to ESP32-S3 · 480 Mbps data. A laptop with only USB-C ports: use USB-C to USB-C data cables instead.
   - note:
   - paid:
-- [ ] **CTL-03** USB A-to-B cable for the E4 — 1 × $3.95 = $3.95 · [buy at adafruit.com](https://www.adafruit.com/product/62) · status: suggested
-  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="CTL-03"> **Qty 1** · **Must meet:** USB data cable (not charge-only) with the E4's connector, ≤ 2 m
-  - *why:* Laptop to E4 (or use WiFi/BT) · The E4 has a USB-B socket. Adafruit 62 is out of stock: any USB A-B printer cable. Check your E4's USB port: USB-C → this cable; micro-USB → a second CTL-04.
-  - note:
-  - paid:
-- [ ] **CTL-04** USB-A to micro-B data cable 1 m — 1 × $2.95 = $2.95 · [buy at adafruit.com](https://www.adafruit.com/product/592) · status: suggested
-  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="CTL-04"> **Qty 1** · **Must meet:** USB-A to micro-B data cable (not charge-only), ≤ 2 m
-  - *why:* Laptop to Pico · Consumable: set `have` if it's in your drawer.
-  - note:
-  - paid:
-- [ ] **CTL-05** Membrane keypad 1 x 4 — 2 × $2.95 = $5.90 · [buy at adafruit.com](https://www.adafruit.com/product/1332) · status: suggested
-  - <img src="docs/assets/parts/icon-keypad.svg" width="64" height="64" alt="CTL-05"> **Qty 2** · **Must meet:** 1 × 4 membrane keypad, 5-wire tail (common + 4 keys) ending in a 2.54 mm female connector, adhesive back
-  - *why:* HOME START STOP LIGHT (pad A); NEXT, PAUSE (pad B) · Sticks onto the printed panel. Common → GND, keys → Pico GP2–GP6 with male–female jumpers.
+- [ ] **CTL-05** Membrane keypad 1 x 4 — 1 × $7.89 = $7.89 · [buy at amazon.com](https://www.amazon.com/dp/B076WS74VN) · status: suggested
+  - <img src="docs/assets/parts/icon-keypad.svg" width="64" height="64" alt="CTL-05"> **Qty 1** · **Must meet:** 1 × 4 membrane keypad, 70 × 20 mm, 5-wire tail (common + 4 keys) ending in a 2.54 mm Dupont connector, adhesive back (2 used)
+  - *why:* HOME START STOP LIGHT (pad A); NEXT, PAUSE (pad B) · 3-pack: 2 used, 1 spare. Sticks onto the printed panel. Keys → ESP32-S3 GPIO 4, 5, 6, 7 / 15, 16 with male–female jumpers; both commons → one lever connector → GND (README → Wiring → 6).
   - note:
   - paid:
 - [ ] **CTL-06** JST-XH pre-crimped lead kit — 1 × $10.99 = $10.99 · [buy at amazon.com](https://www.amazon.com/dp/B0F8HMQRRN) · status: suggested
@@ -183,52 +168,46 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Keyed connectors
   - note:
   - paid:
-- [ ] **CTL-07** Jumper wires male-female 150 mm (20) — 2 × $1.95 = $3.90 · [buy at adafruit.com](https://www.adafruit.com/product/1954) · status: suggested
-  - <img src="docs/assets/parts/icon-jumper.svg" width="64" height="64" alt="CTL-07"> **Qty 2** · **Must meet:** Male–female 2.54 mm jumper wires, ≥ 150 mm, ≥ 20
-  - *why:* Keypads, opto and breadboard to the Pico; cut in half for pin-to-wire leads · 2 packs = 40: keypads 7, opto + ground link 3, lamp lead 10 (daisy-chained), sense/HE0/3V3 leads 4, spares. Cut one in half = pin socket on one end, bare wire on the other.
+- [ ] **CTL-07** Jumper wires male-female 20 cm (120) — 1 × $6.98 = $6.98 · [buy at amazon.com](https://www.amazon.com/dp/B0BHNM91FX) · status: suggested
+  - <img src="docs/assets/parts/icon-jumper.svg" width="64" height="64" alt="CTL-07"> **Qty 1** · **Must meet:** Male–female 2.54 mm jumper wires, ≥ 150 mm, ≥ 30
+  - *why:* Keypads, opto module and LED driver to the ESP32-S3 and SKR Pico; cut in half for pin-to-wire leads · Peel off strips of 40. Cut one in half = pin socket on one end, bare wire on the other.
   - note:
   - paid:
 - [ ] **CTL-08** Fan 40 mm 24 V — 1 × $7.99 = $7.99 · optional · [buy at amazon.com](https://www.amazon.com/dp/B09F9JT3BY) · status: suggested
   - <img src="docs/assets/parts/icon-fan.svg" width="64" height="64" alt="CTL-08"> **Qty 1** · **Must meet:** 40 mm fan, 24 V DC, 2-wire
-  - *why:* Only if T6 driver temperature fails
+  - *why:* Advised by BTT above 0.8 A per motor; fit it if T6 driver temperature fails · SKR Pico has FAN1–3 outputs (12/24 V, switched); this one runs from the motor supply.
   - note:
   - paid:
-- [ ] **CTL-11** Stepper cables 1 m, PH2.0 6-pin to XH2.54 4-pin (4-pack) — 1 × $6.00 = $6.00 · [buy at amazon.com](https://www.amazon.com/dp/B099214RPZ) · status: suggested
-  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="CTL-11"> **Qty 1** · **Must meet:** 1 m, 4-wire, PH2.0 6-pin (motor end) to XH2.54 4-pin (E4 end); check the motor end matches your motor's socket
-  - *why:* Motors into the E4 sockets without crimping
+- [ ] **CTL-11** Stepper cables 1 m, PH2.0 6-pin to XH2.54 4-pin (4-pack) — 1 × $6.00 = $6.00 · optional · [buy at amazon.com](https://www.amazon.com/dp/B099214RPZ) · status: suggested
+  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="CTL-11"> **Qty 1** · **Must meet:** 1 m, 4-wire, PH2.0 6-pin (motor end) to XH2.54 4-pin (board end)
+  - *why:* Only if the motor cables in the 5-pack do not fit the SKR Pico XH sockets · Only if the SIMAX 5-pack cables do not latch into the SKR Pico XH sockets: check on arrival before ordering. The listing names both an XH and a Dupont board end: check its photos.
   - note:
   - paid:
+- [ ] **CTL-02** ESP32-S3-DevKitC-1 (owned) — you supply · status: suggested
+  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="CTL-02"> **Qty 1** · **Must meet:** ESP32-S3 dev board with pins soldered, USB-C, MicroPython (ESP32_GENERIC_S3)
+  - *why:* Buttons, PAUSE, e-stop sense, LED bank, OLED/AS7341 · Already owned. Flash: bash scripts/hub.sh flash oct|plain (oct if the module can says N8R8 / N16R8). Plug its USB connector (not UART) into the laptop.
+  - note:
 - [ ] **CTL-09** Laptop (Windows or Linux) — you supply · status: suggested
   - <img src="docs/assets/parts/icon-laptop.svg" width="64" height="64" alt="CTL-09"> **Qty 1** · **Must meet:** Laptop with a free USB port per camera; Windows 10+ (camera via Windows Python) or Linux
   - *why:* Control and processing · The laptop you already run Ubuntu (WSL) on; the only thing assumed owned.
   - note:
 - [ ] **CTL-10** Controller case + button panel — print · print · status: suggested
   - <img src="docs/assets/parts/CTL-10a_button_panel.png" width="64" height="64" alt="CTL-10"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/CTL-10a_button_panel.step](phases/02-controller/3d/CTL-10a_button_panel.step)
-  - *why:* Holds E4 and Pico, panel labels
+  - *why:* Holds the SKR Pico, ESP32-S3, opto module and LED driver; panel labels
   - note:
 
 ## 03 · Frame
 
-0/7 decided · still to buy $71.96 · [bom.csv](phases/03-frame/bom.csv) · [checklist](phases/03-frame/README.md)
+0/6 decided · still to buy $22.45 · [bom.csv](phases/03-frame/bom.csv) · [checklist](phases/03-frame/README.md)
 
-- [ ] **FRM-01** Baltic birch plywood 1/2 in, 24 x 24 in — 1 × $20.00 = $20.00 · [buy at amazon.com](https://www.amazon.com/dp/B0D5YR61FW) · status: suggested
-  - <img src="docs/assets/parts/icon-plywood.svg" width="64" height="64" alt="FRM-01"> **Qty 1** · **Must meet:** 12 mm (½ in) flat plywood, sold pre-cut at 2 × 2 ft (≈ 610 × 610 mm): used as bought, no saw
-  - *why:* Base plate
+- [ ] **FRM-06** M2 socket screw kit, 4–25 mm, with nuts and washers (900 pcs) — 1 × $7.58 = $7.58 · [buy at amazon.com](https://www.amazon.com/dp/B0DCKCN2WM) · status: suggested
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FRM-06"> **Qty 1** · **Must meet:** M2-0.4 socket-head cap screws, stainless: ≥ 40 each of 8, 10, 12 mm and ≥ 20 of 16 mm, plus ≥ 100 nuts and washers; hex key 1.5 mm
+  - *why:* Every printed join and module mount · 300 screws: 50 × 4/6/8, 40 × 10/12, 25 × 16/20, 20 × 25 mm. About 130 used. Self-tap into 1.7 mm printed pilots (set from the coupon).
   - note:
   - paid:
-- [ ] **FRM-02** 2020 V-slot 500 mm (4-pack) — 1 × $22.39 = $22.39 · [buy at amazon.com](https://www.amazon.com/dp/B0BBR6RPZR) · status: suggested
-  - <img src="docs/assets/parts/icon-extrusion.svg" width="64" height="64" alt="FRM-02"> **Qty 1** · **Must meet:** 2020 aluminium extrusion, 6 mm slot (V-slot or T-slot), 500 mm, square-cut ends
-  - *why:* Outrigger, scan-camera post, light-arm upright, horizontal light arm
-  - note:
-  - paid:
-- [ ] **FRM-03** M5 T-nuts for 2020, 50 drop-in + 50 sliding — 1 × $5.99 = $5.99 · [buy at amazon.com](https://www.amazon.com/dp/B0GC71GBGJ) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FRM-03"> **Qty 1** · **Must meet:** M5 drop-in T-nuts for 2020 / 6 mm slot
-  - *why:* Brackets on extrusion · 12 used.
-  - note:
-  - paid:
-- [ ] **FRM-06** Socket screw kit M2–M5, 8/10/16/20 mm, with nuts — 1 × $9.99 = $9.99 · [buy at amazon.com](https://www.amazon.com/dp/B0DBLCHK48) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FRM-06"> **Qty 1** · **Must meet:** Socket-head M3/M4/M5 screws 8–30 mm with nuts and washers; hex keys 2.5 / 3 / 4 mm included or owned
-  - *why:* General fastening · Has M3 x 8/10, M4 x 16 (use for the rim: 9 mm rim + 3 mm plate + nut), M5 x 10. Also covers TBL-06, TLT-06, SPN-06.
+- [ ] **FRM-07** Socket screw kit M2/M3/M4 with nuts (820 pcs): M3 for the motors — 1 × $9.88 = $9.88 · [buy at amazon.com](https://www.amazon.com/dp/B0D636MJ1N) · status: suggested
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FRM-07"> **Qty 1** · **Must meet:** M3-0.5 × 8 mm socket-head cap screws (≥ 16) with washers; hex key 2.5 mm
+  - *why:* M3 x 8 into the four NEMA 17 faces (the motors' own thread); spare M2 · Only M3 left in the machine: motors are threaded M3. Covers TBL-06, TLT-06, SPN-06.
   - note:
   - paid:
 - [ ] **FRM-08** 608-2RS bearings (10) — 1 × $4.99 = $4.99 · [buy at amazon.com](https://www.amazon.com/dp/B0CX8CDL7D) · status: suggested
@@ -236,28 +215,31 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Table 2, tilt 2, spares 6
   - note:
   - paid:
-- [ ] **FRM-12** Wood screws #8 x 5/8 in, Type 17 point (100) — 1 × $8.60 = $8.60 · [buy at amazon.com](https://www.amazon.com/dp/B07542157N) · status: suggested
-  - <img src="docs/assets/parts/icon-woodscrew.svg" width="64" height="64" alt="FRM-12"> **Qty 1** · **Must meet:** #8 (4.2 mm) × 5/8 in (16 mm) pan-head wood screws with a Type 17 self-drilling point (start without a pilot hole), Phillips or combo drive
-  - *why:* Every printed part, the lazy Susan and the feet onto the plywood: no drilling
+- [ ] **FRM-01** Deck: 9 tiles of 200 mm (600 x 600 x 24 mm) — print · print · status: suggested
+  - <img src="docs/assets/parts/FRM-01a_deck_tile_SW.png" width="64" height="64" alt="FRM-01"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/FRM-01a_deck_tile_SW.step](phases/03-frame/3d/FRM-01a_deck_tile_SW.step)
+  - *why:* Base for every part: replaces plywood · Bolted edge to edge with 36 x M2 x 10 + nuts (FRM-06). Pilot bosses at every mount point and a 40 mm grid of spare pilots: nothing to measure or mark. ≈ 1.4 kg ABS, ≈ 6 h per tile.
   - note:
-  - paid:
-- [ ] **FRM-09** OG-40 adapter, feet, 2020 saddles, scan-post socket, camera pillar, end foot, protractor scales — print · print · status: suggested
-  - <img src="docs/assets/parts/FRM-09a_og40_adapter.png" width="64" height="64" alt="FRM-09"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/FRM-09a_og40_adapter.step](phases/03-frame/3d/FRM-09a_og40_adapter.step)
-  - *why:* Printed frame parts · Everything screws onto the plywood with FRM-12 wood screws: no drilling. Protractors for alignment [R1].
+- [ ] **FRM-02** Printed 20 x 20 bars: outrigger (2 x 250 mm), scan post (2 x 175 mm) — print · print · status: suggested
+  - <img src="docs/assets/parts/FRM-02a_outrigger_bar_1.png" width="64" height="64" alt="FRM-02"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/FRM-02a_outrigger_bar_1.step](phases/03-frame/3d/FRM-02a_outrigger_bar_1.step)
+  - *why:* Outrigger and scan-camera post: replaces aluminium extrusion · M2 self-tap pilots at every clamp station; bar couplers (FRM-09i) join the halves.
+  - note:
+- [ ] **FRM-09** Ring scale clamps, bar saddles, scan-post socket, camera pillar, end foot, bar couplers — print · print · status: suggested
+  - <img src="docs/assets/parts/FRM-09c_protractor_segment.png" width="64" height="64" alt="FRM-09"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/FRM-09c_protractor_segment.step](phases/03-frame/3d/FRM-09c_protractor_segment.step)
+  - *why:* Printed frame parts · Everything screws into the deck's pilots with M2 (FRM-06). The ring-scale segments also clamp the lazy Susan [R1].
   - note:
 
 ## 04 · Light arm (M4)
 
-0/8 decided · still to buy $74.54 · [bom.csv](phases/04-light-arm/bom.csv) · [checklist](phases/04-light-arm/README.md)
+1/8 decided · still to buy $41.55 · [bom.csv](phases/04-light-arm/bom.csv) · [checklist](phases/04-light-arm/README.md)
 
 - [ ] **LAR-01** 12 in lazy Susan bearing — 1 × $13.99 = $13.99 · [buy at amazon.com](https://www.amazon.com/dp/B0CQXFVDN7) · status: suggested
   - <img src="docs/assets/parts/icon-turntable.svg" width="64" height="64" alt="LAR-01"> **Qty 1** · **Must meet:** 12 in (≈ 305 mm) lazy-Susan ball bearing, flat, ≥ 50 kg rating, no wobble you can feel
   - *why:* M4: light arm rotates around the sample · Measure it before printing the rim (M13.1); the table motor needs an inner opening ≥ 150 mm.
   - note:
   - paid:
-- [ ] **LAR-02** NEMA 17 stepper 59 Ncm 2 A (3-pack: M4, M3, M2) — 1 × $32.99 = $32.99 · [buy at amazon.com](https://www.amazon.com/dp/B00Y2HJE22) · status: suggested
-  - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="LAR-02"> **Qty 1** · **Must meet:** NEMA 17, 1.8°/step, bipolar 4-wire, ≥ 40 N·cm holding, ≤ 2.0 A/phase (driver runs 0.8 A), 5 mm D-shaft
-  - *why:* M4 drive · 3-pack covers LAR-02, TBL-01, TLT-01. The included cables end in a 4-pin 0.1 in housing: use the CTL-11 cables to reach the E4's XH sockets.
+- [x] **LAR-02** NEMA 17 stepper 42 Ncm 1.5 A, 38 mm (5-pack: M4, M3, M2 + 2 spare) — 1 × $32.99 = $32.99 · [buy at amazon.com](https://www.amazon.com/dp/B088B756MY) · status: ordered
+  - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="LAR-02"> **Qty 1** · **Must meet:** NEMA 17, 1.8°/step, bipolar 4-wire, ≥ 40 N·cm holding, ≤ 2.0 A/phase (driver runs 0.8 A), body ≤ 48 mm, 5 mm D-shaft
+  - *why:* M4 drive · Bought. 5-pack covers LAR-02, TBL-01, TLT-01 and 2 spares. Its five 1 m cables (6-pin motor end, 4-pin XH board end in the photos): M4, M3, M2, one spliced to the M1 pancake (SPN-01), one spare. CAD clash check at 38 mm: 0 clashes on M4, M3, M2. Not for M1 (spin): that needs the 21.5 mm pancake (SPN-01).
   - note:
   - paid:
 - [ ] **LAR-03** GT2 6 mm open belt (5 m) — 1 × $7.59 = $7.59 · [buy at amazon.com](https://www.amazon.com/dp/B0BSMNZ53S) · status: suggested
@@ -271,7 +253,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **LAR-05** Optical endstop module, slot type (6-pack) — 1 × $8.99 = $8.99 · [buy at amazon.com](https://www.amazon.com/dp/B0719K9Z9R) · status: suggested
-  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="LAR-05"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the E4 home input reads
+  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="LAR-05"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the controller endstop input reads
   - *why:* M4 home · Covers LAR-05, TBL-04, TLT-04, SPN-04. Check the slot is ≥ 3 mm (the flag is 1.5 mm).
   - note:
   - paid:
@@ -282,21 +264,21 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - paid:
 - [ ] **LAR-09** Laser module class 2 (650 nm, < 1 mW); mirror = one CAL-02 tile — 1 × $15.99 = $15.99 · tool · [buy at amazon.com](https://www.amazon.com/dp/B00ZR80S9S) · status: suggested
   - <img src="docs/assets/parts/icon-laser.svg" width="64" height="64" alt="LAR-09"> **Qty 1** · **Must meet:** Red laser pointer, class 2 (< 1 mW), plus a ~25 mm flat mirror
-  - *why:* Repeatability test: mirror on the moving part, spot on a wall 2 m away (0.1 deg = 7 mm) · Bare module, 2.6–6 V: run it from the E4's 5 V pins with two jumper wires. Mirror: one CAL-02 tile.
+  - *why:* Repeatability test: mirror on the moving part, spot on a wall 2 m away (0.1 deg = 7 mm) · Bare module, 2.6–6 V: run it from a spare 5 V and GND pin pair (an SKR Pico STOP port or the ESP32-S3 5V pin) with two jumper wires. Mirror: one CAL-02 tile.
   - note:
   - paid:
-- [ ] **LAR-08** Belt rim segments, arm segment, M4 motor mount, cross clamp — print · print · status: suggested
+- [ ] **LAR-08** Belt rim segments, arm segment, M4 motor mount, cross clamp, upright + arm bars — print · print · status: suggested
   - <img src="docs/assets/parts/LAR-08a_rim_segment.png" width="64" height="64" alt="LAR-08"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/LAR-08a_rim_segment.step](phases/04-light-arm/3d/LAR-08a_rim_segment.step)
-  - *why:* Printed M4 parts · 7 rim segments + the arm segment (8th, with the upright socket) bolt to the lazy-Susan top plate with M4 x 16 + nuts (FRM-06) where a slot meets a plate hole, CA glue elsewhere; no idlers: the motor pinion meshes with the rim belt.
+  - *why:* Printed M4 parts · 7 rim segments + the arm segment (8th, with the upright socket) bolt to the lazy-Susan top plate with M2 x 12 + wide printed washer + nut (FRM-06, TBL-07f) where a slot meets a plate hole, CA glue elsewhere; no idlers: the motor pinion meshes with the rim belt. Printed 200 mm upright and arm bars.
   - note:
 
 ## 05 · Table (M3)
 
-0/7 decided · still to buy $23.56 · [bom.csv](phases/05-table/bom.csv) · [checklist](phases/05-table/README.md)
+1/7 decided · still to buy $23.56 · [bom.csv](phases/05-table/bom.csv) · [checklist](phases/05-table/README.md)
 
-- [ ] **TBL-01** NEMA 17 stepper 59 Ncm 2 A — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B00Y2HJE22) · status: suggested
-  - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="TBL-01"> **Qty 1** · **Must meet:** NEMA 17, 1.8°/step, bipolar 4-wire, ≥ 40 N·cm holding, ≤ 2.0 A/phase (driver runs 0.8 A), 5 mm D-shaft
-  - *why:* M3 (table rotation, vertical axis) drive · In the LAR-02 3-pack. Same motor on every axis.
+- [x] **TBL-01** NEMA 17 stepper 42 Ncm 1.5 A, 38 mm — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B088B756MY) · status: ordered
+  - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="TBL-01"> **Qty 1** · **Must meet:** NEMA 17, 1.8°/step, bipolar 4-wire, ≥ 40 N·cm holding, ≤ 2.0 A/phase (driver runs 0.8 A), body ≤ 48 mm, 5 mm D-shaft
+  - *why:* M3 (table rotation, vertical axis) drive · In the LAR-02 5-pack.
   - note:
   - paid:
 - [ ] **TBL-02** GT2 6 mm closed belt 232 mm — 1 × $8.19 = $8.19 · [buy at amazon.com](https://www.amazon.com/dp/B0FRFGBS6J) · status: suggested
@@ -310,7 +292,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **TBL-04** Optical endstop module, slot type (from the LAR-05 6-pack) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0719K9Z9R) · status: suggested
-  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="TBL-04"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the E4 home input reads
+  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="TBL-04"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the controller endstop input reads
   - *why:* Home · In the LAR-05 6-pack.
   - note:
   - paid:
@@ -319,9 +301,9 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Fixed axle: head locked in the post, drum turns on two 608s around it · Bolts $9.38 + nuts $5.99 (https://www.amazon.com/dp/B0CZQNB22Q); nuts also cover TLT-05.
   - note:
   - paid:
-- [ ] **TBL-06** Axis fasteners (M3/M5 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0DBLCHK48) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="TBL-06"> **Qty 1** · **Must meet:** M3/M5 socket screws 8–30 mm, nuts and washers (motor mount, pulley, clamp)
-  - *why:* Motor mount, pulley, clamp · From the FRM-06 kit.
+- [ ] **TBL-06** Axis fasteners (M3 motor face + M2 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0D636MJ1N) · status: suggested
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="TBL-06"> **Qty 1** · **Must meet:** 4 × M3 × 8 for the NEMA 17 face; M2 socket screws 6–16 mm with nuts and washers
+  - *why:* Motor face (M3), brackets, flags, clamps (M2) · From the FRM-06 and FRM-07 kits.
   - note:
   - paid:
 - [ ] **TBL-07** Printed table parts — print · print · status: suggested
@@ -331,7 +313,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 ## 06 · Camera and light
 
-0/10 decided · still to buy $118.20 · [bom.csv](phases/06-camera-light/bom.csv) · [checklist](phases/06-camera-light/README.md)
+0/9 decided · still to buy $111.91 · [bom.csv](phases/06-camera-light/bom.csv) · [checklist](phases/06-camera-light/README.md)
 
 - [ ] **CAM-01** USB camera 12 MP IMX477, M12 mount (UVC) — 1 × $59.99 = $59.99 · [buy at amazon.com](https://www.amazon.com/dp/B0C1G73QZD) · status: suggested
   - <img src="docs/assets/parts/icon-camera.svg" width="64" height="64" alt="CAM-01"> **Qty 1** · **Must meet:** USB Video Class (UVC) camera, Sony IMX477 12.3 MP, 1.55 µm pixels, M12 × 0.5 lens mount, manual exposure / gain / white balance, ≥ 3840 × 3032 output, IR-cut filter for true colour
@@ -348,19 +330,14 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Holds and connects the COB without solder · Ø35 × 3.6 mm, 3 A / 60 V DC, poke-in for 18–20 AWG solid or stranded [L23]. No screws: the lamp body's round seat centres it and the cap clamps heatsink + holder. Leads: 2 × 15 cm of PWR-15 18 AWG.
   - note:
   - paid:
-- [ ] **CAM-07** M2.5 x 8 mm screws (100-pack) — 1 × $6.29 = $6.29 · [buy at amazon.com](https://www.amazon.com/dp/B07YS6D2GT) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="CAM-07"> **Qty 1** · **Must meet:** M2.5-0.45 × 8 mm pan-head machine screws
-  - *why:* Camera board onto its plate (self-tap into 2.2 mm holes) · Covers CAM-08.
-  - note:
-  - paid:
 - [ ] **LSR-01** COB LED CRI 97, 12 V, 13.5 mm (Citizen CLU7A3) — 1 × $5.91 = $5.91 · [buy at digikey.com](https://www.digikey.com/en/products/detail/citizen/CLU7A3-0403E1-303H7X5/17053751) · status: suggested
   - <img src="docs/assets/parts/icon-led.svg" width="64" height="64" alt="LSR-01"> **Qty 1** · **Must meet:** White chip-on-board LED, Colour Rendering Index (CRI) ≥ 90, 3000–5000 K, forward voltage ≤ 18 V at 350 mA (the driver needs headroom under 24 V), rated ≥ 350 mA, ≤ 6 mm light-emitting surface, 13.5 × 13.5 mm board (fits LSR-06)
   - *why:* White measurement light · Datasheet: 12.2 V typ at 525 mA, max 900 mA, case ≤ 120 °C, Rj-c 3.4 °C/W; ≈ 4 W at 350 mA. Cree CXA13 COBs dropped: every CXA13 holder is obsolete [L21].
   - note:
   - paid:
 - [ ] **LSR-02** Constant-current driver 350 mA — 1 × $5.41 = $5.41 · [buy at digikey.com](https://www.digikey.com/en/products/detail/mean-well-usa-inc/NLDD-350H/13913618) · status: suggested
-  - <img src="docs/assets/parts/icon-driver.svg" width="64" height="64" alt="LSR-02"> **Qty 1** · **Must meet:** Constant-current LED driver 350 mA, input range covering 24 V, output covering the LED's ≈ 12 V, no flicker (DC output); 2.54 mm-pitch pins that push into a breadboard (or a wire-lead version)
-  - *why:* Drives the COB from 24 V; on/off from E4 GPIO2 MOSFET
+  - <img src="docs/assets/parts/icon-driver.svg" width="64" height="64" alt="LSR-02"> **Qty 1** · **Must meet:** Constant-current LED driver 350 mA, input range covering 24 V, output covering the LED's ≈ 12 V, no flicker (DC output); 2.54 mm-pitch pins that take female jumper ends (no breadboard, no solder)
+  - *why:* Drives the COB from 24 V; on/off from the SKR Pico HE (heater) MOSFET output · Sits pins-up in a locating frame on the controller tray; female jumper ends on its pins, male ends into lever connectors. The wire-lead NLDD-350HW (13913611) was out of stock on 2026-10-11.
   - note:
   - paid:
 - [ ] **LSR-03** Heatsink 40 x 40 mm (from a pack) — 1 × $6.99 = $6.99 · [buy at amazon.com](https://www.amazon.com/dp/B07D4FVC61) · status: suggested
@@ -379,7 +356,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
 - [ ] **LSR-05** Lamp body + tube, back cap — print · print · status: suggested
   - <img src="docs/assets/parts/LSR-05a_lamp_tube.png" width="64" height="64" alt="LSR-05"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/LSR-05a_lamp_tube.step](phases/06-camera-light/3d/LSR-05a_lamp_tube.step)
-  - *why:* Holds heatsink + COB holder, 10 mm exit aperture, polarizer slot, clamps to the horizontal 2020 arm
+  - *why:* Holds heatsink + COB holder, 10 mm exit aperture, polarizer slot, clamps to the printed arm bar (M2 into its pilot)
   - note:
 
 ## 07 · Calibrate → game material
@@ -417,8 +394,8 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **CAL-04** ChArUco print + picture-frame glass — 1 × $4.31 = $4.31 · [buy at amazon.com](https://www.amazon.com/dp/B000Y79K32) · status: suggested
-  - <img src="docs/assets/parts/icon-chart.svg" width="64" height="64" alt="CAL-04"> **Qty 1** · **Must meet:** ChArUco board 7 × 5, 10 mm squares, 7 mm markers (DICT_4X4_50), laser-printed at 100 % on matte paper, held flat under glass
-  - *why:* Intrinsics, pose, repeatability · Check it has real glass (the board must be flat). Print the ChArUco board at a shop or library.
+  - <img src="docs/assets/parts/icon-chart.svg" width="64" height="64" alt="CAL-04"> **Qty 1** · **Must meet:** ChArUco board 7 × 5, 10 mm squares, 7 mm markers (DICT_4X4_50), printed at 100 % on matte paper, held flat under glass
+  - *why:* Intrinsics, pose, repeatability · Check it has real glass (the board must be flat). Print the ChArUco board on the TLS-08 printer.
   - note:
   - paid:
 - [ ] **CAL-05** Colour target (ColorChecker Mini or similar) — 1 × $55.50 = $55.50 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0973JNJCB) · status: suggested
@@ -447,11 +424,11 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 ## 08 · Tilt (M2)
 
-0/7 decided · still to buy $16.68 · [bom.csv](phases/08-tilt/bom.csv) · [checklist](phases/08-tilt/README.md)
+1/7 decided · still to buy $16.68 · [bom.csv](phases/08-tilt/bom.csv) · [checklist](phases/08-tilt/README.md)
 
-- [ ] **TLT-01** NEMA 17 stepper 59 Ncm 2 A — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B00Y2HJE22) · status: suggested
-  - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="TLT-01"> **Qty 1** · **Must meet:** NEMA 17, 1.8°/step, bipolar 4-wire, ≥ 40 N·cm holding, ≤ 2.0 A/phase (driver runs 0.8 A), 5 mm D-shaft
-  - *why:* M2 (sample tilt, horizontal axis) drive · In the LAR-02 3-pack. Same motor on every axis.
+- [x] **TLT-01** NEMA 17 stepper 42 Ncm 1.5 A, 38 mm — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B088B756MY) · status: ordered
+  - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="TLT-01"> **Qty 1** · **Must meet:** NEMA 17, 1.8°/step, bipolar 4-wire, ≥ 40 N·cm holding, ≤ 2.0 A/phase (driver runs 0.8 A), body ≤ 48 mm, 5 mm D-shaft
+  - *why:* M2 (sample tilt, horizontal axis) drive · In the LAR-02 5-pack.
   - note:
   - paid:
 - [ ] **TLT-02** GT2 6 mm closed belt 280 mm — 1 × $7.49 = $7.49 · [buy at amazon.com](https://www.amazon.com/dp/B07RK1TX8C) · status: suggested
@@ -465,7 +442,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **TLT-04** Optical endstop module, slot type (from the LAR-05 6-pack) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0719K9Z9R) · status: suggested
-  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="TLT-04"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the E4 home input reads
+  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="TLT-04"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the controller endstop input reads
   - *why:* Home · In the LAR-05 6-pack.
   - note:
   - paid:
@@ -474,9 +451,9 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Cradle turns on two stub axles in the yoke's 608s · Nuts from the TBL-05 pack.
   - note:
   - paid:
-- [ ] **TLT-06** Axis fasteners (M3/M5 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0DBLCHK48) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="TLT-06"> **Qty 1** · **Must meet:** M3/M5 socket screws 8–30 mm, nuts and washers (motor mount, pulley, clamp)
-  - *why:* Motor mount, pulley, clamp · From the FRM-06 kit.
+- [ ] **TLT-06** Axis fasteners (M3 motor face + M2 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0D636MJ1N) · status: suggested
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="TLT-06"> **Qty 1** · **Must meet:** 4 × M3 × 8 for the NEMA 17 face; M2 socket screws 6–16 mm with nuts and washers
+  - *why:* Motor face (M3), brackets, flags, clamps (M2) · From the FRM-06 and FRM-07 kits.
   - note:
   - paid:
 - [ ] **TLT-07** Printed tilt parts — print · print · status: suggested
@@ -486,21 +463,21 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 ## 09 · Spin (M1)
 
-0/4 decided · still to buy $11.99 · [bom.csv](phases/09-spin/bom.csv) · [checklist](phases/09-spin/README.md)
+1/4 decided · still to buy $0.00 · [bom.csv](phases/09-spin/bom.csv) · [checklist](phases/09-spin/README.md)
 
-- [ ] **SPN-01** NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) — 1 × $11.99 = $11.99 · [buy at amazon.com](https://www.amazon.com/dp/B00PNEQ79Q) · status: suggested
+- [x] **SPN-01** NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) — 1 × $11.99 = $11.99 · [buy at amazon.com](https://www.amazon.com/dp/B00PNEQ79Q) · status: ordered
   - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="SPN-01"> **Qty 1** · **Must meet:** NEMA 17 pancake, body ≤ 25 mm, 1.8°/step, ≥ 13 N·cm, ≤ 1.0 A, 5 mm D-shaft ≥ 16 mm (driver at 1/64 microstep)
-  - *why:* M1 spin: the platter sits on its shaft
+  - *why:* M1 spin: the platter sits on its shaft · Bought. Fixed bare leads, no connector (listing photo): spliced to a spare LAR-02 cable (6-pin plug cut off) with 4 × WAGO 221-412 (fine-stranded 0.14–4 mm²), XH 4-pin end into the SKR Pico E socket. Wiring: README → Wiring, M27.1.
   - note:
   - paid:
 - [ ] **SPN-04** Optical endstop module, slot type (from the LAR-05 6-pack) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0719K9Z9R) · status: suggested
-  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="SPN-04"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the E4 home input reads
+  - <img src="docs/assets/parts/icon-endstop.svg" width="64" height="64" alt="SPN-04"> **Qty 1** · **Must meet:** Slotted optical switch module (TCST2103, 3.1 mm slot), 3.3–5 V supply, digital output the controller endstop input reads
   - *why:* Home · In the LAR-05 6-pack.
   - note:
   - paid:
-- [ ] **SPN-06** Axis fasteners (M3/M5 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0DBLCHK48) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="SPN-06"> **Qty 1** · **Must meet:** M3/M5 socket screws 8–30 mm, nuts and washers (motor mount, pulley, clamp)
-  - *why:* Motor mount, pulley, clamp · From the FRM-06 kit.
+- [ ] **SPN-06** Axis fasteners (M3 motor face + M2 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0D636MJ1N) · status: suggested
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="SPN-06"> **Qty 1** · **Must meet:** 4 × M3 × 8 for the NEMA 17 face; M2 socket screws 6–16 mm with nuts and washers
+  - *why:* Motor face (M3), brackets, flags, clamps (M2) · From the FRM-06 and FRM-07 kits.
   - note:
   - paid:
 - [ ] **SPN-07** Spin platter (direct drive) — print · print · status: suggested
@@ -514,17 +491,17 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 - [ ] **MSK-01** Narrow-band 3 W star LEDs, pre-soldered leads (7 bands, 450–660 nm) — 7 × $10.99 = $76.93 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0GJMJ5MWN) · status: suggested
   - <img src="docs/assets/parts/icon-led.svg" width="64" height="64" alt="MSK-01"> **Qty 7** · **Must meet:** Narrow-band LEDs on 20 mm stars with pre-soldered wire leads (no solder), 1–3 W, bandwidth ≤ 30 nm, spread over 450–660 nm
-  - *why:* Colour bands · One pack per band, $10.99 each (lens angle doesn't matter: the lenses are left off). The yellow and orange listings give no wavelength (typically ≈ 590 / ≈ 605 nm): measure them with the SPC sensor. Ring slot 8 stays spare. The first-draft CHANZON parts are bare chips that need soldering.
+  - *why:* Colour bands · BLOCKED (audit F09): do not buy or power until the LED driver circuit is reviewed (design.md). One pack per band, $10.99 each (lens angle doesn't matter: the lenses are left off). The yellow and orange listings give no wavelength (typically ≈ 590 / ≈ 605 nm): measure them with the SPC sensor. Ring slot 8 stays spare. The first-draft CHANZON parts are bare chips that need soldering.
   - note:
   - paid:
 - [ ] **MSK-02** Constant-current driver 350 mA — 1 × $5.41 = $5.41 · optional · [buy at digikey.com](https://www.digikey.com/en/products/detail/mean-well-usa-inc/NLDD-350H/13913618) · status: suggested
   - <img src="docs/assets/parts/icon-driver.svg" width="64" height="64" alt="MSK-02"> **Qty 1** · **Must meet:** Constant-current LED driver 350 mA, input covering 24 V
-  - *why:* One driver, one LED on at a time
+  - *why:* One driver, one LED on at a time · BLOCKED (audit F09): do not buy or power until the LED driver circuit is reviewed (design.md). 
   - note:
   - paid:
-- [ ] **MSK-03** Darlington array 8-ch — 1 × $3.84 = $3.84 · optional · [buy at digikey.com](https://www.digikey.com/en/products/detail/stmicroelectronics/ULN2803A/599591) · status: suggested
-  - <img src="docs/assets/parts/icon-chip.svg" width="64" height="64" alt="MSK-03"> **Qty 1** · **Must meet:** ULN2803A 8-channel Darlington array (500 mA per channel), DIP-18 (plugs into the breadboard)
-  - *why:* Pico selects the band (low-side)
+- [ ] **MSK-03** 4-channel MOSFET switch module, opto-isolated inputs, screw terminals (2 used: 8 channels) — 2 × $7.39 = $14.78 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0GY97176W) · status: suggested
+  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="MSK-03"> **Qty 2** · **Must meet:** 4-channel low-side MOSFET module, isolated inputs that switch at 3.3 V (3–20 V input), ≥ 0.5 A per channel at 24 V, screw terminals on every input and output (no solder)
+  - *why:* The ESP32-S3 hub selects the band (low-side switch on each LED cathode) · BLOCKED (audit F09): do not buy or power until the LED driver circuit is reviewed (design.md). Replaces the ULN2803A chip, which needed a breadboard. Same wiring: LED cathode → OUTn, inputs ← ESP32-S3 GPIO 8–14 and 21.
   - note:
   - paid:
 - [ ] **MSK-04** Heatsink 40 mm (from LSR-03 pack) — $0 (in another row) · optional · [buy at amazon.com](https://www.amazon.com/dp/B07D4FVC61) · status: suggested
@@ -537,14 +514,14 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Polarized capture (specular/diffuse separation)
   - note:
   - paid:
-- [ ] **SPC-01** AS7341 10-band spectral sensor breakout (STEMMA QT) — 1 × $18.95 = $18.95 · optional · [buy at adafruit.com](https://www.adafruit.com/product/4698) · status: suggested
-  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="SPC-01"> **Qty 1** · **Must meet:** AS7341 10-channel spectral sensor breakout, I²C address 0x39, 3.3 V, STEMMA QT / Qwiic
-  - *why:* Spectral reading of the spot at the zero point · I2C 0x39 on Pico GP16/GP17, shared with the OLED
+- [ ] **SPC-01** AS7341 spectral sensor breakout, 8 visible bands + clear + NIR (STEMMA QT) — 1 × $18.95 = $18.95 · optional · [buy at adafruit.com](https://www.adafruit.com/product/4698) · status: suggested
+  - <img src="docs/assets/parts/icon-board.svg" width="64" height="64" alt="SPC-01"> **Qty 1** · **Must meet:** AS7341 spectral sensor breakout (8 visible bands + clear + NIR), I²C address 0x39, 3.3 V, STEMMA QT / Qwiic
+  - *why:* Spectral reading of the spot at the zero point · I2C 0x39 on ESP32-S3 GPIO 1 (SDA) / 2 (SCL), shared with the OLED
   - note:
   - paid:
 - [ ] **SPC-02** JST-SH 4-pin to female jumper cable 150 mm — 1 × $0.95 = $0.95 · optional · [buy at adafruit.com](https://www.adafruit.com/product/4397) · status: suggested
   - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="SPC-02"> **Qty 1** · **Must meet:** JST-SH 4-pin (STEMMA QT) to female 2.54 mm sockets, ≈ 150 mm
-  - *why:* Sensor to Pico
+  - *why:* Sensor to the ESP32-S3 hub
   - note:
   - paid:
 - [ ] **MSK-06** LED bank ring on a 40 deg mast, polarizer holders — print · print · status: suggested
@@ -558,16 +535,16 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 ## 11 · 3D scan: capture
 
-0/6 decided · still to buy $3.33 · [bom.csv](phases/11-scan-capture/bom.csv) · [checklist](phases/11-scan-capture/README.md)
+0/5 decided · still to buy $2.33 · [bom.csv](phases/11-scan-capture/bom.csv) · [checklist](phases/11-scan-capture/README.md)
 
 - [ ] **SCN-01** Mounting putty 2 oz — 1 × $2.33 = $2.33 · [buy at amazon.com](https://www.amazon.com/dp/B003LZMHIY) · status: suggested
   - <img src="docs/assets/parts/icon-putty.svg" width="64" height="64" alt="SCN-01"> **Qty 1** · **Must meet:** Removable mounting putty
   - *why:* Holds objects on the tilted platter during scans
   - note:
   - paid:
-- [ ] **SCN-02** ChArUco scanning mat print — 1 × $1.00 = $1.00 · status: suggested
+- [ ] **SCN-02** ChArUco scanning mat (printed on TLS-08) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B01FV0F8H8) · status: suggested
   - <img src="docs/assets/parts/icon-chart.svg" width="64" height="64" alt="SCN-02"> **Qty 1** · **Must meet:** ChArUco mat printed at 100 % on matte paper
-  - *why:* Scale and pose check under the object · A service, not a store item. Free generator: ChArUco, A4/Letter, print at 100 %.
+  - *why:* Scale and pose check under the object · In the TLS-11 paper. Free generator: ChArUco, Letter, print at 100 %.
   - note:
   - paid:
 - [ ] **CAM-04** Second USB camera 12 MP IMX477, M12 mount (scan camera) — 1 × $59.99 = $59.99 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0C1G73QZD) · status: suggested
@@ -578,11 +555,6 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 - [ ] **CAM-05** Second M12 16 mm lens (scan camera) — 1 × $30.11 = $30.11 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0HJWVFD7R) · status: suggested
   - <img src="docs/assets/parts/icon-lens.svg" width="64" height="64" alt="CAM-05"> **Qty 1** · **Must meet:** Identical to CAM-02: 16 mm focal length (236 × 186 mm field at 650 mm), used at f/8 (2.0 mm stop)
   - *why:* No-switching kit: the scan camera stays at 650 mm; the measuring camera never moves or refocuses
-  - note:
-  - paid:
-- [ ] **CAM-08** M2.5 x 8 mm screws (4), second camera — $0 (in another row) · optional · [buy at amazon.com](https://www.amazon.com/dp/B07YS6D2GT) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="CAM-08"> **Qty 1** · **Must meet:** M2.5-0.45 × 8 mm pan-head machine screws
-  - *why:* Second camera (CAM-04) onto the scan camera plate (2nd camera kit; without it the CAM-07 screws move with the camera) · From the CAM-07 pack.
   - note:
   - paid:
 - [ ] **SCN-03** Platter risers (20/40/60 mm), scan camera plate (15 deg) — print · print · status: suggested
@@ -605,13 +577,13 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **STA-03** Buck converter 24 V to 5 V 3 A — 1 × $7.99 = $7.99 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0DBVYP91F) · status: suggested
-  - <img src="docs/assets/parts/icon-driver.svg" width="64" height="64" alt="STA-03"> **Qty 1** · **Must meet:** Buck converter 24 V in → 5.1 V out, ≥ 3 A, screw terminals on input and output
-  - *why:* Powers the Pi from BUS_24V (before the e-stop) · Set it to 5.1 V with the trimmer before connecting the Pi; check for screw terminals.
+  - <img src="docs/assets/parts/icon-driver.svg" width="64" height="64" alt="STA-03"> **Qty 1** · **Must meet:** Buck converter 18–24 V in → 5.1 V out, ≥ 3 A, screw terminals on input and output
+  - *why:* Powers the Pi from the pack (after the fuse, before the e-stop: the Pi stays up when the e-stop is pressed) · The Pi draws ~2–3 W from the pack even with the e-stop pressed: take the buck's `+` out of the lever connector for storage. Set it to 5.1 V with the trimmer before connecting the Pi; check for screw terminals.
   - note:
   - paid:
 - [ ] **STA-04** Micro-USB OTG adapter — 1 × $2.50 = $2.50 · optional · [buy at adafruit.com](https://www.adafruit.com/product/1099) · status: suggested
-  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="STA-04"> **Qty 1** · **Must meet:** Micro-USB OTG to USB-A adapter (powered USB hub if using two cameras)
-  - *why:* Camera into the Pi USB port
+  - <img src="docs/assets/parts/icon-cable.svg" width="64" height="64" alt="STA-04"> **Qty 1** · **Must meet:** Micro-USB OTG to USB-A adapter, then a powered USB hub (camera + SKR Pico USB-C cable)
+  - *why:* Camera and the SKR Pico into the Pi USB port · A powered USB hub is also needed in standalone mode (two devices on one port); it is not in this list yet: choose one when you reach stage 15.
   - note:
   - paid:
 - [ ] **STA-05** SSD1306 OLED 0.96 in I2C 128x64 — 1 × $17.50 = $17.50 · optional · [buy at adafruit.com](https://www.adafruit.com/product/326) · status: suggested
@@ -621,7 +593,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - paid:
 - [ ] **STA-06** Jumper wires female-female (10) — 1 × $1.95 = $1.95 · optional · [buy at adafruit.com](https://www.adafruit.com/product/1950) · status: suggested
   - <img src="docs/assets/parts/icon-jumper.svg" width="64" height="64" alt="STA-06"> **Qty 1** · **Must meet:** Female–female 2.54 mm jumper wires
-  - *why:* Pi UART to Pico; OLED · Consumable: set `have` if it's in your drawer.
+  - *why:* Pi UART to the ESP32-S3 hub; OLED · Consumable: set `have` if it's in your drawer.
   - note:
   - paid:
 - [ ] **STA-08** USB-A to micro-B data cable 1 m — 1 × $2.95 = $2.95 · optional · [buy at adafruit.com](https://www.adafruit.com/product/592) · status: suggested

@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/08.svg" width="100%" alt="Steps of stage 08">
 
-$16.68 · total so far $560.74 / $630
+$16.68 · total so far $554.78 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -28,12 +28,12 @@ Tick the boxes; `make done id=M25.1`.
 
 ### M25.2 Cradle, platter and stub axles
 
-**Time** 1 h · **Needs** 2 × 608 · TLT-05 2 × M8 × 35 + nuts · spacers (TBL-07f) · SPN-01 pancake motor · 4 × M3 × 8, 4 × M4 × 16 · M3 grub or M3 × 8 + nut · TLS-10 spanner
+**Time** 1 h · **Needs** 2 × 608 · TLT-05 2 × M8 × 35 + nuts · spacers (TBL-07f) · SPN-01 pancake motor · 4 × M3 × 8 (FRM-07), 4 × M2 × 12 · M2 × 6 + M2 nut · TLS-10 spanner
 
 #### Do
 
-1. Pancake motor under the cradle floor (shaft up through it, 4 × M3 × 8). Platter on the shaft: M3 nut in its slot, grub onto the D flat; platter top level with the stub-bolt axis (the end blocks stand 10 mm higher).
-2. Yoke on the drum (4 × M4 × 16 self-tap into the OG-40 holes) with its arms along ±Y: at M3 = 0 the tilt axis is square to the camera direction (+X) and the flag holes on the drum stay clear. The pulley-side arm is +Y.
+1. Pancake motor under the cradle floor (shaft up through it, 4 × M3 × 8). Platter on the shaft: M2 nut in its slot, M2 × 6 through the hub onto the D flat; platter top level with the stub-bolt axis (the end blocks stand 10 mm higher).
+2. Yoke on the drum (4 × M2 × 12 self-tap into the OG-40 pilots) with its arms along ±Y: at M3 = 0 the tilt axis is square to the camera direction (+X) and the flag holes on the drum stay clear. The pulley-side arm is +Y.
 3. Pulley side: bolt through 100T pulley → 1 mm shim → 608 (outer face of the arm) → 6.8 mm spacer → cradle nut. Other side: the same with the 9.4 mm spacer instead of the pulley. Hold each bolt head with the spanner; snug, not tight.
 
 #### Verify
@@ -51,12 +51,12 @@ Tick the boxes; `make done id=M25.2`.
 
 ### M25.3 Tilt drive and flag
 
-**Time** 45 min · **Needs** TLT-01 motor · TLT-02 280 mm belt · TLT-03 pulley · TLT-04 endstop · TBL-07b flag · 4 × M3 × 8
+**Time** 45 min · **Needs** TLT-01 motor · TLT-02 280 mm belt · TLT-03 pulley · TLT-04 endstop · TBL-07b flag · 4 × M3 × 8 (FRM-07)
 
 #### Do
 
 1. Motor on the inner face of the pulley-side arm above the axis, shaft out through the arm slot (4 × M3 × 8 in the slots); 20T pulley outside, level with the 100T; belt on; slide the motor up to tension (~3 mm deflection); tighten.
-2. Flag on a cradle end block at −90°; endstop on the arm; lead into the E4 Z-MIN socket (CTL-06, as M10.3).
+2. Flag on a cradle end block at −90°; endstop on the arm; lead into the SKR Pico Z-STOP socket (CTL-06, as M10.2).
 
 #### Verify
 
@@ -164,4 +164,4 @@ Tick the boxes; `make done id=M26.2`.
 
 Both fits in phases/08-tilt/design.md → Results; commit.
 
-[Sources](../../REFERENCES.md): G3 · G8 · G23 · G25 · G30 · T2 · T3 · T4 · T5 · T10 · T12 · T13 · T14 · T16 · T17 · T21 · T25 · T26 · V9 · N1 · N5 · N7 · N8 · H3 · H20 · H21 · H48 · P40 · P41 · P42 · P43 · F12
+[Sources](../../REFERENCES.md): G3 · G8 · G23 · G25 · G30 · T2 · T3 · T4 · T5 · T10 · T12 · T13 · T14 · T16 · T17 · T21 · T25 · T26 · V9 · N1 · N5 · N7 · N8 · H3 · H20 · H21 · H48 · P41 · P42 · P43 · P58 · F12

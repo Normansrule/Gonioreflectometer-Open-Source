@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/04.svg" width="100%" alt="Steps of stage 04">
 
-$74.54 · total so far $362.52 / $630
+$74.54 · total so far $362.85 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -35,7 +35,7 @@ Plate Ø, `RIM_TEETH`, `gear_ratio` in phases/04-light-arm/design.md → Results
 
 #### Do
 
-1. Print 7 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08c_arm_segment.stl` (the 8th rim segment, with the upright socket), 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl` (8 washers).
+1. Print 7 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08c_arm_segment.stl` (the 8th rim segment, with the upright socket), 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08e_cross_clamp.stl`, `LAR-08f_upright_bar.stl` and `LAR-08g_arm_bar.stl` (lying flat), 4 × `FRM-09c_protractor_segment.stl` (ring scale + lazy-Susan clamp, 80° each).
 
 #### Verify
 
@@ -47,19 +47,20 @@ Tick the boxes; `make done id=M13.2`.
 
 ### M13.3 Lazy Susan, rim and belt
 
-**Time** 1.25 h · **Needs** LAR-01 lazy Susan · LAR-03 belt · FRM-12 wood screws + 4 mm printed washers · M4 × 16 + nuts (FRM-06) · TLS-09 CA glue · TLS-04 cutter
+**Time** 1.25 h · **Needs** LAR-01 lazy Susan · LAR-03 belt · 4 × FRM-09c ring-scale clamps · 8 × M2 × 10 + washers · M2 × 12 + nuts + the 2 wide printed washers (TBL-07f) · TLS-09 CA glue · TLS-04 cutter
 
 #### Do
 
-1. Lazy Susan centred on the template circle; #8 wood screws through its bottom-plate holes, each through a 4 mm printed washer (the steel plate is thin: without the washer the 16 mm screw pokes through the plywood).
-2. Rim segments + the arm segment on the top plate, closed ring: turn the ring so an arm-segment slot lands on a plate hole; M4 × 16 + nut through every slot that lands on a hole; CA-glue the rest (the arm segment's whole underside).
+1. Lazy Susan on the deck centre, its bottom plate inside the ring of 8 pilot holes (r 163). Ring-scale segments end to end from 20° to 340° (0° = +X, toward the camera; the gap is the M4 motor): each inner wall against the bottom plate's edge, its lip over the plate; 2 × M2 × 10 + washer into the deck pilots. The lazy Susan needs no screws of its own.
+2. Rim segments + the arm segment on the top plate, closed ring: turn the ring so an arm-segment slot lands on a plate hole; M2 × 12 + wide printed washer + nut through every slot that lands on a hole; CA-glue the rest (the arm segment's whole underside).
 3. CA-glue the GT2 belt teeth-out on the 6 mm band, its edges flush with the band's edges, ends butted, no gap; it ties the segments together.
 
 #### Verify
 
 - [ ] Count the belt teeth: equals `RIM_TEETH` ± 1.
 - [ ] No tooth step at the joint (run a fingernail over it).
-- [ ] No screw tip under the plywood.
+- [ ] Bottom plate can't slide or lift (push hard sideways).
+- [ ] The 20° and 340° scale ends sit symmetric about the line deck centre → camera pillar (string line).
 
 #### If a check fails
 
@@ -71,12 +72,12 @@ Tooth count in design.md.
 
 ### M13.4 Motor
 
-**Time** 30 min · **Needs** LAR-02 motor · LAR-04 20T pulley · LAR-08b mount · 4 × M3 × 8 · FRM-12 wood screws
+**Time** 30 min · **Needs** LAR-02 motor · LAR-04 20T pulley · LAR-08b mount · 4 × M3 × 8 (FRM-07) · 2 × M2 × 12 + washers
 
 #### Do
 
 1. Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt (its flanges pass above and below the band).
-2. Mount on its template outline at 0° (+X), base outside the lazy Susan; slide it in until the pulley meshes the rim belt fully, then screw the base down (2 screws in the slots).
+2. Mount at 0° (+X), base outside the lazy Susan, its two slots over the two deck pilots; slide it in until the pulley meshes the rim belt fully, then M2 × 12 + washer through each slot.
 
 #### Verify
 
@@ -92,12 +93,12 @@ Tick the boxes; `make done id=M13.4`.
 
 ### M13.5 Arm
 
-**Time** 45 min · **Needs** LAR-08c arm segment (in the ring) · 2 × FRM-02 2020 (upright + arm) · LAR-08e cross clamp · M4 × 16 + nuts · LSR-05 lamp body (stage 06, or a dummy)
+**Time** 45 min · **Needs** LAR-08c arm segment (in the ring) · LAR-08f upright + LAR-08g arm bars · LAR-08e cross clamp · 3 × M2 × 16 · LSR-05 lamp body (stage 06, or a dummy)
 
 #### Do
 
 1. The upright stands in the arm segment's socket, 36 mm beside the lamp's beam line (so it never shades the sample).
-2. 2020 upright in the socket (M5 × 10 + T-nut). Cross clamp on the upright (the uncut 500 mm upright runs straight through it); horizontal 2020 arm in its side channel, parallel to the beam line, pointing outward; the lamp's clamp is offset so its beam centre passes through the zero point, 300 mm out, at 150 mm.
+2. Upright bar in the socket, M2 × 16 through the socket wall into its lower pilot. Cross clamp down the upright until its screw meets the upper pilot (M2 × 16). Arm bar through the clamp's side channel, parallel to the beam line, pointing outward, its inner pilot under the clamp's top screw (M2 × 16). The lamp's clamp takes the outer pilot (M18.1), so the beam centre passes through the zero point, 300 mm out, at 150 mm.
 
 #### Verify
 
@@ -118,13 +119,13 @@ M4 returns to the same spot every time (≤ 0.1°). · 0/4 steps done · ~2.2 h 
 
 #### Do
 
-1. Mount the TCST2103 so the arm flag cuts it at 20° (lead as in M10.3).
-2. Roller over-travel switch (LAR-06) screwed to the base 3° beyond. Unplug the adapter; cut the red wire where it passes the switch, strip both ends, one under COM, one under NC.
+1. Mount the TCST2103 so the arm flag cuts it at 20°: M2 × 8 + washer through one module hole into the nearest spare deck pilot (40 mm grid), double-sided tape under it (lead as in M10.3).
+2. Roller over-travel switch (LAR-06) on the deck 3° beyond (M2 into spare pilots, or double-sided tape). Press the e-stop; cut the red wire where it passes the switch, strip both ends, one under COM, one under NC.
 
 #### Verify
 
 - [ ] `opengonio send '?'` shows `Pn:X` with the flag in the slot.
-- [ ] Pressing the roller switch drops E4 VIN to 0 V (and the hub prints `POWER 0`).
+- [ ] Pressing the roller switch drops SKR Pico POWER to 0 V (and the hub prints `POWER 0`).
 
 #### Record
 
@@ -138,15 +139,19 @@ Tick the boxes; `make done id=M14.1`.
 
 1. Set `installed_phase: 4` and `M4.gear_ratio` (from M13.1).
 2. `make test`
-3. `opengonio home` ten times.
+3. Power-cycle the SKR Pico (e-stop, then USB): `opengonio send '?'`.
+4. `opengonio home` ten times.
 
 #### Verify
 
-- [ ] Tests pass; home finishes 10/10; arm stops on the flag, never on the roller switch.
+- [ ] Tests pass.
+- [ ] After power-up `?` shows `<Alarm` (must_home: nothing moves until homed); after homing `<Idle`.
+- [ ] Home finishes 10/10; arm stops on the flag, never on the roller switch.
 
 #### If a check fails
 
-- Homes the wrong way: `homing.positive_direction` for X in `firmware/fluidnc/config.yaml`.
+- Homes the wrong way: clear the X bit of `$23` (homing direction mask) in `tools/grblhal_settings.py`, `make build`, `bash scripts/controller.sh settings`.
+- Still `<Alarm` after homing the installed axes: your grblHAL build keeps the startup lock until every configured axis is homed. Note the version (`$I`) in design.md, set `$22=11` (no init lock) in `tools/grblhal_settings.py`, `make build`, `bash scripts/controller.sh settings`: the software still refuses every move until it has homed and checked the position.
 
 #### Record
 
@@ -178,7 +183,7 @@ Three readings in design.md.
 
 #### Do
 
-1. Laser on the base, small mirror taped to the arm, spot on a wall 2.0 m away (0.1° = 7 mm).
+1. Laser on the deck, small mirror taped to the arm, spot on a wall 2.0 m away (0.1° = 7 mm).
 2. `opengonio repeat M4 --at 60 --away 30 --n 20`; type each spot offset (mm).
 3. `opengonio repeat M4 --at 60 --home --n 10`
 
@@ -194,4 +199,4 @@ Three readings in design.md.
 
 Both JSON summaries in phases/04-light-arm/design.md → Results; commit.
 
-[Sources](../../REFERENCES.md): R1 · G10 · N15 · N47 · H2 · H11 · H16 · H17 · H18 · H26 · P40 · P42 · P43 · P44 · M1 · M2 · M10
+[Sources](../../REFERENCES.md): R1 · G10 · N15 · N47 · H2 · H11 · H16 · H17 · H18 · H26 · P42 · P43 · P44 · P58 · M1 · M2 · M10

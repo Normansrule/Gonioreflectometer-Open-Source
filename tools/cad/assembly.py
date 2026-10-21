@@ -4,7 +4,7 @@ it arrives as an Assembly with every part separate and named by BOM ID).
 
 Printed parts come from tools/cad/parts.py, bought parts from the dummies in tools/cad/bought.py (envelopes: swap in
 vendor models from cad/README.md). Pose shown: M4 = 90 deg (light arm on +Y), M3 = 0, M2 = 90 deg (platter face up).
-Frame: origin under the zero point on the plywood top, +X toward the camera, z up; zero point at (0, 0, 150).
+Frame: origin under the zero point on the deck top, +X toward the camera, z up; zero point at (0, 0, 150).
 Positions are v0 (from the docs and the CAD constants); expect to nudge some by a few mm.
 SPDX-License-Identifier: CERN-OHL-S-2.0
 """
@@ -48,7 +48,7 @@ def rot_z(shape, deg, t=(0, 0, 0)):
     return s.rotate(cq.Vector(0, 0, 0), cq.Vector(0, 0, 1), deg).translate(cq.Vector(*t))
 
 
-GROUPS: dict[str, str] = {}   # part name -> what moves it: fixed, arm (M4, about z), table (M3, about z), tilt (M2, about y at z 150)
+GROUPS: dict[str, str] = {}   # part name -> what moves it: fixed, arm (M4), table (M3), tilt (M2), spin (M1); transforms in poses.py
 
 
 def build() -> cq.Assembly:
@@ -58,32 +58,43 @@ def build() -> cq.Assembly:
 
     def add(name, shape, color, g="fixed"):
         n[name] = n.get(name, 0) + 1
-        full = f"{name}_{n[name]}" if n[name] > 1 or name in ("FRM-09b", "LAR-08a", "FRM-09c", "FRM-09d", "FRM-09e", "FRM-02") else name
+        full = f"{name}_{n[name]}" if n[name] > 1 or name in ("LAR-08a", "FRM-09c", "FRM-09d", "FRM-09i") else name
         a.add(shape, name=full, color=color)
         GROUPS[full] = g
 
     Z = P.TABLE_Z
     # ---- frame
-    add("FRM-01_plywood", orient(B.box(610, 610, 12), t=(0, 0, -12)), BUY)
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            add("FRM-09b", orient(P.foot(), t=(sx * 280, sy * 280, -24)), PRINT)
-    for x in (237, 282):
-        add("FRM-09d", orient(P.extrusion_saddle(), t=(x, 0, 0)), PRINT)
-    add("FRM-02", orient(B.vslot(500), z_to=(1, 0, 0), y_to=(0, 1, 0), t=(P.OUTRIGGER_X[0], 0, 16)), BUY)  # outrigger
-    add("FRM-09f_end_foot", orient(P.end_foot(), t=(P.END_FOOT_X, 0, -24)), PRINT)
+    for k, tile in enumerate(P.TILE_NAMES):                                          # printed deck, flipped from print pose
+        i, j = k % 3 - 1, k // 3 - 1
+        add(f"FRM-01{chr(97 + k)}_deck_{tile}", orient(P.deck_tile(i, j), z_to=(0, 0, -1), y_to=(0, 1, 0), t=(P.DECK_TILE * i, P.DECK_TILE * j, 0)), PRINT)
+    for x in P.SADDLES_X:
+        add("FRM-09d", orient(P.bar_saddle(), t=(x, 0, 0)), PRINT)
+    vert = dict(z_to=(-1, 0, 0), y_to=(0, 1, 0))                                     # bar along world z, `top` pilots along x
+    add("FRM-02a_outrigger_1", orient(P.outrigger_bar(0), t=(P.OUTRIGGER_X[0], 0, 16)), PRINT)
+    add("FRM-02b_outrigger_2", orient(P.outrigger_bar(1), t=(P.OUT_JOINT, 0, 16)), PRINT)
+    add("FRM-09i", orient(P.bar_coupler(), z_to=(1, 0, 0), y_to=(0, 0, 1), t=(P.OUT_JOINT - P.COUPLER_L / 2, 0, 16)), PRINT)
+    add("FRM-09f_end_foot", orient(P.end_foot(), t=(P.END_FOOT_X, 0, -P.DECK_H)), PRINT)
     add("FRM-09h_camera_pillar", orient(P.camera_pillar(), t=(P.CAM_POST_X, 0, 12)), PRINT)            # measuring camera
-    add("FRM-09e", orient(P.post_socket(), t=(P.SCAN_POST_X, 0, 12)), PRINT)
-    add("FRM-02", orient(B.vslot(500), t=(P.SCAN_POST_X, 0, 36)), BUY)                                    # scan post
+    add("FRM-09e_post_socket", orient(P.post_socket(), t=(P.SCAN_POST_X, 0, 12)), PRINT)
+    add("FRM-02c_scan_post_1", orient(P.scan_post_bar(0), t=(P.SCAN_POST_X, 0, P.POST_Z0), **vert), PRINT)
+    add("FRM-02d_scan_post_2", orient(P.scan_post_bar(1), t=(P.SCAN_POST_X, 0, P.POST_JOINT), **vert), PRINT)
+    add("FRM-09i", orient(P.bar_coupler(), t=(P.SCAN_POST_X, 0, P.POST_JOINT - P.COUPLER_L / 2)), PRINT)
     for k in range(4):
         add("FRM-09c", rot_z(P.protractor_segment(), 20 + 80 * k), PRINT)
     # ---- power and controller
     add("PWR-18a_power_box", orient(P.power_box(), t=(220, -220, 0)), PRINT)
     add("PWR-18b_power_lid", orient(P.power_lid(), t=(220, -220, P.BOX_H)), PRINT)
-    add("PWR-13_estop", orient(B.estop(), t=(220, -220, P.BOX_H + 3.2)), BUY)
-    add("CTL-10b_controller_tray", orient(P.controller_tray(), t=(-190, 220, 0)), PRINT)
-    add("CTL-01_fysetc_e4", orient(B.e4_board(), t=(-190 - 50, 220, 9)), BUY)
-    add("CTL-02_pico_h", orient(B.pico_h(), z_to=(0, 0, -1), t=(-190 + 52, 220 - 42, P.PICO_PEG + 1.0)), BUY)   # pins up
+    add("PWR-28_estop", orient(B.estop_cheap(), t=(220 + P.ESTOP_AT[0], -220 + P.ESTOP_AT[1], P.BOX_H + 3.2)), BUY)
+    add("PWR-21_battery", orient(B.battery_pack(), t=(220 + P.PACK_AT[0], -220 + P.PACK_AT[1], P.PAD_Z)), BUY)
+    add("PWR-29_drok_cc_cv", orient(B.drok_cc_cv(), t=(220 + P.DROK_AT[0], -220 + P.DROK_AT[1], P.PAD_Z)), BUY)
+    add("PWR-27_pd_trigger", orient(B.pd_trigger(), t=(220 + P.TRIG_AT[0], -220 + P.TRIG_AT[1], P.PAD_Z)), BUY)
+    add("PWR-04_fuse_holder", orient(B.fuse_holder(), t=(220 + P.FUSE_AT[0], -220 + P.FUSE_AT[1], 2.4 + 1.5)), BUY)
+    tx, ty = P.TRAY_XY
+    add("CTL-10b_controller_tray", orient(P.controller_tray(), t=(tx, ty, 0)), PRINT)
+    add("CTL-01_btt_skr_pico", orient(B.skr_pico(), y_to=(0, -1, 0), t=(tx + P.SKR_AT[0], ty + P.SKR_AT[1], 3 + P.SKR_STANDOFF)), BUY)   # turned 180 deg
+    add("CTL-02_esp32s3_hub", orient(B.esp32s3_devkitc(), t=(tx + P.ESP_AT[0], ty + P.ESP_AT[1], 3 + P.ESP_PED + 1.0)), BUY)   # pins up, 1 mm foam tape
+    add("PWR-10_opto_module", orient(B.B_PARTS["PWR-10"][1](), t=(tx + 47, ty + 40, 3)), BUY)
+    add("LSR-02_led_driver", orient(B.ldd_module(), z_to=(0, 0, -1), t=(tx + 40, ty + 5, 3 + 12.2)), BUY)   # pins up
     # ---- light arm (M4 = 90 deg: arm on +Y)
     add("LAR-01_lazy_susan", orient(B.lazy_susan()), BUY)
     lead = P.UPRIGHT_LEAD                                                       # lamp on +Y; upright 15.3 deg further on
@@ -93,13 +104,13 @@ def build() -> cq.Assembly:
     add("LAR-08c_arm_segment", rot_z(P.arm_segment(), rim0, (0, 0, 8)), PRINT, g="arm")
     R = P.RING_MOTOR_R
     add("LAR-08b_ring_motor_mount", orient(P.ring_motor_mount(), t=(R, 0, 0)), PRINT)
-    add("LAR-02_motor_M4", orient(B.nema17(48, 24), z_to=(0, 0, -1), y_to=(0, 1, 0), t=(R, 0, 30)), BUY)
+    add("LAR-02_motor_M4", orient(B.nema17(38, 24), z_to=(0, 0, -1), y_to=(0, 1, 0), t=(R, 0, 30)), BUY)
     add("LAR-04_pulley_M4", orient(B.gt2_20t(), t=(R, 0, 8)), BUY)
     ux, uy = -P.UPRIGHT_OFFSET, math.sqrt(P.ARM_R ** 2 - P.UPRIGHT_OFFSET ** 2)  # upright beside the beam line (x = 0)
-    add("FRM-02", orient(B.vslot(500), t=(ux, uy, 8 + P.RIM_H + 4)), BUY, g="arm")                    # upright
-    arm_z = 150 + 48 / 2 + 12                                                                           # lamp clamp channel centre
+    add("LAR-08f_upright_bar", orient(P.upright_bar(), t=(ux, uy, P.UPRIGHT_Z0), **vert), PRINT, g="arm")
+    arm_z = P.ARM_Z                                                                                     # lamp clamp channel centre
     add("LAR-08e_cross_clamp", orient(P.cross_clamp(), t=(ux + 11, uy, arm_z - 16)), PRINT, g="arm")
-    add("FRM-02", orient(B.vslot(500), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(P.LAMP_ARM_X, uy, arm_z)), BUY, g="arm")   # horizontal arm
+    add("LAR-08g_arm_bar", orient(P.arm_bar(), z_to=(0, 0, 1), y_to=(-1, 0, 0), t=(P.LAMP_ARM_X, P.ARM_Y0, arm_z)), PRINT, g="arm")
     ly = 300.0 + P.LAMP_COB_Z                                                    # back face: COB 300 mm from the zero point
     lamp = dict(z_to=(0, -1, 0), y_to=(0, 0, 1), t=(0, ly, 150))                     # beam axis through the zero point
     add("LSR-05a_lamp", orient(P.lamp_tube(), **lamp), PRINT, g="arm")
@@ -115,17 +126,17 @@ def build() -> cq.Assembly:
     for zz in (Z["b1"], Z["b2"]):
         add("FRM-08_608", orient(B.cyl(22, 7).cut(B.cyl(8, 7)), t=(0, 0, zz)), BUY, g="table")
     add("TBL-07c_table_motor_bracket", orient(P.table_motor_bracket(), t=(-P.TABLE_BELT_C, 0, 0)), PRINT)
-    add("TBL-01_motor_M3", orient(B.nema17(48, 24), t=(-P.TABLE_BELT_C, 0, 48)), BUY)
+    add("TBL-01_motor_M3", orient(B.nema17(38, 24), t=(-P.TABLE_BELT_C, 0, 48)), BUY)
     add("TBL-03_pulley_M3", orient(B.gt2_20t(), t=(-P.TABLE_BELT_C, 0, 53.7)), BUY)
     add("TBL-02_belt_232", orient(B.belt_loop(6.37, 31.83, P.TABLE_BELT_C), t=(-P.TABLE_BELT_C, 0, Z["drum"] + 1.2)), BUY)
     # ---- tilt (yoke arms along Y) + spin, M2 = 90 deg: platter face up
     yz = Z["hub_top"]
     add("TLT-07a_tilt_yoke", rot_z(P.tilt_yoke(), 90, (0, 0, yz)), PRINT, g="table")
     add("TLT-07c_tilt_cradle", rot_z(P.tilt_cradle(), 90, (0, 0, 150 + P.SPIN["motor_face"])), PRINT, g="tilt")
-    add("SPN-07a_spin_platter", orient(P.spin_platter(), t=(0, 0, 150 - P.SPIN["platter"])), PRINT, g="tilt")
+    add("SPN-07a_spin_platter", orient(P.spin_platter(), t=(0, 0, 150 - P.SPIN["platter"])), PRINT, g="spin")
     add("SPN-01_motor_M1", orient(B.nema17(21.5, 20), t=(0, 0, 150 + P.SPIN["motor_face"])), BUY, g="tilt")
     ya = P.YOKE_INNER / 2
-    add("TLT-01_motor_M2", orient(B.nema17(48, 24), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(0, ya, yz + P.YOKE_SEAT + P.TILT_BELT_C)), BUY, g="table")
+    add("TLT-01_motor_M2", orient(B.nema17(38, 24), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(0, ya, yz + P.YOKE_SEAT + P.TILT_BELT_C)), BUY, g="table")
     add("TLT-07b_pulley_100T", orient(P.gt2_pulley(100), z_to=(0, 1, 0), y_to=(0, 0, 1), t=(0, ya + 13, 150)), PRINT, g="tilt")
     for s in (-1, 1):
         add("TLT-05_stub_bolt", orient(B.bolt(8, 35, 13, 5.3, True), z_to=(0, -s, 0), y_to=(0, 0, 1), t=(0, s * (ya + 12 + 1 + 9.4 + 5.3), 150)), BUY, g="tilt")
@@ -165,7 +176,7 @@ def main() -> int:
         print(f"{OUT.relative_to(ROOT)} up to date (CAD sources unchanged; --force to rebuild)")
         return 0
     a = build()
-    a.save(str(OUT), exportType="STEP")
+    a.export(str(OUT), exportType="STEP")
     stepio.stabilise(OUT)
     STAMP.write_text(digest + "\n")
     print(f"{len(a.children)} parts -> {OUT.relative_to(ROOT)} ({OUT.stat().st_size / 1e6:.1f} MB)")

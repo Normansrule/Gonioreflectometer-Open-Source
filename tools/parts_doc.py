@@ -194,7 +194,7 @@ def main(argv=None) -> int:
                 f"${f([r for r in core if r['Status'] in ('have', 'ordered')]):.2f} | "
                 f"${sum(float(r['Paid USD']) for r in rows if r['Paid USD']):.2f} | "
                 f"{sum(r['Status'] != 'suggested' for r in rows)}/{len(rows)} parts | ${f([r for r in tools if to_buy_tool(r)]):.2f} |\n\n"
-                + " · ".join(f"Optional {k} +${f(v):.2f}" for k, v in kits.items()))
+                + " · ".join(f"Optional {k} +\\${f(v):.2f}" for k, v in kits.items()))
         t = re.sub(r"\$\d+\.\d\d total \(cap \$\d+\)", f"${f(core):.2f} total (cap ${bom_check.HARD_CAP:.0f})", t)   # intro line
         head, rest = t.split("<!-- budget:start -->", 1)
         readme.write_text(f"{head}<!-- budget:start -->\n{body}\n<!-- budget:end -->{rest.split('<!-- budget:end -->', 1)[1]}",

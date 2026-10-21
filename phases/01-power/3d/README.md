@@ -19,16 +19,14 @@ Every bought part has a model in the repo (dummy in `cad/bought/` or open model 
 
 | ID | Part | In the repo | Real model |
 |---|---|---|---|
-| PWR-01 | AC adapter 24 V 2.5 A 60 W | [`PWR-01_gst60a24_adapter.step`](../../../cad/bought/PWR-01_gst60a24_adapter.step) | [link](https://www.meanwellusa.com/) (search GST60A → product page → 3D STEP); or the Mouser page's ECAD/CAD model link |
-| PWR-02 | IEC C13 mains cord | [`PWR-02_iec_c13_cord.step`](../../../cad/bought/PWR-02_iec_c13_cord.step) | None published - use the dummy (generic cord) |
-| PWR-03 | DC jack to screw-terminal adapter 2.1 mm | [`PWR-03_dc_jack_screw_terminal.step`](../../../cad/bought/PWR-03_dc_jack_screw_terminal.step) | None published - use the dummy |
-| PWR-04 | Inline 5 x 20 mm fuse holder | [`PWR-04_inline_fuse_holder.step`](../../../cad/bought/PWR-04_inline_fuse_holder.step) | Digi-Key product page (Link column) → EDA / CAD Models (free login) |
-| PWR-05 | Fuse 3.15 A time-lag 5 x 20 mm | [`PWR-05_fuse_5x20.step`](../../../cad/bought/PWR-05_fuse_5x20.step) | Digi-Key product page (Link column) → EDA / CAD Models (free login) |
-| PWR-10 | Optocoupler LTV-817 / PC817 (DIP-4) | [`PWR-10_kicad_DIP-4_W7.62mm_pc817.step`](../../../cad/open/PWR-10_kicad_DIP-4_W7.62mm_pc817.step) | cad/open/PWR-10_kicad_DIP-4_W7.62mm_pc817.step |
-| PWR-11 | Resistors 10k (2) | [`PWR-11_kicad_R_Axial_DIN0207_resistor.step`](../../../cad/open/PWR-11_kicad_R_Axial_DIN0207_resistor.step) | cad/open/PWR-11_kicad_R_Axial_DIN0207_resistor.step |
-| PWR-13 | Emergency stop 22 mm latching, 1 NC | [`PWR-13_estop_22mm.step`](../../../cad/bought/PWR-13_estop_22mm.step) | [link](https://us.idec.com/) (search YW1B-V4E01R → CAD → STEP; button + contact block) |
+| PWR-21 | 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS) | [`PWR-21_battery_6s_24v_5ah.step`](../../../cad/bought/PWR-21_battery_6s_24v_5ah.step) | None published - repo model at the listing size 78 x 50 x 72 mm (listing read 2026-10-12; measure on arrival) |
+| PWR-27 | USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals | [`PWR-27_usb_c_pd_trigger.step`](../../../cad/bought/PWR-27_usb_c_pd_trigger.step) | None published - repo model at an ESTIMATED 60 x 30 mm (no size published; measure on arrival) |
+| PWR-29 | DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W) | [`PWR-29_drok_cc_cv_35w.step`](../../../cad/bought/PWR-29_drok_cc_cv_35w.step) | None published - repo model at the maker's size 72 x 59 x 32 mm (droking.com) |
+| PWR-04 | Inline 5 x 20 mm fuse holder, 16 AWG (2-pack) | [`PWR-04_fuse_holder_inline_5x20.step`](../../../cad/bought/PWR-04_fuse_holder_inline_5x20.step) | None published - repo model at an ESTIMATED body Ø12 x 50 mm (no size published; measure on arrival) |
+| PWR-05 | Fuse 3.15 A time-lag 5 x 20 mm | [`PWR-05_fuse_5x20.step`](../../../cad/bought/PWR-05_fuse_5x20.step) | None needed - 5 x 20 mm cylinder (repo model) |
+| PWR-28 | Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack) | [`PWR-28_estop_22mm_1no1nc.step`](../../../cad/bought/PWR-28_estop_22mm_1no1nc.step) | None published - repo model at the listing size (40 mm head, 70 mm overall height) |
+| PWR-10 | Optocoupler module PC817, 24 V input, screw terminals (2-pack) | [`PWR-10_pc817_opto_module_24v.step`](../../../cad/bought/PWR-10_pc817_opto_module_24v.step) | None published - repo model at the maker size 66 x 16.5 x 12 mm |
 | PWR-15 | 18 AWG silicone wire red/black, 1 m pair | [`PWR-15_wire_18awg_pair.step`](../../../cad/bought/PWR-15_wire_18awg_pair.step) | None published - use the dummy (wire) |
-| PWR-19 | Half-size breadboard (400 points) | [`PWR-19_adafruit_64_halfsize_breadboard.step`](../../../cad/open/PWR-19_adafruit_64_halfsize_breadboard.step) | cad/open/PWR-19_adafruit_64_halfsize_breadboard.step |
-| PWR-20 | Lever wire connectors, WAGO 221 assortment (12) | [`PWR-20_lever_connector_221_412.step`](../../../cad/bought/PWR-20_lever_connector_221_412.step) | [link](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) (Downloads → STEP) |
+| PWR-20 | Lever wire connectors, WAGO 221 assortment (28) | [`PWR-20_lever_connector_221_412.step`](../../../cad/bought/PWR-20_lever_connector_221_412.step) | [link](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) (Downloads → STEP) |
 
 Design notes: [../design.md](../design.md).

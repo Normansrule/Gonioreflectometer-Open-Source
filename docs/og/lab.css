@@ -1,0 +1,99 @@
+/* The lab page (docs/lab.html): instruments on the raking-light tokens in og.css.
+   SPDX-License-Identifier: CC-BY-SA-4.0 */
+
+.bar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: var(--s-5);
+  padding: var(--s-3) var(--margin);
+  background: var(--ground);
+}
+.bar .mark { font-size: 1.5rem; text-decoration: none; white-space: nowrap; }
+.bar nav { display: flex; gap: var(--s-5); overflow-x: auto; margin-right: auto; scrollbar-width: none; }
+.bar nav::-webkit-scrollbar { display: none; }
+.bar nav a { color: var(--ink-2); font-size: var(--step-small); text-decoration: none; white-space: nowrap; padding: var(--s-2) 0; }
+@media (hover: hover) and (pointer: fine) { .bar nav a:hover { color: var(--ink); } }
+.bar .theme { min-height: 36px; padding: 0 var(--s-4); flex: none; }
+@media (max-width: 720px) {
+  .bar { flex-wrap: wrap; row-gap: 0; }
+  .bar nav { order: 3; width: 100%; margin: 0; }
+  .bar .theme { margin-left: auto; }
+}
+
+main { max-width: 1240px; margin: 0 auto; padding: 0 var(--margin) var(--s-9); }
+section { padding: var(--s-9) 0 0; scroll-margin-top: 72px; }
+.intro { padding-top: var(--s-8); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-7); align-items: end; }
+.intro figure { margin: 0; }
+.intro img { width: 100%; height: auto; border-radius: var(--radius); }
+.intro figcaption { margin-top: var(--s-2); font-size: var(--step-small); color: var(--ink-2); }
+@media (max-width: 900px) { .intro { grid-template-columns: minmax(0, 1fr); } }
+.intro h1 { font-size: var(--step-display); }
+.lead { font-size: var(--step-lead); line-height: 1.4; color: var(--ink-2); max-width: 46ch; margin-top: var(--s-5); }
+h2 { font-family: var(--font-display); font-size: var(--step-head); letter-spacing: -0.015em; line-height: 1.05; margin-bottom: var(--s-3); }
+.sub { color: var(--ink-2); margin: 0 0 var(--s-5); max-width: 72ch; }
+code { font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 0.88em; color: var(--ink); }
+.note { margin: 0 0 var(--s-4); color: var(--ink-2); font-size: var(--step-small); max-width: 72ch; }
+.note::before, .status::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: var(--s-2); border-radius: 1px; background: var(--light); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--s-4); }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--ground-2); border-radius: var(--radius); padding: var(--s-5); min-width: 0; }
+canvas { width: 100%; height: auto; background: var(--ground); border-radius: var(--radius); touch-action: none; }
+.full { width: 100%; border-radius: var(--radius); background: var(--ground-2); }
+section > .full + .full { margin-top: var(--s-4); }
+
+label { display: grid; grid-template-columns: 116px minmax(0, 1fr) 64px; align-items: center; gap: var(--s-3);
+        font-size: var(--step-small); color: var(--ink-2); margin: var(--s-2) 0; min-height: 36px; }
+label output, label > span { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink); }
+@media (max-width: 480px) { label { grid-template-columns: 88px minmax(0, 1fr) 56px; } }
+select { /* taste-skill-ignore: a form field */ width: 100%; min-width: 0; min-height: 36px; padding: 0 var(--s-2); background: var(--ground); color: var(--ink);
+         border: 1px solid var(--rule); border-radius: var(--radius); font-size: var(--step-small); text-overflow: ellipsis; }
+
+/* range: a tungsten thumb on a dim track */
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; cursor: pointer; }
+input[type=range]::-webkit-slider-runnable-track { height: 3px; background: var(--ground-4); }
+input[type=range]::-moz-range-track { height: 3px; background: var(--ground-4); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6.5px; border: 0;
+  border-radius: 50%; background: var(--light-mark); transition: transform var(--t-press) var(--ease-out); }
+input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--light-mark);
+  transition: transform var(--t-press) var(--ease-out); }
+input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); }
+input[type=range]:active::-moz-range-thumb { transform: scale(1.2); }
+
+.read { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2); margin-top: var(--s-4); }
+.read div { background: var(--ground); border-radius: var(--radius); padding: var(--s-3); }
+.read small { display: block; color: var(--ink-2); font-size: 0.8125rem; }
+.read span { font-size: 1.375rem; font-variant-numeric: tabular-nums; }
+
+.status { margin-top: var(--s-4); padding: var(--s-3) var(--s-4); background: var(--ground); border-radius: var(--radius);
+          font-size: var(--step-small); }
+.status::before { background: var(--patch-grey); }
+.status.ok::before { background: var(--patch-green); }
+.status.warn::before, .status.spec::before { background: var(--light); }
+.status.bad::before { background: var(--patch-red); }
+.ok, .warn, .bad, .spec { color: var(--ink); }
+#partinfo b, .status b { font-weight: 600; }
+
+.phase { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-2) 0 var(--s-4); }
+.phase button { min-height: 36px; padding: 0 var(--s-4); background: var(--ground-3); color: var(--ink-2); border: 0;
+  border-radius: var(--radius); font-size: var(--step-small); cursor: pointer;
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-ui) ease, color var(--t-ui) ease; }
+.phase button:active { transform: scale(0.97); }
+.phase button.on { background: var(--ink); color: var(--ground); }
+@media (hover: hover) and (pointer: fine) { .phase button:not(.on):hover { background: var(--ground-4); color: var(--ink); } }
+
+.eq, .eq p { overflow-x: auto; text-wrap: wrap; }   /* text-wrap: pretty around KaTeX crashes some Chromium builds */
+.eq h3 { margin: var(--s-6) 0 var(--s-2); font-size: var(--step-body); font-weight: 600; color: var(--ink); }
+.nomath .eq::after { content: "(equation shown as TeX: the math renderer did not load)"; display: block; color: var(--ink-2); font-size: 0.8125rem; }
+.katex { font-size: 1.08em; }
+
+table { border-collapse: collapse; width: 100%; font-size: var(--step-small); }
+td, th { border-bottom: 1px solid var(--rule); padding: var(--s-3) var(--s-2); text-align: left; vertical-align: top; }
+th { color: var(--ink-2); font-weight: 500; }
+td:first-child { white-space: nowrap; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.foot { max-width: 1240px; margin: 0 auto; padding: var(--s-7) var(--margin); color: var(--ink-2); font-size: var(--step-small); display: grid; gap: var(--s-2); }
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+  .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out); }
+  .js .reveal.lit { opacity: 1; transform: none; }
+}

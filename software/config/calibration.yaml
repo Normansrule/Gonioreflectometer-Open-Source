@@ -4,7 +4,7 @@
 schema: 1
 angle_offset_deg: {M4: 0.0, M3: 0.0, M2: 0.0, M1: 0.0}   # true angle = commanded + offset (calibrate mirror)
 dark_counts: null          # camera mean with the lamp off, 8-bit counts (calibrate dark)
-spectral_dark: null        # AS7341 counts with the lamp off, 10 channels (calibrate dark --spectral run)
+spectral_dark: null        # AS7341 counts with the lamp off, 10 readings F1-F8, clear, NIR (calibrate dark --spectral run)
 white: null                # PTFE at 45:0 -> {counts, theta_i_deg, rho, exposure_ms} (calibrate white)
 drift_limit_pct: 2.0       # lamp: reference shot at the end vs the start of a run
 max_age_days: 30

@@ -4,13 +4,13 @@
 
 <img src="../../docs/assets/axes.svg" width="100%" alt="Frame">
 
-$71.96 · total so far $287.98 / $630
+$22.45 · total so far $288.31 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
-## M11 · Place the base mounts
+## M11 · Print and join the deck
 
-Every mount screwed to the board from a paper template; no cutting, no drilling. · 0/3 steps done · ~1.6 h hands-on · ~1 wk
+Nine printed tiles bolted into one 600 mm deck; every mount already has its pilot hole. · 0/3 steps done · ~1.6 h hands-on · ~1 wk
 
 ### M11.1 Order frame parts
 
@@ -28,128 +28,92 @@ Every mount screwed to the board from a paper template; no cutting, no drilling.
 
 Commit `PARTS.md`.
 
-### M11.2 Print the template and mounts
+### M11.2 Print the deck tiles
 
-**Time** 30 min (+ print 4 h) · **Needs** TLS-08 paper printing · tape · FIL-01 ABS
+**Time** 30 min (+ print ≈ 55 h (9 × 6 h)) · **Needs** FIL-01 ABS (1.5 kg of it) · TLS-01 enclosed printer
 
 #### Do
 
-1. Print `phases/03-frame/placement-template.svg` at 100 % in poster/tile mode; tape the tiles on the crosses.
-2. Print 4 × `FRM-09b_foot.stl`, 2 × `FRM-09d_extrusion_saddle.stl`.
+1. Print the 9 tiles `FRM-01a_deck_tile_SW.stl` … `FRM-01i_deck_tile_NE.stl` as exported: top face on the bed, no supports, 5 mm brim, door shut until cool.
+2. Write each tile's name (SW … NE) on its underside as it comes off. Map: `phases/03-frame/design.md`.
 
 #### Verify
 
-- [ ] The 100 mm bar measures 100 ± 0.5 mm.
-- [ ] Tile joins: lines meet within 0.5 mm.
+- [ ] Each tile lies flat on the table: a sheet of paper won't slide under any corner.
+- [ ] Calipers: every edge 200.0 ± 0.4 mm.
 
 #### If a check fails
 
-- Bar 97 mm: the printer scaled to fit; turn *fit to page* off.
+- Corner lifts: 8 mm brim, bed 105 °C, door shut until below 40 °C; reprint.
+- Edges short: XY shrink compensation from M03.3 not set; reprint.
 
 #### Record
 
 Tick the boxes; `make done id=M11.2`.
 
-### M11.3 Screw down the mounts
+### M11.3 Bolt the deck together
 
-**Time** 45 min · **Needs** FRM-01 plywood as bought · FRM-12 wood screws · TLS-02 Phillips #2 · TLS-06 calipers
+**Time** 45 min · **Needs** 9 deck tiles · 36 × M2 × 10 + nuts + washers (FRM-06) · TLS-03 hex key 1.5 mm · a flat table
 
 #### Do
 
-1. Template on the best face, centred (equal overhang on all sides), taped.
-2. Saddles 1 and 2 on their outlines (x = 237 and 282), walls along the +X line; 4 screws each, straight down through the paper, firm, not over-tightened.
-3. Leave the template on for the boxes (M12.4).
+1. Tiles upside down (top face on the table, ribs up), in their places as seen from below: east and west swap, so E tiles lie on your left when N points away.
+2. Butt neighbouring walls; M2 × 10 through each pair of seam holes (3 per edge), washer and nut on the other side. Finger-tight everywhere first, then tighten from the centre tile outward.
+3. Turn the deck over, onto the table where it will live (+X, east, toward where the camera goes; leave 450 mm free beyond that edge for the outrigger).
 
 #### Verify
 
-- [ ] Saddle centres 237 ± 1 and 282 ± 1 mm from the centre cross (tape).
-- [ ] Nothing moves when you push it hard sideways.
+- [ ] A straight edge across every seam: no step > 0.3 mm.
+- [ ] Lift one corner 10 mm: the deck moves as one piece, no seam opens.
 
 #### If a check fails
 
-- Screw spins without tightening: glue a wooden toothpick into the hole, snap it flush, drive the screw again.
+- Step at a seam: loosen its 3 bolts, press both skins flat on the table, tighten again.
 
 #### Record
 
-Photo `phases/03-frame/base.jpg`; commit.
+Photo `phases/03-frame/deck.jpg`; commit.
 
 ## M12 · Assemble the frame
 
-Board on feet with outrigger, camera pillar and post, scales and boxes. · 0/4 steps done · ~1.8 h hands-on · ~1 wk
+Outrigger, camera pillar, scan post and boxes screwed into the deck's pilots. · 0/2 steps done · ~1.2 h hands-on · ~1 wk
 
-### M12.1 Feet
+### M12.1 Outrigger, camera pillar and scan post
 
-**Time** 15 min · **Needs** 4 × FRM-09b feet · 8 × FRM-12 screws
+**Time** 1 h (+ print 8 h) · **Needs** FRM-02a–d bars · 2 × FRM-09d saddles · 2 × FRM-09i couplers · FRM-09e post socket · FRM-09h camera pillar · FRM-09f end foot · 8 × M2 × 12 and 14 × M2 × 16 (FRM-06) · TLS-07 phone level app
 
 #### Do
 
-1. Board face down on a towel. A foot flush in each corner; 2 screws each.
-2. Turn it over on the table where it will live.
+1. Print the bars `FRM-02a…d` (lying flat, as exported), 2 × `FRM-09d_bar_saddle.stl`, 2 × `FRM-09i_bar_coupler.stl` (standing), `FRM-09e_post_socket.stl`, `FRM-09f_end_foot.stl`, `FRM-09h_camera_pillar.stl`.
+2. Saddles on their pilots in the east tile (x = 237 and 278, on the +X line): 4 × M2 × 12 each.
+3. Outrigger: bars 1 and 2 butted inside a coupler, M2 × 16 through the coupler into each bar's pilots. Lay it in the saddles, inner end at x = 215, the far end on the end foot (standing on the table at x = 628). Every clamp's hole now lines up with a pilot in the bar: M2 × 16 through each saddle cheek and the end foot.
+4. Camera pillar (FRM-09h) over the outrigger at its pilot (x = 391.8); post socket over the pilot at x = 674.4, M2 × 16 each. Scan post: bar 1 into the socket (M2 × 16), bar 2 on top through the second coupler. No tall post at the measuring camera: it would stand in the scan camera's view.
 
 #### Verify
 
-- [ ] Board doesn't rock when pressed at each corner.
-- [ ] No screw tip shows on the top face.
+- [ ] Posts vertical: phone level app on two faces reads 90.0 ± 0.5°.
+- [ ] Every screw found its pilot (none driven into plain plastic).
+- [ ] Pillar and post centres 391.8 ± 1 and 674.4 ± 2 mm from the deck centre (tape); pillar's camera pilot at 150 ± 1 mm above the deck.
+- [ ] Outrigger level end to end (phone level app ±0.5°).
 
 #### If a check fails
 
-- Rocks: the table isn't flat; fold paper under the short foot. (No levelling needed: the optics reference the board, not gravity.)
+- A screw misses its pilot by > 1 mm: that bar shrank; check the XY compensation (M03.3) and reprint it.
+- Far end low: the end foot is 30 mm for the 24 mm deck + 6 mm saddle floor; shim it.
 
 #### Record
 
 Tick the boxes; `make done id=M12.1`.
 
-### M12.2 Outrigger, camera pillar and scan post
+### M12.2 Mount the boxes
 
-**Time** 45 min (+ print 3 h) · **Needs** 2 × FRM-02 2020 (outrigger + scan post) · 7 × FRM-03 T-nuts · 7 × M5 × 10 · FRM-09e post socket · FRM-09h camera pillar · FRM-09f end foot · TLS-07 tape + phone level app
-
-#### Do
-
-1. Print 2 × `FRM-09e_post_socket.stl` and 1 × `FRM-09f_end_foot.stl`.
-2. Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under it at x = 628 (just inside the scan post).
-3. M5 × 10 through each saddle wall and the end foot into the T-nuts; tighten.
-4. Camera pillar (FRM-09h) on the outrigger at x = 391.8 (measuring camera: lens front lands at 350); post socket at x = 674.4 with the 500 mm scan post (M5 × 10 + T-nut each). No tall post at the measuring camera: it would stand in the scan camera's view.
-
-#### Verify
-
-- [ ] Posts vertical: phone level app on two faces reads 90.0 ± 0.5°.
-- [ ] Pillar and post centres 391.8 ± 1 and 674.4 ± 2 mm from the board centre (tape); pillar's M5 pilot at 150 ± 1 mm above the board.
-- [ ] Outrigger level end to end (phone level app ±0.5°).
-
-#### If a check fails
-
-- Far end low: the end foot is 30 mm for 12 mm feet + 12 mm plywood + 6 mm saddle; shim it.
-
-#### Record
-
-Tick the boxes; `make done id=M12.2`.
-
-### M12.3 Protractor scales
-
-**Time** 30 min (+ print 2 h) · **Needs** 4 × FRM-09c · double-sided tape or glue
+**Time** 15 min · **Needs** power box · controller tray · 8 × M2 × 12 (FRM-06)
 
 #### Do
 
-1. Print 4 × `FRM-09c_protractor_segment.stl` (80° each).
-2. Stick them end to end around the ring circle from 20° to 340° (0° = +X, toward the camera; the gap is the M4 motor).
-
-#### Verify
-
-- [ ] The 20° and 340° ends sit symmetric about the line board centre → camera pillar (string line).
-
-#### Record
-
-Tick the boxes; `make done id=M12.3`.
-
-### M12.4 Mount the boxes
-
-**Time** 15 min · **Needs** power box · controller box · 8 × FRM-12 screws
-
-#### Do
-
-1. Power box: 4 wood screws through its floor's OG-40 holes at the template crosses (220, −220), e-stop toward you.
-2. Controller tray: 4 wood screws through its corner bosses at the template crosses (centre −190, 220).
-3. Black wire along the board edge to E4 VIN `−`. Red wire for now straight to E4 VIN `+` (it gets the over-travel switch in M14.1).
+1. Power box: 4 × M2 × 12 from inside, through its floor bosses into the SE tile's pilots (centre 220, −220), e-stop toward you.
+2. Controller tray: 4 × M2 × 12 through its corner bosses into the NW tile's pilots (centre −200, 220).
+3. Black wire along the deck edge to SKR Pico POWER `−`. Red wire for now straight to POWER `+` (it gets the over-travel switch in M14.1).
 
 #### Verify
 
@@ -159,4 +123,4 @@ Tick the boxes; `make done id=M12.3`.
 
 Photo `phases/03-frame/frame.jpg`; commit.
 
-[Sources](../../REFERENCES.md): R1 · G10 · G38 · H30 · H38 · F1 · F2 · F3 · F5 · F7 · F8
+[Sources](../../REFERENCES.md): R1 · G10 · G38 · H30 · H38 · F7

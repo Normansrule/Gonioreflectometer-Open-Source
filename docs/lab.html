@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenGonio lab</title>
+<meta name="description" content="OpenGonio lab: the machine simulator, BRDF explorer, calibration lab and 3D scan planner, computed in your browser. Design stage: nothing here is a measurement.">
+<meta name="theme-color" content="#0c0b0a">
+<link rel="icon" href="og/icon.svg" type="image/svg+xml">
+<link rel="preload" href="og/fonts/hanken-grotesk-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="og/og.css">
+<script src="og/og.js"></script>
+<!-- KaTeX 0.16.9 bundled in docs/vendor (MIT, pinned): equations render offline; if it fails the TeX source stays readable -->
+<link rel="stylesheet" href="vendor/katex-0.16.9/katex.min.css">
+<script defer src="vendor/katex-0.16.9/katex.min.js"></script>
+<script defer src="vendor/katex-0.16.9/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"
+  onerror="document.documentElement.classList.add('nomath')"></script>
+<link rel="stylesheet" href="og/lab.css">
+</head>
+<body>
+<a class="skip btn btn-light" href="#main">Skip to the lab</a>
+<header class="bar">
+ <a class="mark display" href="./">OpenGonio</a>
+ <nav aria-label="Lab sections">
+  <a href="#machine">Machine</a><a href="#brdf">BRDF</a><a href="#calibrate">Calibrate</a><a href="#scanner">3D scan</a><a href="#equations">Equations</a>
+  <a href="#build">Build</a><a href="#budget">Budget</a><a href="#refs">References</a>
+ </nav>
+ <button class="btn theme" type="button" data-theme-toggle><span data-theme-label>Light</span></button>
+</header>
+<main id="main">
+<section class="intro">
+ <div>
+ <h1 class="display">The lab</h1>
+ <p class="lead">Every instrument on this page runs on the same numbers as the software: <code>machine.yaml</code> for the geometry,
+  the GGX model behind <code>make sim</code> for the light. Nothing here is a measurement; no machine has been built yet.</p>
+ </div>
+ <figure><img src="og/img/moment-camera.png" width="900" height="560" alt="The machine simulator seen from above: sample on the table, lamp on its ring, camera on its post.">
+  <figcaption>The simulator below, seen from above.</figcaption></figure>
+</section>
+<section id="machine" class="reveal">
+ <h2>Machine simulator</h2>
+ <p class="note" role="note">Offline illustration: no instrument connected. Angles and clearances are computed in your browser from machine.yaml; nothing here is a measurement.</p>
+ <p class="sub">Drag (or focus the view and use the arrow keys) to look around · scroll or +/− to zoom · double-click or 0 to reset · click a part for its files · slide the build stage.</p>
+ <div class="phase" id="modes"><button data-mode="gonio" class="on">Gonioreflectometer</button><button data-mode="scan">+ 3D scanner add-on</button></div>
+ <div class="grid">
+  <div class="card" data-ui><canvas id="sim" width="900" height="560" tabindex="0" role="img" aria-label="3D machine view: arrow keys orbit, plus and minus zoom, 0 resets" aria-describedby="posetext"></canvas>
+   <p class="sub" id="posetext" aria-live="polite" style="font-size:13px;margin:8px 0 0">–</p>
+   <div class="phase" style="margin-top:10px"><button id="play">▶ Demo</button><button id="bspec">Specular pose</button><button id="bzero">Reset</button></div>
+   <label>Build stage <input id="build" type="range" min="1" max="17" value="17"><output></output></label>
+   <p class="sub" id="buildinfo" style="font-size:13px;margin:2px 0 8px">–</p>
+   <div class="status" id="partinfo" style="font-weight:400">Click any part: what it is, its stage, its parts list and 3D files.</div>
+  </div>
+  <div class="card" data-ui>
+   <label>Material <select id="mat"></select><span></span></label>
+   <p class="sub" id="matnote" style="font-size:13px;margin:4px 0 8px">–</p>
+   <div class="phase" id="phases"></div>
+   <label>M4 light <input id="m4" type="range" min="20" max="340" step="0.5" value="60"><output></output></label>
+   <label>M3 table <input id="m3" type="range" min="-180" max="180" step="0.5" value="30"><output></output></label>
+   <label>M2 tilt <input id="m2" type="range" min="-90" max="90" step="0.5" value="0"><output></output></label>
+   <label>M1 spin <input id="m1" type="range" min="-180" max="180" step="0.5" value="0"><output></output></label>
+   <div class="read">
+    <div><small>θi incident</small><span id="ti">–</span></div><div><small>θr reflected (camera)</small><span id="tr">–</span></div>
+    <div><small>φi light azimuth</small><span id="pi">–</span></div><div><small>φr camera azimuth</small><span id="prr">–</span></div>
+   </div>
+   <div class="status" id="status" role="status">–</div>
+   <p class="sub" id="isonote" style="margin-top:10px;font-size:13px">–</p>
+  </div>
+ </div>
+</section>
+
+<section id="brdf" class="reveal">
+ <h2>BRDF explorer</h2>
+ <p class="sub">Lambert + GGX + Schlick, in-plane. Radius ∝ √(f<sub>r</sub> cos θ<sub>r</sub>).</p>
+ <div class="grid">
+  <div class="card" data-ui><canvas id="lobe" width="900" height="480" role="img" aria-label="BRDF polar plot; peak and albedo are given as text beside it"></canvas></div>
+  <div class="card" data-ui>
+   <label>θi <input id="bti" type="range" min="0" max="85" value="35"><output></output></label>
+   <label>roughness <input id="brg" type="range" min="0.05" max="1" step="0.01" value="0.3"><output></output></label>
+   <label>base colour <input id="bbc" type="range" min="0" max="1" step="0.01" value="0.5"><output></output></label>
+   <label>metallic <input id="bmt" type="range" min="0" max="1" step="0.01" value="0"><output></output></label>
+   <div class="read"><div><small>peak θr</small><span id="bpk">–</span></div><div><small>albedo (cos-weighted)</small><span id="bal">–</span></div></div>
+   <p class="eq">$$f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r}$$</p>
+  </div>
+ </div>
+</section>
+
+<section id="calibrate" class="reveal">
+ <h2>Calibration lab</h2>
+ <p class="sub">What <code>opengonio verify</code> and <code>calibrate</code> see (stages 06–07), on the same GGX mirror and lamp model as <code>make sim</code>. Hover the chart for values.</p>
+ <div class="grid">
+  <div class="card" data-ui>
+   <canvas id="mir" width="900" height="380" role="img" aria-label="Mirror sweep: brightness vs table angle; the peak error is given as text beside it"></canvas>
+   <canvas id="lamp" width="900" height="200" style="margin-top:12px" role="img" aria-label="Lamp brightness during a run; the drift is given as text beside it"></canvas>
+  </div>
+  <div class="card" data-ui>
+   <label>θ (mirror) <input id="cth" type="range" min="20" max="60" step="10" value="40"><output></output></label>
+   <label>hidden table error <input id="cerr" type="range" min="-1" max="1" step="0.05" value="0.8"><output></output></label>
+   <label>lamp drift / shot <input id="cdrift" type="range" min="0" max="0.5" step="0.01" value="0"><output></output></label>
+   <div class="phase"><button id="ccal">Run calibrate mirror</button><button id="creset">Forget calibration</button></div>
+   <div class="read">
+    <div><small>M3 offset in calibration.yaml</small><span id="coff">0.00°</span></div><div><small>mirror_peak_error_deg</small><span id="cpe">–</span></div>
+    <div><small>lamp_drift_pct</small><span id="cdp">–</span></div><div><small>shots in the sweep</small><span>31</span></div>
+   </div>
+   <div class="status" id="cstat" role="status">–</div>
+   <p class="sub" style="margin-top:10px;font-size:13px">Steps: M19.1 (mirror sweeps), M22.2 (angle offset), M18.3 (warm-up). Practice: M02.3.</p>
+  </div>
+ </div>
+</section>
+
+<section id="scanner" class="reveal">
+ <h2>3D photo scanner</h2>
+ <p class="sub">Stages 11–12. Fixed camera; M1 spins and M2 tilts the object, so every pose is known [S9].</p>
+ <div class="grid">
+  <div class="card" data-ui><canvas id="sphere" width="900" height="560" tabindex="0" role="img" aria-label="View sphere of the scan plan: arrow keys rotate"></canvas></div>
+  <div class="card" data-ui>
+   <label>rings <input id="srings" type="range" min="1" max="5" value="5"><output></output></label>
+   <label>views / ring <input id="sper" type="range" min="8" max="48" step="4" value="36"><output></output></label>
+   <label>PS lights <input id="sps" type="range" min="2" max="8" value="6"><output></output></label>
+   <label>mast elev. <input id="smast" type="range" min="0" max="60" value="40"><output></output></label>
+   <div class="read">
+    <div><small>images</small><span id="snum">–</span></div><div><small>spacing on ring 0</small><span id="sspace">–</span></div>
+    <div><small>light rank</small><span id="srank">–</span></div><div><small>pose error @ 55 mm</small><span>≈ 0.1 mm</span></div>
+   </div>
+   <div class="status" id="sstat">–</div>
+   <p class="sub" style="margin-top:10px;font-size:13px">Blue: views. Yellow: photometric-stereo lights. Mast 0° = coplanar lights, no normals.</p>
+  </div>
+ </div>
+ <img class="full" src="assets/scanner.svg" alt="Animated scanner: object spinning and tilting, view sphere filling">
+ <p class="eq">$$\lambda\,[u,v,1]^\top = K(R_{oc}p_O+t_{oc}),\quad R_{oc}=R_{wc}RP\qquad V=\bigcap_j\{p:\pi_j(p)\in S_j\}\qquad I=L\,g,\;g=\rho\hat n$$</p>
+</section>
+
+<section id="equations" class="reveal eq">
+ <h2>Equations</h2>
+ <p class="sub">Hanrahan CS348b [R2]; Ansari-Asl et al. [R1].</p>
+ <h3>BRDF and reflection equation</h3>
+ $$f_r(\omega_i\to\omega_r)\equiv\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\quad[\mathrm{sr}^{-1}]\qquad L_r(x,\omega_r)=\int_{H^2}f_r(x,\omega_i\to\omega_r)L_i(x,\omega_i)\cos\theta_i\,d\omega_i$$
+ <h3>Reciprocity, isotropy, energy</h3>
+ $$f_r(\omega_r\to\omega_i)=f_r(\omega_i\to\omega_r)\qquad f_r(\theta_i,\varphi_i;\theta_r,\varphi_r)=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|)\qquad \frac{d\Phi_r}{d\Phi_i}\le 1$$
+ <h3>Mirror, Snell, total internal reflection</h3>
+ $$\hat R=\hat I-2(\hat I\cdot\hat N)\hat N\qquad f_{r,m}=\frac{\delta(\cos\theta_i-\cos\theta_r)}{\cos\theta_i}\delta(\varphi_i-\varphi_r\pm\pi)\qquad \eta_i\sin\theta_i=\eta_t\sin\theta_t\qquad 1-\mu^2\big(1-(\hat I\cdot\hat N)^2\big)<0$$
+ <h3>Fresnel, Cook-Torrance colour, Lambert</h3>
+ $$F(\theta)=F(0)+(1-F(0))(1-\cos\theta)^5\qquad R=R(0)+R(\tfrac{\pi}{2})\frac{F(\theta)-F(0)}{F(\pi/2)-F(0)}\qquad f_{r,d}=\frac{\rho_d}{\pi}$$
+ <h3>Isotropic vs anisotropic; in-plane angles [R1][G9]</h3>
+ $$f_r^{\mathrm{iso}}=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|)\qquad f_r^{\mathrm{aniso}}=f_r(\theta_i,\varphi_i,\theta_r,\varphi_r)\qquad \theta_r=M_3,\;\theta_i=M_4-M_3,\;\text{specular } M_3=M_4/2$$
+ <h3>Measured quantities [R1]</h3>
+ $$Y^{\mathrm{SVBRDF}}=\mathrm{SVBRDF}(x,y,\theta_i,\varphi_i,\theta_r,\varphi_r,\lambda)\qquad Y^{\mathrm{BTF}}=\mathrm{BTF}(x,y,\theta_i,\varphi_i,\theta_r,\varphi_r,\lambda)$$
+ <h3>Kinematics (Tait-Bryan, extrinsic x-y-z) and per-pixel directions [R1]</h3>
+ $$R=R_z(M_3)R_y(-M_2)R_x(M_1)\qquad \omega^s=R^\top\omega^w\qquad \omega_i(p)=\frac{P_L-p}{\|P_L-p\|},\;\omega_r(p)=\frac{P_C-p}{\|P_C-p\|}$$
+ <h3>Fixed-camera optics [R1]</h3>
+ $$\frac{1}{p'}-\frac{1}{p}=\frac{1}{f}\qquad m=\frac{p'}{p}\qquad d_{\mathrm{Airy}}=2.44\lambda N\qquad \mathrm{DOF}\approx\frac{2Nc(1+m)}{m^2}$$
+ <h3>HDR response (Debevec & Malik) [R5]</h3>
+ $$g(Z_{ij})=\ln E_i+\ln\Delta t_j$$
+</section>
+
+<section id="build" class="reveal">
+ <h2>Build plan</h2>
+ <p class="sub">18 stages, 48 milestones, one GitHub issue per step (Time · Needs → Do → Verify → If a check fails → Record). Laptop mode or standalone (Pi Zero + buttons).</p>
+ <img class="full" src="assets/phases.svg" alt="Stages and milestones">
+ <img class="full" src="assets/architecture.svg" alt="Control architecture: laptop, SKR Pico (grblHAL), ESP32-S3 hub, camera">
+ <img class="full" src="assets/axes.svg" alt="Four axes around one zero point">
+</section>
+
+<section id="budget" class="reveal">
+ <h2>Budget</h2>
+ <p class="sub">Cheapest parts, prices checked 2026-10-04. Your decisions (agree, have, ordered, swap, skip, paid) live in <code>PARTS.md</code>, editable on GitHub.</p>
+ <img class="full" src="assets/budget.svg" alt="Budget per phase">
+</section>
+
+<section id="refs" class="reveal">
+ <h2>References</h2>
+ <p class="sub">Key sources. Full list (489): <code>REFERENCES.md</code>.</p>
+ <table>
+  <tr><th>ID</th><th>Source</th></tr>
+  <tr><td>R1</td><td>Ansari-Asl, Barbieri, Obein, Hardeberg, <i>J. Imaging</i> 10(3):55, 2024. <a href="https://doi.org/10.3390/jimaging10030055">doi:10.3390/jimaging10030055</a></td></tr>
+  <tr><td>R2</td><td>P. Hanrahan, <i>Reflection Models I: Ideal Materials</i>, Stanford CS348b Lecture 10, 2016</td></tr>
+  <tr><td>S1–S3</td><td>COLMAP format and known-pose FAQ; Schönberger &amp; Frahm 2016. <a href="https://colmap.github.io/faq.html">colmap.github.io</a></td></tr>
+  <tr><td>S4–S7</td><td>Woodham 1980 (photometric stereo); Laurentini 1994 (visual hull); Szeliski 1993; Kutulakos &amp; Seitz 2000</td></tr>
+  <tr><td>S9</td><td>Fitzgibbon, Cross, Zisserman, turntable reconstruction, 1998. <a href="https://link.springer.com/chapter/10.1007/3-540-49437-5_11">doi</a></td></tr>
+  <tr><td>R5</td><td>Debevec &amp; Malik, SIGGRAPH 1997. <a href="https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf">PDF</a></td></tr>
+  <tr><td>R6–R8</td><td>Walter et al. 2007 (GGX); Schlick 1994; Cook &amp; Torrance 1982</td></tr>
+  <tr><td>R83–R85</td><td>grblHAL core, Trinamic plugin and RP2040 board map. <a href="https://github.com/grblHAL">github.com/grblHAL</a></td></tr>
+  <tr><td>R20–R30</td><td>FluidNC documentation (ESP32-board option). <a href="http://wiki.fluidnc.com/">wiki.fluidnc.com</a></td></tr>
+  <tr><td>R73</td><td>KaTeX (equation rendering). <a href="https://katex.org/">katex.org</a></td></tr>
+ </table>
+</section>
+</main>
+</main>
+<footer class="foot">
+ <p><a href="./">Back to OpenGonio</a> · <a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source">Source on GitHub</a></p>
+ <p>Hardware CERN-OHL-S-2.0 · software GPL-3.0-or-later · docs CC BY-SA 4.0. Figures are original drawings.</p>
+</footer>
+
+<script>
+// sections come into the light as they arrive (desktop, motion allowed); same rule as the landing page
+(() => { const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("lit"); io.unobserve(e.target); } }),
+  { rootMargin: "0px 0px 15% 0px" }); document.querySelectorAll(".reveal").forEach(el => io.observe(el)); })();
+</script>
+<script src="machine.js"></script>
+<script src="plan.js"></script>
+<script>
+// ---------- shared math ----------
+const K = OG.tokens();   // colours come from docs/og/og.css, so both themes stay in step
+const $ = id => document.getElementById(id);
+const [m4, m3, m2, m1, ti, tr, pi, dp, bti, brg, bbc, bmt, bpk, bal] =
+  ["m4", "m3", "m2", "m1", "ti", "tr", "pi", "dp", "bti", "brg", "bbc", "bmt", "bpk", "bal"].map($);
+const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+const c = d => Math.cos(d * D2R), s = d => Math.sin(d * D2R);
+const mul = (A, B) => A.map((r, i) => B[0].map((_, j) => r.reduce((t, _, k) => t + A[i][k] * B[k][j], 0)));
+const mv = (A, v) => A.map(r => r[0] * v[0] + r[1] * v[1] + r[2] * v[2]);
+const T = A => A[0].map((_, j) => A.map(r => r[j]));
+const Rx = d => [[1, 0, 0], [0, c(d), -s(d)], [0, s(d), c(d)]];
+const Ry = d => [[c(d), 0, s(d)], [0, 1, 0], [-s(d), 0, c(d)]];
+const Rz = d => [[c(d), -s(d), 0], [s(d), c(d), 0], [0, 0, 1]];
+const add = (a, b) => a.map((x, i) => x + b[i]), sub = (a, b) => a.map((x, i) => x - b[i]);
+const sc = (a, k) => a.map(x => x * k), dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const norm = a => Math.hypot(...a), unit = a => sc(a, 1 / norm(a));
+// Same numbers as software/config/machine.yaml (docs/machine.js, written by `make`); fallback if it is missing.
+const M = Object.assign({Dc: 350, Dgonio: 350, Dscan: 650, scanElev: 15, twoCams: true, Dl: 300, ring: 140, rc: 30, rl: 30, ra: 15, keep: 30, minA: 5, axes: {}}, window.MACHINE || {});
+Object.entries(M.axes).forEach(([k, [lo, hi]]) => { const el = document.getElementById(k.toLowerCase()); if (el) { el.min = lo; el.max = hi; } });
+
+function segDist(p1, q1, p2, q2) {          // Ericson 5.1.9 [R9]
+  const d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2);
+  const a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r);
+  let s_ = 0, t = 0;
+  if (a < 1e-12 && e < 1e-12) return norm(r);
+  if (a < 1e-12) { t = Math.min(Math.max(f / e, 0), 1); }
+  else { const cc = dot(d1, r);
+    if (e < 1e-12) { s_ = Math.min(Math.max(-cc / a, 0), 1); }
+    else { const b = dot(d1, d2), den = a * e - b * b;
+      s_ = den > 1e-12 ? Math.min(Math.max((b * f - cc * e) / den, 0), 1) : 0;
+      t = (b * s_ + f) / e;
+      if (t < 0) { t = 0; s_ = Math.min(Math.max(-cc / a, 0), 1); }
+      else if (t > 1) { t = 1; s_ = Math.min(Math.max((b - cc) / a, 0), 1); } } }
+  return norm(sub(add(p1, sc(d1, s_)), add(p2, sc(d2, t))));
+}
+function clearance(m4) {
+  const cd = [1, 0, 0], l = mv(Rz(m4), [1, 0, 0]);
+  const cam = [[sc(cd, M.Dc), sc(cd, M.Dc + 60), M.rc], [[M.Dc + 30, 0, -150], [M.Dc + 30, 0, 0], M.ra]];
+  const lit = [[sc(l, M.ring), sc(l, M.Dl + 40), M.ra], [sc(l, M.Dl), sc(l, M.Dl), M.rl]];
+  let g = 1e9;
+  for (const a of cam) for (const b of lit) g = Math.min(g, segDist(a[0], a[1], b[0], b[1]) - a[2] - b[2]);
+  return g;
+}
+function state(p) {
+  const R = mul(mul(Rz(p.m3), Ry(-p.m2)), Rx(p.m1)), Rt = T(R);
+  const l = mv(Rz(p.m4), [1, 0, 0]), cd = [1, 0, 0];
+  const ang = w => { const q = mv(Rt, w); return [Math.acos(Math.max(-1, Math.min(1, q[0]))) * R2D, Math.atan2(q[2], q[1]) * R2D]; };
+  const [ti, pi] = ang(l), [tr, pr] = ang(cd);
+  let dp = Math.abs(((pr - pi + 180) % 360 + 360) % 360 - 180);
+  const a = p.m4 % 360, phase = Math.min(a, 360 - a);
+  return {R, l, ti, pi, tr, pr, dp, gap: clearance(p.m4), phase};
+}
+
+// ---------- 3D view ----------
+const cv = $("sim"), g2 = cv.getContext("2d");
+const VIEW0 = {yaw: -70, pitch: 24, zoom: 1};
+let view = {...VIEW0}, drag = null, mode = "gonio", phase = 6, anim = null, flash = null, picks = [];
+cv.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY, view.yaw, view.pitch, false]; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag[0], dy = e.clientY - drag[1];
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag[4] = true;
+  view.yaw = drag[2] + dx * 0.4; view.pitch = Math.max(-5, Math.min(85, drag[3] + dy * 0.3)); draw(); });
+cv.addEventListener("pointerup", e => { if (drag && !drag[4]) pick(e); drag = null; });
+cv.addEventListener("wheel", e => { e.preventDefault(); view.zoom = Math.max(0.5, Math.min(2.5, view.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); draw(); }, {passive: false});
+cv.addEventListener("dblclick", () => { view = {...VIEW0}; draw(); });
+cv.addEventListener("keydown", e => {            // keyboard orbit: arrows, +/- zoom, 0 reset
+  const k = e.key, d = e.shiftKey ? 15 : 5;
+  if (k === "ArrowLeft") view.yaw -= d; else if (k === "ArrowRight") view.yaw += d;
+  else if (k === "ArrowUp") view.pitch = Math.min(85, view.pitch + d); else if (k === "ArrowDown") view.pitch = Math.max(-5, view.pitch - d);
+  else if (k === "+" || k === "=") view.zoom = Math.min(2.5, view.zoom * 1.1); else if (k === "-") view.zoom = Math.max(0.5, view.zoom * 0.9);
+  else if (k === "0") view = {...VIEW0}; else return;
+  e.preventDefault(); draw(); });
+function P(v) { const k = 1.15 * view.zoom * (mode === "scan" ? 0.75 : 1);
+  const a = mv(Rz(view.yaw), v); const b = [a[0], a[1] * c(view.pitch) - a[2] * s(view.pitch), a[1] * s(view.pitch) + a[2] * c(view.pitch)];
+  return [cv.width / 2 - 40 + b[0] * k, cv.height * 0.58 - b[2] * k, b[1]]; }
+function line(a, b, col, w = 2, dash = []) { const A = P(a), B = P(b); g2.strokeStyle = col; g2.lineWidth = w; g2.setLineDash(dash);
+  g2.beginPath(); g2.moveTo(A[0], A[1]); g2.lineTo(B[0], B[1]); g2.stroke(); g2.setLineDash([]); }
+const path = (pts, col, w) => pts.reduce((a, b) => (line(a, b, col, w), b));
+function poly(pts, fill, stroke) { g2.beginPath(); pts.map(P).forEach((q, i) => i ? g2.lineTo(q[0], q[1]) : g2.moveTo(q[0], q[1]));
+  g2.closePath(); if (fill) { g2.fillStyle = fill; g2.fill(); } if (stroke) { g2.strokeStyle = stroke; g2.lineWidth = 2; g2.stroke(); } }
+function dotp(v, r, col) { const q = P(v); g2.fillStyle = col; g2.beginPath(); g2.arc(q[0], q[1], r, 0, 7); g2.fill(); }
+function text(v, t, col, dx = 6, dy = -6) { const q = P(v); g2.fillStyle = col; g2.font = "500 15px " + K.text; g2.fillText(t, q[0] + dx, q[1] + dy); }
+function arc(a, b, r, col, label, dy = -6) {           // angle arc between unit vectors a and b
+  const pts = []; for (let k = 0; k <= 16; k++) { const t = k / 16; pts.push(sc(unit(add(sc(a, 1 - t), sc(b, t))), r)); }
+  path(pts, col, 2); text(pts[8], label, col, 6, dy);
+}
+const glow = ax => flash && flash.ax === ax ? K.lightText : null;
+function box3(c, sz, fill, stroke) {          // axis-aligned box: top + two visible sides
+  const [x, y, z] = c, [a, b, h] = sz.map(v => v / 2);
+  const C = (i, j, k) => [x + i * a, y + j * b, z + k * h];
+  [[C(-1,-1,1), C(1,-1,1), C(1,1,1), C(-1,1,1)], [C(-1,-1,-1), C(1,-1,-1), C(1,-1,1), C(-1,-1,1)],
+   [C(1,-1,-1), C(1,1,-1), C(1,1,1), C(1,-1,1)]].forEach(f => poly(f, fill, stroke));
+}
+const PARTS = {   // what you click -> where its files are (relative to docs/)
+  M4: {n: "Light arm (M4) on the 12 in ring", st: "04-light-arm", bom: "LAR-01…08", ax: "M4"},
+  M3: {n: "Table post (M3)", st: "05-table", bom: "TBL-01…07", ax: "M3"},
+  M2: {n: "Tilt yoke (M2)", st: "08-tilt", bom: "TLT-01…07", ax: "M2"},
+  M1: {n: "Spin platter (M1) + sample", st: "09-spin", bom: "SPN-01…07", ax: "M1"},
+  cam: {n: "Fixed camera, 16 mm lens, f/8 stop", st: "06-camera-light", bom: "CAM-01…03"},
+  lamp: {n: "White lamp (COB + driver)", st: "06-camera-light", bom: "LSR-01…05"},
+  leds: {n: "8-band LED bank on a 40° mast", st: "10-color", bom: "MSK-01…06"},
+  pwr: {n: "Power box (24 V Li-ion pack, USB-C charging, fuse, e-stop)", st: "01-power", bom: "PWR-04…29"},
+  ctl: {n: "Controller: SKR Pico (USB-C) + ESP32-S3 + buttons", st: "02-controller", bom: "CTL-01…11"},
+  pi: {n: "Pi Zero 2 W station (optional)", st: "15-standalone", bom: "STA-01…07"},
+  base: {n: "Printed deck + camera rail", st: "03-frame", bom: "FRM-01…09"},
+};
+function showPart(k) { const q = PARTS[k]; if (!q) return;
+  $("partinfo").innerHTML = `<b>${q.n}</b> · stage ${q.st.slice(0, 2)} · BOM ${q.bom} · ` +
+    `<a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/tree/main/phases/${q.st}/3d">3D files</a> · <a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/blob/main/phases/${q.st}/bom.csv">parts list</a> · <a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/tree/main/phases/${q.st}">checklist</a>`; }
+function pose() { return {m4: +m4.value, m3: +m3.value, m2: phase >= 8 ? +m2.value : 0, m1: phase >= 9 ? +m1.value : 0}; }
+function draw() {
+  const p = pose(), st = state(p), scan = mode === "scan", B = +$("build").value;
+  g2.clearRect(0, 0, cv.width, cv.height);
+  const ring = []; for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([150 * c(a), 150 * s(a), -144]); }
+  if (B < 3) { $("partinfo").textContent = "Stages 01–02 are bench builds: power box and controller."; }
+  const xEnd = M.twoCams && (scan || B >= 11) ? M.Dscan * Math.cos(M.scanElev * Math.PI / 180) + 70 : M.Dc + 70;
+  poly([[-220, -220, -150], [xEnd, -220, -150], [xEnd, 220, -150], [-220, 220, -150]], B >= 3 ? K.g2 : K.ground, K.rule);
+  box3([-170, -170, -130], [70, 50, 40], K.g3, K.ink);
+  box3([-170, 170, -135], [80, 60, 30], K.g3, K.ink2);
+  if (B >= 15) box3([-110, 170, -140], [40, 25, 20], K.g3, K.green);
+  if (B >= 4) poly(ring, null, glow("M4") || K.ink3);
+  if (B >= 5) line([0, 0, -150], [0, 0, -70], glow("M3") || K.ink3, 8);
+  // yoke: turns with M3; plate tilts inside it with M2
+  const ay = mv(Rz(p.m3), [0, 1, 0]), Y = 58;
+  if (B >= 8) path([sc(ay, Y), add(sc(ay, Y), [0, 0, -70]), add(sc(ay, -Y), [0, 0, -70]), sc(ay, -Y)], glow("M2") || K.ink2, 5);
+  else if (B >= 5) line([0, 0, -70], [0, 0, -40], K.ink3, 8);
+  // platter (M1) + sample or object
+  const u = mv(st.R, [0, 1, 0]), v = mv(st.R, [0, 0, 1]), n = mv(st.R, [1, 0, 0]);
+  const disk = []; for (let k = 0; k < 28; k++) { const a = k * 360 / 28; disk.push(add(sc(n, -6), add(sc(u, 50 * c(a)), sc(v, 50 * s(a))))); }
+  if (B >= 9) poly(disk, K.g4, glow("M1") || K.green);
+  if (B < 5) {}
+  else if (scan && B >= 11) {                                  // 50 mm object on the platter
+    const q = (a, b, h) => add(add(sc(u, a * 25), sc(v, b * 25)), sc(n, h));
+    const F = [[[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0]], [[-1,-1,50],[1,-1,50],[1,1,50],[-1,1,50]],
+      [[-1,-1,0],[1,-1,0],[1,-1,50],[-1,-1,50]], [[1,-1,0],[1,1,0],[1,1,50],[1,-1,50]],
+      [[1,1,0],[-1,1,0],[-1,1,50],[1,1,50]], [[-1,1,0],[-1,-1,0],[-1,-1,50],[-1,1,50]]]
+      .map(f => f.map(x => q(...x))).sort((A, B) => P(A[2])[2] - P(B[2])[2] < 0 ? 1 : -1);
+    F.forEach(f => poly(f, OG.alpha(K.ink, .55), K.ink));
+  } else {
+    const corner = (a, b) => add(sc(u, a * 40), sc(v, b * 40));
+    poly([corner(-1, -1), corner(1, -1), corner(1, 1), corner(-1, 1)], OG.alpha(K.ink, .88), glow("M1") || K.ink);
+    line(sc(u, -36), sc(u, 36), K.g4, 4);
+  }
+  line([0, 0, 0], sc(n, 80), K.ink, 1.5, [3, 4]); text(sc(n, 84), "n", K.ink);
+  // camera (fixed)
+  if (B >= 3) line([M.Dc + 30, 0, -150], [M.Dc + 30, 0, -20], K.ink3, 6);
+  if (B >= 6) {
+  poly([[M.Dc, -22, -18], [M.Dc, 22, -18], [M.Dc, 22, 18], [M.Dc, -22, 18]], K.g2, K.blue);
+  line([0, 0, 0], [M.Dc, 0, 0], K.blue, 2, [8, 6]); text([M.Dc, 0, 22], scan && !M.twoCams ? "camera 650 mm" : "measuring camera", K.blue); }
+  // scan camera: fixed at 650 mm, raised to look over the measuring camera (stage 11; no lens or position changes)
+  if (M.twoCams && (scan || B >= 11)) {
+    const e = M.scanElev * Math.PI / 180, S = [M.Dscan * Math.cos(e), 0, M.Dscan * Math.sin(e)];
+    line([S[0] + 30, 0, -150], [S[0] + 30, 0, S[2] - 20], K.ink3, 6);
+    poly([[S[0], -22, S[2] - 18], [S[0], 22, S[2] - 18], [S[0], 22, S[2] + 18], [S[0], -22, S[2] + 18]], K.g2, K.ink2);
+    line([0, 0, 0], S, K.ink2, scan ? 2 : 1, [8, 6]); text([S[0], 0, S[2] + 24], `scan camera ${M.Dscan} mm, ${M.scanElev}° up`, K.ink2); }
+  // light arm (M4) on the ring
+  const L = sc(st.l, M.Dl);
+  if (B >= 4) path([add(sc(st.l, 150), [0, 0, -138]), add(sc(st.l, M.Dl + 30), [0, 0, -138]), sc(st.l, M.Dl + 30), L], glow("M4") || K.ink3, 6);
+  if (B >= 6) { line(L, [0, 0, 0], K.light, 2.5, [8, 6]); dotp(L, 11, glow("M4") || K.light); text(L, "light", K.light, 12, -10); }
+  else if (B >= 4) dotp(L, 8, K.ink3);
+  const LB = add(sc(st.l, M.Dl - 10), [0, 0, 60]);
+  if (B >= 10) { path([sc(st.l, M.Dl + 30), add(sc(st.l, M.Dl + 30), [0, 0, 40]), LB], K.ink3, 4);
+    ["#7b2cbf", "#3a0ca3", "#4361ee", "#4cc9f0", "#2a9d8f", "#e9c46a", "#f4a261", "#e63946"].forEach((cc, i) =>
+      dotp(add(LB, [0, 0, 0]).map((v, j) => v + [6 * c(i * 45), 6 * s(i * 45), 0][j]), 3, cc));
+    text(LB, "colour LED bank (blocked)", K.red, 11, -12); }
+  // incident / reflected angles
+  if (!scan && B >= 6) { arc(n, st.l, 55, K.light, `θi ${st.ti.toFixed(0)}°`); arc(n, [1, 0, 0], 85, K.blue, `θr ${st.tr.toFixed(0)}°`, 16); }
+  dotp([0, 0, 0], 4, K.ink);
+  picks = [["M4", L], ["M1", [0, 0, 0]], ["M2", sc(ay, Y)], ["M2", sc(ay, -Y)], ["M3", [0, 0, -110]],
+    ["cam", [M.Dc, 0, 0]], ["pwr", [-170, -170, -110]], ["ctl", [-170, 170, -120]], ["pi", [-110, 170, -130]],
+    ["leds", LB], ["base", [200, -180, -150]]].filter(([k]) => ({M4: 4, M3: 5, M2: 8, M1: 9, cam: 6, leds: 10, pi: 15, base: 3})[k] <= B || ["pwr", "ctl"].includes(k));
+  // readouts
+  const fmt = x => x.toFixed(1) + "°";
+  ti.textContent = fmt(st.ti); tr.textContent = fmt(st.tr); pi.textContent = fmt(st.pi); $("prr").textContent = fmt(st.pr);
+  const S = $("status");
+  const unsafe = st.gap < M.keep || st.phase < M.minA;
+  const meas = st.ti < 90 && st.tr < 90;
+  const spec = meas && Math.abs(st.ti - st.tr) < 0.6 && Math.abs(st.dp - 180) < 0.6;
+  $("posetext").textContent = `Pose: M4 ${fmt(+m4.value)}, M3 ${fmt(+m3.value)}` + (phase >= 8 ? `, M2 ${fmt(+m2.value)}` : "") +
+    (phase >= 9 ? `, M1 ${fmt(+m1.value)}` : "") + (scan ? "" : ` → θi ${fmt(st.ti)}, θr ${fmt(st.tr)}, φi ${fmt(st.pi)}, φr ${fmt(st.pr)}`) +
+    ` · clearance ${st.gap.toFixed(0)} mm` + (unsafe ? " (refused by the software)" : "");
+  if (scan) { S.className = "status " + (unsafe ? "bad" : "ok");
+    S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance` : `Scan view: elevation ${(90 - p.m2 + (M.twoCams ? M.scanElev : 0)).toFixed(0)}°, around ${p.m1.toFixed(0)}°`; return; }
+  S.className = "status " + (unsafe ? "bad" : !meas ? "warn" : spec ? "spec" : "ok");
+  S.textContent = unsafe ? `Collision: ${st.gap.toFixed(0)} mm clearance (< 30 mm)` :
+    !meas ? "Not measurable: light or camera behind the sample" :
+    spec ? "Specular geometry: the mirror peak is here" : `OK · clearance ${st.gap.toFixed(0)} mm · |φr − φi| ${fmt(st.dp)}`;
+}
+// ---------- motion: tweens, demo, click a part ----------
+const sliders = {M4: m4, M3: m3, M2: m2, M1: m1};
+function setAx(ax, val) { const el = sliders[ax]; el.value = val; el.nextElementSibling.textContent = (+val).toFixed(1) + "°"; }
+const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function tween(target, ms = 900, done) {      // smooth move of several axes (a jump when reduced motion is asked for)
+  if (REDUCE) { cancelAnimationFrame(anim?.raf); anim = null; for (const k in target) setAx(k, target[k]); draw();
+    if (done) setTimeout(done, ms); return; }
+  const from = Object.fromEntries(Object.keys(target).map(k => [k, +sliders[k].value])), t0 = performance.now();
+  cancelAnimationFrame(anim?.raf); anim = {raf: 0};
+  const step = now => { const t = Math.min(1, (now - t0) / ms), e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+    for (const k in target) setAx(k, from[k] + (target[k] - from[k]) * e);
+    draw(); if (t < 1) anim.raf = requestAnimationFrame(step); else { anim = null; done && done(); } };
+  anim.raf = requestAnimationFrame(step);
+}
+function needPhase(ax) { const need = {M2: 8, M1: 9}[ax] || 0; if (phase < need) setPhase(9); }
+function wiggle(ax) { needPhase(ax); const v0 = +sliders[ax].value, d = {M4: 40, M3: 30, M2: 30, M1: 90}[ax];
+  flash = {ax}; tween({[ax]: v0 + d}, 700, () => tween({[ax]: v0}, 700, () => { flash = null; draw(); })); }
+function pick(e) { const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * cv.width / r.width, y = (e.clientY - r.top) * cv.height / r.height;
+  let best = null, bd = 40; for (const [ax, v] of picks) { const q = P(v), d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = ax; } }
+  if (best) { showPart(best); if (PARTS[best].ax) wiggle(best); } }
+let demo = false;
+function demoLoop() {
+  if (!demo) return;
+  const seq = mode === "scan"
+    ? [{M2: 90, M1: -180}, {M1: 180}, {M2: 70, M1: -180}, {M1: 180}, {M2: 50, M1: -180}, {M1: 180}, {M2: 30}]
+    : [{M4: 120}, {M3: 60}, {M4: 60, M3: 30}, {M2: 30}, {M2: -20}, {M2: 0}, {M1: 120}, {M1: -60}, {M1: 0}];
+  let i = 0; const next = () => { if (!demo) return; if (i >= seq.length) { i = 0; } const tgt = seq[i++];
+    Object.keys(tgt).forEach(needPhase); flash = {ax: Object.keys(tgt).pop()}; tween(tgt, 1100, () => setTimeout(next, 250)); };
+  next();
+}
+$("play").onclick = () => { demo = !demo; $("play").textContent = demo ? "■ Stop" : "▶ Demo"; if (demo) demoLoop(); else { flash = null; draw(); } };
+$("bspec").onclick = () => { const a = +m4.value; tween({M3: a <= 180 ? a / 2 : a / 2 - 180, M2: 0}); };   // normal bisects lamp and camera, facing the camera
+$("bzero").onclick = () => tween(mode === "scan" ? {M4: 30, M3: 0, M2: 90, M1: 0} : {M4: 60, M3: 30, M2: 0, M1: 0});
+// ---------- materials: what to test and where to put the light and camera ----------
+const MATS = [
+  {n: "PTFE white reference", iso: true, pose: {M4: 45, M3: 0, M2: 0, M1: 0}, b: [0.95, 1, 0],
+   t: "Diffuse calibration. Light 45°, camera along the normal (45°:0°, CIE). Reading should not change with θr."},
+  {n: "Matte paper", iso: true, pose: {M4: 60, M3: 20, M2: 0, M1: 0}, b: [0.8, 0.95, 0],
+   t: "Near-Lambertian first test. Sweep M3 at fixed light: curve ≈ cos θr."},
+  {n: "First-surface mirror", iso: true, pose: {M4: 60, M3: 30, M2: 0, M1: 0}, b: [0.95, 0.05, 1],
+   t: "Angle calibration. Peak must sit at M3 = M4 / 2 (θi = θr)."},
+  {n: "Glossy plastic (acrylic, LEGO)", iso: true, pose: {M4: 80, M3: 40, M2: 0, M1: 0}, b: [0.5, 0.2, 0],
+   t: "Isotropic gloss. Specular pose at θ = 20/40/60°, then step M3 ±10° around it."},
+  {n: "Metallic car paint", iso: true, pose: {M4: 90, M3: 35, M2: 0, M1: 0}, b: [0.6, 0.35, 0.8],
+   t: "Near-specular + flake sparkle: measure 15° off specular (ASTM E2194 style)."},
+  {n: "Brushed aluminium", iso: false, pose: {M4: 60, M3: 30, M2: 0, M1: 0}, b: [0.9, 0.25, 1],
+   t: "Anisotropic. Hold the specular pose and spin M1: the highlight stretches across the brushing."},
+  {n: "Satin ribbon / brushed fabric", iso: false, pose: {M4: 70, M3: 35, M2: 15, M1: 45}, b: [0.6, 0.45, 0],
+   t: "Anisotropic. Needs M2 + M1: tilt 15°, spin in 15° steps."},
+  {n: "Velvet / retroreflective tape", iso: true, pose: {M4: 20, M3: 10, M2: 0, M1: 0}, b: [0.3, 0.9, 0],
+   t: "Back-scatter: light as close to the camera as allowed (M4 = 20°, ≥ 5° + 30 mm keep-out)."},
+];
+const SCAN_MATS = [
+  {n: "Matte 3D print / plaster figure", t: "Ideal: matte, textured. Rings at view elevation 20…80° (M2 = 85…25° with the scan camera 15° up), 12–36 views each."},
+  {n: "Painted wood toy", t: "Good. Lamp at M4 = 30° with crossed polarizers to kill glare."},
+  {n: "Shiny or clear object", t: "Spray with matte scanning spray first; glass and chrome do not scan."},
+];
+function fillMats() { const sel = $("mat"); sel.innerHTML = "";
+  (mode === "scan" ? SCAN_MATS : MATS).forEach((m, i) => sel.add(new Option(m.n + (m.iso === false ? " (anisotropic)" : ""), i))); applyMat(); }
+function applyMat() { const m = (mode === "scan" ? SCAN_MATS : MATS)[+$("mat").value];
+  $("matnote").textContent = m.t;
+  $("isonote").innerHTML = mode === "scan" ? "Scan: view elevation = 90° − M2 + 15° (scan camera height); M1 gives the views around each ring. Neither camera moves or refocuses."
+    : m.iso ? "<b>Isotropic</b>: only θi, θr and |φr − φi| matter (3 angles) → M4, M3, M2 are enough."
+            : "<b>Anisotropic</b>: φi and φr matter separately (4 angles) → needs M1 spin (phase 09).";
+  if (m.pose) { Object.keys(m.pose).forEach(needPhase); tween(m.pose);
+    [brg.value, bbc.value, bmt.value] = [m.b[1], m.b[0], m.b[2]]; bti.value = (m.pose.M4 - m.pose.M3).toFixed(0);
+    ["bti", "brg", "bbc", "bmt"].forEach(id => $(id).dispatchEvent(new Event("input"))); }
+  else tween({M4: 30, M3: 0, M2: 90, M1: 0}); }
+$("mat").onchange = applyMat;
+document.querySelectorAll("#modes button").forEach(b => b.onclick = () => {
+  mode = b.dataset.mode; document.querySelectorAll("#modes button").forEach(x => x.classList.toggle("on", x === b));
+  M.Dc = mode === "scan" && !M.twoCams ? M.Dscan : M.Dgonio; if (mode === "scan") setPhase(9); fillMats(); });
+// ---------- sliders and phase buttons ----------
+["m4", "m3", "m2", "m1"].forEach(id => { const el = $(id); const out = el.nextElementSibling;
+  el.addEventListener("input", () => { out.textContent = (+el.value).toFixed(1) + "°"; draw(); }); out.textContent = el.value + "°"; });
+const ph = $("phases");
+function setPhase(k) { phase = k; [...ph.children].forEach(x => x.classList.toggle("on", +x.dataset.k === k));
+  m2.disabled = phase < 8; m1.disabled = phase < 9; draw(); }
+[6, 8, 9].forEach(k => { const b = document.createElement("button"); b.dataset.k = k;
+  b.textContent = `Phase ${k}${k === 6 ? " (M4+M3)" : k === 8 ? " +M2 tilt" : " +M1 spin"}`; b.onclick = () => setPhase(k); ph.appendChild(b); });
+// ---------- BRDF explorer ----------
+const lc = document.getElementById("lobe"), g3 = lc.getContext("2d");
+function sph(t, p) { return [s(t) * c(p), s(t) * s(p), c(t)]; }
+function ggx(wi, wo, base, rough, metal) {
+  if (wi[2] <= 0 || wo[2] <= 0) return 0;
+  const h = unit(add(wi, wo)), a = Math.max(rough * rough, 1e-4), a2 = a * a, ch = h[2];
+  const D = a2 / (Math.PI * (ch * ch * (a2 - 1) + 1) ** 2);
+  const ci = wi[2], co = wo[2];
+  const G = 2 * ci * co / (co * Math.sqrt(ci * ci * (1 - a2) + a2) + ci * Math.sqrt(co * co * (1 - a2) + a2));
+  const f0 = 0.04 * (1 - metal) + base * metal, F = f0 + (1 - f0) * (1 - dot(wi, h)) ** 5;
+  return (1 - metal) * (1 - F) * base / Math.PI + D * G * F / (4 * ci * co);
+}
+function drawLobe() {
+  const tI = +bti.value, r = +brg.value, b = +bbc.value, m = +bmt.value;
+  const W = lc.width, H = lc.height, cx = W / 2, cy = H - 40, RR = Math.min(W / 2, H) - 60;
+  g3.clearRect(0, 0, W, H);
+  g3.strokeStyle = K.rule; g3.lineWidth = 1;
+  for (let k = 1; k <= 3; k++) { g3.beginPath(); g3.arc(cx, cy, RR * k / 3, Math.PI, 0); g3.stroke(); }
+  for (let a = -90; a <= 90; a += 30) { g3.beginPath(); g3.moveTo(cx, cy); g3.lineTo(cx + RR * s(a), cy - RR * c(a)); g3.stroke(); }
+  const wi = sph(tI, 180); const vals = []; let fmax = 0, peak = 0, alb = 0;
+  for (let k = 0; k <= 180; k++) { const t = -90 + k; const wo = sph(Math.abs(t), t >= 0 ? 0 : 180);
+    const f = ggx(wi, wo, b, r, m) * Math.max(wo[2], 0); vals.push([t, f]); if (f > fmax) { fmax = f; peak = t; } }
+  for (let it = 0; it < 32; it++) for (let jp = 0; jp < 64; jp++) { const t = (it + .5) * 90 / 32, pp = (jp + .5) * 360 / 64;
+    alb += ggx(wi, sph(t, pp), b, r, m) * c(t) * s(t) * (Math.PI / 2 / 32) * (2 * Math.PI / 64); }
+  g3.beginPath(); vals.forEach(([t, f], i) => { const rr = RR * Math.sqrt(f / fmax); const x = cx + rr * s(t), y = cy - rr * c(t);
+    i ? g3.lineTo(x, y) : g3.moveTo(x, y); }); g3.closePath();
+  g3.fillStyle = OG.alpha(K.ink, .25); g3.fill(); g3.strokeStyle = K.ink; g3.lineWidth = 2.5; g3.stroke();
+  g3.strokeStyle = K.light; g3.lineWidth = 3; g3.beginPath(); g3.moveTo(cx, cy); g3.lineTo(cx - RR * s(tI), cy - RR * c(tI)); g3.stroke();
+  g3.strokeStyle = K.ink3; g3.lineWidth = 2; g3.beginPath(); g3.moveTo(cx - RR - 10, cy); g3.lineTo(cx + RR + 10, cy); g3.stroke();
+  g3.fillStyle = K.ink3; g3.font = "14px " + K.text; g3.fillText("light side", cx - RR, cy + 24); g3.fillText("view side", cx + RR - 64, cy + 24);
+  bpk.textContent = peak + "°"; bal.textContent = alb.toFixed(3);
+}
+["bti", "brg", "bbc", "bmt"].forEach(id => { const el = document.getElementById(id), out = el.nextElementSibling;
+  const upd = () => { out.textContent = el.value; drawLobe(); }; el.addEventListener("input", upd); out.textContent = el.value; });
+
+window.addEventListener("og:theme", () => { OG.tokens(); draw(); drawLobe(); drawSphere(); });
+// ---------- scanner view sphere ----------
+const scv = $("sphere"), g4 = scv.getContext("2d");
+const [srings, sper, sps, smast] = ["srings", "sper", "sps", "smast"].map($);
+let syaw = 30, spitch = 22, sdrag = null;
+scv.addEventListener("pointerdown", e => { sdrag = [e.clientX, e.clientY, syaw, spitch]; scv.setPointerCapture(e.pointerId); });
+scv.addEventListener("pointermove", e => { if (!sdrag) return; syaw = sdrag[2] + (e.clientX - sdrag[0]) * 0.4;
+  spitch = Math.max(-80, Math.min(80, sdrag[3] + (e.clientY - sdrag[1]) * 0.3)); drawSphere(); });
+scv.addEventListener("pointerup", () => sdrag = null);
+scv.addEventListener("keydown", e => { const d = e.shiftKey ? 15 : 5;
+  if (e.key === "ArrowLeft") syaw -= d; else if (e.key === "ArrowRight") syaw += d;
+  else if (e.key === "ArrowUp") spitch = Math.min(80, spitch + d); else if (e.key === "ArrowDown") spitch = Math.max(-80, spitch - d);
+  else return; e.preventDefault(); drawSphere(); });
+function SP(v) { const a = mv(Rz(syaw), v); const b = [a[0], a[1] * c(spitch) - a[2] * s(spitch), a[1] * s(spitch) + a[2] * c(spitch)];
+  return [scv.width / 2 + b[0] * 220, scv.height / 2 - b[2] * 220, b[1]]; }
+function rank3(L) {                       // numeric rank of k x 3 via Gram determinant / eigen check
+  const G = [[0,0,0],[0,0,0],[0,0,0]];
+  L.forEach(l => { for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) G[i][j] += l[i] * l[j]; });
+  const det = G[0][0]*(G[1][1]*G[2][2]-G[1][2]*G[2][1]) - G[0][1]*(G[1][0]*G[2][2]-G[1][2]*G[2][0]) + G[0][2]*(G[1][0]*G[2][1]-G[1][1]*G[2][0]);
+  const tr = G[0][0] + G[1][1] + G[2][2];
+  if (det > 1e-6 * tr ** 3) return 3;
+  return L.length > 1 && Math.abs(dot(unit(L[0]), unit(L[1]))) < 0.9999 ? 2 : 1;
+}
+function drawSphere() {
+  const nR = +srings.value, nP = +sper.value, nL = +sps.value, mast = +smast.value;
+  const elevs = [0, 20, 40, 60, 80].slice(0, nR), counts = elevs.map(e => e >= 80 ? Math.max(4, nP / 3) : e >= 60 ? Math.round(nP * 2 / 3) : nP);
+  g4.clearRect(0, 0, scv.width, scv.height);
+  g4.strokeStyle = K.rule; g4.lineWidth = 1;
+  for (let e = -60; e <= 80; e += 20) { g4.beginPath(); for (let a = 0; a <= 360; a += 6) { const q = SP([c(e) * c(a), c(e) * s(a), s(e)]);
+    a ? g4.lineTo(q[0], q[1]) : g4.moveTo(q[0], q[1]); } g4.stroke(); }
+  const pts = [];
+  elevs.forEach((e, i) => { for (let k = 0; k < counts[i]; k++) { const a = 360 * k / counts[i]; pts.push([[c(e) * c(a), c(e) * s(a), s(e)], K.blue]); } });
+  const L = []; for (let k = 0; k < nL; k++) { const a = 360 * k / nL + 15; const l = [c(mast) * c(a), c(mast) * s(a), s(mast)]; L.push(l); pts.push([sc_(l, 1.18), K.light]); }
+  pts.map(([v, col]) => [SP(v), col]).sort((a, b) => b[0][2] - a[0][2]).forEach(([q, col]) => {
+    g4.globalAlpha = q[2] > 0 ? 0.35 : 1; g4.fillStyle = col; g4.beginPath(); g4.arc(q[0], q[1], col === K.light ? 6 : 4, 0, 7); g4.fill(); });
+  g4.globalAlpha = 1;
+  const base = [[-0.35, -0.2, -0.05], [0.35, -0.2, -0.05], [0.35, 0.2, -0.05], [-0.35, 0.2, -0.05]].map(SP);
+  g4.fillStyle = OG.alpha(K.ink2, .5); g4.beginPath(); base.forEach((q, i) => i ? g4.lineTo(q[0], q[1]) : g4.moveTo(q[0], q[1])); g4.closePath(); g4.fill();
+  const car = [[-0.3, -0.12, 0], [0.3, -0.12, 0], [0.3, 0.12, 0], [-0.3, 0.12, 0], [-0.2, -0.1, 0.18], [0.15, -0.1, 0.18], [0.15, 0.1, 0.18], [-0.2, 0.1, 0.18]].map(SP);
+  g4.strokeStyle = K.ink; g4.lineWidth = 2;
+  [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([a, b]) => { g4.beginPath(); g4.moveTo(car[a][0], car[a][1]); g4.lineTo(car[b][0], car[b][1]); g4.stroke(); });
+  const n = counts.reduce((a, b) => a + b, 0), rk = rank3(L);
+  $("snum").textContent = n; $("sspace").textContent = (360 / nP).toFixed(1) + "°"; $("srank").textContent = rk;
+  const st = $("sstat");
+  st.className = "status " + (rk < 3 ? "bad" : nP < 24 ? "warn" : "ok");
+  st.textContent = rk < 3 ? "Photometric stereo impossible: lights coplanar" : nP < 24 ? "Sparse ring: < 24 views may leave gaps in photogrammetry" : `${n} views + ${nL} PS lights: ready`;
+}
+function sc_(v, k) { return v.map(x => x * k); }
+[srings, sper, sps, smast].forEach(el => { const out = el.nextElementSibling; const upd = () => { out.textContent = el.value; drawSphere(); };
+  el.addEventListener("input", upd); out.textContent = el.value; });
+function buildInfo(b) {
+  const P = window.PLAN, st = P && P.stages.find(x => x.n === b);
+  if (!st) { $("buildinfo").textContent = ""; return; }
+  const steps = st.ms.reduce((a, m) => a + m.steps.length, 0), done = st.ms.reduce((a, m) => a + m.steps.filter(s => P.done.includes(s.id)).length, 0);
+  $("buildinfo").textContent = `Stage ${String(b).padStart(2, "0")} ${st.title} · ${st.ms.map(m => m.id).join(", ")} · ${done}/${steps} steps done`;
+}
+$("build").addEventListener("input", e => { const b = +e.target.value; e.target.nextElementSibling.textContent = b;
+  setPhase(b >= 9 ? 9 : b >= 8 ? 8 : 6); buildInfo(b); });
+$("build").nextElementSibling.textContent = "17"; buildInfo(17);
+setPhase(6); fillMats(); drawLobe(); drawSphere();
+</script>
+<script>
+// ---------- calibration lab: same model as software/src/opengonio/sim.py ----------
+(() => {
+  const $ = id => document.getElementById(id), rad = d => d * Math.PI / 180;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function ggxMirror(cosI, cosO, cosH, cosIH) {            // base 0.9, roughness 0.1, metallic 1 (sim "mirror")
+    if (cosI <= 0 || cosO <= 0) return 0;
+    const a = 0.01, a2 = a * a, d = a2 / (Math.PI * (cosH * cosH * (a2 - 1) + 1) ** 2);
+    const g = 2 * cosI * cosO / (cosO * Math.sqrt(cosI * cosI * (1 - a2) + a2) + cosI * Math.sqrt(cosO * cosO * (1 - a2) + a2));
+    const f = 0.9 + 0.1 * (1 - cosIH) ** 5;
+    return d * g * f / (4 * cosI * cosO);
+  }
+  function counts(m3true, m4) {                              // camera on +X, light at M4, sample normal at M3 (in-plane)
+    const n = [Math.cos(rad(m3true)), Math.sin(rad(m3true))], l = [Math.cos(rad(m4)), Math.sin(rad(m4))], c = [1, 0];
+    const h = [l[0] + c[0], l[1] + c[1]], hn = Math.hypot(...h); h[0] /= hn; h[1] /= hn;
+    const cI = n[0] * l[0] + n[1] * l[1], cO = n[0], cH = n[0] * h[0] + n[1] * h[1], cIH = l[0] * h[0] + l[1] * h[1];
+    return ggxMirror(cI, cO, cH, cIH) * cI;
+  }
+  let offset = 0;
+  const S = { th: 40, err: 0.4, drift: 0 };
+  function sweep() {
+    const m4 = 2 * S.th, pts = [];
+    for (let k = 0; k <= 30; k++) { const m3 = S.th - 3 + 0.2 * k; pts.push([m3, counts(m3 - offset + S.err, m4)]); }
+    const peak = counts(S.th, m4) || 1;
+    return pts.map(([x, y], i) => [x, 4 + 216 * y / peak * (1 - S.drift / 100 * (i + 1))]);
+  }
+  let hover = null, last = [];
+  function chart(cv, pts, opts) {
+    const g = cv.getContext("2d"), W = cv.width, H = cv.height, L = 56, R = 20, T = 34, B = 36;
+    const txt = css("--ink"), mut = css("--ink-2"), line = css("--rule");
+    g.clearRect(0, 0, W, H); g.font = "500 13px " + css("--font-text"); g.fillStyle = txt; g.fillText(opts.title, L, 20);
+    const xs = pts.map(p => p[0]), x0 = Math.min(...xs), x1 = Math.max(...xs), y1 = opts.ymax;
+    const X = x => L + (x - x0) / (x1 - x0) * (W - L - R), Y = y => H - B - (y - opts.ymin) / (y1 - opts.ymin) * (H - T - B);
+    g.strokeStyle = line; g.lineWidth = 1; g.fillStyle = mut; g.font = "12px " + css("--font-text");
+    opts.yt.forEach(t => { g.beginPath(); g.moveTo(L, Y(t)); g.lineTo(W - R, Y(t)); g.stroke(); g.fillText(t, 8, Y(t) + 4); });
+    opts.xt.forEach(t => g.fillText(t + (opts.xunit || ""), X(t) - 10, H - B + 16));
+    g.fillText(opts.xlabel, (W - L) / 2, H - 6);
+    if (opts.band) { g.fillStyle = OG.alpha(K.green, .12); g.fillRect(L, Y(opts.band[1]), W - L - R, Y(opts.band[0]) - Y(opts.band[1])); }
+    if (opts.vline != null) { g.strokeStyle = css("--light"); g.lineWidth = 1.5; g.beginPath(); g.moveTo(X(opts.vline), T - 6); g.lineTo(X(opts.vline), H - B); g.stroke();
+      g.fillStyle = txt; g.fillText(opts.vlabel, X(opts.vline) + 6, T + 4); }
+    g.strokeStyle = K.blue; g.lineWidth = 2; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y))); g.stroke();
+    (opts.dots || pts).forEach(([x, y]) => { g.beginPath(); g.arc(X(x), Y(y), 4, 0, 7); g.fillStyle = K.blue; g.fill(); g.lineWidth = 2; g.strokeStyle = css("--ground-2"); g.stroke(); });
+    if (opts.mark) { g.beginPath(); g.arc(X(opts.mark[0]), Y(opts.mark[1]), 7, 0, 7); g.strokeStyle = txt; g.lineWidth = 2; g.stroke(); }
+    if (opts.hover != null) { const [x, y] = pts[opts.hover]; g.fillStyle = css("--ground-3"); g.fillRect(X(x) + 8, Y(y) - 34, 150, 28);
+      g.fillStyle = txt; g.fillText(opts.tip(x, y), X(x) + 14, Y(y) - 16); }
+    return { X, Y };
+  }
+  function draw() {
+    const pts = sweep(); last = pts;
+    const k = pts.reduce((b, p, i) => p[1] > pts[b][1] ? i : b, 0), pe = +(pts[k][0] - S.th).toFixed(2);
+    chart($("mir"), pts, { title: `mirror_${S.th}: brightness vs table angle (what curve.svg shows)`, xlabel: "M3 (deg)", ymin: 0, ymax: 240,
+      yt: [0, 50, 100, 150, 200], xt: [S.th - 3, S.th - 2, S.th - 1, S.th, S.th + 1, S.th + 2, S.th + 3], vline: S.th,
+      vlabel: `M3 = M4/2 = ${S.th}°`, mark: pts[k], hover, tip: (x, y) => `M3 ${x.toFixed(1)}° · ${y.toFixed(0)} counts` });
+    const n = 31, run = [];
+    for (let i = 0; i <= n + 1; i++) run.push([i, 100 * (1 - S.drift / 100 * i)]);
+    const dp = +(100 * (run[n + 1][1] - run[0][1]) / run[0][1]).toFixed(2);
+    chart($("lamp"), run, { title: "lamp during the run: ref_start → 31 shots → ref_end (green band = ±2 %)", xlabel: "shot", ymin: 80, ymax: 102,
+      yt: [80, 90, 100], xt: [0, 8, 16, 24, 32], band: [98, 102], dots: [run[0], run[n + 1]] });
+    $("cpe").textContent = (pe > 0 ? "+" : "") + pe.toFixed(2) + "°"; $("coff").textContent = (offset >= 0 ? "+" : "") + offset.toFixed(2) + "°";
+    $("cdp").textContent = (dp > 0 ? "+" : "") + dp.toFixed(2) + " %";
+    const st = $("cstat"), drift = Math.abs(dp) > 2, warn = Math.abs(pe) > 0.5;
+    st.className = "status " + (drift ? "bad" : warn ? "warn" : "ok");
+    st.textContent = drift ? `verify would say FAIL: lamp drift ${dp} % > 2 %: raise lights.white.warmup_s`
+      : warn ? `verify would say WARN: mirror peak ${pe}° off: run calibrate mirror`
+      : `verify would say PASS${Math.abs(pe) > 0.15 ? " (peak " + pe + "°: calibrate mirror for ±0.2°)" : ""}`;
+  }
+  [["cth", v => S.th = v, v => v + "°"], ["cerr", v => S.err = v, v => (v > 0 ? "+" : "") + v.toFixed(2) + "°"],
+   ["cdrift", v => S.drift = v, v => v.toFixed(2) + " %"]].forEach(([id, set, fmt]) => {
+    const el = $(id), out = el.nextElementSibling;
+    const upd = () => { set(+el.value); out.textContent = fmt(+el.value); draw(); };
+    el.addEventListener("input", upd); out.textContent = fmt(+el.value); set(+el.value); });
+  $("ccal").onclick = () => { const k = last.reduce((b, p, i) => p[1] > last[b][1] ? i : b, 0); offset = +(offset - (last[k][0] - S.th)).toFixed(2); draw(); };
+  $("creset").onclick = () => { offset = 0; draw(); };
+  $("mir").addEventListener("mousemove", e => { const r = e.target.getBoundingClientRect(), x = (e.clientX - r.left) * e.target.width / r.width;
+    const L = 56, W = e.target.width - 20; hover = Math.max(0, Math.min(30, Math.round((x - L) / (W - L) * 30))); draw(); });
+  $("mir").addEventListener("mouseleave", () => { hover = null; draw(); });
+  window.addEventListener("og:theme", draw);
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -26,7 +26,7 @@ BED = (220.0, 220.0, 200.0)        # TLS-01 requirement (the printer bought must
 RHO = 1.04                         # g/cm3, ABS
 SHELL = 1.2                        # mm: average skin over all faces (4 x 0.45 mm walls, 5 x 0.2 mm top/bottom)
 INFILL = 0.25
-SUPPLY = 2000.0                    # g, FIL-01 (2 x 1 kg)
+SUPPLY = 4000.0                    # g, FIL-01 (4 x 1 kg)
 OPTIONAL_STAGES = {"10-color", "15-standalone"}
 OPTIONAL_PARTS = {"CAL-06c": "chrome balls CAL-03", "ENC-04a": "dowel drape ENC-01/03"}   # serve optional bought parts
 REG = dict((m[0], (m[1], m[3])) for m in re.findall(
@@ -77,7 +77,7 @@ def main() -> int:
          "Enclosed printer, nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, brim on tall "
          "or long parts, door shut until cool; XY shrink compensation from the tolerance coupon (M03.3). Print in the "
          "orientation of the STL (flat face down). Filament is an estimate (±25 %): the slicer has the real number.", "",
-         f"**Core machine: ≈ {core:.0f} g of ABS** ({core / SUPPLY * 100:.0f} % of the 2 kg FIL-01 supply; ±25 %, plus any "
+         f"**Core machine: ≈ {core:.0f} g of ABS** ({core / SUPPLY * 100:.0f} % of the 4 kg FIL-01 supply; ±25 %, plus any "
          f"reprints) · optional add-ons (stages 10, 15, {', '.join(OPTIONAL_PARTS)}): ≈ {opt:.0f} g · minimum build volume {BED[0]:.0f} × {BED[1]:.0f} × {BED[2]:.0f} mm "
          f"(largest part: {max(rows, key=lambda r: r[5][2])[1]}, {max(r[5][2] for r in rows):.0f} mm tall).", "",
          "| Stage | ID | Part | Print | Size x × y × z (mm) | ≈ g each | ≈ g total | Fits |", "|---|---|---|---:|---|---:|---:|---|"]

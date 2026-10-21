@@ -1,0 +1,137 @@
+% Open Source Gonioreflectometer -- manuscript for HardwareX (Elsevier). Build: `make paper` (repo root) -> paper/build/opengonio.pdf
+% Structure: HardwareX hardware-article template. Citations: APA 7 (biblatex-apa); keys = IDs in REFERENCES.md.
+% Tables in generated/ and figures in figures/ come from the repo (tools/paper_assets.py): do not edit them by hand.
+% SPDX-License-Identifier: CC-BY-SA-4.0
+\documentclass[preprint,12pt,nonatbib]{elsarticle}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\makeatletter\let\c@author\relax\makeatother   % elsarticle and biblatex both define the author counter
+\usepackage[style=apa,backend=biber]{biblatex}
+\addbibresource{references.bib}
+\usepackage{amsmath,amssymb,graphicx,tabularx,longtable,booktabs,xcolor,siunitx}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Open Source Gonioreflectometer: a four-axis BRDF instrument and 3D scanner built from printed parts without soldering},
+  pdfauthor={Aleksander Norman}, pdfsubject={Open-source scientific hardware},
+  pdfkeywords={BRDF, gonioreflectometer, material appearance, open hardware, 3D printing}, pdflang={en-US}}
+\usepackage{url}
+\graphicspath{{figures/}}
+\input{generated/numbers.tex}
+\newcommand{\tbd}[1]{\textcolor{red}{\textbf{[TBD: #1]}}}   % placeholder until measured data exists
+
+\ifdefined\pdftrailerid\pdftrailerid{opengonio}\fi   % same source -> same PDF bytes (no noise in git)
+\journal{HardwareX}
+
+\begin{document}
+\begin{frontmatter}
+\title{Open Source Gonioreflectometer: a four-axis BRDF instrument and 3D scanner built from printed parts without soldering}
+
+\author[csudh]{Aleksander Norman\corref{cor}}
+\cortext[cor]{Corresponding author: \tbd{email}}
+\affiliation[csudh]{organization={California State University, Dominguez Hills},
+  city={Carson}, state={CA}, country={USA}}
+
+\begin{abstract}
+The Open Source Gonioreflectometer measures the bidirectional reflectance distribution function (BRDF) of flat samples and scans objects in 3D.
+A light arm on a \SI{305}{mm} ring and three sample axes (yaw, tilt, spin) set every illumination and viewing direction
+relative to a fixed camera, following \textcite{R1}. All \nprinted{} structural parts are 3D printed in ABS; the
+\nbought{} bought parts cost \costparts{} from three distributors. No soldering, drilling, sawing or crimping is needed.
+Calibration uses a mirror for angles, an exposure series for camera response and a pressed-PTFE tile for absolute
+reflectance. Fitted Lambert + GGX parameters export to game engines. \tbd{repeatability, accuracy vs. reference data}.
+\end{abstract}
+
+\begin{keyword}
+BRDF \sep gonioreflectometer \sep material appearance \sep open hardware \sep 3D printing \sep photometric calibration
+\end{keyword}
+\end{frontmatter}
+
+\section*{Specifications table}
+\input{generated/specs.tex}
+
+\section{Hardware in context}
+Gonioreflectometers measure how a surface reflects light as a function of incident and reflected direction
+\parencite{G1}. Laboratory instruments reach high accuracy at high cost \parencite{G25,G27,G31}; image-based
+\parencite{G12,G15} and robot-arm \parencite{G39} setups lower the cost but still need machining or industrial arms.
+Consumer-hardware capture \parencite{G38} trades angular coverage for speed. \textcite{R1} describe a multispectral
+goniometric device with a light arm and a three-axis sample stage. The Open Source Gonioreflectometer reproduces that geometry with printed parts,
+stepper motors and a USB camera, for builders without a workshop, consistent with open-hardware practice
+\parencite{H28,H34}.
+
+\section{Hardware description}
+\begin{figure}[h]\centering
+\includegraphics[width=0.85\linewidth]{assembly.png}
+\caption{Whole-machine assembly from the repository CAD (\texttt{cad/assembly}). Sample axes at centre, light arm on the
+ring, measuring camera on the right.}\label{fig:assembly}
+\end{figure}
+
+\begin{figure}[h]\centering
+\includegraphics[width=\linewidth]{axes.pdf}
+\caption{Four axes, one zero point. M4: light arm; M3: table yaw; M2: tilt; M1: spin.}\label{fig:axes}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{Geometry.} M4 (light arm, 20--324\textdegree, 24:1 belt on the ring), M3 (yaw, $\pm$180\textdegree, 5:1),
+  M2 (tilt, $\pm$90\textdegree, 5:1), M1 (spin, direct drive). Camera fixed at \SI{350}{mm}; light at \SI{300}{mm}
+  (Fig.~\ref{fig:axes}). Anisotropic materials need M1 \parencite{G9}.
+\item \textbf{Light.} Chip-on-board LED, colour rendering index 97, \SI{350}{mA} constant current, collimating printed
+  tube with a \SI{10}{mm} aperture; solderless holder clamped by the lamp body.
+\item \textbf{Camera.} 12 MP IMX477 USB module, \SI{16}{mm} lens, printed f/8 stop; exposure, gain and white balance locked.
+\item \textbf{Control.} grblHAL on an RP2040 board (BTT SKR Pico, USB-C) drives four steppers; a microcontroller reads keypads and sensors;
+  optical homing on every axis; over-travel switches in the emergency-stop loop.
+\item \textbf{One screw size.} Every printed join and module mount is an M2 screw self-tapping into a printed pilot;
+  M3 only into the motors, M8 bolts as axles. The base is a printed deck of nine tiles with a pilot at every mount point.
+\item \textbf{No-tool joins.} Lever connectors, screw terminals and modules (optocoupler, LED driver) instead of loose chips.
+\end{itemize}
+
+\section{Design files summary}
+\input{generated/design_files.tex}
+
+\section{Bill of materials summary}
+Parts from Digi-Key, Amazon and Adafruit. Tools (\costtools{}, including the printer) are listed separately in the
+repository. Printed parts: $\approx$\SI{\abs}{g} ABS.
+\input{generated/bom.tex}
+
+\section{Build instructions}
+The repository splits the build into stages (power, controller, frame, each axis, camera and light, calibration).
+Each step lists time, parts, actions, a measured pass criterion and what to check on failure (\path{phases/*/README.md}).
+\begin{enumerate}
+\item Print the tolerance coupon; set clearance and self-tap hole size.
+\item Wire the power box; check polarity and fuse before the first power-on.
+\item Mount the controller; move one motor from the laptop.
+\item Print and bolt the deck; screw every mount into its pilot; assemble the axes; home each axis.
+\item Mount camera and lamp; run the mirror test; calibrate (Section~\ref{sec:validation}).
+\end{enumerate}
+
+\section{Operation instructions}
+\begin{enumerate}
+\item \texttt{opengonio check-pose M4=60 M3=30}: angle and collision check.
+\item \texttt{opengonio capture inplane --step 10 --out data/s}: in-plane sweep.
+\item \texttt{opengonio curve data/s}: calibrated BRDF curve and Lambert + GGX fit \parencite{R6,T11}.
+\end{enumerate}
+Safety: the lamp is viewed only through the sample; the emergency stop cuts motor power.
+
+\section{Validation and characterization}\label{sec:validation}
+\paragraph{Calibration.} Angle offset from the mirror peak ($M_3 = M_4/2$ in-plane); dark level from a lamp-off frame;
+camera response from an exposure series \parencite{R5}; absolute scale from pressed PTFE \parencite{N30}:
+\begin{equation}
+f_r=\frac{C_{\mathrm{lin}}}{C_{w,\mathrm{lin}}}\,\frac{\rho_w}{\pi}\,\frac{\cos 45^\circ}{\cos\theta_i},\qquad
+C_{\mathrm{lin}}=(C-C_d)^{\gamma}.
+\end{equation}
+\paragraph{Results.} \tbd{angular repeatability per axis (mirror, 10 repeats); lamp drift over a run; PTFE reflectance
+vs. reference; matte and glossy samples vs. MERL \parencite{G15} or RGL \parencite{R16} data; scan accuracy}.
+
+\section*{Ethics statements}
+No human or animal subjects.
+
+\section*{CRediT author statement}
+\textbf{Aleksander Norman:} Conceptualization, Methodology, Software, Hardware, Writing -- original draft.
+
+\section*{Declaration of competing interest}
+None.
+
+\section*{Acknowledgements}
+\tbd{acknowledgements}
+
+\printbibliography
+\end{document}

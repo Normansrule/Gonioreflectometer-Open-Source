@@ -8,7 +8,7 @@ Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20
 
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| PLAN-01 | Fit test: M3 self-tap holes + 608 pockets | [PLAN-01_tolerance_coupon.step](PLAN-01_tolerance_coupon.step) | [PLAN-01_tolerance_coupon.stl](PLAN-01_tolerance_coupon.stl) |
+| PLAN-01 | Fit test: M2 self-tap holes + 608 pockets | [PLAN-01_tolerance_coupon.step](PLAN-01_tolerance_coupon.step) | [PLAN-01_tolerance_coupon.stl](PLAN-01_tolerance_coupon.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
@@ -18,6 +18,6 @@ Every bought part has a model in the repo (dummy in `cad/bought/` or open model 
 
 | ID | Part | In the repo | Real model |
 |---|---|---|---|
-| FIL-01 | ABS filament 1.75 mm, black, 1 kg (2 spools) | — | n/a (filament) |
+| FIL-01 | ABS filament 1.75 mm, black, 1 kg (4 spools) | — | n/a (filament) |
 
 Design notes: [../design.md](../design.md).

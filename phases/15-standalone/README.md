@@ -32,8 +32,8 @@ Commit.
 
 #### Do
 
-1. OLED SDA → GP16, SCL → GP17, VCC → 3V3, GND → GND.
-2. `bash scripts/pico.sh`
+1. OLED SDA → ESP32-S3 J3-4 (GPIO 1), SCL → J3-5 (GPIO 2), VIN → J1-2 (3V3), GND → J3-22. With the AS7341 fitted: plug the OLED into the sensor's second STEMMA QT socket instead (README → Wiring → 8).
+2. `bash scripts/hub.sh`
 
 #### Verify
 
@@ -41,7 +41,7 @@ Commit.
 
 #### If a check fails
 
-- Blank: address not 0x3C — some boards are 0x3D; change it in `firmware/pico-hub/main.py`.
+- Blank: address not 0x3C — some boards are 0x3D; change it in `firmware/hub/main.py`.
 
 #### Record
 
@@ -49,7 +49,7 @@ Tick the boxes; `make done id=M40.2`.
 
 ## M41 · Pi Zero station set up
 
-Pi drives the E4 over WiFi and grabs camera frames. · 0/3 steps done · ~1.4 h hands-on · ~1 wk
+Pi drives the SKR Pico over USB and grabs camera frames. · 0/3 steps done · ~1.4 h hands-on · ~1 wk
 
 ### M41.1 SD card
 
@@ -74,9 +74,9 @@ Tick the boxes; `make done id=M41.1`.
 #### Do
 
 1. Set the buck to 5.1 V **before** connecting the Pi (meter on its output).
-2. Two cameras: a powered USB hub on the Pi's OTG port (STA-04) carries both.
-3. Buck input: a thin pair under the jack's `+` / `−` screws in the power box (adapter unplugged first).
-4. Wire buck output, UART and Pico power per `phases/15-standalone/design.md` (Pi GPIO14 → Pico GP1, GPIO15 ← GP0, GND, Pi 5V → Pico VSYS).
+2. A powered USB hub on the Pi's OTG port (STA-04) carries the camera(s) and the SKR Pico's USB-C cable.
+3. Buck input: a thin pair into the FUSED and GND lever connectors in the power box (after the fuse, before the e-stop; 5-way connectors if 3-way are full): pack BAT+ lever open first.
+4. Wire buck output, UART and hub power per README → Wiring → 9: buck 5.1 V → Pi pin 2, buck − → Pi pin 14; Pi pin 8 (GPIO14 TX) → hub J3-16 (GPIO 48), Pi pin 10 (GPIO15 RX) ← hub J3-17 (GPIO 47), Pi pin 6 → hub J3-1 (GND), Pi pin 4 (5V) → hub J1-21 (5V); never with the hub's USB in the laptop at the same time.
 
 #### Verify
 

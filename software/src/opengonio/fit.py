@@ -4,6 +4,9 @@ Model: Lambert diffuse + GGX specular, metallic-roughness parameters (the glTF /
 convention) [R6][R2]. Grey (one channel): base colour is a single value 0–1.
 Search: coarse grid over (base colour, roughness, metallic), then three finer grids around the best point;
 the error is the RMS of f_r - model over all rows, reported as % of the measured peak.
+Validation: the same fit on 4 of every 5 rows, scored on the 5th (holdout RMS); a holdout RMS far above the fit RMS
+means the model or the sampling does not support the parameters. fit.json records what was fitted (curve file and
+calibration id, quantity, model) - a material fitted to relative values is labelled so.
 """
 from __future__ import annotations
 
@@ -66,11 +69,35 @@ def fit(data: dict[str, np.ndarray]) -> dict:
                         "Unity (URP Lit, metallic)": {"Base Map": [b, b, b], "Smoothness": round(1 - r, 3), "Metallic": m}}}
 
 
+def holdout(data: dict[str, np.ndarray], every: int = 5) -> dict | None:
+    """Fit on all rows except every `every`-th, score on those. None when there are too few rows to hold any out."""
+    n = len(data["f"])
+    test = np.arange(n) % every == every - 1
+    if test.sum() < 2 or (~test).sum() < 6:
+        return None
+    train = fit({k: v[~test] for k, v in data.items()})
+    wi, wo = _vec(data["theta_i"][test], data["phi_i"][test]), _vec(data["theta_r"][test], data["phi_r"][test])
+    pred = ggx(wi, wo, train["base_color"], train["roughness"], train["metallic"])
+    rms = float(np.sqrt(np.mean((pred - data["f"][test]) ** 2)))
+    return {"rows_held_out": int(test.sum()), "rule": f"every {every}th row", "rms_per_sr": round(rms, 5),
+            "rms_pct_of_peak": round(100 * rms / float(data["f"].max()), 2),
+            "params_from_training_rows": {k: train[k] for k in ("base_color", "roughness", "metallic")}}
+
+
 def fit_run(run: str | Path) -> dict:
+    from . import __version__
     from .plot import line_chart
     d = Path(run)
     data = load_curve(d)
     res = fit(data)
+    meta = d / "curve.json"
+    cprov = json.loads(meta.read_text(encoding="utf-8")) if meta.exists() else {}
+    res["holdout"] = holdout(data)
+    res["provenance"] = {"curve": "curve.csv", "calibration": cprov.get("calibration"),
+                         "relative_only": cprov.get("relative_only"), "software": f"opengonio {__version__}",
+                         "quantity": "grey BRDF of the signal plane mean(R,G,B) (one channel: no colour)",
+                         "model": "Lambert + GGX, metallic-roughness, F0 dielectric 0.04",
+                         "note": "an engine material approximates the measured curve; check holdout before use"}
     (d / "fit.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
     inplane = np.abs(np.abs(((data["phi_r"] - data["phi_i"] + 180) % 360) - 180) - 180) < 1.0
     inplane |= (data["theta_i"] < 0.5) | (data["theta_r"] < 0.5)

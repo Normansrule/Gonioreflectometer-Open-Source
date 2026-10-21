@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """One health check for the whole repo: `make check` (or `python tools/check.py`).
 
-Checks: milestones file, parts lists + budget, reference IDs, internal links, machine + calibration config,
+Checks: milestones file, parts lists + budget, reference IDs, internal links, machine + calibration config, wiring pins,
 simulator numbers (docs/machine.js) = machine.yaml.
 Prints one line per problem and exits 1 if there are any.
 SPDX-License-Identifier: GPL-3.0-or-later
@@ -84,11 +84,13 @@ def check_refs_and_links() -> list[str]:
     for f in md_files():
         t = f.read_text(encoding="utf-8")
         rel = f.relative_to(ROOT)
+        if rel.parts[:2] == ("wiki", "src"):          # templates: {{REPO}} and wiki pages resolve after tools/refs_bib.py
+            continue
         if f.name != "REFERENCES.md" and f != ROOT / "README.md":
             for r in sorted(set(re.findall(r"\[([A-Z]\d{1,3})\](?!\()", t)) - known):
                 errs.append(f"{rel}: cites [{r}], not in REFERENCES.md")
         for link in re.findall(r"\]\(([^)\s]+)\)", t) + re.findall(r'src="([^"]+)"', t):
-            path = link.split("#")[0]
+            path = link.split("#")[0].split("?")[0]
             if path and not link.startswith(("http", "mailto")) and not (f.parent / path).exists():
                 errs.append(f"{rel}: broken link {link}")
     return errs
@@ -100,7 +102,7 @@ BAD_MACROS = ("\\operatorname", "\\DeclareMathOperator", "\\newcommand", "\\def"
 def check_math_and_parts() -> list[str]:
     """GitHub refuses some TeX macros ("The following macros are not allowed"); PARTS.md status words must be known."""
     errs = []
-    for f in list(md_files()) + [ROOT / "docs" / "index.html"]:
+    for f in list(md_files()) + [ROOT / "docs" / "index.html", ROOT / "docs" / "lab.html"]:
         t = f.read_text(encoding="utf-8")
         for mac in BAD_MACROS:
             if mac in t:
@@ -136,9 +138,34 @@ def check_config() -> list[str]:
     return errs
 
 
+def check_wiring() -> list[str]:
+    import wiring
+    return wiring.check()
+
+
+def check_site() -> list[str]:
+    """Website and control app: every local src/href resolves, and the app's copy of docs/og matches the original."""
+    errs = []
+    app = ROOT / "software" / "src" / "opengonio" / "app" / "static"
+    for page in (ROOT / "docs" / "index.html", ROOT / "docs" / "lab.html", app / "index.html"):
+        for ref in re.findall(r'(?:src|href)="([^"#?]+)', page.read_text(encoding="utf-8")):
+            if re.match(r"^(https?:|mailto:|data:)", ref) or ref.startswith("/api/"):
+                continue
+            if not (page.parent / ref).exists():
+                errs.append(f"{page.relative_to(ROOT)}: missing {ref}")
+    for f in (ROOT / "docs" / "og").rglob("*"):
+        rel = f.relative_to(ROOT / "docs" / "og")
+        if f.is_file() and (rel.parts[0] == "fonts" or f.name in ("og.css", "og.js", "icon.svg")):
+            twin = app / "og" / rel
+            if not twin.exists() or twin.read_bytes() != f.read_bytes():
+                errs.append(f"{twin.relative_to(ROOT)} differs from docs/og/{rel} (run `make build`)")
+    return errs
+
+
 def main() -> int:
     groups = {"milestones": check_phases, "parts + budget": check_bom, "references + links": check_refs_and_links,
-              "machine config + simulator": check_config, "math macros + PARTS.md": check_math_and_parts}
+              "machine config + simulator": check_config, "math macros + PARTS.md": check_math_and_parts,
+              "wiring (docs/wiring.yaml vs firmware)": check_wiring, "website + app files": check_site}
     bad = 0
     for name, fn in groups.items():
         errs = fn()

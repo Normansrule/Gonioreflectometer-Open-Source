@@ -106,7 +106,7 @@ def main(check_only: bool = False) -> int:
          "anywhere along each axis' travel (M4 20–324°, M3 a full turn, M2 ±90°), and no part in the sight lines from the measuring "
          "camera, the scan camera and the lamp to the sample. Run it after every CAD change.", "",
          "**Start in Onshape:** Create → Import → `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, "
-         "which holds every STEP). Units are millimetres. Origin: the plywood top under the zero point; +X toward the camera, +Z up. "
+         "which holds every STEP). Units are millimetres. Origin: the deck top under the zero point; +X toward the camera, +Z up. "
          "Pose shown: light arm on +Y (M4 = 90°), table at 0 (M3), platter face up (M2 = 90°).", "",
          "**Dummies vs real models:** a dummy is a plain envelope built from the datasheet dimensions (source in `tools/cad/bought.py`). "
          "Where the vendor publishes a model, swap the dummy for the `cad/vendor/` file; the dummy's origin and axes follow the comment in "

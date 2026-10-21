@@ -4,35 +4,48 @@
 
 Enclosed printer, nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, brim on tall or long parts, door shut until cool; XY shrink compensation from the tolerance coupon (M03.3). Print in the orientation of the STL (flat face down). Filament is an estimate (±25 %): the slicer has the real number.
 
-**Core machine: ≈ 1033 g of ABS** (52 % of the 2 kg FIL-01 supply; ±25 %, plus any reprints) · optional add-ons (stages 10, 15, CAL-06c, ENC-04a): ≈ 106 g · minimum build volume 220 × 220 × 200 mm (largest part: FRM-09h, 184 mm tall).
+**Core machine: ≈ 2848 g of ABS** (71 % of the 4 kg FIL-01 supply; ±25 %, plus any reprints) · optional add-ons (stages 10, 15, CAL-06c, ENC-04a): ≈ 106 g · minimum build volume 220 × 220 × 200 mm (largest part: FRM-09h, 184 mm tall).
 
 | Stage | ID | Part | Print | Size x × y × z (mm) | ≈ g each | ≈ g total | Fits |
 |---|---|---|---:|---|---:|---:|---|
-| 00-plan | PLAN-01 | [Fit test: M3 self-tap holes + 608 pockets](../phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) | 1 | 100 × 60 × 8 | 26 | 26 | yes |
-| 01-power | PWR-18a | [Power box](../phases/01-power/3d/PWR-18a_power_box.stl) | 1 | 120 × 80 × 60 | 87 | 87 | yes |
-| 01-power | PWR-18b | [Power box lid (e-stop)](../phases/01-power/3d/PWR-18b_power_lid.stl) | 1 | 120 × 80 × 3 | 26 | 26 | yes |
+| 00-plan | PLAN-01 | [Fit test: M2 self-tap holes + 608 pockets](../phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) | 1 | 100 × 60 × 8 | 26 | 26 | yes |
+| 01-power | PWR-18a | [Power box](../phases/01-power/3d/PWR-18a_power_box.stl) | 1 | 160 × 130 × 80 | 191 | 191 | yes |
+| 01-power | PWR-18b | [Power box lid (e-stop)](../phases/01-power/3d/PWR-18b_power_lid.stl) | 1 | 160 × 130 × 5 | 58 | 58 | yes |
 | 02-controller | CTL-10a | [Keypad panel + OLED window](../phases/02-controller/3d/CTL-10a_button_panel.stl) | 1 | 160 × 60 × 3 | 26 | 26 | yes |
-| 02-controller | CTL-10b | [Controller tray (E4 + Pico + breadboard)](../phases/02-controller/3d/CTL-10b_controller_tray.stl) | 1 | 200 × 130 × 10 | 64 | 64 | yes |
-| 03-frame | FRM-09a | [OG-40 adapter plate](../phases/03-frame/3d/FRM-09a_og40_adapter.stl) | 1 | 56 × 56 × 6 | 12 | 12 | yes |
-| 03-frame | FRM-09b | [Corner foot, screws on (print 4)](../phases/03-frame/3d/FRM-09b_foot.stl) | 4 | 50 × 50 × 12 | 14 | 55 | yes |
-| 03-frame | FRM-09c | [Ring scale, 80 deg (print 4: 20-340 deg)](../phases/03-frame/3d/FRM-09c_protractor_segment.stl) | 4 | 147 × 172 × 2 | 7 | 29 | yes |
-| 03-frame | FRM-09d | [2020 saddle, screws on (print 2)](../phases/03-frame/3d/FRM-09d_extrusion_saddle.stl) | 2 | 45 × 40 × 22 | 9 | 19 | yes |
+| 02-controller | CTL-10b | [Controller tray (E4 + Pico + opto + LED driver)](../phases/02-controller/3d/CTL-10b_controller_tray.stl) | 1 | 200 × 130 × 15 | 77 | 77 | yes |
+| 03-frame | FRM-01a | [Deck tile SW (x -300..-100, y -300..-100)](../phases/03-frame/3d/FRM-01a_deck_tile_SW.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
+| 03-frame | FRM-01b | [Deck tile S (x -100..100, y -300..-100)](../phases/03-frame/3d/FRM-01b_deck_tile_S.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
+| 03-frame | FRM-01c | [Deck tile SE: power box (x 100..300, y -300..-100)](../phases/03-frame/3d/FRM-01c_deck_tile_SE.stl) | 1 | 200 × 200 × 24 | 159 | 159 | yes |
+| 03-frame | FRM-01d | [Deck tile W (x -300..-100, y -100..100)](../phases/03-frame/3d/FRM-01d_deck_tile_W.stl) | 1 | 200 × 200 × 24 | 159 | 159 | yes |
+| 03-frame | FRM-01e | [Deck tile C: table post + motor (x -100..100, y -100..100)](../phases/03-frame/3d/FRM-01e_deck_tile_C.stl) | 1 | 200 × 200 × 24 | 160 | 160 | yes |
+| 03-frame | FRM-01f | [Deck tile E: M4 motor + saddles (x 100..300, y -100..100)](../phases/03-frame/3d/FRM-01f_deck_tile_E.stl) | 1 | 200 × 200 × 24 | 164 | 164 | yes |
+| 03-frame | FRM-01g | [Deck tile NW: controller tray (x -300..-100, y 100..300)](../phases/03-frame/3d/FRM-01g_deck_tile_NW.stl) | 1 | 200 × 200 × 24 | 160 | 160 | yes |
+| 03-frame | FRM-01h | [Deck tile N (x -100..100, y 100..300)](../phases/03-frame/3d/FRM-01h_deck_tile_N.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
+| 03-frame | FRM-01i | [Deck tile NE (x 100..300, y 100..300)](../phases/03-frame/3d/FRM-01i_deck_tile_NE.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
+| 03-frame | FRM-02a | [Outrigger bar 1, 250 mm (x 215..465)](../phases/03-frame/3d/FRM-02a_outrigger_bar_1.stl) | 1 | 250 × 20 × 20 | 45 | 45 | yes |
+| 03-frame | FRM-02b | [Outrigger bar 2, 250 mm (x 465..715)](../phases/03-frame/3d/FRM-02b_outrigger_bar_2.stl) | 1 | 250 × 20 × 20 | 45 | 45 | yes |
+| 03-frame | FRM-02c | [Scan post bar 1, 175 mm (z 36..211)](../phases/03-frame/3d/FRM-02c_scan_post_bar_1.stl) | 1 | 175 × 20 × 20 | 32 | 32 | yes |
+| 03-frame | FRM-02d | [Scan post bar 2, 175 mm (z 211..386)](../phases/03-frame/3d/FRM-02d_scan_post_bar_2.stl) | 1 | 175 × 20 × 20 | 32 | 32 | yes |
+| 03-frame | FRM-09c | [Ring scale + lazy-Susan clamp, 80 deg (print 4: 20-340 deg)](../phases/03-frame/3d/FRM-09c_protractor_segment.stl) | 4 | 149 × 172 × 5 | 19 | 76 | yes |
+| 03-frame | FRM-09d | [Outrigger saddle (print 2)](../phases/03-frame/3d/FRM-09d_bar_saddle.stl) | 2 | 40 × 40 × 22 | 9 | 18 | yes |
 | 03-frame | FRM-09e | [Scan-post socket on the outrigger](../phases/03-frame/3d/FRM-09e_post_socket.stl) | 1 | 40 × 32 × 50 | 19 | 19 | yes |
-| 03-frame | FRM-09h | [Measuring-camera pillar on the outrigger](../phases/03-frame/3d/FRM-09h_camera_pillar.stl) | 1 | 40 × 32 × 184 | 41 | 41 | yes |
+| 03-frame | FRM-09h | [Measuring-camera pillar on the outrigger](../phases/03-frame/3d/FRM-09h_camera_pillar.stl) | 1 | 40 × 32 × 184 | 40 | 40 | yes |
 | 03-frame | FRM-09f | [Outrigger end foot](../phases/03-frame/3d/FRM-09f_end_foot.stl) | 1 | 40 × 40 × 42 | 22 | 22 | yes |
-| 03-frame | FRM-09g | [4 mm screw washers for the lazy Susan (8)](../phases/03-frame/3d/FRM-09g_washers.stl) | 1 | 60 × 28 × 4 | 3 | 3 | yes |
-| 04-light-arm | LAR-08a | [Belt rim segment (print 7)](../phases/04-light-arm/3d/LAR-08a_rim_segment.stl) | 7 | 60 × 108 × 9 | 12 | 85 | yes |
+| 03-frame | FRM-09i | [Bar coupler: outrigger, scan post (print 2)](../phases/03-frame/3d/FRM-09i_bar_coupler.stl) | 2 | 28 × 28 × 50 | 15 | 29 | yes |
+| 04-light-arm | LAR-08a | [Belt rim segment (print 7)](../phases/04-light-arm/3d/LAR-08a_rim_segment.stl) | 7 | 60 × 108 × 9 | 12 | 87 | yes |
 | 04-light-arm | LAR-08b | [M4 motor mount at 0 deg, pinion meshes the rim](../phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl) | 1 | 78 × 96 × 30 | 42 | 42 | yes |
-| 04-light-arm | LAR-08c | [Arm segment: rim segment + 2020 upright socket](../phases/04-light-arm/3d/LAR-08c_arm_segment.stl) | 1 | 66 × 108 × 39 | 26 | 26 | yes |
-| 04-light-arm | LAR-08e | [2020 cross clamp: upright to horizontal arm](../phases/04-light-arm/3d/LAR-08e_cross_clamp.stl) | 1 | 54 × 32 × 32 | 19 | 19 | yes |
-| 05-table | TBL-07a | [Table drum: 100T teeth, 608 seats, OG-40 top](../phases/05-table/3d/TBL-07a_table_drum.stl) | 1 | 68 × 68 × 27 | 38 | 38 | yes |
+| 04-light-arm | LAR-08c | [Arm segment: rim segment + upright socket](../phases/04-light-arm/3d/LAR-08c_arm_segment.stl) | 1 | 66 × 108 × 39 | 26 | 26 | yes |
+| 04-light-arm | LAR-08e | [Cross clamp: upright to horizontal arm](../phases/04-light-arm/3d/LAR-08e_cross_clamp.stl) | 1 | 54 × 32 × 32 | 19 | 19 | yes |
+| 04-light-arm | LAR-08f | [Light-arm upright bar, 200 mm](../phases/04-light-arm/3d/LAR-08f_upright_bar.stl) | 1 | 200 × 20 × 20 | 36 | 36 | yes |
+| 04-light-arm | LAR-08g | [Horizontal light-arm bar, 200 mm](../phases/04-light-arm/3d/LAR-08g_arm_bar.stl) | 1 | 200 × 20 × 20 | 36 | 36 | yes |
+| 05-table | TBL-07a | [Table drum: 100T teeth, 608 seats, OG-40 top](../phases/05-table/3d/TBL-07a_table_drum.stl) | 1 | 68 × 68 × 27 | 37 | 37 | yes |
 | 05-table | TBL-07b | [Home flag (print 3: table, tilt, spin)](../phases/05-table/3d/TBL-07b_home_flag.stl) | 3 | 16 × 34 × 10 | 1 | 3 | yes |
 | 05-table | TBL-07c | [Table motor bracket (shaft up, slotted)](../phases/05-table/3d/TBL-07c_table_motor_bracket.stl) | 1 | 46 × 79 × 53 | 30 | 30 | yes |
-| 05-table | TBL-07d | [Table post: fixed M8 x 75 axle (hex-locked head)](../phases/05-table/3d/TBL-07d_table_post.stl) | 1 | 54 × 54 × 52 | 20 | 20 | yes |
+| 05-table | TBL-07d | [Table post: fixed M8 x 75 axle (hex-locked head)](../phases/05-table/3d/TBL-07d_table_post.stl) | 1 | 54 × 54 × 52 | 21 | 21 | yes |
 | 05-table | TBL-07f | [Spacers + shims, table and tilt (one print)](../phases/05-table/3d/TBL-07f_spacers.stl) | 1 | 60 × 28 × 9 | 2 | 2 | yes |
 | 06-camera-light | CAM-03a | [f/8 aperture stop](../phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) | 1 | 14 × 14 × 1 | 0 | 0 | yes |
 | 06-camera-light | CAM-03b | [Camera plate + post clamp](../phases/06-camera-light/3d/CAM-03b_camera_plate.stl) | 1 | 50 × 50 × 34 | 18 | 18 | yes |
-| 06-camera-light | LSR-05a | [Lamp body + tube, 2020 clamp, polarizer slot](../phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) | 1 | 53 × 72 × 74 | 36 | 36 | yes |
+| 06-camera-light | LSR-05a | [Lamp body + tube, bar clamp, polarizer slot](../phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) | 1 | 53 × 72 × 74 | 36 | 36 | yes |
 | 06-camera-light | LSR-05b | [Lamp back cap](../phases/06-camera-light/3d/LSR-05b_lamp_cap.stl) | 1 | 48 × 48 × 3 | 6 | 6 | yes |
 | 07-calibrate | CAL-06a | [PTFE holder](../phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl) | 1 | 60 × 60 × 11 | 15 | 15 | yes |
 | 07-calibrate | CAL-06b | [Mirror holder](../phases/07-calibrate/3d/CAL-06b_mirror_holder.stl) | 1 | 60 × 60 × 8 | 14 | 14 | yes |
@@ -51,4 +64,4 @@ Enclosed printer, nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm 
 | 11-scan-capture | SCN-03d | [Scan camera plate, looks 15 deg down](../phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.stl) | 1 | 50 × 52 × 44 | 20 | 20 | yes |
 | 15-standalone | STA-07a (optional) | [Pi Zero 2 W mount](../phases/15-standalone/3d/STA-07a_pi_zero_mount.stl) | 1 | 75 × 40 × 11 | 9 | 9 | yes |
 
-Total all parts: ≈ 1139 g. Regenerate: `make parts` (or `python tools/cad/printability.py`).
+Total all parts: ≈ 2954 g. Regenerate: `make parts` (or `python tools/cad/printability.py`).

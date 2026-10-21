@@ -24,11 +24,18 @@ def _meta(folder: Path) -> dict:
     return json.loads((folder / "scan.json").read_text(encoding="utf-8"))
 
 
-def _calib(cfg: Machine, meta: dict):
-    if meta.get("calibrated") and cfg.scan.get("calibration"):
-        from .calibrate import CameraCalibration
+def _calib(cfg: Machine, meta: dict, folder: Path | None = None):
+    """The measured camera saved WITH the run (scan_calibration.yaml in the folder); a run never reads the current
+    machine.yaml calibration path, so moving or editing that file can't change an old scan."""
+    if not meta.get("calibrated"):
+        return None
+    from .calibrate import CameraCalibration
+    name = meta.get("calibration_file")
+    if folder is not None and name and (folder / name).exists():
+        return CameraCalibration.load(folder / name)
+    if meta.get("schema", 1) < 2 and cfg.scan.get("calibration"):      # legacy runs stored no copy
         return CameraCalibration.load(cfg.scan["calibration"])
-    return None
+    raise FileNotFoundError(f"scan.json says calibrated but {name} is missing from the run folder")
 
 
 def _grey(a) -> np.ndarray:
@@ -37,30 +44,41 @@ def _grey(a) -> np.ndarray:
 
 
 def hull(cfg: Machine, folder: str | Path, voxel_mm: float = 1.0, downscale: int = 4, threshold: float = 12.0,
-         clip_below_mm: float | None = None, read=None) -> dict:
+         clip_below_mm: float | None = None, read=None, min_coverage: float = 0.8, min_views: int = 8) -> dict:
+    """Visual hull from object + empty-platter image pairs. Refuses to run with fewer than min_views pairs or under
+    min_coverage of the planned views (a hull from a few views is far larger than the object). Output is a POINT CLOUD
+    of the hull surface (hull.ply), not a mesh, and the hull can't see concavities."""
     folder = Path(folder)
     meta, read = _meta(folder), read or default_reader()
     K = Intrinsics(**meta["intrinsics"]).scaled(1.0 / downscale)
-    scfg, calib = cfg.for_scan(), _calib(cfg, meta)
-    masks, views = [], []
+    scfg, calib = cfg.for_scan(), _calib(cfg, meta, folder)
+    dist = calib.dist if calib is not None else meta.get("distortion")
+    masks, views, missing = [], [], []
     for i, pose in enumerate(meta["plan"]):
         name = f"img_{i:04d}"
         f = next((folder / "images" / f"{name}{e}" for e in (".jpg", ".png") if (folder / "images" / f"{name}{e}").exists()), None)
         b = next((folder / "background" / f"{name}{e}" for e in (".jpg", ".png") if (folder / "background" / f"{name}{e}").exists()), None)
         if f is None or b is None:
+            missing.append(name)
             continue
         img, bg = _grey(read(f))[::downscale, ::downscale], _grey(read(b))[::downscale, ::downscale]
         masks.append(silhouette_from_background(img, bg, threshold))
         views.append(object_to_camera(scfg, pose, float(meta.get("platter_offset_mm", 0.0)), calib))
+    planned = len(meta["plan"])
     if not masks:
         raise FileNotFoundError("no image + background pairs: run `opengonio scan run --background` and `scan run` first")
+    if len(masks) < min_views or len(masks) < min_coverage * planned:
+        raise ValueError(f"only {len(masks)} of {planned} views have image + background (need >= {min_views} and "
+                         f">= {min_coverage:.0%}); missing e.g. {missing[:5]}")
     half = 1.1 * float(cfg.scan["object_max_radius_mm"])
-    grid = carve(masks, views, K.K, half_size_mm=half, n=int(2 * half / voxel_mm), clip_below_z=clip_below_mm)
+    grid = carve(masks, views, K.K, half_size_mm=half, n=int(2 * half / voxel_mm), clip_below_z=clip_below_mm, dist=dist)
     pts = grid.centers()
     write_ply(folder / "hull.ply", grid.surface_points())
     size = (pts.max(0) - pts.min(0) + grid.voxel_mm) if len(pts) else np.zeros(3)
-    return {"views": len(masks), "voxel_mm": round(grid.voxel_mm, 3), "size_mm": [round(float(v), 1) for v in size],
-            "volume_cm3": round(grid.volume_mm3 / 1000, 2), "ply": str(folder / "hull.ply")}
+    return {"views": len(masks), "planned_views": planned, "missing_views": missing, "voxel_mm": round(grid.voxel_mm, 3),
+            "size_mm": [round(float(v), 1) for v in size], "volume_cm3": round(grid.volume_mm3 / 1000, 2),
+            "camera_model": meta.get("intrinsics_source", "nominal") + (" + distortion" if dist and any(dist) else ""),
+            "output": "visual-hull surface points (not a mesh; concavities are not recovered)", "ply": str(folder / "hull.ply")}
 
 
 def ps(cfg: Machine, folder: str | Path, station: int = 0, gamma: float = 1.0, sphere: bool = False, read=None) -> dict:
@@ -71,13 +89,21 @@ def ps(cfg: Machine, folder: str | Path, station: int = 0, gamma: float = 1.0, s
     imgs = [_grey(read(folder / "ps" / f"st{station:02d}_l{k}.png")) for k in range(len(L))]
     I = (np.clip(np.stack(imgs), 0, 255) / 255.0) ** gamma                    # linear 0-1 [R5]
     res = solve(I, L)
-    R_oc, _ = object_to_camera(cfg.for_scan(), st["pose"], float(meta.get("platter_offset_mm", 0.0)), _calib(cfg, meta))
+    R_oc, _ = object_to_camera(cfg.for_scan(), st["pose"], float(meta.get("platter_offset_mm", 0.0)), _calib(cfg, meta, folder))
     n_cam = res.normals @ R_oc.T
     rgb = np.where(res.valid[..., None], (n_cam * [1, -1, -1] + 1) / 2 * 255, 0)   # x right, y up, z to viewer
     write_png(folder / f"normals_st{station:02d}.png", rgb)
     write_png(folder / f"albedo_st{station:02d}.png", np.clip(res.albedo / max(res.albedo.max(), 1e-9) * 255, 0, 255))
+    import math
+    r_obj, d_light = float(cfg.scan["object_max_radius_mm"]), float(cfg.light_distance_mm)
+    far = math.degrees(math.atan(r_obj / d_light))
     out = {"station": station, "lights": len(L), "valid_fraction": round(float(res.valid.mean()), 3),
-           "normals": str(folder / f"normals_st{station:02d}.png")}
+           "normals": str(folder / f"normals_st{station:02d}.png"),
+           "light_model": "distant lights (one direction per LED position for the whole object)",
+           "far_field_direction_error_deg_max": round(far, 1),
+           "note": ("near-light correction not applied: light direction varies up to "
+                    f"{far:.1f} deg across a {r_obj:.0f} mm object at {d_light:.0f} mm; validate on a sphere (--sphere) "
+                    "before trusting absolute normals")}
     if sphere:                                    # S6: compare with the ideal sphere that best fits the normals
         v, u = np.nonzero(res.valid)
         nx, ny = n_cam[v, u, 0], n_cam[v, u, 1]

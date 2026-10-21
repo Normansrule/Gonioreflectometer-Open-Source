@@ -189,4 +189,8 @@ user_outputs:
   digital2_pin: gpio.13              # fan MOSFET (optional fan, P2)
 
 start:
-  must_home: false                   # the laptop homes M4 first, then the stage
+  must_home: true                    # power-up in Alarm (Unhomed): no motion until homed; the laptop homes M4 first,
+                                     # then the stage ($HX, $HY ...). Bench check (stage 04): after power-up `?` shows
+                                     # Alarm; after homing every installed axis it shows Idle. If your FluidNC build keeps
+                                     # the alarm until every configured axis is homed, set false (the software still refuses
+                                     # moves until it has homed) and note it in phases/04-light-arm/design.md.

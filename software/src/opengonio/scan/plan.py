@@ -43,17 +43,18 @@ def check_object(cfg: Machine, radius_mm: float | None = None) -> None:
         cl = scan_view_clearance_mm(cfg)
         if cl["line_of_sight_mm"] <= 0:
             raise PlanError(f"scan camera can't see over the measuring camera ({cl}): raise scan.camera_elevation_deg")
-    import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "tools"))
-    try:
-        import optics
-        dof = optics.scan_dof_mm(float(cfg.camera["focal_length_mm"]), float(cfg.scan["camera_distance_mm"]),
-                                 float(cfg.scan["aperture_f"]), float(cfg.camera["pixel_um"]))
-        if 2 * r > dof:
-            raise PlanError(f"object depth {2 * r:.0f} mm exceeds the {dof:.0f} mm depth of field")
-    except ImportError:                       # installed package without the repo tools
-        pass
+    dof = scan_dof_mm(float(cfg.camera["focal_length_mm"]), float(cfg.scan["camera_distance_mm"]),
+                      float(cfg.scan["aperture_f"]), float(cfg.camera["pixel_um"]))
+    if 2 * r > dof:
+        raise PlanError(f"object depth {2 * r:.0f} mm exceeds the {dof:.0f} mm depth of field")
+
+
+def scan_dof_mm(f_mm: float, object_mm: float, n: float, pixel_um: float, lam_um: float = 0.55) -> float:
+    """Thin-lens depth of field, blur circle = max(2 pixels, diffraction FWHM 1.03 lambda N): same model as
+    tools/optics.py (tests/test_audit.py checks they agree), here so an installed package always runs the check."""
+    m = f_mm / (abs(object_mm) - f_mm)
+    coc_um = max(2 * pixel_um, 1.03 * lam_um * n)
+    return 2 * n * (coc_um / 1000.0) * (1 + m) / (m * m)
 
 
 def rings_plan(cfg: Machine, rings: list[dict] | None = None, lamp_m4: float | None = None) -> list[ScanPose]:

@@ -5,7 +5,23 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 HOST=${1:?usage: bash scripts/station.sh USER@opengonio.local}
-git archive --format=tar HEAD | ssh "$HOST" "rm -rf ~/opengonio && mkdir -p ~/opengonio && tar -x -C ~/opengonio"
+# Update keeps the station's own machine.yaml and calibration.yaml: the new code goes to ~/opengonio.new, the two files
+# are carried over from the old install (the repo's machine.yaml is left beside it as machine.yaml.repo to compare),
+# the old install is kept as ~/opengonio.prev. Nothing measured is lost by re-running this script.
+git archive --format=tar HEAD | ssh "$HOST" 'set -e; rm -rf ~/opengonio.new; mkdir -p ~/opengonio.new; tar -x -C ~/opengonio.new
+for f in machine.yaml calibration.yaml; do
+  if [ -f ~/opengonio/software/config/$f ]; then
+    [ "$f" = machine.yaml ] && cp ~/opengonio.new/software/config/$f ~/opengonio.new/software/config/$f.repo
+    cp -p ~/opengonio/software/config/$f ~/opengonio.new/software/config/$f
+    echo "kept the station $f"
+    if [ "$f" = machine.yaml ] && ! cmp -s ~/opengonio.new/software/config/$f ~/opengonio.new/software/config/$f.repo; then
+      echo "NOTE the repo machine.yaml changed: compare with diff ~/opengonio/software/config/machine.yaml{,.repo}"
+    fi
+  fi
+done
+if [ -d ~/opengonio ]; then rm -rf ~/opengonio.prev; mv ~/opengonio ~/opengonio.prev; fi
+mv ~/opengonio.new ~/opengonio'
+
 ssh "$HOST" 'bash -s' <<'REMOTE'
 set -e
 sudo apt-get update -qq

@@ -17,27 +17,34 @@ machine:
   min_phase_angle_deg: 5.0      # extra angular buffer between light and camera, as in [R1]
   repeatability_target_deg: 0.1
 
-controller:                     # FYSETC E4 running FluidNC
-  transport: serial             # serial (USB or Bluetooth COM port) | tcp (WiFi)
-  port: auto                    # COM5, /dev/ttyUSB0, /dev/rfcomm0 ... auto = first CH340
+controller:                     # BTT SKR Pico V1.0 running grblHAL (USB-C)
+  firmware: grblhal             # grblhal (SKR Pico) | fluidnc (ESP32 boards such as the FYSETC E4)
+  transport: serial             # serial (USB-C) | tcp (WiFi: FluidNC boards only)
+  port: auto                    # COM5, /dev/ttyACM0 ... auto = first port with the firmware's USB VID (RP2040 0x2E8A)
   baud: 115200
-  host: fluidnc.local           # tcp only
+  host: fluidnc.local           # tcp only (FluidNC)
   tcp_port: 23
   feed_deg_per_min: 600
 
-hub:                            # Raspberry Pi Pico panel + sensor hub
-  port: auto
+hub:                            # ESP32-S3 DevKitC-1 panel + sensor hub (MicroPython)
+  port: auto                    # auto = first Espressif USB port (VID 0x303A: the board's "USB" connector)
   baud: 115200
 
 station:                        # standalone mode: Pi Zero 2 W runs `opengonio station` (no laptop)
-  controller: {transport: tcp, host: fluidnc.local, tcp_port: 23}   # E4 over WiFi
-  hub_port: /dev/serial0        # Pico panel on the Pi UART (Pi GPIO14 TX -> Pico GP1, GPIO15 RX <- Pico GP0)
+  controller: {transport: serial, port: auto}   # SKR Pico USB-C into the Pi's USB hub (STA-04)
+  hub_port: /dev/serial0        # ESP32-S3 hub on the Pi UART (Pi GPIO14 TX -> hub GPIO 48 RX, GPIO15 RX <- hub GPIO 47 TX)
   data_dir: ~/opengonio-data    # one folder per job: images + manifest.json
   exposure_ms: 20
 
 spectral:                       # AS7341 above the camera lens (stage 10): set from your mount
   elevation_deg: 7.0            # sensor line of sight above the camera axis (45 mm over 350 mm)
   field_deg: 4.0                # 3 mm aperture, 40 mm tube
+
+sample:                         # planar sample on the platter (roi.py: which pixels count as valid signal)
+  size_mm: 50.0                 # square swatch side
+  roi_fraction: 0.8             # use the central 80 % of the swatch (edges, chamfers, holder shadows excluded)
+  lit_fraction: 0.9             # and the inner 90 % of the lamp's fully lit spot
+  min_area_mm2: 25.0            # less valid area than this: no value for that pose
 
 camera:
   index: 0
@@ -47,9 +54,14 @@ camera:
   pixel_um: 1.55
   exposure_ms: 20               # locked in M17.2; dark and white calibration must use the same value
 
-lights:                         # FluidNC user digital outputs (M62/M63 P<n>)
-  white: {output: 0, phase: 6, elevation_deg: 0.0, warmup_s: 60}   # warm-up before every run: measured in M18.2
-  multispectral: {output: 1, phase: 10, elevation_deg: 40.0, built: false}   # optional colour kit (M30): LED bank on a 40 deg mast, non-coplanar lights for photometric stereo; set true once built
+lights:                         # controller digital outputs (M62/M63 P<n>); grblHAL port numbers from `$PINS` (M08.2)
+  white: {output: 4, phase: 6, elevation_deg: 0.0, warmup_s: 60, umbra_radius_mm: 16.2}   # warm-up: measured in M18.2; umbra: nominal from the lamp tube (10 mm exit 61.7 mm from the 4.2 mm COB), measure in M18.1
+  multispectral:                # optional colour kit (M30): LED bank on a 40 deg mast, non-coplanar lights for photometric stereo
+    output: 3
+    phase: 10
+    elevation_deg: 40.0
+    built: false                # set true once built
+    blocked: "NLDD-350H needs >= 6 V across its output; one colour LED is ~2-3.5 V, so the driver is out of regulation, and switching LEDs in and out on its live output can spike the current. Do not energize until a reviewed driver circuit replaces it (audit F09)"   # software refuses to switch it on while this is set
 
 scan:                           # 3D photo scanner (stage 11): second camera fixed at 650 mm, 15 deg up, looking over the first
   camera_index: 1               # second USB camera (CAM-04). One-camera option: 0, and move the camera to the scan post

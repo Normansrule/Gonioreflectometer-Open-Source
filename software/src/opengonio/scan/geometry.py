@@ -119,13 +119,22 @@ def camera_elevation_in_object(cfg: Machine, pose: dict[str, float]) -> float:
     return math.degrees(math.asin(c[2] / np.linalg.norm(c)))
 
 
-def project(points_o: np.ndarray, K: np.ndarray, R_oc: np.ndarray, t_oc: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Pinhole projection x ~ K (R p + t). Returns (uv (N,2), depth (N,))."""
+def project(points_o: np.ndarray, K: np.ndarray, R_oc: np.ndarray, t_oc: np.ndarray,
+            dist=None) -> tuple[np.ndarray, np.ndarray]:
+    """Pinhole projection x ~ K (R p + t), with OpenCV's k1 k2 p1 p2 lens distortion when `dist` is given (the same
+    model the ChArUco calibration measured). Returns (uv (N,2), depth (N,))."""
     pc = points_o @ R_oc.T + t_oc
     z = pc[:, 2]
     uv = np.full((len(z), 2), np.nan)
     front = z > 1e-9
-    uv[front] = (pc[front] @ K.T)[:, :2] / z[front, None]
+    x, y = pc[front, 0] / z[front], pc[front, 1] / z[front]
+    if dist is not None and any(dist):
+        k1, k2, p1, p2 = (list(dist) + [0.0] * 4)[:4]
+        r2 = x * x + y * y
+        rad = 1 + k1 * r2 + k2 * r2 * r2
+        x, y = x * rad + 2 * p1 * x * y + p2 * (r2 + 2 * x * x), y * rad + p1 * (r2 + 2 * y * y) + 2 * p2 * x * y
+    uv[front, 0] = K[0, 0] * x + K[0, 1] * y + K[0, 2]
+    uv[front, 1] = K[1, 1] * y + K[1, 2]
     return uv, z
 
 

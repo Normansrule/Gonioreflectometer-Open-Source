@@ -1,81 +1,151 @@
-"""Client for the Pico panel + sensor hub (firmware/pico-hub/main.py).
+"""Client for the ESP32-S3 panel + sensor hub (firmware/hub/main.py).
 
-Lines from the hub:  "BTN <HOME|START|STOP|LIGHT|NEXT>", "POWER <0|1>", "ENC a b c d", "SPEC f1..f8 clear nir", "PONG ...", "ERR ..."
-Lines to the hub:    "BAND <0-7>", "BAND OFF", "ENC?", "POWER?", "PING", "SHOW a|b|c" (OLED), "SPEC?" (AS7341 spectral sensor)
+Lines from the hub:  "BTN <HOME|START|STOP|LIGHT|NEXT|PAUSE>", "POWER <0|1>", "ENC a b c d", "SPEC #<id> f1..f8 clear nir",
+                     "PONG ...", "ERR ..."
+Lines to the hub:    "BAND <0-7>", "BAND OFF", "ENC?", "POWER?", "PING", "SHOW a|b|c" (OLED), "SPEC? <id>" (AS7341)
 Port: USB (laptop) or the Pi UART /dev/serial0 (standalone station).
+
+One reader owns the line: every event that arrives while waiting for a sensor reply is kept in order and handed
+out by poll(), never dropped. A STOP or POWER 0 that arrives during a sensor read also aborts that read
+(SafetyInterrupt), so the caller stops the run at once.
 """
 from __future__ import annotations
 
+import time
+from collections import deque
 from dataclasses import dataclass, field
 
-BUTTONS = ("HOME", "START", "STOP", "LIGHT", "NEXT")
+BUTTONS = ("HOME", "START", "STOP", "LIGHT", "NEXT", "PAUSE")
+N_SPECTRAL = 10
+MAX_LINE = 256
 
 
 @dataclass
 class HubEvent:
-    kind: str           # BTN | POWER | ENC | PONG
+    kind: str           # BTN | POWER | ENC | PONG | SPEC | ERR
     value: str
 
 
+class SafetyInterrupt(RuntimeError):
+    """STOP pressed or motion power lost while the host was waiting on the hub; the event stays queued."""
+
+
 def parse(line: str) -> HubEvent | None:
+    if not isinstance(line, str):
+        return None
+    line = line.strip("\r\n")
+    if len(line) > MAX_LINE or not line.isprintable():          # noise, binary garbage, unterminated junk
+        return None
     parts = line.strip().split(maxsplit=1)
-    if not parts or parts[0] not in ("BTN", "POWER", "ENC", "PONG", "SPEC"):
+    if not parts or parts[0] not in ("BTN", "POWER", "ENC", "PONG", "SPEC", "ERR"):
         return None
     ev = HubEvent(parts[0], parts[1] if len(parts) > 1 else "")
     if ev.kind == "BTN" and ev.value not in BUTTONS:
         return None
+    if ev.kind == "POWER" and ev.value not in ("0", "1"):
+        return None
     return ev
 
 
-class Hub:  # pragma: no cover - needs hardware
+def is_safety(ev: HubEvent) -> bool:
+    return (ev.kind == "BTN" and ev.value == "STOP") or (ev.kind == "POWER" and ev.value == "0")
+
+
+def parse_spectral(value: str, req: int | None) -> list[int]:
+    """'#<id> v1 .. v10' -> 10 ints in 0..65535 (ValueError otherwise, or if the id doesn't match)."""
+    parts = value.split()
+    if parts and parts[0].startswith("#"):
+        rid, parts = int(parts[0][1:]), parts[1:]
+        if req is not None and rid != req:
+            raise ValueError(f"SPEC reply #{rid} does not answer request #{req}")
+    elif req is not None:
+        raise ValueError("SPEC reply without a request id (update the hub firmware)")
+    vals = [int(x) for x in parts]
+    if len(vals) != N_SPECTRAL or not all(0 <= v <= 65535 for v in vals):
+        raise ValueError(f"SPEC reply needs {N_SPECTRAL} values in 0..65535, got {parts}")
+    return vals
+
+
+class HubBase:
+    """Shared logic; subclasses provide send() and _readline()."""
+
+    def __init__(self):
+        self.pending: deque[HubEvent] = deque()
+        self._req = 0
+
+    def send(self, line: str) -> None:  # pragma: no cover - abstract
+        raise NotImplementedError
+
+    def _readline(self) -> str:  # pragma: no cover - abstract
+        raise NotImplementedError
+
+    def _next(self) -> HubEvent | None:
+        return parse(self._readline())
+
+    def poll(self) -> HubEvent | None:
+        if self.pending:
+            return self.pending.popleft()
+        return self._next()
+
+    def band(self, n: int | None) -> None:
+        self.send("BAND OFF" if n is None else f"BAND {int(n)}")
+
+    def show(self, *lines: str) -> None:
+        self.send("SHOW " + "|".join(str(x).replace("|", "/") for x in lines))
+
+    def spectral(self, timeout_s: float = 3.0, clock=time.monotonic) -> list[int]:
+        """One AS7341 reading: 8 bands + clear + NIR (raw counts). Other events are queued for poll();
+        STOP / POWER 0 also raise SafetyInterrupt. Raises RuntimeError on timeout, ValueError on a bad reply."""
+        self._req = (self._req + 1) % 10000
+        req = self._req
+        self.send(f"SPEC? {req}")
+        end = clock() + timeout_s
+        while clock() < end:
+            ev = self._next()
+            if ev is None:
+                continue
+            if ev.kind == "SPEC":
+                try:
+                    return parse_spectral(ev.value, req)
+                except ValueError as exc:
+                    if "does not answer" in str(exc):          # stale reply to an earlier request: skip it
+                        continue
+                    raise
+            self.pending.append(ev)
+            if is_safety(ev):
+                raise SafetyInterrupt(f"{ev.kind} {ev.value} during a spectral read")
+        raise RuntimeError("no SPEC reply: check the AS7341 wiring (design.md)")
+
+
+class Hub(HubBase):  # pragma: no cover - needs hardware
     def __init__(self, port: str = "auto", baud: int = 115200):
+        super().__init__()
         import serial
         from serial.tools import list_ports
         if port == "auto":
-            picos = [p.device for p in list_ports.comports() if p.vid == 0x2E8A]   # Raspberry Pi USB VID
-            if not picos:
-                raise RuntimeError("Pico hub not found; set hub.port in machine.yaml")
-            port = picos[0]
+            hubs = [p.device for p in list_ports.comports() if p.vid == 0x303A]   # Espressif USB VID (ESP32-S3 "USB" port)
+            if not hubs:
+                raise RuntimeError("ESP32-S3 hub not found (use its USB connector, not UART); set hub.port in machine.yaml")
+            port = hubs[0]
         self.s = serial.Serial(port, baud, timeout=0.1)
 
     def send(self, line: str) -> None:
         self.s.write((line + "\n").encode())
 
-    def poll(self) -> HubEvent | None:
-        return parse(self.s.readline().decode(errors="replace"))
-
-    def band(self, n: int | None) -> None:
-        self.send("BAND OFF" if n is None else f"BAND {int(n)}")
-
-    def show(self, *lines: str) -> None:
-        self.send("SHOW " + "|".join(str(x).replace("|", "/") for x in lines))
-
-    def spectral(self, timeout_s: float = 3.0) -> list[int]:
-        """Ask the hub for one AS7341 reading: 8 bands + clear + NIR (raw counts)."""
-        import time
-        self.send("SPEC?")
-        end = time.monotonic() + timeout_s
-        while time.monotonic() < end:
-            ev = self.poll()
-            if ev and ev.kind == "SPEC":
-                return [int(x) for x in ev.value.split()]
-        raise RuntimeError("no SPEC reply: check the AS7341 wiring (design.md)")
+    def _readline(self) -> str:
+        return self.s.readline(MAX_LINE + 2).decode(errors="replace")
 
 
-@dataclass
-class FakeHub:
-    """Test double."""
-    queue: list[str] = field(default_factory=list)
-    sent: list[str] = field(default_factory=list)
+class FakeHub(HubBase):
+    """Test double: `queue` holds lines the hub will send; `sent` records lines sent to it."""
+
+    def __init__(self, queue: list[str] | None = None, sent: list[str] | None = None):
+        super().__init__()
+        self.queue = list(queue or [])
+        self.sent = sent if sent is not None else []
 
     def send(self, line: str) -> None:
         self.sent.append(line)
 
-    def poll(self) -> HubEvent | None:
-        return parse(self.queue.pop(0)) if self.queue else None
-
-    def band(self, n: int | None) -> None:
-        self.send("BAND OFF" if n is None else f"BAND {int(n)}")
-
-    def show(self, *lines: str) -> None:
-        self.send("SHOW " + "|".join(str(x).replace("|", "/") for x in lines))
+    def _readline(self) -> str:
+        return self.queue.pop(0) if self.queue else ""

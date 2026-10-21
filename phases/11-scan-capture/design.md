@@ -17,7 +17,7 @@ Camera fixed; M1 spins and M2 tilts the object, so every pose is known [S9].
 - Photogrammetry light: lamp at M4 = 30°, crossed polarizers if you built the colour kit [V51]. Photometric stereo (colour kit only): LED bank at 6 arm positions.
 - Background pass (empty platter, same poses) → clean silhouettes, even for black parts.
 
-Fasteners: M3 × 8 × 2, M5 × 10 + T-nut × 1. Optics: [optics.md](../06-camera-light/optics.md).
+Fasteners: M2 × 8 × 4 (camera), M2 × 16 × 1 (clamp into the post's pilot), M2 risers into the platter. Optics: [optics.md](../06-camera-light/optics.md).
 
 ## 3D parts
 

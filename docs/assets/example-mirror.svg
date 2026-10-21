@@ -4,9 +4,9 @@
 <text x="64" y="47" fill="#8b949e" font-size="12">peak should sit on the orange line; `verify` reports the gap</text>
 <line x1="64" x2="720" y1="368.0" y2="368.0" stroke="#21262d" stroke-width="1"/><text x="56" y="372.0" fill="#8b949e" font-size="11" text-anchor="end">0</text>
 <line x1="64" x2="720" y1="302.1" y2="302.1" stroke="#21262d" stroke-width="1"/><text x="56" y="306.1" fill="#8b949e" font-size="11" text-anchor="end">50</text>
-<line x1="64" x2="720" y1="236.2" y2="236.2" stroke="#21262d" stroke-width="1"/><text x="56" y="240.2" fill="#8b949e" font-size="11" text-anchor="end">100</text>
-<line x1="64" x2="720" y1="170.3" y2="170.3" stroke="#21262d" stroke-width="1"/><text x="56" y="174.3" fill="#8b949e" font-size="11" text-anchor="end">150</text>
-<line x1="64" x2="720" y1="104.4" y2="104.4" stroke="#21262d" stroke-width="1"/><text x="56" y="108.4" fill="#8b949e" font-size="11" text-anchor="end">200</text>
+<line x1="64" x2="720" y1="236.3" y2="236.3" stroke="#21262d" stroke-width="1"/><text x="56" y="240.3" fill="#8b949e" font-size="11" text-anchor="end">100</text>
+<line x1="64" x2="720" y1="170.4" y2="170.4" stroke="#21262d" stroke-width="1"/><text x="56" y="174.4" fill="#8b949e" font-size="11" text-anchor="end">150</text>
+<line x1="64" x2="720" y1="104.5" y2="104.5" stroke="#21262d" stroke-width="1"/><text x="56" y="108.5" fill="#8b949e" font-size="11" text-anchor="end">200</text>
 <text x="64.0" y="386" fill="#8b949e" font-size="11" text-anchor="middle">37</text>
 <text x="173.3" y="386" fill="#8b949e" font-size="11" text-anchor="middle">38</text>
 <text x="282.7" y="386" fill="#8b949e" font-size="11" text-anchor="middle">39</text>
@@ -16,7 +16,7 @@
 <text x="720.0" y="386" fill="#8b949e" font-size="11" text-anchor="middle">43</text>
 <text x="392.0" y="408" fill="#8b949e" font-size="12" text-anchor="middle">M3 (deg)</text><text x="16" y="226.0" fill="#8b949e" font-size="12" text-anchor="middle" transform="rotate(-90 16 226.0)">centre brightness (counts)</text>
 <line x1="392.0" x2="392.0" y1="76" y2="368" stroke="#f0883e" stroke-width="1.5"/><text x="398.0" y="82" fill="#e6edf3" font-size="11">M3 = M4/2 = 40°</text>
-<path d="M64.0,347.4 L85.9,345.2 L107.7,342.4 L129.6,338.8 L151.5,334.3 L173.3,328.4 L195.2,320.3 L217.1,309.3 L238.9,293.6 L260.8,270.6 L282.7,237.6 L304.5,191.1 L326.4,137.4 L348.3,105.0 L370.1,123.1 L392.0,174.1 L413.9,223.8 L435.7,261.0 L457.6,286.6 L479.5,304.2 L501.3,316.6 L523.2,325.5 L545.1,332.0 L566.9,337.0 L588.8,340.7 L610.7,343.9 L632.5,346.1 L654.4,348.2 L676.3,349.9 L698.1,351.2 L720.0,352.3" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round"/>
+<path d="M64.0,347.4 L85.9,345.2 L107.7,342.4 L129.6,338.8 L151.5,334.3 L173.3,328.4 L195.2,320.3 L217.1,309.3 L238.9,293.6 L260.8,270.7 L282.7,237.7 L304.5,191.1 L326.4,137.5 L348.3,105.0 L370.1,123.2 L392.0,174.3 L413.9,224.1 L435.7,260.9 L457.6,286.6 L479.5,304.2 L501.3,316.6 L523.2,325.5 L545.1,332.0 L566.9,337.1 L588.8,340.7 L610.7,343.9 L632.5,346.0 L654.4,348.2 L676.3,349.9 L698.1,351.2 L720.0,352.4" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round"/>
 <circle cx="64.0" cy="347.4" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 37, 15.6</title></circle>
 <circle cx="85.9" cy="345.2" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 37.2, 17.3</title></circle>
 <circle cx="107.7" cy="342.4" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 37.4, 19.4</title></circle>
@@ -25,27 +25,27 @@
 <circle cx="173.3" cy="328.4" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38, 30.1</title></circle>
 <circle cx="195.2" cy="320.3" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38.2, 36.2</title></circle>
 <circle cx="217.1" cy="309.3" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38.4, 44.6</title></circle>
-<circle cx="238.9" cy="293.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38.6, 56.4</title></circle>
-<circle cx="260.8" cy="270.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38.8, 73.9</title></circle>
-<circle cx="282.7" cy="237.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39, 99</title></circle>
+<circle cx="238.9" cy="293.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38.6, 56.5</title></circle>
+<circle cx="260.8" cy="270.7" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 38.8, 73.9</title></circle>
+<circle cx="282.7" cy="237.7" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39, 98.9</title></circle>
 <circle cx="304.5" cy="191.1" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39.2, 134</title></circle>
-<circle cx="326.4" cy="137.4" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39.4, 175</title></circle>
+<circle cx="326.4" cy="137.5" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39.4, 175</title></circle>
 <circle cx="348.3" cy="105.0" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39.6, 200</title></circle>
-<circle cx="370.1" cy="123.1" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39.8, 186</title></circle>
-<circle cx="392.0" cy="174.1" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40, 147</title></circle>
-<circle cx="413.9" cy="223.8" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.2, 109</title></circle>
-<circle cx="435.7" cy="261.0" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.4, 81.2</title></circle>
-<circle cx="457.6" cy="286.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.6, 61.7</title></circle>
+<circle cx="370.1" cy="123.2" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 39.8, 186</title></circle>
+<circle cx="392.0" cy="174.3" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40, 147</title></circle>
+<circle cx="413.9" cy="224.1" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.2, 109</title></circle>
+<circle cx="435.7" cy="260.9" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.4, 81.3</title></circle>
+<circle cx="457.6" cy="286.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.6, 61.8</title></circle>
 <circle cx="479.5" cy="304.2" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 40.8, 48.4</title></circle>
 <circle cx="501.3" cy="316.6" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41, 39</title></circle>
-<circle cx="523.2" cy="325.5" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41.2, 32.2</title></circle>
+<circle cx="523.2" cy="325.5" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41.2, 32.3</title></circle>
 <circle cx="545.1" cy="332.0" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41.4, 27.3</title></circle>
-<circle cx="566.9" cy="337.0" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41.6, 23.5</title></circle>
+<circle cx="566.9" cy="337.1" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41.6, 23.4</title></circle>
 <circle cx="588.8" cy="340.7" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 41.8, 20.7</title></circle>
 <circle cx="610.7" cy="343.9" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42, 18.3</title></circle>
-<circle cx="632.5" cy="346.1" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42.2, 16.6</title></circle>
+<circle cx="632.5" cy="346.0" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42.2, 16.7</title></circle>
 <circle cx="654.4" cy="348.2" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42.4, 15.1</title></circle>
 <circle cx="676.3" cy="349.9" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42.6, 13.7</title></circle>
-<circle cx="698.1" cy="351.2" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42.8, 12.7</title></circle>
-<circle cx="720.0" cy="352.3" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 43, 11.9</title></circle>
+<circle cx="698.1" cy="351.2" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 42.8, 12.8</title></circle>
+<circle cx="720.0" cy="352.4" r="4" fill="#3987e5" stroke="#0d1117" stroke-width="2"><title>mirror_40: M3 43, 11.9</title></circle>
 <line x1="64" x2="720" y1="368.0" y2="368.0" stroke="#8b949e" stroke-width="1"/></svg>

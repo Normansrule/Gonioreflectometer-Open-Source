@@ -8,14 +8,25 @@ Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20
 
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
-| FRM-09a | OG-40 adapter plate | [FRM-09a_og40_adapter.step](FRM-09a_og40_adapter.step) | [FRM-09a_og40_adapter.stl](FRM-09a_og40_adapter.stl) |
-| FRM-09b | Corner foot, screws on (print 4) | [FRM-09b_foot.step](FRM-09b_foot.step) | [FRM-09b_foot.stl](FRM-09b_foot.stl) |
-| FRM-09c | Ring scale, 80 deg (print 4: 20-340 deg) | [FRM-09c_protractor_segment.step](FRM-09c_protractor_segment.step) | [FRM-09c_protractor_segment.stl](FRM-09c_protractor_segment.stl) |
-| FRM-09d | 2020 saddle, screws on (print 2) | [FRM-09d_extrusion_saddle.step](FRM-09d_extrusion_saddle.step) | [FRM-09d_extrusion_saddle.stl](FRM-09d_extrusion_saddle.stl) |
+| FRM-01a | Deck tile SW (x -300..-100, y -300..-100) | [FRM-01a_deck_tile_SW.step](FRM-01a_deck_tile_SW.step) | [FRM-01a_deck_tile_SW.stl](FRM-01a_deck_tile_SW.stl) |
+| FRM-01b | Deck tile S (x -100..100, y -300..-100) | [FRM-01b_deck_tile_S.step](FRM-01b_deck_tile_S.step) | [FRM-01b_deck_tile_S.stl](FRM-01b_deck_tile_S.stl) |
+| FRM-01c | Deck tile SE: power box (x 100..300, y -300..-100) | [FRM-01c_deck_tile_SE.step](FRM-01c_deck_tile_SE.step) | [FRM-01c_deck_tile_SE.stl](FRM-01c_deck_tile_SE.stl) |
+| FRM-01d | Deck tile W (x -300..-100, y -100..100) | [FRM-01d_deck_tile_W.step](FRM-01d_deck_tile_W.step) | [FRM-01d_deck_tile_W.stl](FRM-01d_deck_tile_W.stl) |
+| FRM-01e | Deck tile C: table post + motor (x -100..100, y -100..100) | [FRM-01e_deck_tile_C.step](FRM-01e_deck_tile_C.step) | [FRM-01e_deck_tile_C.stl](FRM-01e_deck_tile_C.stl) |
+| FRM-01f | Deck tile E: M4 motor + saddles (x 100..300, y -100..100) | [FRM-01f_deck_tile_E.step](FRM-01f_deck_tile_E.step) | [FRM-01f_deck_tile_E.stl](FRM-01f_deck_tile_E.stl) |
+| FRM-01g | Deck tile NW: controller tray (x -300..-100, y 100..300) | [FRM-01g_deck_tile_NW.step](FRM-01g_deck_tile_NW.step) | [FRM-01g_deck_tile_NW.stl](FRM-01g_deck_tile_NW.stl) |
+| FRM-01h | Deck tile N (x -100..100, y 100..300) | [FRM-01h_deck_tile_N.step](FRM-01h_deck_tile_N.step) | [FRM-01h_deck_tile_N.stl](FRM-01h_deck_tile_N.stl) |
+| FRM-01i | Deck tile NE (x 100..300, y 100..300) | [FRM-01i_deck_tile_NE.step](FRM-01i_deck_tile_NE.step) | [FRM-01i_deck_tile_NE.stl](FRM-01i_deck_tile_NE.stl) |
+| FRM-02a | Outrigger bar 1, 250 mm (x 215..465) | [FRM-02a_outrigger_bar_1.step](FRM-02a_outrigger_bar_1.step) | [FRM-02a_outrigger_bar_1.stl](FRM-02a_outrigger_bar_1.stl) |
+| FRM-02b | Outrigger bar 2, 250 mm (x 465..715) | [FRM-02b_outrigger_bar_2.step](FRM-02b_outrigger_bar_2.step) | [FRM-02b_outrigger_bar_2.stl](FRM-02b_outrigger_bar_2.stl) |
+| FRM-02c | Scan post bar 1, 175 mm (z 36..211) | [FRM-02c_scan_post_bar_1.step](FRM-02c_scan_post_bar_1.step) | [FRM-02c_scan_post_bar_1.stl](FRM-02c_scan_post_bar_1.stl) |
+| FRM-02d | Scan post bar 2, 175 mm (z 211..386) | [FRM-02d_scan_post_bar_2.step](FRM-02d_scan_post_bar_2.step) | [FRM-02d_scan_post_bar_2.stl](FRM-02d_scan_post_bar_2.stl) |
+| FRM-09c | Ring scale + lazy-Susan clamp, 80 deg (print 4: 20-340 deg) | [FRM-09c_protractor_segment.step](FRM-09c_protractor_segment.step) | [FRM-09c_protractor_segment.stl](FRM-09c_protractor_segment.stl) |
+| FRM-09d | Outrigger saddle (print 2) | [FRM-09d_bar_saddle.step](FRM-09d_bar_saddle.step) | [FRM-09d_bar_saddle.stl](FRM-09d_bar_saddle.stl) |
 | FRM-09e | Scan-post socket on the outrigger | [FRM-09e_post_socket.step](FRM-09e_post_socket.step) | [FRM-09e_post_socket.stl](FRM-09e_post_socket.stl) |
 | FRM-09f | Outrigger end foot | [FRM-09f_end_foot.step](FRM-09f_end_foot.step) | [FRM-09f_end_foot.stl](FRM-09f_end_foot.stl) |
-| FRM-09g | 4 mm screw washers for the lazy Susan (8) | [FRM-09g_washers.step](FRM-09g_washers.step) | [FRM-09g_washers.stl](FRM-09g_washers.stl) |
 | FRM-09h | Measuring-camera pillar on the outrigger | [FRM-09h_camera_pillar.step](FRM-09h_camera_pillar.step) | [FRM-09h_camera_pillar.stl](FRM-09h_camera_pillar.stl) |
+| FRM-09i | Bar coupler: outrigger, scan post (print 2) | [FRM-09i_bar_coupler.step](FRM-09i_bar_coupler.step) | [FRM-09i_bar_coupler.stl](FRM-09i_bar_coupler.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 
@@ -25,11 +36,8 @@ Every bought part has a model in the repo (dummy in `cad/bought/` or open model 
 
 | ID | Part | In the repo | Real model |
 |---|---|---|---|
-| FRM-01 | Baltic birch plywood 1/2 in, 24 x 24 in | [`FRM-01_plywood_610x610x12.step`](../../../cad/bought/FRM-01_plywood_610x610x12.step) | None published - use the dummy (stock sheet, 610 x 610 x 12) |
-| FRM-02 | 2020 V-slot 500 mm (4-pack) | [`FRM-02_vslot_2020_500.step`](../../../cad/bought/FRM-02_vslot_2020_500.step) | [link](https://grabcad.com/openbuilds-1/models) (V-Slot 20x20, free login) or Onshape Standard Content |
-| FRM-03 | M5 T-nuts for 2020, 50 drop-in + 50 sliding | [`FRM-03_tnut_m5_dropin.step`](../../../cad/bought/FRM-03_tnut_m5_dropin.step) | [link](https://grabcad.com/openbuilds-1/models) Onshape Standard Content (T-slot nut) or |
-| FRM-06 | Socket screw kit M2–M5, 8/10/16/20 mm, with nuts | [`FRM-06_screws_m3_m4_m5_samples.step`](../../../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content: ISO 4762 socket head M3/M4/M5 |
+| FRM-06 | M2 socket screw kit, 4–25 mm, with nuts and washers (900 pcs) | [`FRM-06_screws_m2_samples.step`](../../../cad/bought/FRM-06_screws_m2_samples.step) | Onshape Standard Content: ISO 4762 socket head M2 |
+| FRM-07 | Socket screw kit M2/M3/M4 with nuts (820 pcs): M3 for the motors | [`FRM-07_screw_m3x8.step`](../../../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content: ISO 4762 socket head M3 |
 | FRM-08 | 608-2RS bearings (10) | [`FRM-08_bearing_608_2rs.step`](../../../cad/bought/FRM-08_bearing_608_2rs.step) | Onshape Standard Content: ball bearing 608 (8 x 22 x 7) |
-| FRM-12 | Wood screws #8 x 5/8 in, Type 17 point (100) | [`FRM-12_wood_screw_8x5_8.step`](../../../cad/bought/FRM-12_wood_screw_8x5_8.step) | Onshape Standard Content (wood screw) or the dummy |
 
 Design notes: [../design.md](../design.md).

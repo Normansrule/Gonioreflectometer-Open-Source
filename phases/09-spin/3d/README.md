@@ -20,6 +20,6 @@ Every bought part has a model in the repo (dummy in `cad/bought/` or open model 
 |---|---|---|---|
 | SPN-01 | NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) | [`SPN-01_nema17_17hs08_1004s_pancake.step`](../../../cad/bought/SPN-01_nema17_17hs08_1004s_pancake.step) | [link](https://files.omc-stepperonline.com/17HS08-1004S.STEP) |
 | SPN-04 | Optical endstop module, slot type (from the LAR-05 6-pack) | [`LAR-05_tcst2103_endstop_module.step`](../../../cad/bought/LAR-05_tcst2103_endstop_module.step) | [link](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only) |
-| SPN-06 | Axis fasteners (M3/M5 set) | [`FRM-06_screws_m3_m4_m5_samples.step`](../../../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content |
+| SPN-06 | Axis fasteners (M3 motor face + M2 set) | [`FRM-07_screw_m3x8.step`](../../../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content |
 
 Design notes: [../design.md](../design.md).

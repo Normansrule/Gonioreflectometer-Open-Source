@@ -26,10 +26,10 @@
 
 | ID | Source | Used for |
 |---|---|---|
-| **R5** | P. Debevec, J. Malik, "Recovering High Dynamic Range Radiance Maps from Photographs," SIGGRAPH 1997 — [PDF](https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf), [ACM](https://dl.acm.org/doi/10.1145/258734.258884) | Camera response + HDR for 8-bit UVC frames |
-| **R6** | B. Walter, S. Marschner, H. Li, K. Torrance, "Microfacet Models for Refraction through Rough Surfaces," EGSR 2007 (bibliographic; not fetched) | GGX distribution |
-| **R7** | C. Schlick, "An Inexpensive BRDF Model for Physically-based Rendering," Computer Graphics Forum 13(3), 1994 (bibliographic; cited via [R2]) | Schlick Fresnel |
-| **R8** | R. Cook, K. Torrance, "A Reflectance Model for Computer Graphics," ACM TOG 1(1), 1982 (bibliographic; cited via [R2]) | Cook-Torrance colour shift |
+| **R5** | P. Debevec, J. Malik, "Recovering High Dynamic Range Radiance Maps from Photographs," *Proc. SIGGRAPH ’97*, 1997 — [PDF](https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf), [ACM](https://dl.acm.org/doi/10.1145/258734.258884) | Camera response + HDR for 8-bit UVC frames |
+| **R6** | B. Walter, S. Marschner, H. Li, K. Torrance, "Microfacet Models for Refraction through Rough Surfaces," *EGSR*, 2007 (bibliographic; not fetched) | GGX distribution |
+| **R7** | C. Schlick, "An Inexpensive BRDF Model for Physically-based Rendering," *Computer Graphics Forum* 13(3), 1994 (bibliographic; cited via [R2]) | Schlick Fresnel |
+| **R8** | R. Cook, K. Torrance, "A Reflectance Model for Computer Graphics," *ACM TOG* 1(1), 1982 (bibliographic; cited via [R2]) | Cook-Torrance colour shift |
 | **R9** | C. Ericson, *Real-Time Collision Detection*, Morgan Kaufmann, 2005, §5.1.9 (bibliographic) | Segment-segment distance in the collision model |
 
 ## Other rigs and data
@@ -638,6 +638,10 @@
 | **R79** | Seeed XIAO ESP32S3 Sense — [link](https://www.seeedstudio.com/XIAO-ESP32S3-Sense-p-5639.html), [OV5640 add-on](https://www.seeedstudio.com/OV5640-Camera-for-XIAO-ESP32S3-Sense-With-Heat-Sink-p-5739.html) | Wireless camera alternative (rejected: autofocus) |
 | **R80** | Freenove FNK0085 — [store](https://store.freenove.com/products/fnk0085); [espressif issue #10792](https://github.com/espressif/arduino-esp32/issues/10792) | Wireless camera alternative |
 | **R82** | Mean Well STEP files FAQ — [link](https://meanwellpowersupplies.com/technical-articles/faq/where-to-find-mean-well-step-files-3d-files/) | Where Mean Well CAD lives |
+| **R83** | grblHAL core settings and commands — [settings.h](https://github.com/grblHAL/core/blob/master/settings.h), [system.c](https://github.com/grblHAL/core/blob/master/system.c) | $10 report mask (bit 0 MPos, bit 4 Pn), $22 homing flags (enable, single-axis $HX, init lock, force origin), $23, $62 sleep, $100–$133; `$HX`/`$HA`, `$SLP` |
+| **R84** | grblHAL Trinamic plugin — [Plugins_motor README](https://github.com/grblHAL/Plugins_motor/blob/master/README.md) | `M122 I` re-initialises the drivers after motor power returns; $14x current (mA), $15x microsteps, $21x hold current (%) |
+| **R85** | grblHAL RP2040 driver: BTT SKR Pico 1.0 board map — [btt_skr_pico_10_map.h](https://github.com/grblHAL/RP2040/blob/master/boards/btt_skr_pico_10_map.h); [Web Builder](https://svn.io-engineering.com:8443/?driver=RP2040) | 4th axis (A) on the E driver with its own limit input (E0-stop) when N_AXIS > 3; aux outputs FAN1-3, HB, HE; TMC2209 on UART; no WiFi; USB VID 0x2E8A (pico-sdk stdio_usb) |
+| **R86** | ESP32-S3-DevKitC-1 user guide (Espressif) — [docs.espressif.com](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide.html); safe-GPIO summary — [esp32.co.uk](https://esp32.co.uk/esp32-s3-devkitc-1-pinout/) | hub pin map: avoids strapping pins 0/3/45/46, USB 19/20, flash/PSRAM 26–37, UART0 43/44; RGB LED on 48 (v1.0) or 38 (v1.1) |
 
 ## Licences and publishing
 
@@ -655,7 +659,7 @@
 | **P3** | GST60A24-P1J — [TRC](https://trcelectronics.com/products/mean-well-gst60a24-p1j), [Jameco](https://www.jameco.com/z/GST60A24-P1J-MEAN-WELL-24-Volt-2500mA-60-Watt-3-Wire-Regulated-Switching-Desktop-Power-Adapter-2-1mm-Plug-Level-VI_2224411.html), [Bravo](https://www.bravoelectro.com/gst60a24-p1j.html), [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/GST60A24-P1J/7703715) | No-load power, price cross-check, cord sold separately |
 | **P4** | Switchcraft 721A — [product](https://www.switchcraft.com/dc-power-jack-0-084-2-1mm-pin-solder-lugs-termination/721a/) | 2.1 mm, 5 A / 24 V · not used since the no-solder, no-drill build |
 | **P5** | Switchcraft 721A — [Octopart](https://octopart.com/721a-switchcraft-89444436), [Digi-Key](https://www.digikey.com/en/products/detail/switchcraft-inc/721A/8571716) | $4.03 · not used since the no-solder, no-drill build |
-| **P6** | Littelfuse 01500274ZXU — [Mouser](https://www.mouser.com/ProductDetail/Littelfuse/01500274ZXU?qs=HS3fcsxbgMwxzHo3fy8LGg%3D%3D) | $3.27 |
+| **P6** | Littelfuse 01500274ZXU — [Mouser](https://www.mouser.com/ProductDetail/Littelfuse/01500274ZXU?qs=HS3fcsxbgMwxzHo3fy8LGg%3D%3D) | $3.27; body 47.5 ± 1 mm × Ø11.0 mm, 16 AWG leads 330 mm ([Littelfuse drawing](https://www.farnell.com/datasheets/2259214.pdf), checked 2026-10-14) |
 | **P7** | Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) | $2.73 · not used since the no-solder, no-drill build |
 | **P8** | IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) | Rds(on), Vgs · not used since the no-solder, no-drill build |
 | **P9** | onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) | $0.28 · not used since the no-solder, no-drill build |
@@ -694,6 +698,16 @@
 | **P46** | Adafruit 64 half-size breadboard — [product](https://www.adafruit.com/products/64) | 400 points, solderless |
 | **P47** | WAGO 221 lever connectors, 28-piece assortment — [Amazon](https://www.amazon.com/dp/B01N0LRTXZ), [price seen $15.71](https://slickdeals.net/f/18335398-28-piece-wago-221-lever-nuts-splicing-wire-connector-assortment-w-case-15-71-free-shipping-w-prime) | Solderless joins |
 | **P48** | StepperOnline 17HS08-1004S pancake NEMA 17 — [product](https://www.omc-stepperonline.com/hybrid-stepper-motor/nema-17-bipolar-18deg-13ncm-184ozin-1a-35v-42x42x20mm-4-wires-17hs08-1004s.html) | $7.99, 21.5 mm body, 16 N·cm, 1 A, 5 mm D-shaft |
+| **P49** | Xeanerol 24 V 5 Ah Li-ion pack with 2 A charger (YX-DIY-24-50) — [Amazon](https://www.amazon.com/dp/B0FHPST5TP) | $41.99 (checked 2026-10-12); label input 25.2 V 2 A, output 22–25 V 10 A max; 78 × 50 × 72 mm |
+| **P50** | DROK buck-boost converter 6–36 V to 0.6–36 V, 5 A 80 W, LCD — [Amazon](https://www.amazon.com/dp/B0BQBXMH67) | $22.99 (checked 2026-10-12); 78.6 × 42.7 × 38.6 mm; LVP, OCP, power-on state, lock; 88 % efficiency (listing) |
+| **P51** | MEAN WELL RSD-60G-24 DC-DC converter — [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/RSD-60G-24/7706259), [3D model](https://www.meanwell.com/upload/pdf/RSD-60/RSD-60-3D.zip) | $43.70 (checked 2026-10-12); 9–36 V in, 24 V 2.5 A, 90 %, 128 × 60 × 25 mm |
+| **P52** | Phoenix Contact UT 4-HESI (5X20) fuse terminal block 3046032 — [Digi-Key](https://www.digikey.com/en/products/detail/phoenix-contact/3046032/2051197), [Phoenix Contact](https://www.phoenixcontact.com/en-us/products/fuse-terminal-block-ut-4-hesi-5x20-3046032) | $5.56; 6.2 × 57.8 × 75.6 mm on NS 35/7.5; CAD download on both pages |
+| **P53** | Phoenix Contact PLC-RSC- 24DC/21AU relay module 2966265 — [Digi-Key](https://www.digikey.com/en/products/detail/phoenix-contact/2966265/349708), [Phoenix Contact](https://www.phoenixcontact.com/en-us/products/relay-module-plc-rsc-24dc21au-2966265) | $19.64; 6.2 × 80 × 94 mm; hard-gold contact, min. 1 mA at 24 V; CAD download on both pages |
+| **P54** | INIU 20000 mAh 65 W laptop power bank — [Amazon](https://www.amazon.com/dp/B0DB86W481) | $46.99 (checked 2026-10-13); 73 Wh, 109 × 71 × 28 mm, 12 cm USB-C cable |
+| **P55** | USB-C PD trigger board, DIP 5–20 V, LED display, screw terminals — [Amazon](https://www.amazon.com/dp/B0HHNFY7HT) | $9.99 (checked 2026-10-13); falls back to 5 V if 20 V is not offered |
+| **P56** | MEETOOT 22 mm emergency stop, 1 NO + 1 NC, 2-pack — [Amazon](https://www.amazon.com/dp/B09JP4JKY6) | $8.99 (checked 2026-10-13); 40 mm head, 60 × 70 mm max |
+| **P57** | DROK buck-boost 5.5–30 V, 4 A 35 W, CC/CV, LCD — [Amazon](https://www.amazon.com/dp/B07VNDGFT6) | $16.99 (checked 2026-10-12); 72 × 59 × 32 mm with case ([DROK product page](https://www.droking.com/Adjustable-Buck-Boost-Converter-Board-DC-5.5-30V-to-0.5-30V-4A-High-Power-Supply-Regulator-with-Case-LCD-Display), checked 2026-10-14); CV + CC pots, display in/out V, A, W; reverse-input and output anti-backflow protection |
+| **P58** | SIMAX3D 17HS4401 NEMA 17, 5-pack — [Amazon](https://www.amazon.com/dp/B088B756MY) | $32.99 (checked 2026-10-14); 1.5 A, 42 N·cm, 42 × 42 × 38 mm, 4-wire, five 1 m cables |
 
 ## Parts: controller
 
@@ -710,6 +724,8 @@
 | **C9** | Adafruit 1332 membrane 1x4 keypad — [product](https://www.adafruit.com/product/1332) | Panel keys |
 | **C10** | Adafruit 1954 male/female jumper wires 20 x 6 in — [product](https://www.adafruit.com/product/1954), [Jameco](https://www.jameco.com/z/1954-Adafruit-Industries-Premium-Female-Male-Extension-Jumper-Wires-20-X-6_2507535.html) | Solderless leads |
 | **C11** | Stepper cable PH2.0 6-pin to XH2.54 4-pin, 1 m — [Jameco 2333607](https://www.jameco.com/z/JST-PH20-XH4P-Jameco-ValuePro-4-Wire-Stepper-Motor-Cable-4-Pin-Series-PH-2mm-to-6-Pin-XH2-2-54mm-1-Meter_2333607.html) | $1.95, closeout |
+| **C12** | BIGTREETECH SKR Pico V1.0 — [Amazon](https://www.amazon.com/dp/B09MYKL9MP), [GitHub: manual, STEP, pins](https://github.com/bigtreetech/SKR-Pico) | $35.99 (checked 2026-10-14); RP2040, 4 × TMC2209 UART, USB-C, DC 12/24 V, 85 × 56 mm, 4 × Ø2.7 holes on 58 × 49 mm (measured from the maker STEP); fan advised above 0.8 A per motor; flashing: BOOT jumper + reset, copy the .uf2 |
+| **C13** | ESP32-S3-DevKitC-1 (owned) — MicroPython firmware [ESP32_GENERIC_S3](https://micropython.org/download/ESP32_GENERIC_S3/) | button + sensor hub (replaces the Pico H); USB-C; see R86 for pins |
 
 ## Parts: camera
 

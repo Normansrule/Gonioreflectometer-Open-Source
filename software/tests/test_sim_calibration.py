@@ -59,11 +59,11 @@ def test_png_filters(tmp_path, f):
 
 
 def test_offsets_only_change_gcode(cfg):
-    t = RecordingTransport()
+    t = RecordingTransport.for_machine(cfg)
     g = Gantry(cfg, FluidNC(t, timeout_s=1), offsets={"M3": 0.4})
     g.home()
     g.move({"M4": 60.0, "M3": 30.0})
-    assert t.lines[-1] == "G53 G1 X60.0000 Y29.6000 F600"      # command = true - offset
+    assert t.lines[-2:] == ["G53 G1 X40.0000 Y209.6000 F600", "G4 P0"]     # command = true - offset - home (grblHAL zero)
     assert g.position["M3"] == 30.0                              # software keeps true angles
 
 
@@ -117,7 +117,7 @@ def test_drifting_lamp_fails(tmp_path, cfg):
 
 def test_warmup_settle_time(tmp_path, cfg):
     from opengonio.station import run_warmup
-    g = Gantry(cfg, FluidNC(RecordingTransport(), timeout_s=1))
+    g = Gantry(cfg, FluidNC(RecordingTransport.for_machine(cfg), timeout_s=1))
     g.home()
 
     class Lamp:                       # brightness rises 10 % with a 60 s time constant

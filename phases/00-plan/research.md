@@ -113,8 +113,8 @@ Cheapest credible option; prices checked 2026-10-04.
 | Need | Chosen | Rejected |
 |---|---|---|
 | Compute | Your laptop ($0) | Raspberry Pi 5, $110–175 [R63] |
-| Motor board | FYSETC E4, $32: 4 × TMC2209, WiFi, BT, USB [C3] | SKR Pico $39.85 [R56]; DIY ESP32 ~$36 [R68][R69]; SKR Mini E3 $49.85 [R64] |
-| Power | GST60A24 60 W, $19.40 [P1] | 120 W + 5 V buck, ~$85 (only for a Pi) [P31][P32] |
+| Motor board | BTT SKR Pico V1.0, $35.99: 4 × TMC2209 UART, USB-C, grblHAL [C12][R85] | FYSETC E4 $32–41 (USB-B, 3 endstop inputs) [C3]; MKS DLC32 MAX (USB-B); DIY ESP32 ~$36 [R68][R69]; SKR Mini E3 $49.85 [R64] |
+| Power | 24 V Li-ion pack with BMS [P49], charged over USB-C by a PD trigger + CC/CV module [P55][P57], fuse, ~$112 (earlier: GST60A24 24 V adapter [P1]; pack + 80 W converter [P49]–[P53]; USB-C power bank [P54]) | 120 W + 5 V buck, ~$85 (only for a Pi) [P31][P32] |
 | Camera | Arducam B0433 + 16 mm lens, $80.99 [K1][K5] | Pi HQ (needs a Pi) [K19]; ESP32 cameras (autofocus) [R79][R80] |
 | White light | Citizen CLU7A3-0403E1 CRI 97, 12.2 V, $5.91, in a TE Z35 holder $3.50 + NLDD-350H [L22][L23][L4] | 36 V COBs need 48 V [L9][L18]; Cree CXA1304 (first draft [L1]): holders obsolete [L21] |
 | E-stop | IDEC YW1B $9.96 [P15] | Schneider XB5 (0.5 A DC) [P23]; Eaton $19.90 [P17] |

@@ -7,12 +7,13 @@ import re
 from pathlib import Path
 
 _STAMP = re.compile(r"(FILE_NAME\('[^']*',)'[^']*'")
+_TRANSLATOR = re.compile(r"(Open CASCADE STEP translator \d+\.\d+) \d+")    # per-session counter in the product name
 
 
 def stabilise(path: str | Path) -> None:
     """Replace the export time in the STEP header with a fixed one."""
     p = Path(path)
     text = p.read_text(encoding="utf-8", errors="surrogateescape")
-    new = _STAMP.sub(r"\1'2026-01-01T00:00:00'", text, count=1)
+    new = _TRANSLATOR.sub(r"\1", _STAMP.sub(r"\1'2026-01-01T00:00:00'", text, count=1))
     if new != text:
         p.write_text(new, encoding="utf-8", errors="surrogateescape")

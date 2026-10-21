@@ -80,16 +80,6 @@ def belt_loop(r1, r2, c, w=6.0, t=1.4):
     return outer.cut(inner)
 
 
-def vslot(length):
-    """20x20 V-slot/T-slot envelope with 6.2 mm slots on all 4 faces and a 4.2 mm centre bore, along +z."""
-    s = W("XY").rect(20, 20).extrude(length)
-    for a in range(4):
-        slot = box(6.2, 6.0, length, cx=True, cy=False).translate((0, 4.0, 0)).rotate((0, 0, 0), (0, 0, 1), 90 * a)
-        cav = box(11.0, 3.0, length, cx=True, cy=False).translate((0, 4.5, 0)).rotate((0, 0, 0), (0, 0, 1), 90 * a)
-        s = s.cut(slot).cut(cav)
-    return s.cut(cyl(4.2, length))
-
-
 def bolt(d, length, head_d, head_h, hex_head=False, nut=None):
     head = W("XY").polygon(6, head_d / math.cos(math.radians(30))).extrude(head_h) if hex_head else cyl(head_d, head_h)
     b = head.union(cyl(d, length).translate((0, 0, head_h)))
@@ -119,14 +109,6 @@ def heatsink(x=40, y=40, h=11, fins=8):
     for i in range(fins):
         b = b.union(box(1.2, y, h).translate((-x / 2 + 2.5 + i * (x - 5) / (fins - 1), 0, 0)))
     return b
-
-
-def estop():
-    """IDEC YW1B-V4E01R: 40 mm mushroom head above the panel (z = 0); bushing + 1 contact block with screw terminals
-    and cover reach 48.7 mm behind the panel [IDEC YW catalogue]."""
-    head = W("XY").circle(20).extrude(10).faces(">Z").fillet(6).translate((0, 0, 10)).union(cyl(30, 10))
-    body = cyl(22, 12).translate((0, 0, -12)).union(box(30, 30, 36.7).translate((0, 0, -48.7)))
-    return head.union(body)
 
 
 def lazy_susan():
@@ -178,7 +160,9 @@ def keypad_1x4():
 
 
 def wago(n):
-    return box(18.5, 5.8 * n + 2, 8.3).union(box(14, 5.2 * n, 2).translate((0, 0, 8.3)))
+    """WAGO 221-41n lever connector: 18.6 deep x 8.4 high (levers included); 221-412 is 13.2 wide (WAGO data sheet [P47])."""
+    w = 5.5 * n + 2.2
+    return box(18.6, w, 6.4).union(box(14, w - 1.0, 2.0).translate((0, 0, 6.4)))
 
 
 def ptfe():
@@ -209,18 +193,28 @@ def pico_h():
     return b.union(box(8, 6, 3).translate((-23, 0, 1.0)))
 
 
+def skr_pico():
+    """BTT SKR Pico V1.0 envelope [C12]: 85 x 56 mm board, 4 x 2.7 mm holes on 58 x 49 mm (3.5 mm from the left/bottom
+    edges), connectors up to 10 mm tall, USB-C on the +X edge. The maker STEP is linked in the BOM."""
+    b = pcb(85, 56, holes=[(-39.0, sy * 24.5) for sy in (-1, 1)] + [(19.0, sy * 24.5) for sy in (-1, 1)], hole_d=2.7)
+    b = b.union(box(78, 50, 8.4).translate((0, 0, 1.6)))
+    return b.union(box(7, 9, 3.2).translate((42.5 - 3.5, 56 / 2 - 2.89 - 6, 1.6)))
+
+
+def esp32s3_devkitc():
+    """ESP32-S3-DevKitC-1 envelope, drawn as it sits in the tray: upside down (module can down, header pins up).
+    Outline ESTIMATE 69 x 26 mm (clones vary): 2 x 22 pins, can 18 x 25.5 x 3.2 at the -X end, USB-C at +X."""
+    b = pcb(69, 26).translate((0, 0, 3.2))
+    b = b.union(box(25.5, 18, 3.2).translate((-69 / 2 + 13, 0, 0)))                    # module can (rests on the pedestal)
+    for y in (-11.43, 11.43):
+        b = b.union(box(56, 2.5, 2.5).translate((2, y, 4.8))).union(box(56, 0.64, 8.5).translate((2, y, 7.3)))   # headers + pins
+    return b
+
+
 def e4_board():
     """FYSETC E4 envelope: 96 x 68 mm, 4 x 3.2 holes on 83.6 x 60.6, 22 mm tall components (use the vendor STEP!)."""
     b = pcb(96, 68, holes=[(sx * 41.8, sy * 30.3) for sx in (-1, 1) for sy in (-1, 1)])
     return b.union(box(80, 50, 20).translate((0, 0, 1.6)))
-
-
-def fuse_holder():
-    return cyl(14, 55).rotate((0, 0, 0), (0, 1, 0), 90).translate((-27.5, 0, 7)).union(cyl(2, 150).rotate((0, 0, 0), (0, 1, 0), 90).translate((-75, 0, 7)))
-
-
-def dc_jack_terminal():
-    return cyl(11, 14).rotate((0, 0, 0), (0, 1, 0), 90).translate((-14, 0, 6)).union(box(15, 10, 12).translate((7.5, 0, 0)))
 
 
 def me8108():
@@ -229,9 +223,38 @@ def me8108():
     return b.union(box(6, 4, 30).translate((10, 0, 18))).union(cyl(18, 6).rotate((0, 0, 0), (1, 0, 0), 90).translate((10, 3, 48)))
 
 
-def adapter_gst60():
-    """MEAN WELL GST60A desktop adapter: 125 x 50 x 31.5 mm, C14 inlet one end, DC cord stub the other."""
-    return box(125, 50, 31.5).union(cyl(5, 40).rotate((0, 0, 0), (0, 1, 0), 90).translate((62.5, 0, 15)))
+def battery_pack():
+    """Xeanerol 6S Li-ion pack with BMS [P49]: 78 x 50 x 72 mm upright (listing), leads out of the +X face near the top."""
+    return box(78, 50, 72).union(cyl(8, 12).rotate((0, 0, 0), (0, 1, 0), 90).translate((39, 12, 60)))
+
+
+def drok_cc_cv():
+    """DROK 35 W buck-boost CC/CV module in its case [P57]: 72 x 59 x 32 mm (maker page "Size: 72*59*32mm"), drawn with
+    the long side along Y as it sits in the box; LCD window on top. Terminals are inside that envelope."""
+    return box(59, 72, 31).union(box(30, 22, 1).translate((0, 8, 31)))
+
+
+def fuse_holder():
+    """uxcell inline screw-type 5 x 20 mm holder, 16 AWG (PWR-04): no size published - ESTIMATE body Ø12 x 50 mm
+    (measure on arrival; the box cradle takes up to Ø14). 15 mm of each lead shown."""
+    return cyl(12, 50).rotate((0, 0, 0), (0, 1, 0), 90).translate((-25, 0, 0)).union(
+        cyl(2.6, 80).rotate((0, 0, 0), (0, 1, 0), 90).translate((-40, 0, 0))).translate((0, 0, 6))
+
+
+def fuse_5x20():
+    """5 x 20 mm glass fuse (IEC 60127 size)."""
+    return cyl(5, 20).rotate((0, 0, 0), (0, 1, 0), 90).translate((-10, 0, 2.5))
+
+
+def pd_trigger():
+    """USB-C PD trigger board [P55]: footprint estimate 60 x 30 mm, display and terminal block 18 mm tall."""
+    return pcb(60, 30).union(box(20, 12, 10).translate((-12, 0, 1.6))).union(box(12, 26, 12).translate((22, 0, 1.6)))
+
+
+def estop_cheap():
+    """22 mm e-stop, 1 NO + 1 NC [P56]: 40 mm head above the panel (z = 0), body ~50 mm behind it (60 x 70 mm max)."""
+    head = W("XY").circle(20).extrude(10).faces(">Z").fillet(6).translate((0, 0, 10)).union(cyl(30, 10))
+    return head.union(cyl(22, 10).translate((0, 0, -10))).union(box(32, 42, 40).translate((0, 0, -50)))
 
 
 def fan40():
@@ -247,16 +270,18 @@ def star_led():
 
 
 B_PARTS = {   # id: (file stem, builder, source of the dimensions)
-    "PWR-01": ("gst60a24_adapter", adapter_gst60, "MEAN WELL GST60A spec [P2]: 125 x 50 x 31.5 mm"),
-    "PWR-02": ("iec_c13_cord", lambda: cable(1800, 7, (40, 25, 20), (40, 25, 20)), "IEC C13 plug envelope, 1.8 m"),
-    "PWR-03": ("dc_jack_screw_terminal", dc_jack_terminal, "Adafruit 368 listing photo; measure on arrival"),
-    "PWR-04": ("inline_fuse_holder", fuse_holder, "Littelfuse 01500274ZXU: ~14 x 55 mm body + 18 AWG leads"),
-    "PWR-05": ("fuse_5x20", lambda: cyl(5.2, 20), "5 x 20 mm glass fuse"),
-    "PWR-13": ("estop_22mm", estop, "IDEC YW1B-V4E01R: 40 mm head, 22.3 mm panel hole [P16]"),
+    "PWR-21": ("battery_6s_24v_5ah", battery_pack, "Xeanerol 6S 5 Ah pack, Amazon listing read 2026-10-12 [P49]: 78 x 50 x 72 mm (not re-checked)"),
+    "PWR-27": ("usb_c_pd_trigger", pd_trigger, "PD trigger board [P55]: ESTIMATE 60 x 30 mm (no size published), measure on arrival"),
+    "PWR-29": ("drok_cc_cv_35w", drok_cc_cv, "DROK 35 W CC/CV module, maker page [P57]: 72 x 59 x 32 mm"),
+    "PWR-04": ("fuse_holder_inline_5x20", fuse_holder, "uxcell 16 AWG inline holder: ESTIMATE body Ø12 x 50 mm (no size published)"),
+    "PWR-05": ("fuse_5x20", fuse_5x20, "5 x 20 mm fuse (IEC 60127 size)"),
+    "PWR-28": ("estop_22mm_1no1nc", estop_cheap, "LAY37-11ZS e-stop listing [P56]: 40 mm head, 22 mm hole, 60 x 70 mm max"),
+    "PWR-10": ("pc817_opto_module_24v", lambda: pcb(66, 16.5).union(box(10, 16.5, 10.4).translate((-28, 0, 1.6))).union(box(10, 16.5, 10.4).translate((28, 0, 1.6))),
+               "NOYITO PC817 1-channel module: 66 x 16.5 x 12 mm (maker manual); screw terminals both ends"),
     "PWR-15": ("wire_18awg_pair", lambda: box(4, 2, 1000), "18 AWG silicone pair, 1 m"),
-    "PWR-20": ("lever_connector_221_412", lambda: wago(2), "WAGO 221-412: 18.5 x 13.1 x 8.3 mm"),
-    "CTL-01": ("fysetc_e4_envelope", e4_board, "FYSETC E4: 96 x 68 mm, holes 83.6 x 60.6 [C1]"),
-    "CTL-02": ("pico_h", pico_h, "Raspberry Pi Pico datasheet [C6]: 51 x 21 mm, holes 47 x 11.4"),
+    "PWR-20": ("lever_connector_221_412", lambda: wago(2), "WAGO 221-412 data sheet: 18.6 x 13.2 x 8.4 mm"),
+    "CTL-01": ("btt_skr_pico_envelope", skr_pico, "BTT SKR Pico V1.0 maker STEP [C12]: 85 x 56 mm, holes 58 x 49"),
+    "CTL-02": ("esp32s3_devkitc1", esp32s3_devkitc, "ESP32-S3-DevKitC-1: ESTIMATE 69 x 26 mm (clones vary; measure)"),
     "CTL-03": ("usb_cable_e4", lambda: cable(1000, 3.5, (12, 7, 20), (9, 5, 15)), "USB cable envelope"),
     "CTL-05": ("membrane_keypad_1x4", keypad_1x4, "Adafruit 1332: 69 x 20 x 0.8 mm, 85 mm tail [C9]"),
     "CTL-06": ("jst_xh_lead_3pin", lambda: box(7.5, 5.75, 9.8).union(cyl(1.3, 500).translate((0, 0, 9.8))).union(box(7.5, 5.75, 9.8).translate((0, 0, 509.8))),
@@ -265,15 +290,12 @@ B_PARTS = {   # id: (file stem, builder, source of the dimensions)
     "CTL-08": ("fan_40mm", fan40, "40 x 40 x 10 mm fan"),
     "CTL-11": ("stepper_cable_ph_xh", lambda: box(12.5, 4.5, 6).union(cyl(3, 1000).translate((0, 0, 6))).union(box(10, 5.75, 9.8).translate((0, 0, 1006))),
                "PH2.0 6-pin housing / XH 4-pin housing, 1 m"),
-    "FRM-01": ("plywood_610x610x12", lambda: box(610, 610, 12), "2 x 2 ft panel, 15/32 in"),
-    "FRM-02": ("vslot_2020_500", lambda: vslot(500), "OpenBuilds V-Slot 20x20, 500 mm [F2] (simplified slots)"),
-    "FRM-03": ("tnut_m5_dropin", lambda: box(10, 6, 4).cut(cyl(5, 4)), "M5 drop-in T-nut for 6 mm slot [F3]"),
-    "FRM-06": ("screws_m3_m4_m5_samples", lambda: bolt(3, 10, 5.5, 3).union(bolt(4, 16, 7, 4).translate((15, 0, 0))).union(bolt(5, 10, 8.5, 5).translate((30, 0, 0))),
-               "ISO 4762 socket head M3 x 10, M4 x 16, M5 x 10 (Onshape Standard Content has exact ones)"),
+    "FRM-06": ("screws_m2_samples", lambda: bolt(2, 8, 3.8, 2).union(bolt(2, 12, 3.8, 2).translate((8, 0, 0))).union(bolt(2, 16, 3.8, 2).translate((16, 0, 0))),
+               "ISO 4762 socket head M2 x 8 / 12 / 16 (Onshape Standard Content has exact ones)"),
+    "FRM-07": ("screw_m3x8", lambda: bolt(3, 8, 5.5, 3), "ISO 4762 socket head M3 x 8 (NEMA 17 faces)"),
     "FRM-08": ("bearing_608_2rs", lambda: cyl(22, 7).cut(cyl(8, 7)), "608-2RS: 8 x 22 x 7 mm"),
-    "FRM-12": ("wood_screw_8x5_8", lambda: cyl(8.2, 3).union(cyl(4.2, 16).translate((0, 0, 3))), "#8 x 5/8 in pan head"),
     "LAR-01": ("lazy_susan_12in", lazy_susan, "12 in round, ID ~160 mm (Bearing King listing); measure holes on arrival"),
-    "LAR-02": ("nema17_17hs19_2004s1", lambda: nema17(48, 24), "StepperOnline 17HS19-2004S1: 42.3 x 42.3 x 48, 5 mm D-shaft 24 mm [P40]"),
+    "LAR-02": ("nema17_17hs4401", lambda: nema17(38, 24), "SIMAX3D 17HS4401 listing [P58]: 42 x 42 x 38 mm, 5 mm D-shaft (24 mm assumed: measure)"),
     "LAR-03": ("gt2_belt_open_1m", lambda: box(6, 1.4, 1000), "GT2 6 mm open belt, 1 m"),
     "LAR-04": ("gt2_pulley_20t_5mm", gt2_20t, "GT2 20T 5 mm bore, 16 mm flanges [P42]"),
     "LAR-05": ("tcst2103_endstop_module", tcst2103_module, "TCST2103 module: 33 x 11 mm PCB, 3.1 mm slot [P43]"),
@@ -282,7 +304,6 @@ B_PARTS = {   # id: (file stem, builder, source of the dimensions)
     "TBL-05": ("bolt_m8x75_nut", lambda: bolt(8, 75, 13, 5.3, True, (13, 6.5)), "DIN 931 M8 x 75 + DIN 934 nut"),
     "CAM-01": ("arducam_b0433_imx477_usb", camera_b0433, "Arducam B0433 datasheet drawing: 38 x 38, holes 34 mm [K3]"),
     "CAM-02": ("m12_lens_16mm", lens_m12, "M12 x 0.5 lens, ~14 mm flange"),
-    "CAM-07": ("screw_m2_5x8", lambda: bolt(2.5, 8, 4.5, 1.7), "M2.5 x 8 pan head"),
     "LSR-01": ("citizen_clu7a3_cob", cob_clu7a3, "Citizen CLU7A3-0403E1: 13.5 x 13.5 x 1.4 mm, 4.2 mm LES [L22]"),
     "LSR-02": ("meanwell_nldd_350h", ldd_module, "MEAN WELL NLDD-H spec: 31.8 x 20.3 x 12.2 mm [L6]"),
     "LSR-03": ("heatsink_40x40x11", heatsink, "40 x 40 x 11 mm finned heatsink [L7]"),
@@ -302,6 +323,8 @@ B_PARTS = {   # id: (file stem, builder, source of the dimensions)
     "TLT-02": ("gt2_belt_280_loop", lambda: belt_loop(6.37, 31.83, 75.6), "GT2 280 mm loop on 20T + 100T at 75.6 mm"),
     "SPN-01": ("nema17_17hs08_1004s_pancake", lambda: nema17(21.5, 20), "StepperOnline 17HS08-1004S: 42.3 x 42.3 x 21.5, shaft 20 [P48]"),
     "MSK-01": ("star_led_20mm", star_led, "20 mm hex star LED"),
+    "MSK-03": ("mosfet_module_4ch", lambda: pcb(60, 45).union(box(8, 40, 10).translate((-26, 0, 1.6))).union(box(8, 40, 10).translate((26, 0, 1.6))),
+               "4-channel MOSFET switch module (envelope ~60 x 45 x 12 mm); measure on arrival"),
     "MSK-05": ("polarizer_film_100mm", lambda: box(100, 100, 0.3), "10 x 10 cm film"),
     "SPC-02": ("jst_sh_cable", lambda: box(5, 4, 3).union(cyl(2, 150).translate((0, 0, 3))), "JST-SH 4-pin, 150 mm"),
     "SCN-01": ("mounting_putty_blob", lambda: W("XY").sphere(15).translate((0, 0, 10)).intersect(box(40, 40, 20)), "Putty blob"),
@@ -316,8 +339,8 @@ B_PARTS = {   # id: (file stem, builder, source of the dimensions)
 }
 ALIASES = {   # same physical part as another ID: same model
     "TBL-01": "LAR-02", "TLT-01": "LAR-02", "TBL-03": "LAR-04", "TLT-03": "LAR-04", "TBL-04": "LAR-05", "TLT-04": "LAR-05",
-    "SPN-04": "LAR-05", "CTL-04": "STA-08", "MSK-02": "LSR-02", "MSK-04": "LSR-03", "CAM-04": "CAM-01", "CAM-05": "CAM-02", "CAM-08": "CAM-07",
-    "TBL-06": "FRM-06", "TLT-06": "FRM-06", "SPN-06": "FRM-06",
+    "SPN-04": "LAR-05", "CTL-04": "STA-08", "MSK-02": "LSR-02", "MSK-04": "LSR-03", "CAM-04": "CAM-01", "CAM-05": "CAM-02",
+    "TBL-06": "FRM-07", "TLT-06": "FRM-07", "SPN-06": "FRM-07",
 }
 
 
@@ -328,8 +351,11 @@ def build(only: str | None = None) -> list[Path]:
         if only and pid != only:
             continue
         path = OUT / f"{pid}_{stem}.step"
-        cq.exporters.export(fn(), str(path))
+        shape = fn()
+        cq.exporters.export(shape, str(path))
         stepio.stabilise(path)
+        # STL beside the STEP: preview on GitHub, slicers, mesh tools (coarse: it is an envelope)
+        cq.exporters.export(shape, str(path.with_suffix(".stl")), tolerance=0.1, angularTolerance=0.3)
         out.append(path)
     return out
 

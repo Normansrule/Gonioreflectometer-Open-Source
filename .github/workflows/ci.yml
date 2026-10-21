@@ -2,14 +2,40 @@ name: ci
 on: [push, pull_request]
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
-      - run: pip install -e "./software[dev]" pyyaml numpy
-      - run: make check test
+      - run: pip install -e "./software[dev]" pyyaml numpy openpyxl pillow
+      - name: Checks and tests
+        run: set -o pipefail; make check test 2>&1 | tee /tmp/ci.out
       - name: Generated files are up to date
         run: |
-          make build
-          git diff --quiet || { git diff --stat; echo "::warning::generated files differ: run make (after a PARTS.md edit on GitHub, parts-sync commits them)"; }
+          set -o pipefail
+          make build 2>&1 | tee /tmp/ci.out
+          # Strict: a commit whose generated files (README tables, checklists, packaged machine.yaml ...) are stale fails.
+          # A PARTS.md edit made on github.com fails here once; parts-sync then commits the regenerated files.
+          git diff --quiet || { git diff --stat; echo "::error::generated files are stale: run make build and commit"; exit 1; }
+      - name: Show the error
+        if: failure()
+        run: tail -n 15 /tmp/ci.out | sed 's/^/::error::/'
+  wheel:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - name: Build the wheel, install it in a clean venv, init + sim-demo
+        run: bash scripts/wheel_check.sh
+  cad:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - run: pip install -e "./software[dev]" pyyaml numpy "cadquery==2.8.0"
+      - name: Pose transforms (no cadquery) and the interference check (shown pose, every axis, mixed poses)
+        run: |
+          python -m pytest -q software/tests/test_cad_poses.py
+          python tools/cad/interference.py

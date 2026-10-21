@@ -6,20 +6,25 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency: {group: repo-write, cancel-in-progress: false}   # queue with docs: one writer at a time
 jobs:
   sync:
     if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+        with: {ref: main}                                       # latest main, not the triggering commit
+      - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
       - run: pip install -e "./software[dev]" pyyaml numpy
-      - run: make build
-      - run: python tools/check.py
+      - name: Build and check
+        run: set -o pipefail; { make build && python tools/check.py; } 2>&1 | tee /tmp/sync.out
       - name: Commit the synced files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --quiet || { git commit -m "Sync parts list (PARTS.md -> bom.csv, budget, checklists)"; git push; }
+          git diff --cached --quiet || { git commit -m "Sync parts list (PARTS.md -> bom.csv, budget, checklists)"; git pull --rebase -q; git push; }
+      - name: Show the error
+        if: failure()
+        run: tail -n 15 /tmp/sync.out | sed 's/^/::error::/'

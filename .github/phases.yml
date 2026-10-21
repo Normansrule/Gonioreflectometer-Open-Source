@@ -7,7 +7,9 @@ stages:
   safety: 'ABS gives off fumes (styrene) while printing: enclosed printer, door shut, in a ventilated room you don''t sleep in; open the door only after it cools.'
 - folder: 01-power
   title: Power box
-  safety: Mains stays inside the certified adapter. Plug in with the e-stop pressed; unplug before touching any screw terminal.
+  safety: 'No mains in the machine: a 24 V lithium-ion pack with its own protection board, a 3.15 A fuse and the e-stop. Before touching any screw terminal: unplug the USB-C charger and lift the pack''s
+    red lead out of its lever connector. Charge on a hard surface; don''t leave it charging unattended until M06 has passed. A pack that swells, smells or passes 45 °C: unplug it, move it outdoors away
+    from anything that burns, don''t charge it again.'
 - folder: 02-controller
   title: Controller and buttons
   safety: Never plug or unplug motors with 24 V on.
@@ -84,9 +86,9 @@ milestones:
     title: Explore the simulator
     time: 30 min
     needs:
-    - docs/index.html in a browser
+    - docs/lab.html in a browser
     do:
-    - Open `docs/index.html`. Drag to orbit; scroll to zoom; double-click to reset.
+    - Open `docs/lab.html`. Drag to orbit; scroll to zoom; double-click to reset.
     - Press ▶ Demo. Drag *Build stage* from 1 to 17 and watch parts appear.
     - Set M4 = 60, M3 = 30. Then M4 = 60, M3 = 25.
     - 'Calibration lab: hidden table error +0.8°; press *Run calibrate mirror*; then drag *lamp drift* to 0.2 %.'
@@ -148,7 +150,7 @@ milestones:
     - '`opengonio check-pose M4=10 M3=0`'
     verify:
     - 'First: `"safe": true`, `theta_i` = `theta_r` = 30.0.'
-    - Second prints `G53 G1 X80.0000 Y25.0000 F600`.
+    - 'Second prints `G53 G1 X60.0000 Y205.0000 F600` (grblHAL counts from each home switch: M4 80 − 20, M3 25 + 180).'
     - 'Third: `"safe": false` (light would hit the camera) and exit code 2.'
     fail:
     - '`command not found`: run `source .venv/bin/activate` first.'
@@ -204,7 +206,7 @@ milestones:
     needs:
     - '`PARTS.md` → 00 · Plan'
     do:
-    - Order TLS-01 (enclosed printer for ABS), FIL-01 (black ABS 1 kg), TLS-03 hex keys, TLS-06 calipers, plus FRM-06 (M3/M4/M5 screws) and FRM-08 (608 bearings) for the fit test; set them `ordered` with
+    - Order TLS-01 (enclosed printer for ABS), FIL-01 (black ABS, 4 × 1 kg), TLS-03 hex keys, TLS-06 calipers, plus FRM-06 (M2 screws) and FRM-08 (608 bearings) for the fit test; set them `ordered` with
       `paid:` in `PARTS.md`.
     - No printer? Skip TLS-01 and send the STL files to a print service or makerspace in black ABS; tell them the settings in M03.3.
     verify:
@@ -221,7 +223,7 @@ milestones:
     - 'Import `cad/assembly/opengonio_assembly.step` (whole machine, every part has a model; `cad/README.md` lists them). Real vendor models: `bash scripts/get_cad.sh` → `cad/vendor/`.'
     verify:
     - 'Coupon imports as one solid (Parts list: 1 part, not a mesh).'
-    - The assembly opens with the plywood, lazy Susan, arm, table and both cameras in place.
+    - The assembly opens with the printed deck, lazy Susan, arm, table and both cameras in place.
     fail:
     - 'Imported as a mesh: you picked the .stl; import the .step.'
     record: Onshape link under Onshape set-up in `phases/00-plan/design.md`; commit.
@@ -247,14 +249,14 @@ milestones:
     title: Set clearances
     time: 30 min
     needs:
-    - 5 × M3 × 10 from FRM-06
+    - 5 × M2 × 10 from FRM-06
     - FRM-08 608 bearings (3)
-    - TLS-03 hex key 2.5 mm
+    - TLS-03 hex key 1.5 mm
     - TLS-06 calipers
     do:
-    - Drive one M3 × 10 into each of the 5 holes (2.5 → 2.9 mm) with the hex key, slowly, until the head touches; back it out.
+    - Drive one M2 × 10 into each of the 5 holes (1.5 → 1.9 mm) with the hex key, slowly, until the head touches; back it out.
     - Push a 608 into each of the 3 pockets by thumb.
-    - Pick the smallest hole where the screw goes all the way without splitting the coupon and holds when you pull on it → `M3_TAP` = that hole Ø.
+    - Pick the smallest hole where the screw goes all the way without splitting the coupon and holds when you pull on it → `M2_TAP` = that hole Ø (every printed pilot in the machine uses it).
     - Pick the pocket where the 608 presses in and does not fall out upside down → `CLEAR` = pocket Ø − 22.0.
     - Set both at the top of `tools/cad/parts.py`.
     - 'Once: `.venv/bin/pip install cadquery numpy-stl matplotlib`; then `make parts`.'
@@ -268,7 +270,7 @@ milestones:
 - id: M04
   stage: 01-power
   title: Order power parts
-  goal: Everything for the power box on the bench.
+  goal: Everything for the battery box on the bench; the charging module set before the pack is connected.
   weeks: 2
   steps:
   - id: M04.1
@@ -283,14 +285,61 @@ milestones:
     - Order every stage-01 part ticked `[x]` (status `agreed`), using its link.
     - FRM-06 screws were ordered in M03.1; the box uses them.
     - 'Tools: order the TLS rows (00 · Plan; their own total, not in the machine total): multimeter (TLS-05) and wire stripper (TLS-04) are needed now; the printer and ABS were ordered in M03.1.'
+    - 'Charging needs a USB-C charger with a 20 V profile, ≥ 30 W: the laptop''s, if it charges over USB-C, or any USB-C PD charger ≥ 30 W.'
     - 'In `PARTS.md` set each ordered part to `status: ordered` and fill `paid:`.'
     verify:
     - Stage 01 in `PARTS.md` has no `agreed` or `suggested` parts left; *Paid so far* went up.
     - Tools TLS-02 to TLS-06 are `have` or `ordered`.
     fail:
-    - 'Part out of stock: its *Must meet* line says what a substitute needs; set `swap` + `note:`, or add one with `python tools/new.py part …`.'
+    - 'Part out of stock: its *Must meet* line says what a substitute needs (pack: assembled 6S with a protection board, ≥ 5 A; charging module: CC/CV with output anti-backflow, screw terminals); set `swap`
+      + `note:`, or add one with `python tools/new.py part …`.'
     record: Commit the dated BOM.
   - id: M04.2
+    title: Check parts
+    time: 20 min
+    needs:
+    - all PWR parts
+    - TLS-05 multimeter
+    - calipers (TLS-06)
+    do:
+    - 'Pack (PWR-21): look it over (no dents, no swelling, leads insulated); DC V across its leads. Put the 25.2 V wall charger that came with it away: it is not used.'
+    - Measure the pack (L × W × H), the DROK (PWR-29, L × W × H) and the trigger board (PWR-27, L × W). If any differs from `PACK` / `DROK` / `TRIG` in `tools/cad/parts.py` by more than 1 mm, change it
+      there and run `make parts` before printing.
+    - 'Fuse (PWR-05, 3.15 A T) into the holder (PWR-04): Ω across the holder''s two leads.'
+    verify:
+    - Pack 18.0–24.0 V, positive on the red lead.
+    - Fuse holder < 1 Ω.
+    - E-stop (PWR-28) has a contact block marked NC with screw terminals.
+    - Pack, DROK and trigger within 1 mm of the CAD values (or the CAD updated).
+    fail:
+    - 'Pack below 18 V, swollen or dented: return it; don''t charge it.'
+    - 'Pack above 24.0 V: it shipped charged past 4.0 V per cell; don''t connect it to the motor board until it reads ≤ 24.0 V (ask in an issue before improvising a load).'
+    - 'Wrong part: return it now; don''t substitute ratings (pack 6S with protection board, e-stop NC ≥ 3 A at 24 V DC).'
+    record: '`status: have` per part in `PARTS.md` as it arrives; measured sizes in design.md; commit.'
+  - id: M04.3
+    title: Set the charging module (pack not connected)
+    time: 20 min
+    needs:
+    - PWR-27 trigger
+    - PWR-29 DROK
+    - USB-C charger
+    - TLS-05 multimeter
+    - two 10 cm pieces of PWR-15 wire
+    - small screwdriver
+    do:
+    - Trigger board DIP switch to **20 V**. Trigger `+` / `−` → DROK IN `+` / `−` (10 cm red / black). Nothing on DROK OUT.
+    - Plug the USB-C charger into the trigger. Read its display; then DROK's LCD (input V).
+    - DROK's CV pot until its LCD reads **24.00 V** out; check with the meter on OUT `+` / `−` (T2).
+    - Meter on 10 A, leads into OUT `+` and OUT `−` (the meter is the short). Turn the CC pot until the meter reads **1.00 A** (T2). Remove the meter, unplug the charger.
+    verify:
+    - Trigger display 20 V; DROK input 19.5–20.5 V.
+    - 'T2: open 23.95–24.05 V; short 0.95–1.05 A.'
+    fail:
+    - 'Trigger reads 5 V: the charger has no 20 V profile or the DIP switch is off 20 V; use the laptop''s charger or another ≥ 30 W PD charger.'
+    - 'Voltage won''t move: you are turning the CC pot; the LCD shows which value is changing (see the listing''s pictures).'
+    - 'Meter reads 0 A: meter lead still in the V socket; move it to 10 A.'
+    record: T2 in `phases/01-power/test.csv`; mark both pots with a dot of paint or a strip of tape so they don't get turned.
+  - id: M04.4
     title: Print the box
     time: 15 min
     wait: print 5 h
@@ -298,32 +347,17 @@ milestones:
     - FIL-01 ABS
     - TLS-01 enclosed printer
     do:
-    - 'Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl`: ABS (settings from M03.3, brim on), 0.2 mm, 4 walls, 30 % infill.'
+    - 'Print `phases/01-power/3d/PWR-18a_power_box.stl` and `PWR-18b_power_lid.stl` (lid top face down, ribs up): ABS (settings from M03.3, brim on), 0.2 mm, 4 walls, 30 % infill.'
     verify:
-    - Walls not split; the Ø22.3 e-stop hole in the lid is round (calipers 22.2–22.5 mm).
+    - Walls not split; the Ø22.3 e-stop hole is round (calipers 22.2–22.5 mm).
+    - Pack, DROK and trigger board drop into their floor frames without forcing; the trigger's USB-C lines up with the +X opening; the fuse holder sits in its cradle.
     fail:
-    - 'Hole too small: scale the lid XY by +1 % in the slicer and reprint (no drilling).'
-    record: Tick the boxes; `make done id=M04.2`.
-  - id: M04.3
-    title: Check parts
-    time: 20 min
-    needs:
-    - all PWR parts
-    - printed box + lid
-    do:
-    - Lay all parts out; check each against its *Must meet* line in `PARTS.md` (value, rating).
-    - 'Dry-fit: DC jack adapter PWR-03 in the slot of the +X wall; e-stop PWR-13 in the lid.'
-    verify:
-    - Fuse PWR-05 marked 3.15 A **T** (time-lag), 2 pieces.
-    - E-stop has an NC contact block with screw terminals.
-    - Each part fits its hole without forcing.
-    fail:
-    - 'Wrong part: return it now; don''t substitute ratings (fuse 3.15 A T, e-stop NC ≥ 3 A at 24 V DC).'
-    record: '`status: have` per part in `PARTS.md` as it arrives; commit.'
+    - 'Hole too tight: scale the lid XY by +1 % in the slicer and reprint (no drilling).'
+    record: Tick the boxes; `make done id=M04.4`.
 - id: M05
   stage: 01-power
   title: Wire the power box
-  goal: Fuse and e-stop wired with screw terminals only; nothing soldered; not powered yet.
+  goal: Pack, fuse, charging module, trigger board and e-stop wired with screw terminals and lever connectors only; nothing soldered. Pack leads stay out until M06.
   weeks: 1
   steps:
   - id: M05.1
@@ -331,117 +365,131 @@ milestones:
     time: 20 min
     needs:
     - PWR-18 box + lid
-    - PWR-03 jack adapter
-    - PWR-13 e-stop
-    - 4 × M3 × 10
+    - PWR-28 e-stop
+    - PWR-27 trigger
+    - PWR-29 DROK (set in M04.3)
+    - TLS-09 double-sided tape
+    - 4 × M2 × 10
     - TLS-02 / TLS-03
     do:
-    - Drive the 4 M3 × 10 into the box posts once and back out (cuts the threads).
-    - 'DC jack adapter (PWR-03) into the +X wall slot: barrel facing out, screw block inside.'
-    - E-stop (PWR-13) through the lid hole, ring nut tight; NC contact block on its back (marked NC, usually red, terminals 1–2).
+    - Drive the 4 M2 × 10 into the box posts once and back out (cuts the threads).
+    - E-stop (PWR-28) through the lid hole, ring nut tight.
+    - DROK and trigger board into their floor frames, double-sided tape under each; trigger USB-C into the +X opening. Keep the trigger → DROK IN wires from M04.3.
     verify:
-    - 'Twisting each part by hand: nothing rotates.'
-    - Lid closes on 4 × M3 × 10 with no gap.
+    - 'Twisting each part by hand: nothing rotates or lifts.'
+    - A USB-C plug goes into the trigger from outside the box.
+    - Lid closes on 4 × M2 × 10 with no gap.
     fail:
-    - 'Lid screw spins: that post''s hole is too big; reprint the box with a smaller `M3_TAP`.'
+    - 'Lid screw spins: that post''s hole is too big; reprint the box with a smaller `M2_TAP`.'
+    - 'USB-C plug doesn''t reach: the trigger sits back from the wall; peel it off and push it to the +X end of its frame.'
     record: Tick the boxes; `make done id=M05.1`.
   - id: M05.2
     title: Main wiring
-    time: 45 min
+    time: 40 min
     needs:
-    - PWR-04 fuse holder + PWR-05 fuse
+    - PWR-20 lever connectors
     - PWR-15 18 AWG pair (1 m)
+    - PWR-04 fuse holder + PWR-05 fuse
     - TLS-04 stripper
     - TLS-02 flat screwdriver
     do:
-    - Strip 8 mm, twist the strands tight.
-    - Jack `+` terminal → fuse holder lead A. Fuse holder lead B → e-stop NC terminal 1.
-    - E-stop NC terminal 2 → the whole red wire, out through the J3 slot (it will later pass through the over-travel switch, M14.1, on its way to the E4).
-    - Jack `−` terminal → the whole black wire, out through the −X slot. Leave both ends free; zip-tie the pair to the box.
+    - Pack **not** in the box, no USB-C charger. E-stop pressed.
+    - Fuse holder in its cradle. One holder lead into a 2-way lever connector (BAT+, pack red goes in here in M06). Other holder lead into a 3-way connector (FUSED).
+    - FUSED connector ← DROK OUT `+` (short red) and a red wire to e-stop NC terminal 1. E-stop NC terminal 2 → the whole red wire, out through the J3 slot (it will later pass through the over-travel switch,
+      M14.1, on its way to the SKR Pico).
+    - 'A 3-way connector (GND): DROK OUT `−` (short black) + the whole black wire, out through the motor-power slot; one opening left for the pack''s black lead (M06). Leave both long ends free; zip-tie
+      the pair to the box.'
     - 'Tug every wire: none slips out.'
     verify:
-    - 'Continuity beeps along each row of the netlist (`phases/01-power/design.md`): jack + … red end, jack − … black end.'
+    - Continuity beeps along each row of the netlist (`phases/01-power/design.md`).
     - No beep red out ↔ black out.
     fail:
-    - 'No beep through the e-stop: you used the NO block; move the wires to NC.'
-    - 'Wire pulls out: strip longer, twist, re-tighten.'
+    - 'No beep through the e-stop: you used the NO contact; move the wires to NC.'
+    - 'No beep through the fuse: fuse not seated; open the holder and push it in.'
+    - 'Wire pulls out: strip longer (11 mm in lever connectors), twist, re-close the lever.'
     record: Tick each row on the printed netlist. Tick the boxes; `make done id=M05.2`.
   - id: M05.3
     title: Checks with power off
-    time: 10 min
+    time: 5 min
     needs:
     - TLS-05 multimeter
-    - adapter unplugged
+    - pack not connected
     - e-stop released
     do:
-    - 'Ω range: red out to black out (T1).'
-    - 'Ω range: across the fuse holder leads with the fuse in (T2).'
+    - 'Ω range: red out to black out (T1); FUSED connector to GND connector.'
     verify:
-    - T1 > 10 kΩ (or OL).
-    - T2 < 1 Ω.
+    - 'T1 > 10 kΩ (or OL) both ways (the DROK''s output may show a slowly rising value: its capacitors charging from the meter).'
     fail:
-    - 'T1 low: a stray strand bridges + and − at the jack screws; re-strip and re-tighten.'
-    - 'T2 OL: fuse blown or not seated; fit the spare.'
-    record: T1, T2 in `phases/01-power/test.csv` (date, value, PASS/FAIL).
+    - 'T1 low: a stray strand bridges + and − at the DROK or e-stop terminals; re-strip and re-tighten.'
+    record: T1 in `phases/01-power/test.csv` (date, value, PASS/FAIL).
 - id: M06
   stage: 01-power
   title: First power-on
-  goal: Safe 24 V that the e-stop cuts.
+  goal: Pack connected through the fuse and cut by the e-stop; first charge over USB-C, watched.
   weeks: 1
   steps:
   - id: M06.1
-    title: First 24 V and polarity
-    time: 15 min
-    needs:
-    - PWR-01 adapter
-    - PWR-02 cord
-    - TLS-05 multimeter
-    do:
-    - E-stop pressed. Plug the adapter into the jack, then into the wall.
-    - 'Release the e-stop; DC V: black probe on black out, red probe on red out (T3).'
-    verify:
-    - 'T3 = +23.5 to +24.5 V (a plus sign: polarity right).'
-    - No smell, nothing warm after 1 min.
-    fail:
-    - 'Reads −24 V: jack + / − swapped; unplug, swap the two wires at the jack screws.'
-    - '0 V: fuse (check T2), e-stop pressed, or the J3 loop open.'
-    record: T3 in `test.csv`.
-  - id: M06.2
-    title: E-stop and unplug
+    title: Pack in, voltage and polarity
     time: 10 min
     needs:
+    - PWR-21 pack
     - TLS-05 multimeter
+    - red/black out leads free (no motor board)
+    do:
+    - E-stop pressed, no USB-C charger. Pack upright in its pocket, leads toward +X.
+    - 'Pack black lead into the GND connector, then pack red lead into the BAT+ connector (this is the power switch for service: lift this lever to isolate the pack).'
+    - 'Release the e-stop. DC V: black probe on black out, red probe on red out (T3).'
+    verify:
+    - 'T3 = +18.0 to +24.0 V (a plus sign: polarity right), the same as the pack read in M04.2.'
+    - Nothing warm after 1 min.
+    fail:
+    - 'Reads negative: pack leads swapped; open the BAT+ lever first, then swap.'
+    - 'Reads 0 V: fuse blown or not seated (open BAT+ first), or the e-stop still pressed; a blown fuse means a short: find it before replacing it (T1).'
+    record: T3 in `test.csv`.
+  - id: M06.2
+    title: E-stop and first charge
+    time: 45 min
+    wait: 30 min charging, watched
+    needs:
+    - USB-C charger
+    - TLS-05 multimeter + temperature probe
+    - lid off for this step
     do:
     - Press the e-stop; read the out leads after 1 s (T5). Release.
-    - 'Pull the adapter from the wall; read after 2 s (T6). (No rocker: off = e-stop pressed or unplugged.)'
+    - E-stop pressed. Temperature probe taped to the side of the pack. Plug the USB-C charger into the trigger through the +X opening (T13).
+    - 'Read DROK''s LCD: output current and voltage. Stay with it for 30 min; read the pack temperature every 10 min.'
+    - Unplug the charger. DC V on the trigger's `+` / `−` screws (no back-feed from the pack).
     verify:
     - T5 < 1 V within 1 s.
-    - T6 < 0.5 V within 2 s.
+    - 'T13: trigger 20 V; DROK ≤ 1.05 A, voltage rising toward 24.0 V; pack ≤ 45 °C after 30 min.'
+    - 'Charger unplugged: trigger screws < 1 V.'
     fail:
     - 'Stays high on e-stop: J3 loop bypassed or NC/NO swapped.'
-    record: T5, T6 in `test.csv`.
+    - 'DROK shows 0 A: the pack is already at 24.0 V (full: fine), or DROK OUT is not in the FUSED/GND connectors.'
+    - 'Pack above 45 °C, swelling or a smell: unplug the charger, open BAT+, move the pack outdoors; don''t use it.'
+    - 'Trigger screws read pack voltage with the charger out: the DROK has no output anti-backflow; open BAT+, return it, never plug a USB-C device into the trigger.'
+    record: T5, T13 in `test.csv`.
   - id: M06.3
-    title: Heat
+    title: Heat and run time
     time: 15 min
     wait: 30 min soak
     needs:
     - TLS-05 temperature probe
-    - 'optional: plug-in power meter'
+    - 'optional: the SKR Pico with one motor holding, from M08'
     do:
-    - Check the fitted fuse and the spare (T8).
-    - Lid closed, 30 min on; temperature probe through the J3 slot into the box air (T9).
-    - 'Optional: wall power meter, nothing on the out leads: read watts (T10).'
+    - Lid closed, 30 min on with the SKR Pico + one motor holding if you have them; probe through the J3 slot into the box air (T9).
+    - 'Optional (T15): charge to full (DROK current falls below 0.1 A), unplug the charger, run the in-plane demo plan in a loop and note when it stops (the protection board cuts the pack; recharge straight
+      away).'
     verify:
-    - T8 3.15 A T fitted + spare.
-    - T9 ≤ 45 °C.
-    - T10 ≤ 3 W (if measured).
+    - T9 box air ≤ 45 °C.
+    - T15 ≥ 3 h (when measured).
     fail:
-    - 'T9 high: a loose screw terminal heats up; feel each one, re-tighten.'
-    record: T8–T10 in `test.csv`; label the box *24 V*; commit.
+    - 'Box air hot: the DROK runs warm while charging; leave the lid off while charging and tell us in an issue.'
+    record: T9 (T15) in `test.csv`; label the box *24 V Li-ion · USB-C charge · lift BAT+ to isolate*; commit.
 - id: M07
   stage: 02-controller
   title: Order controller parts
-  goal: E4, Pico H, keypads, one motor and one endstop on the bench.
+  goal: SKR Pico, keypads, cables, the motor 5-pack and the endstops on the bench; your ESP32-S3 as the hub.
   weeks: 2
   steps:
   - id: M07.1
@@ -451,68 +499,75 @@ milestones:
     needs:
     - '`PARTS.md` → 02 · Controller and buttons'
     do:
-    - Order every stage-02 part ticked `[x]`.
-    - Also order LAR-02 (one NEMA 17) and LAR-05 (one TCST2103 endstop) from stage 04 for bench tests.
+    - 'Order every stage-02 part ticked `[x]` (all on Amazon). CTL-02 is your own ESP32-S3: already `have`.'
+    - Also order LAR-02 (the 17HS4401 5-pack) and LAR-05 (the endstop 6-pack) from stage 04 for the bench tests.
     - 'Set them `status: ordered` with `paid:` in `PARTS.md`.'
     verify:
     - Stage 02 has no `agreed` or `suggested` parts left.
     fail:
-    - 'E4 sold out: its *Must meet* line names what a replacement needs; its pins differ — update `firmware/fluidnc/config.yaml`.'
+    - 'SKR Pico sold out: its *Must meet* line names what a replacement needs (grblHAL board map, 4 × TMC2209 UART, USB-C); a FluidNC ESP32 board also works with `controller.firmware: fluidnc` and `firmware/fluidnc/config.yaml`.'
     record: Commit the dated BOM.
   - id: M07.2
     title: Unpack and check
-    time: 10 min
+    time: 15 min
     needs:
     - CTL parts
-    - PWR-19 breadboard
-    - PWR-10 PC817
-    - PWR-11 10 k
+    - PWR-10 opto module
+    - TLS-06 calipers
     do:
-    - 'Pico H: both 20-pin headers fitted. Keypads: 5-wire tails intact. Jumpers: male–female.'
+    - 'SKR Pico: BOOT jumper cap in the box (or on the board). ESP32-S3: pins soldered, two USB-C connectors (USB, UART). Keypads: 5-wire tails intact. Jumpers: male–female.'
+    - Measure the ESP32-S3 board (L × W). If it differs from `ESP` in `tools/cad/parts.py` by > 1 mm, change it and `make parts` before printing the tray.
     - 'Find each keypad''s common pin: meter on continuity, one probe on a tail pin, press keys; the common pin beeps with every key.'
     verify:
     - Common pin found on both keypads (write it on the tail with a marker).
+    - ESP32-S3 size within 1 mm of the CAD (or the CAD updated).
     fail:
     - 'No pin beeps with all keys: tail not fully seated in the meter probe; use a jumper''s male end as a probe tip.'
+    - 'No BOOT jumper cap: any 2.54 mm jumper cap; or hold a female–female jumper across the two BOOT pins while pressing RESET.'
     record: '`status: have` per arrived part in `PARTS.md`; commit.'
 - id: M08
   stage: 02-controller
   title: One motor turns from the laptop
-  goal: Laptop → E4 → motor works on the bench.
+  goal: Laptop → USB-C → SKR Pico (grblHAL) → motor works on the bench.
   weeks: 1
   steps:
   - id: M08.1
-    title: USB into Ubuntu
+    title: USB-C into Ubuntu
     time: 15 min
     needs:
-    - CTL-01 E4
-    - CTL-03 USB cable
+    - CTL-01 SKR Pico
+    - CTL-03 USB-C cable
     - Windows PowerShell (admin)
     do:
-    - Plug the E4 into the laptop by USB (no 24 V needed).
-    - 'PowerShell (admin): `usbipd list`; `usbipd bind --busid <E4 busid>`; `usbipd attach --wsl --busid <E4 busid>`.'
-    - 'Ubuntu: `sudo usermod -aG dialout $USER && newgrp dialout`; `ls /dev/ttyUSB*`.'
+    - 'Plug the SKR Pico into the laptop by USB-C (no motor power needed: its schematic feeds USB 5 V into the logic supply through a diode; if no LED lights, connect the pack and release the e-stop).'
+    - 'PowerShell (admin): `usbipd list` (the board shows as 2e8a:…); `usbipd bind --busid <busid>`; `usbipd attach --wsl --busid <busid>`.'
+    - 'Ubuntu: `sudo usermod -aG dialout $USER && newgrp dialout`; `ls /dev/ttyACM*`.'
     verify:
-    - '`ls` prints `/dev/ttyUSB0`.'
+    - The board is listed (as RP2 Boot or a serial port).
     fail:
     - 'Not listed in `usbipd list`: charge-only cable; swap it.'
-    - 'Vanishes after replug: run `usbipd attach` again (needed after every replug).'
+    - 'Vanishes after replug or flashing: run `usbipd attach` again (needed after every re-enumeration).'
     record: Tick the boxes; `make done id=M08.1`.
   - id: M08.2
-    title: Flash FluidNC
-    time: 20 min
+    title: Flash grblHAL
+    time: 25 min
     needs:
     - M08.1
+    - BOOT jumper cap
     do:
-    - '`bash scripts/e4.sh flash`; close its terminal with Ctrl+].'
-    - '`bash scripts/e4.sh wifi "SSID" "PASSWORD"`; press E4 reset.'
-    - '`bash scripts/e4.sh config fluidnc.local`; press E4 reset.'
+    - '`bash scripts/controller.sh flash` and follow its four steps: build the .uf2 in the grblHAL Web Builder (board BTT SKR Pico 1.0, 4 axes), BOOT jumper on, RESET, copy the .uf2 onto `RPI-RP2`, jumper
+      off, RESET.'
+    - '`bash scripts/controller.sh settings` (sends `firmware/grblhal/settings.txt`, then prints `$$`).'
+    - '`bash scripts/controller.sh pins`: note the port numbers of HE, HB and FAN1; set `lights.white.output` (HE) and `lights.multispectral.output` (HB) in `software/config/machine.yaml` if they differ
+      from 4 and 3.'
     verify:
-    - '`opengonio send ''$I''` lists `FluidNC`.'
-    - '`opengonio send ''?''` prints a line starting `<Idle|MPos:` (or `<Alarm` before homing).'
+    - '`opengonio send ''$I''` lists grblHAL and `BTT SKR Pico 1.0`.'
+    - '`opengonio send ''?''` prints a line starting `<Alarm|MPos:` (homing required) or `<Idle|MPos:`.'
+    - '`$$` shows `$22=15` and `$10=17`.'
     fail:
-    - '`fluidnc.local` not found: use the IP the E4 prints on boot, or join hotspot FluidNC / 12345678 and use 192.168.0.1.'
-    record: C1 (USB) in `phases/02-controller/test.csv`.
+    - '`error:` on a settings line: that number doesn''t exist in your build (an option was left out in the Web Builder); rebuild with 4 axes and the Trinamic driver, or remove the line and note it in design.md.'
+    - 'No `RPI-RP2` drive: BOOT jumper not on the right pins, or RESET not pressed after fitting it.'
+    record: C1 in `phases/02-controller/test.csv`.
   - id: M08.3
     title: Bench motor
     time: 20 min
@@ -521,35 +576,40 @@ milestones:
     - power box
     - tape flag on the shaft
     do:
-    - Adapter unplugged. Red out → E4 VIN `+`, black out → E4 VIN `−` (screw terminal). Motor → E4 X socket. Plug in, e-stop released.
-    - '`opengonio send ''G91'' ''G1 X10 F600'' ''G1 X-10 F600'' ''G90''`'
-    - '`opengonio send ''G91'' ''G1 X360 F300'' ''G90''`; press the e-stop halfway.'
+    - E-stop pressed. Red out → SKR Pico POWER `+`, black out → POWER `−` (screw terminal). Motor → the X socket. Release the e-stop.
+    - '`opengonio send ''M122 I''` (drivers configured now that motor power is on).'
+    - '`opengonio send ''$20=0'' ''$X'' ''G91'' ''G1 X10 F600'' ''G1 X-10 F600'' ''G90''` (soft limits off and `$X` unlock: unhomed bench test only).'
+    - '`opengonio send ''$X'' ''G91'' ''G1 X360 F300'' ''G90''`; press the e-stop halfway.'
+    - '`opengonio send ''$20=1''` (soft limits back on).'
     verify:
     - Shaft turns, then returns to the tape mark.
-    - E-stop stops it at once; after release `opengonio send '?'` shows `Alarm` (must re-home).
+    - E-stop stops it at once; after release `opengonio send '?'` shows `Alarm` or a lost position (must re-home).
     fail:
-    - 'Motor buzzes, no turn: coil pairs crossed; swap the middle two wires of its plug.'
-    - 'Wrong direction: flip `direction_pin` in `firmware/fluidnc/config.yaml`, `bash scripts/e4.sh config`.'
+    - 'Motor buzzes, no turn: coil pairs crossed. The SKR Pico drives one coil on plug pins 1 + 4 (2B, 2A) and the other on pins 2 + 3 (1B, 1A) (maker schematic). Motor plugged in, meter on Ω at the 4-pin
+      plug''s back: 1–4 and 2–3 must each read a few ohms. If not, lift contact latches with a pin and move contacts until they do.'
+    - 'Wrong direction: `opengonio send ''$3=1''` (direction invert mask: X 1, Y 2, Z 4, A 8) and add `$3` to `tools/grblhal_settings.py`.'
+    - '`error:` on G1: the board is still locked or soft limits are on; `$20=0` and `$X` must come first in the same send line.'
     record: Note the result under C7 in `test.csv`.
 - id: M09
   stage: 02-controller
   title: Keypads work with the laptop
-  goal: Membrane keys drive the machine.
+  goal: Membrane keys on the ESP32-S3 hub drive the machine.
   weeks: 1
   steps:
   - id: M09.1
     title: Hub firmware
     time: 15 min
     needs:
-    - CTL-02 Pico H
-    - CTL-04 USB cable
+    - CTL-02 ESP32-S3
+    - CTL-03 USB-C cable
     do:
-    - Hold BOOTSEL, plug the Pico in, copy the MicroPython .uf2 onto `RPI-RP2`.
-    - 'WSL: `usbipd attach` the Pico too.'
-    - '`bash scripts/pico.sh`'
+    - 'Plug the ESP32-S3''s **USB** connector (not UART) into the laptop; WSL: `usbipd attach` it too (303a:…).'
+    - 'Read the module can: N8R8 / N16R8 → `bash scripts/hub.sh flash oct`; otherwise `bash scripts/hub.sh flash plain`.'
+    - Press RST, then `bash scripts/hub.sh`.
     verify:
-    - '`pico.sh` prints `PONG OpenGonio-hub 2`.'
+    - '`hub.sh` prints `PONG OpenGonio-hub 4`.'
     fail:
+    - 'Flash can''t connect: hold BOOT, tap RST, release BOOT (download mode), run it again.'
     - '`mpremote` can''t find it: `ls /dev/ttyACM*` empty → attach with usbipd again.'
     record: C4 (PING part) in `test.csv`.
   - id: M09.2
@@ -558,13 +618,13 @@ milestones:
     needs:
     - 2 × CTL-05 keypads
     - CTL-07 jumpers
-    - pin table in `phases/02-controller/design.md`
+    - 1 × WAGO 221-413 (PWR-20)
+    - README → Wiring → 6
     do:
-    - 'Keypad A: male jumper ends into its tail; common → Pico GND; keys 1–4 → GP2 HOME, GP3 START, GP4 STOP, GP5 LIGHT.'
-    - 'Keypad B: common → GND; key 1 → GP6 NEXT.'
-    - 'Common ground (always): one jumper from the E4 TH1 ground pin to Pico GND: the M1 endstop (M27.1) and PAUSE need it without the laptop.'
-    - 'Optional PAUSE: keypad B key 2 → E4 GPIO39 (TH1 signal pin).'
-    - '`python -m serial.tools.miniterm /dev/ttyACM0 115200`, press each key.'
+    - 'Keypad A: male jumper ends into its tail; keys 1–4 → header J1-4 (GPIO 4) HOME, J1-5 (5) START, J1-6 (6) STOP, J1-7 (7) LIGHT.'
+    - 'Keypad B: key 1 → J1-8 (GPIO 15) NEXT; key 2 → J1-9 (GPIO 16) PAUSE.'
+    - 'Both commons: cut the female end off each common jumper, strip 11 mm, fold double, into a 3-way lever connector; a third jumper (male end cut, stripped, folded) from it to J1-22 (GND).'
+    - '`python -m serial.tools.miniterm /dev/ttyACM1 115200` (the hub''s port), press each key.'
     verify:
     - Each press prints its own `BTN <NAME>` exactly once.
     fail:
@@ -578,18 +638,17 @@ milestones:
     - bench motor on X
     do:
     - '`opengonio panel`'
-    - Press HOME, LIGHT, NEXT, START, then STOP.
-    - 'Optional PAUSE: start again; press PAUSE during a move; then `opengonio send ''~''`.'
+    - Press HOME, LIGHT, NEXT, START, PAUSE, START, then STOP.
     verify:
     - Each press prints its action in the panel log.
-    - PAUSE (if wired) freezes the shaft even with the laptop unplugged; `~` resumes.
+    - PAUSE stops the plan after the pose in progress; START carries on from the next pose.
     fail:
-    - 'PAUSE does nothing: GPIO39 pin wrong in config; check the pin table.'
-    record: C5, C6 in `test.csv` (C6 `n/a` if PAUSE not wired).
+    - 'A key does nothing: wrong GPIO; check the pin table.'
+    record: C5, C6 in `test.csv`.
 - id: M10
   stage: 02-controller
   title: Controller box closed
-  goal: Boards boxed; links, homing, e-stop sense and heat tested.
+  goal: Boards on the tray; homing, e-stop sense and heat tested.
   weeks: 1
   steps:
   - id: M10.1
@@ -598,33 +657,23 @@ milestones:
     wait: print 4 h
     needs:
     - CTL-10 prints
-    - 4 × M3 × 8
-    - PWR-19 breadboard
+    - 4 × M2 × 8 + washers
+    - PWR-10 opto module
+    - TLS-09 double-sided foam tape
     do:
     - Print `CTL-10a_button_panel.stl`, `CTL-10b_controller_tray.stl`.
-    - Drive M3 × 8 into the 4 E4 standoffs once; mount the E4 (holes 83.6 × 60.6 mm). Turn the Pico H components-down (header pins up) and press its corner holes over the tray pegs (it was flashed in M09.1).
-    - 'Breadboard: peel its backing, stick it in the recess. Keypads: peel and stick into the panel recesses, tails through the slots.'
+    - Drive M2 × 8 into the 4 SKR Pico standoffs once; mount the board (holes 58 × 49 mm), USB-C toward the tray edge, a washer under each head.
+    - 'ESP32-S3 (flashed in M09.1): a square of foam tape on the pedestal, then the board upside down (module can on the tape, header pins up), USB end at the opening.'
+    - 'Opto module (PWR-10) into the long frame, double-sided tape under it, terminals up. The short frame is for the LED driver (M18.1). Keypads: peel and stick into the panel recesses, tails through the
+      slots.'
     verify:
-    - E4 sits flat on all four standoffs; USB ports reachable through the slots.
-    - Pico doesn't lift when you unplug a jumper.
+    - SKR Pico sits flat on all four standoffs; its USB-C is reachable.
+    - The ESP32-S3 doesn't lift when you unplug a jumper; its USB connector takes a plug.
     fail:
-    - 'Holes off: measure your E4 hole spacing, set it in `tools/cad/parts.py` (CTL-10b), `make parts`, reprint.'
+    - 'Holes off: measure your board''s hole spacing, set `SKR_HOLES` in `tools/cad/parts.py` (CTL-10b), `make parts`, reprint.'
+    - 'Module doesn''t fit its frame: measure it, set `OPTO_MOD` / `LED_DRV` / `ESP` in `tools/cad/parts.py`, `make parts`, reprint the tray.'
     record: Tick the boxes; `make done id=M10.1`.
   - id: M10.2
-    title: WiFi and Bluetooth
-    time: 30 min
-    needs:
-    - phone or laptop Bluetooth
-    do:
-    - 'In `software/config/machine.yaml`: `controller.transport: tcp`; `opengonio status`.'
-    - 'Pair the E4 over Bluetooth; set `transport: serial`, `port: /dev/rfcomm0` (or the COM port); `opengonio status`.'
-    - Set it back to the link you will use.
-    verify:
-    - Both links print `<Idle|MPos:` or `<Alarm|MPos:`.
-    fail:
-    - 'Bluetooth missing: flash the BT build from installer.fluidnc.com.'
-    record: C1 (WiFi, BT) in `test.csv`.
-  - id: M10.3
     title: Flags and homing
     time: 30 min
     needs:
@@ -632,54 +681,55 @@ milestones:
     - 'CTL-06: 3 double-ended XH leads + two 3-pin housings'
     - a card to block it
     do:
-    - 'Endstop lead: push 3 leads into a 3-pin XH housing at each end, same order both ends (V, G, S from the E4 pin table). One end into the E4 X-MIN socket, the other onto the module''s 3 pins (an XH
-      housing fits a 2.54 mm header).'
+    - 'Endstop lead: 3 CTL-06 leads. Board end: one 3-pin XH housing, pin 1 signal, 2 GND, 3 5 V (SKR Pico pin diagram) into X-STOP. Module end: each wire onto the module pin with the matching printed label
+      (S/OUT, G/GND, V/VCC; its pin order may differ: use single housings or a 3-pin housing in that order). Meter the module''s V pin to STOP pin 3 before plugging in.'
     - '`opengonio send ''?''` with the slot open, then blocked.'
     - 'Motor on X, endstop flag taped to the shaft: `opengonio send ''$HX''`.'
     verify:
     - Blocked shows `Pn:X`; open shows no `Pn`.
-    - '`$HX` turns until the flag cuts the slot and stops; `?` shows MPos X = 20.'
+    - '`$HX` turns until the flag cuts the slot and stops; `?` shows MPos X = 0 (`opengonio status` reports M4 = 20).'
     fail:
-    - 'Never stops: inverted input; toggle `:low` on the home pin in config.yaml.'
-    - 'Module LED never lights: V and G swapped (flip the housing at the module end).'
+    - 'Never stops / `Pn:X` while open: inverted input; `opengonio send ''$5=1''` (X bit) and add `$5` to `tools/grblhal_settings.py`.'
+    - 'Module LED never lights: lead on the wrong module pins. Match each wire to the module''s printed label (S/OUT, G/GND, V/VCC); meter the module''s V pin to STOP pin 3 (5 V) before plugging in.'
     record: C2, C3 in `test.csv`.
-  - id: M10.4
-    title: E-stop sense on the breadboard
+  - id: M10.3
+    title: E-stop sense with the opto module
     time: 30 min
     needs:
-    - PWR-10 PC817
-    - PWR-11 10 k
+    - PWR-10 opto module (24 V version)
+    - 2 × WAGO 221-413 (PWR-20)
+    - 2 × 10 cm PWR-15 offcuts (red, black)
     - 2 cut jumpers
     - M-F jumpers
     do:
-    - PC817 across the breadboard trench (dot = pin 1). 10 k from pin 1's row to a free row (*24 V sense*).
-    - Cut jumper from E4 VIN `+` (bare end under the screw with the main lead) → *24 V sense* row; another from E4 VIN `−` → pin 2's row.
-    - Pin 4's row → Pico GP7; pin 3's row → Pico GND (male–female jumpers).
-    - 'Motor holding (`opengonio send ''$ME''`): measure E4 VIN (T4). Press the e-stop: watch the hub output and the panel; release; `opengonio home`.'
+    - 'E-stop pressed. Take the red and black motor-power wires out of the SKR Pico POWER screws; each into a 3-way lever connector (MOT+, MOT−) with a 10 cm 18 AWG offcut back to its POWER screw. Third
+      slot: a cut jumper (stripped, folded double) to the opto module''s input `+` (MOT+) / `−` (MOT−). A thin jumper under a screw beside an 18 AWG wire does not clamp.'
+    - 'Output side: module VCC ← ESP32-S3 J1-1 (3V3), GND ← J3-21 (GND), OUT → J1-10 (GPIO 17) (female jumper ends on the hub pins; bare ends under the module screws, or female ends on its pins).'
+    - 'Motor holding (`opengonio home`, then wait): measure SKR Pico POWER (T4). Press the e-stop: watch the hub output and the panel; release; `opengonio home`.'
     verify:
-    - T4 ≥ 23.0 V.
-    - Hub prints `POWER 0` on e-stop, `POWER 1` after release (T7); moves refused until HOME (C7).
+    - T4 ≥ 17.5 V.
+    - Module input LED on with the pack on; hub prints `POWER 0` on e-stop, `POWER 1` after release, 20 times out of 20 (T7); moves refused until HOME (C7).
     fail:
-    - 'Always `POWER 0`: PC817 backwards (pins 1/2 vs 3/4) or the 10 k in the wrong row.'
-    - 'Always `POWER 1`: pin 4 not on GP7, or pin 3 not on GND.'
+    - 'Reads the wrong way round (`POWER 1` with the e-stop pressed): your module drives OUT high when powered; set `SENSE_ACTIVE_LOW = False` in `firmware/hub/main.py`, `bash scripts/hub.sh`.'
+    - 'Never changes: input `+` / `−` swapped, or OUT not on GPIO 17; the module''s input LED must light with the pack on (dimmer on a low pack is normal).'
     record: T4, T7 in `phases/01-power/test.csv`; C7 in `phases/02-controller/test.csv`.
-  - id: M10.5
+  - id: M10.4
     title: Heat
     time: 10 min
     wait: 30 min hold
     needs:
     - TLS-05 temperature probe
     do:
-    - '`opengonio send ''$ME''`, motor holding at 0.8 A run current for 30 min, lid on; probe on the driver area.'
+    - '`opengonio home`, motor holding at 0.8 A run current for 30 min, lid on; probe on the SKR Pico driver heatsink.'
     verify:
     - Driver area ≤ 80 °C (C8).
     fail:
-    - 'Hotter: fit the optional CTL-08 fan on `M62 P2`, or lower `run_amps` to 0.7.'
+    - 'Hotter: fit the optional CTL-08 fan on FAN1 (`M62 P2`; BTT advise a fan above 0.8 A), or lower `$140` to 700 mA.'
     record: C8 in `test.csv`; commit `make publish m="M10 controller done"`.
 - id: M11
   stage: 03-frame
-  title: Place the base mounts
-  goal: Every mount screwed to the board from a paper template; no cutting, no drilling.
+  title: Print and join the deck
+  goal: Nine printed tiles bolted into one 600 mm deck; every mount already has its pilot hole.
   weeks: 1
   steps:
   - id: M11.1
@@ -694,110 +744,86 @@ milestones:
     - Stage 03 has no `agreed` or `suggested` parts left.
     record: Commit `PARTS.md`.
   - id: M11.2
-    title: Print the template and mounts
+    title: Print the deck tiles
     time: 30 min
-    wait: print 4 h
+    wait: print ≈ 55 h (9 × 6 h)
     needs:
-    - TLS-08 paper printing
-    - tape
-    - FIL-01 ABS
+    - FIL-01 ABS (1.5 kg of it)
+    - TLS-01 enclosed printer
     do:
-    - Print `phases/03-frame/placement-template.svg` at 100 % in poster/tile mode; tape the tiles on the crosses.
-    - Print 4 × `FRM-09b_foot.stl`, 2 × `FRM-09d_extrusion_saddle.stl`.
+    - 'Print the 9 tiles `FRM-01a_deck_tile_SW.stl` … `FRM-01i_deck_tile_NE.stl` as exported: top face on the bed, no supports, 5 mm brim, door shut until cool.'
+    - 'Write each tile''s name (SW … NE) on its underside as it comes off. Map: `phases/03-frame/design.md`.'
     verify:
-    - The 100 mm bar measures 100 ± 0.5 mm.
-    - 'Tile joins: lines meet within 0.5 mm.'
+    - 'Each tile lies flat on the table: a sheet of paper won''t slide under any corner.'
+    - 'Calipers: every edge 200.0 ± 0.4 mm.'
     fail:
-    - 'Bar 97 mm: the printer scaled to fit; turn *fit to page* off.'
+    - 'Corner lifts: 8 mm brim, bed 105 °C, door shut until below 40 °C; reprint.'
+    - 'Edges short: XY shrink compensation from M03.3 not set; reprint.'
     record: Tick the boxes; `make done id=M11.2`.
   - id: M11.3
-    title: Screw down the mounts
+    title: Bolt the deck together
     time: 45 min
     needs:
-    - FRM-01 plywood as bought
-    - FRM-12 wood screws
-    - 'TLS-02 Phillips #2'
-    - TLS-06 calipers
+    - 9 deck tiles
+    - 36 × M2 × 10 + nuts + washers (FRM-06)
+    - TLS-03 hex key 1.5 mm
+    - a flat table
     do:
-    - Template on the best face, centred (equal overhang on all sides), taped.
-    - Saddles 1 and 2 on their outlines (x = 237 and 282), walls along the +X line; 4 screws each, straight down through the paper, firm, not over-tightened.
-    - Leave the template on for the boxes (M12.4).
+    - 'Tiles upside down (top face on the table, ribs up), in their places as seen from below: east and west swap, so E tiles lie on your left when N points away.'
+    - Butt neighbouring walls; M2 × 10 through each pair of seam holes (3 per edge), washer and nut on the other side. Finger-tight everywhere first, then tighten from the centre tile outward.
+    - Turn the deck over, onto the table where it will live (+X, east, toward where the camera goes; leave 450 mm free beyond that edge for the outrigger).
     verify:
-    - Saddle centres 237 ± 1 and 282 ± 1 mm from the centre cross (tape).
-    - Nothing moves when you push it hard sideways.
+    - 'A straight edge across every seam: no step > 0.3 mm.'
+    - 'Lift one corner 10 mm: the deck moves as one piece, no seam opens.'
     fail:
-    - 'Screw spins without tightening: glue a wooden toothpick into the hole, snap it flush, drive the screw again.'
-    record: Photo `phases/03-frame/base.jpg`; commit.
+    - 'Step at a seam: loosen its 3 bolts, press both skins flat on the table, tighten again.'
+    record: Photo `phases/03-frame/deck.jpg`; commit.
 - id: M12
   stage: 03-frame
   title: Assemble the frame
-  goal: Board on feet with outrigger, camera pillar and post, scales and boxes.
+  goal: Outrigger, camera pillar, scan post and boxes screwed into the deck's pilots.
   weeks: 1
   steps:
   - id: M12.1
-    title: Feet
-    time: 15 min
-    needs:
-    - 4 × FRM-09b feet
-    - 8 × FRM-12 screws
-    do:
-    - Board face down on a towel. A foot flush in each corner; 2 screws each.
-    - Turn it over on the table where it will live.
-    verify:
-    - Board doesn't rock when pressed at each corner.
-    - No screw tip shows on the top face.
-    fail:
-    - 'Rocks: the table isn''t flat; fold paper under the short foot. (No levelling needed: the optics reference the board, not gravity.)'
-    record: Tick the boxes; `make done id=M12.1`.
-  - id: M12.2
     title: Outrigger, camera pillar and scan post
-    time: 45 min
-    wait: print 3 h
+    time: 1 h
+    wait: print 8 h
     needs:
-    - 2 × FRM-02 2020 (outrigger + scan post)
-    - 7 × FRM-03 T-nuts
-    - 7 × M5 × 10
+    - FRM-02a–d bars
+    - 2 × FRM-09d saddles
+    - 2 × FRM-09i couplers
     - FRM-09e post socket
     - FRM-09h camera pillar
     - FRM-09f end foot
-    - TLS-07 tape + phone level app
+    - 8 × M2 × 12 and 14 × M2 × 16 (FRM-06)
+    - TLS-07 phone level app
     do:
-    - Print 2 × `FRM-09e_post_socket.stl` and 1 × `FRM-09f_end_foot.stl`.
-    - Drop 2 T-nuts into each side slot of one 2020; lay it in the saddles with its inner end 215 mm from the board centre, running out over +X; end foot under it at x = 628 (just inside the scan post).
-    - M5 × 10 through each saddle wall and the end foot into the T-nuts; tighten.
-    - 'Camera pillar (FRM-09h) on the outrigger at x = 391.8 (measuring camera: lens front lands at 350); post socket at x = 674.4 with the 500 mm scan post (M5 × 10 + T-nut each). No tall post at the measuring
-      camera: it would stand in the scan camera''s view.'
+    - Print the bars `FRM-02a…d` (lying flat, as exported), 2 × `FRM-09d_bar_saddle.stl`, 2 × `FRM-09i_bar_coupler.stl` (standing), `FRM-09e_post_socket.stl`, `FRM-09f_end_foot.stl`, `FRM-09h_camera_pillar.stl`.
+    - 'Saddles on their pilots in the east tile (x = 237 and 278, on the +X line): 4 × M2 × 12 each.'
+    - 'Outrigger: bars 1 and 2 butted inside a coupler, M2 × 16 through the coupler into each bar''s pilots. Lay it in the saddles, inner end at x = 215, the far end on the end foot (standing on the table
+      at x = 628). Every clamp''s hole now lines up with a pilot in the bar: M2 × 16 through each saddle cheek and the end foot.'
+    - 'Camera pillar (FRM-09h) over the outrigger at its pilot (x = 391.8); post socket over the pilot at x = 674.4, M2 × 16 each. Scan post: bar 1 into the socket (M2 × 16), bar 2 on top through the second
+      coupler. No tall post at the measuring camera: it would stand in the scan camera''s view.'
     verify:
     - 'Posts vertical: phone level app on two faces reads 90.0 ± 0.5°.'
-    - Pillar and post centres 391.8 ± 1 and 674.4 ± 2 mm from the board centre (tape); pillar's M5 pilot at 150 ± 1 mm above the board.
+    - Every screw found its pilot (none driven into plain plastic).
+    - Pillar and post centres 391.8 ± 1 and 674.4 ± 2 mm from the deck centre (tape); pillar's camera pilot at 150 ± 1 mm above the deck.
     - Outrigger level end to end (phone level app ±0.5°).
     fail:
-    - 'Far end low: the end foot is 30 mm for 12 mm feet + 12 mm plywood + 6 mm saddle; shim it.'
-    record: Tick the boxes; `make done id=M12.2`.
-  - id: M12.3
-    title: Protractor scales
-    time: 30 min
-    wait: print 2 h
-    needs:
-    - 4 × FRM-09c
-    - double-sided tape or glue
-    do:
-    - Print 4 × `FRM-09c_protractor_segment.stl` (80° each).
-    - Stick them end to end around the ring circle from 20° to 340° (0° = +X, toward the camera; the gap is the M4 motor).
-    verify:
-    - The 20° and 340° ends sit symmetric about the line board centre → camera pillar (string line).
-    record: Tick the boxes; `make done id=M12.3`.
-  - id: M12.4
+    - 'A screw misses its pilot by > 1 mm: that bar shrank; check the XY compensation (M03.3) and reprint it.'
+    - 'Far end low: the end foot is 30 mm for the 24 mm deck + 6 mm saddle floor; shim it.'
+    record: Tick the boxes; `make done id=M12.1`.
+  - id: M12.2
     title: Mount the boxes
     time: 15 min
     needs:
     - power box
-    - controller box
-    - 8 × FRM-12 screws
+    - controller tray
+    - 8 × M2 × 12 (FRM-06)
     do:
-    - 'Power box: 4 wood screws through its floor''s OG-40 holes at the template crosses (220, −220), e-stop toward you.'
-    - 'Controller tray: 4 wood screws through its corner bosses at the template crosses (centre −190, 220).'
-    - Black wire along the board edge to E4 VIN `−`. Red wire for now straight to E4 VIN `+` (it gets the over-travel switch in M14.1).
+    - 'Power box: 4 × M2 × 12 from inside, through its floor bosses into the SE tile''s pilots (centre 220, −220), e-stop toward you.'
+    - 'Controller tray: 4 × M2 × 12 through its corner bosses into the NW tile''s pilots (centre −200, 220).'
+    - Black wire along the deck edge to SKR Pico POWER `−`. Red wire for now straight to POWER `+` (it gets the over-travel switch in M14.1).
     verify:
     - '`opengonio status` still answers; e-stop still cuts (repeat T5).'
     record: Photo `phases/03-frame/frame.jpg`; commit.
@@ -828,8 +854,8 @@ milestones:
     needs:
     - FIL-01 ABS
     do:
-    - Print 7 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08c_arm_segment.stl` (the 8th rim segment, with the upright socket), 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08e_cross_clamp.stl`, 1 × `FRM-09g_washers.stl`
-      (8 washers).
+    - Print 7 × `LAR-08a_rim_segment.stl`, 1 × `LAR-08c_arm_segment.stl` (the 8th rim segment, with the upright socket), 1 × `LAR-08b_ring_motor_mount.stl`, 1 × `LAR-08e_cross_clamp.stl`, `LAR-08f_upright_bar.stl`
+      and `LAR-08g_arm_bar.stl` (lying flat), 4 × `FRM-09c_protractor_segment.stl` (ring scale + lazy-Susan clamp, 80° each).
     verify:
     - Segments butt into a closed ring on the table (no gap > 0.5 mm).
     record: Tick the boxes; `make done id=M13.2`.
@@ -839,20 +865,22 @@ milestones:
     needs:
     - LAR-01 lazy Susan
     - LAR-03 belt
-    - FRM-12 wood screws + 4 mm printed washers
-    - M4 × 16 + nuts (FRM-06)
+    - 4 × FRM-09c ring-scale clamps
+    - 8 × M2 × 10 + washers
+    - M2 × 12 + nuts + the 2 wide printed washers (TBL-07f)
     - TLS-09 CA glue
     - TLS-04 cutter
     do:
-    - 'Lazy Susan centred on the template circle; #8 wood screws through its bottom-plate holes, each through a 4 mm printed washer (the steel plate is thin: without the washer the 16 mm screw pokes through
-      the plywood).'
-    - 'Rim segments + the arm segment on the top plate, closed ring: turn the ring so an arm-segment slot lands on a plate hole; M4 × 16 + nut through every slot that lands on a hole; CA-glue the rest (the
-      arm segment''s whole underside).'
+    - 'Lazy Susan on the deck centre, its bottom plate inside the ring of 8 pilot holes (r 163). Ring-scale segments end to end from 20° to 340° (0° = +X, toward the camera; the gap is the M4 motor): each
+      inner wall against the bottom plate''s edge, its lip over the plate; 2 × M2 × 10 + washer into the deck pilots. The lazy Susan needs no screws of its own.'
+    - 'Rim segments + the arm segment on the top plate, closed ring: turn the ring so an arm-segment slot lands on a plate hole; M2 × 12 + wide printed washer + nut through every slot that lands on a hole;
+      CA-glue the rest (the arm segment''s whole underside).'
     - CA-glue the GT2 belt teeth-out on the 6 mm band, its edges flush with the band's edges, ends butted, no gap; it ties the segments together.
     verify:
     - 'Count the belt teeth: equals `RIM_TEETH` ± 1.'
     - No tooth step at the joint (run a fingernail over it).
-    - No screw tip under the plywood.
+    - Bottom plate can't slide or lift (push hard sideways).
+    - The 20° and 340° scale ends sit symmetric about the line deck centre → camera pillar (string line).
     fail:
     - 'Gap at the joint: cut a 1-tooth filler from spare belt.'
     record: Tooth count in design.md.
@@ -863,11 +891,11 @@ milestones:
     - LAR-02 motor
     - LAR-04 20T pulley
     - LAR-08b mount
-    - 4 × M3 × 8
-    - FRM-12 wood screws
+    - 4 × M3 × 8 (FRM-07)
+    - 2 × M2 × 12 + washers
     do:
     - Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt (its flanges pass above and below the band).
-    - Mount on its template outline at 0° (+X), base outside the lazy Susan; slide it in until the pulley meshes the rim belt fully, then screw the base down (2 screws in the slots).
+    - Mount at 0° (+X), base outside the lazy Susan, its two slots over the two deck pilots; slide it in until the pulley meshes the rim belt fully, then M2 × 12 + washer through each slot.
     verify:
     - Pulley teeth engage the rim belt across its full width; turning the ring by hand turns the motor, no skipped tooth.
     fail:
@@ -878,14 +906,15 @@ milestones:
     time: 45 min
     needs:
     - LAR-08c arm segment (in the ring)
-    - 2 × FRM-02 2020 (upright + arm)
+    - LAR-08f upright + LAR-08g arm bars
     - LAR-08e cross clamp
-    - M4 × 16 + nuts
+    - 3 × M2 × 16
     - LSR-05 lamp body (stage 06, or a dummy)
     do:
     - The upright stands in the arm segment's socket, 36 mm beside the lamp's beam line (so it never shades the sample).
-    - 2020 upright in the socket (M5 × 10 + T-nut). Cross clamp on the upright (the uncut 500 mm upright runs straight through it); horizontal 2020 arm in its side channel, parallel to the beam line, pointing
-      outward; the lamp's clamp is offset so its beam centre passes through the zero point, 300 mm out, at 150 mm.
+    - Upright bar in the socket, M2 × 16 through the socket wall into its lower pilot. Cross clamp down the upright until its screw meets the upper pilot (M2 × 16). Arm bar through the clamp's side channel,
+      parallel to the beam line, pointing outward, its inner pilot under the clamp's top screw (M2 × 16). The lamp's clamp takes the outer pilot (M18.1), so the beam centre passes through the zero point,
+      300 mm out, at 150 mm.
     verify:
     - 'Turning by hand 20 → 324°: no tight spot, no skipped tooth; the arm segment and upright never touch the motor plate.'
     - 'Lamp position: 300 ± 2 mm from the zero point, height 150 ± 2 mm.'
@@ -904,11 +933,12 @@ milestones:
     - LAR-06 roller switch
     - flag on the arm
     do:
-    - Mount the TCST2103 so the arm flag cuts it at 20° (lead as in M10.3).
-    - Roller over-travel switch (LAR-06) screwed to the base 3° beyond. Unplug the adapter; cut the red wire where it passes the switch, strip both ends, one under COM, one under NC.
+    - 'Mount the TCST2103 so the arm flag cuts it at 20°: M2 × 8 + washer through one module hole into the nearest spare deck pilot (40 mm grid), double-sided tape under it (lead as in M10.3).'
+    - Roller over-travel switch (LAR-06) on the deck 3° beyond (M2 into spare pilots, or double-sided tape). Press the e-stop; cut the red wire where it passes the switch, strip both ends, one under COM,
+      one under NC.
     verify:
     - '`opengonio send ''?''` shows `Pn:X` with the flag in the slot.'
-    - Pressing the roller switch drops E4 VIN to 0 V (and the hub prints `POWER 0`).
+    - Pressing the roller switch drops SKR Pico POWER to 0 V (and the hub prints `POWER 0`).
     record: Tick the boxes; `make done id=M14.1`.
   - id: M14.2
     title: Config and homing
@@ -918,11 +948,16 @@ milestones:
     do:
     - 'Set `installed_phase: 4` and `M4.gear_ratio` (from M13.1).'
     - '`make test`'
+    - 'Power-cycle the SKR Pico (e-stop, then USB): `opengonio send ''?''`.'
     - '`opengonio home` ten times.'
     verify:
-    - Tests pass; home finishes 10/10; arm stops on the flag, never on the roller switch.
+    - Tests pass.
+    - 'After power-up `?` shows `<Alarm` (must_home: nothing moves until homed); after homing `<Idle`.'
+    - Home finishes 10/10; arm stops on the flag, never on the roller switch.
     fail:
-    - 'Homes the wrong way: `homing.positive_direction` for X in `firmware/fluidnc/config.yaml`.'
+    - 'Homes the wrong way: clear the X bit of `$23` (homing direction mask) in `tools/grblhal_settings.py`, `make build`, `bash scripts/controller.sh settings`.'
+    - 'Still `<Alarm` after homing the installed axes: your grblHAL build keeps the startup lock until every configured axis is homed. Note the version (`$I`) in design.md, set `$22=11` (no init lock) in
+      `tools/grblhal_settings.py`, `make build`, `bash scripts/controller.sh settings`: the software still refuses every move until it has homed and checked the position.'
     record: 10/10 in design.md.
   - id: M14.3
     title: Angle check
@@ -943,7 +978,7 @@ milestones:
     - LAR-09 laser + mirror
     - wall 2.0 m away
     do:
-    - Laser on the base, small mirror taped to the arm, spot on a wall 2.0 m away (0.1° = 7 mm).
+    - Laser on the deck, small mirror taped to the arm, spot on a wall 2.0 m away (0.1° = 7 mm).
     - '`opengonio repeat M4 --at 60 --away 30 --n 20`; type each spot offset (mm).'
     - '`opengonio repeat M4 --at 60 --home --n 10`'
     verify:
@@ -976,10 +1011,10 @@ milestones:
     - 2 × FRM-08 608
     - TBL-05 M8 × 75 bolt + nut
     - 1 mm shim + 6 mm spacer (TBL-07f)
-    - 4 × FRM-12 screws
+    - 4 × M2 × 12 (FRM-06)
     - TLS-10 13 mm spanner
     do:
-    - Bolt up through the post from below, head into the hex pocket. Post on its template outline at (0, 0); 4 wood screws (the bolt is now trapped and can't turn).
+    - Bolt up through the post from below, head into the hex pocket. Post on its 4 pilots at the deck centre; 4 × M2 × 12 (the bolt is now trapped and can't turn).
     - 'Press both 608s into the drum. Onto the bolt: 1 mm shim (sits on the post top), the drum (lower 608 onto the bolt), 6 mm spacer down the drum''s top hole, M8 nut.'
     - Tighten the nut with the spanner until the drum has no up-down play but still turns freely (the nut presses only the inner races).
     verify:
@@ -997,11 +1032,12 @@ milestones:
     - TBL-02 232 mm belt
     - TBL-03 pulley
     - TBL-07c bracket
-    - 4 × M3 × 8
+    - 4 × M3 × 8 (FRM-07)
+    - 2 × M2 × 12 + washers
     do:
     - Motor face up, bracket top plate on its face (4 × M3 × 8); 20T pulley on the shaft, teeth level with the drum's teeth.
-    - Belt on the motor pulley and the drum's teeth; bracket on its template outline (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; screw the rails down
-      through the slots.
+    - Belt on the motor pulley and the drum's teeth; bracket rails' slots over their 2 deck pilots (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; M2 × 12
+      + washer through each slot.
     verify:
     - No belt skip when you hold the table and the motor turns slowly (`opengonio send 'G91' 'G1 Y5 F100' 'G90'` after M16.1).
     - Motor and bracket stay inside the lazy Susan opening (no contact when M4 turns).
@@ -1018,18 +1054,18 @@ milestones:
     needs:
     - TBL-04 endstop
     - TBL-07b flag
-    - CTL-06 leads (as M10.3)
+    - CTL-06 leads (as M10.2)
     do:
-    - Flag on the drum's two flag holes (M3 × 8 self-tap), pointing at −180°; endstop on a printed riser beside the post, lead into the E4 Y-MIN socket.
+    - Flag on the drum's two flag holes (M2 × 8 self-tap), pointing at −180°; endstop on a printed riser beside the post (M2 into a spare deck pilot), lead into the SKR Pico Y-STOP socket.
     - '`installed_phase: 5`; `opengonio home` ten times.'
     verify:
-    - Home 10/10; `?` shows MPos Y = −180 after homing.
+    - Home 10/10; after homing `opengonio status` shows MPos Y = 0 and true angle M3 = −180.
     record: 10/10 in design.md.
   - id: M16.2
     title: Angle check
     time: 15 min
     needs:
-    - paper 360° protractor (any free printable, TLS-08) taped on the drum top
+    - paper 360° protractor (any free printable, printed on TLS-08) taped on the drum top
     - a fixed pointer (tape on the post)
     do:
     - '`opengonio move M3=0`, `M3=90`, `M3=-90`; read the protractor against the pointer.'
@@ -1076,7 +1112,7 @@ milestones:
     do:
     - 'WSL''s standard kernel has no USB-camera driver, so camera stages run `opengonio` from Windows Python. PowerShell, in the repo folder (`cd \\wsl.localhost\Ubuntu\home\<you>\projects\Gonioreflectometer-Open-Source`):'
     - '`py -m venv $HOME\og-win; & $HOME\og-win\Scripts\pip install "./software[hw]"`'
-    - '`usbipd detach --busid <E4 busid>` (Windows keeps the E4 as a COM port); set `controller.port: COM5` (your port) in `machine.yaml`.'
+    - '`usbipd detach --busid <SKR Pico busid>` (Windows keeps it as a COM port); set `controller.port: COM5` (your port) in `machine.yaml`.'
     - '`& $HOME\og-win\Scripts\opengonio status`'
     verify:
     - '`status` prints `<Idle|` or `<Alarm|`.'
@@ -1096,8 +1132,8 @@ milestones:
     - TLS-09 utility knife + 400-grit paper
     do:
     - 'Order the stage-06 parts ticked in `PARTS.md`, plus CAL-01 PTFE, CAL-02 mirror (stage 07): M17.5–M19 use them. Print `CAM-03a_aperture_stop_f8.stl`, `CAM-03b_camera_plate.stl`, `CAL-06a/b` holders.'
-    - 'Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 6 mm standoffs.'
-    - 'Plate on the camera pillar: slide its clamp down to the pilot hole, M5 × 10 self-taps into it; aperture stop in front of the lens.'
+    - 'Camera board on the plate: 4 × M2 × 8 (FRM-06) self-tap into the 6 mm standoffs.'
+    - 'Plate on the camera pillar: slide its clamp down to the pilot hole, M2 × 16 self-taps into it; aperture stop in front of the lens.'
     - 'White tile (CAL-01): mark one 100 × 100 mm PTFE sheet into four 50 mm squares (lines at 50 mm both ways); cut each line with the utility knife against a straight edge, 4–6 light passes, never through
       in one go. Stack 3 squares (9 mm) in the `CAL-06a` holder; sand the top one with 400 grit in circles until evenly matte; blow off the dust, don''t touch the face.'
     verify:
@@ -1164,14 +1200,15 @@ milestones:
     - Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. Strip one end of a 15 cm red and a 15 cm black 18 AWG lead (PWR-15) to the length in the holder's instruction sheet; push red into the holder's `+` poke-in,
       black into `−`.
     - Holder face-down in the body's round seat, wire entries toward the lead groove (the side away from the clamp), leads along the groove. COB into the holder's square seat, light-emitting face down through
-      the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M3 × 8, leads through its slot; tighten evenly until the heatsink no longer turns.
-    - Lamp clamp onto the horizontal arm (M5 × 10 + T-nut), aperture facing the zero point.
-    - Driver (LSR-02) pins into the breadboard. +Vin row ← 24 V sense row; −Vin row → E4 HE0 `−` (cut jumper under the screw).
-    - Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to
-      the lamp's red (+) / black (−) lead.
+      the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M2 × 12, leads through its slot; tighten evenly until the heatsink no longer turns.
+    - Lamp clamp onto the arm bar's outer pilot (M2 × 16), aperture facing the zero point.
+    - 'Driver (LSR-02) pins up in the short frame on the controller tray (double-sided tape). Female jumper ends onto its pins: +Vin ← SKR Pico HE `+` (terminal marked 12/24V; cut jumper, bare end under
+      the screw); −Vin → SKR Pico HE `−` (terminal marked IO23; output port from M08.2, normally `M62 P4`).'
+    - Driver +Vo / −Vo pins → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last end (cut off, stripped, folded double) to the lamp's
+      red (+) / black (−) lead.
     verify:
     - Each lead holds when tugged (poke-in locked).
-    - 'Polarity checked with the meter before power: +Vo row → red lead beeps.'
+    - 'Polarity checked with the meter before power: +Vo pin → red lead beeps.'
     record: Tick the boxes; `make done id=M18.1`.
   - id: M18.2
     title: Switch and heat
@@ -1185,7 +1222,7 @@ milestones:
     - Lamp follows every command.
     - COB case ≤ 70 °C after 10 min.
     fail:
-    - 'Lamp always on: driver −Vin on GND instead of HE0.'
+    - 'Lamp always on: driver −Vin on GND (or on HE `+`) instead of HE `−` (the terminal marked IO23).'
     record: Temperature in phases/06-camera-light/design.md → Results.
   - id: M18.3
     title: Warm-up time
@@ -1277,7 +1314,7 @@ milestones:
     - Room lights off, curtains closed, tape over power LEDs that face the sample; laptop screen dimmed and turned away.
     - 'Only if M21.2 fails: build the optional drape (ENC-01 fabric on ENC-03 dowels in 4 printed `ENC-04a` sockets), vents of both boxes open.'
     verify:
-    - Standing at the machine, you can't read the template text without the lamp.
+    - Standing at the machine, you can't read this page without the lamp.
     record: Tick the boxes; `make done id=M21.1`.
   - id: M21.2
     title: Stray light test
@@ -1452,13 +1489,13 @@ milestones:
     - TLT-05 2 × M8 × 35 + nuts
     - spacers (TBL-07f)
     - SPN-01 pancake motor
-    - 4 × M3 × 8, 4 × M4 × 16
-    - M3 grub or M3 × 8 + nut
+    - 4 × M3 × 8 (FRM-07), 4 × M2 × 12
+    - M2 × 6 + M2 nut
     - TLS-10 spanner
     do:
-    - 'Pancake motor under the cradle floor (shaft up through it, 4 × M3 × 8). Platter on the shaft: M3 nut in its slot, grub onto the D flat; platter top level with the stub-bolt axis (the end blocks stand
-      10 mm higher).'
-    - 'Yoke on the drum (4 × M4 × 16 self-tap into the OG-40 holes) with its arms along ±Y: at M3 = 0 the tilt axis is square to the camera direction (+X) and the flag holes on the drum stay clear. The
+    - 'Pancake motor under the cradle floor (shaft up through it, 4 × M3 × 8). Platter on the shaft: M2 nut in its slot, M2 × 6 through the hub onto the D flat; platter top level with the stub-bolt axis
+      (the end blocks stand 10 mm higher).'
+    - 'Yoke on the drum (4 × M2 × 12 self-tap into the OG-40 pilots) with its arms along ±Y: at M3 = 0 the tilt axis is square to the camera direction (+X) and the flag holes on the drum stay clear. The
       pulley-side arm is +Y.'
     - 'Pulley side: bolt through 100T pulley → 1 mm shim → 608 (outer face of the arm) → 6.8 mm spacer → cradle nut. Other side: the same with the 9.4 mm spacer instead of the pulley. Hold each bolt head
       with the spanner; snug, not tight.'
@@ -1477,11 +1514,11 @@ milestones:
     - TLT-03 pulley
     - TLT-04 endstop
     - TBL-07b flag
-    - 4 × M3 × 8
+    - 4 × M3 × 8 (FRM-07)
     do:
     - Motor on the inner face of the pulley-side arm above the axis, shaft out through the arm slot (4 × M3 × 8 in the slots); 20T pulley outside, level with the 100T; belt on; slide the motor up to tension
       (~3 mm deflection); tighten.
-    - Flag on a cradle end block at −90°; endstop on the arm; lead into the E4 Z-MIN socket (CTL-06, as M10.3).
+    - Flag on a cradle end block at −90°; endstop on the arm; lead into the SKR Pico Z-STOP socket (CTL-06, as M10.2).
     verify:
     - '`?` shows `Pn:Z` with the flag in the slot.'
     - Belt doesn't skip when you hold the platter and jog `M2` slowly.
@@ -1561,23 +1598,33 @@ milestones:
   steps:
   - id: M27.1
     title: Wire the spin motor
-    time: 30 min
+    time: 40 min
     needs:
-    - CTL-11 cable
+    - spare LAR-02 motor cable
+    - 4 × WAGO 221-412 (PWR-20)
+    - TLS-04 stripper
+    - multimeter
     - SPN-04 endstop
     - TBL-07b flag
     - CTL-06 leads
     - jumpers
     do:
-    - Spin motor cable into the E4 E0 socket (route it along the yoke arm with slack for ±90° tilt and ±180° table).
-    - Flag on the platter rim (2 × M3 × 8), endstop on the cradle.
-    - 'Endstop lead to TH0 (2-pin: signal + ground, no supply): S and G from TH0 via a 2-pin XH lead; the module''s V from Pico 3V3 OUT (pin 36) via a lead whose XH housing slides over Pico pins 36–37 with
-      only pin 36 populated. Pico GND is already tied to the E4 (M09.2 ground jumper).'
+    - 'The pancake (SPN-01) has bare leads. Find its coil pairs: touch two leads together and turn the shaft by hand; noticeably stiffer = one pair (or the meter: a pair reads a few ohms, two leads from
+      different pairs read open). Tape-label them pair 1 and pair 2.'
+    - 'Spare 5-pack cable: cut off the 6-pin (motor-end) plug, strip 11 mm of each of its 4 wires, twist the strands. At the 4-pin XH plug, note which wire colour sits in pins 1 + 4 (board labels 2B, 2A:
+      one driver coil) and 2 + 3 (1B, 1A: the other), from the SKR Pico schematic.'
+    - '4 × WAGO 221-412 (one wire each side): pair 1''s two leads to the wires of plug pins 1 and 4; pair 2''s two leads to the wires of pins 2 and 3. Tug-test each; tape the four connectors together. Check:
+      meter at the plug, 1–4 and 2–3 read a few ohms, 1–2 open. Table: README → Wiring → 3.'
+    - XH plug into the SKR Pico E socket (route the cable along the yoke arm with slack for ±90° tilt and ±180° table).
+    - Flag on the platter rim (2 × M2 × 8), endstop on the cradle.
+    - 'Endstop lead into E0-STOP (3-pin: signal, GND, 5 V, as M10.2): grblHAL uses it as the A limit.'
     verify:
     - Platter turns 360° by hand with the motor unpowered; face runout < 0.3 mm at 40 mm radius.
     - '`?` shows `Pn:A` with the flag in the slot.'
     fail:
-    - 'No `Pn:A`: module V missing (3V3 lead) or the Pico not powered.'
+    - 'No `Pn:A`: lead order wrong at the module end (S, G, V), or the firmware was built with 3 axes (rebuild with 4).'
+    - 'Spin motor buzzes, no turn: a lead from each coil on one driver coil; redo the pair test (plug 1–4 and 2–3 must each read a few ohms).'
+    - 'Turns the wrong way: `$3` A bit (8), as in M08.3.'
     record: Tick the boxes; `make done id=M27.1`.
   - id: M27.2
     title: Home and repeat
@@ -1648,10 +1695,10 @@ milestones:
     needs:
     - SPC-01 AS7341
     - SPC-03 print
-    - 2 × M2.5 screws
+    - 2 × M2 × 8 + 3 × M2 × 16
     do:
-    - Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it.
-    - Clamp it on the camera pillar just above the camera (M5 × 10 into the z 181 pilot); aim at the zero point.
+    - Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it (2 × M2 × 8).
+    - Clamp it on the camera pillar just above the camera (M2 × 16 into the z 181 pilot); aim at the zero point.
     verify:
     - 'Looking down the tube: the zero point is centred.'
     record: Tick the boxes; `make done id=M29.1`.
@@ -1661,8 +1708,8 @@ milestones:
     needs:
     - SPC-02 cable
     do:
-    - SDA → Pico GP16, SCL → GP17, VIN → 3V3, GND → GND (same bus as the OLED).
-    - '`bash scripts/pico.sh`; `python -m serial.tools.miniterm /dev/ttyACM0 115200`; type `SPEC?`.'
+    - 'SPC-02 cable: SDA (blue) → ESP32-S3 J3-4 (GPIO 1), SCL (yellow) → J3-5 (GPIO 2), VIN (red) → J1-2 (3V3), GND (black) → J3-22 (same bus as the OLED: README → Wiring → 8).'
+    - '`bash scripts/hub.sh`; `python -m serial.tools.miniterm /dev/ttyACM1 115200` (the hub''s port); type `SPEC?`.'
     verify:
     - Reply `SPEC` + 10 numbers; covering the tube drops all to < 5 % of uncovered.
     fail:
@@ -1696,7 +1743,8 @@ milestones:
 - id: M30
   stage: 10-color
   title: LED bank and polarizers (optional kit)
-  goal: '8 colour bands for images; shine separated from colour. Built it: set `lights.multispectral.built: true`; without it scans leave out the photometric set.'
+  goal: 'Polarizers: shine separated from colour. **LED bank BLOCKED**: its driver circuit is unsafe as designed (stage 10 design.md); do not wire or power MSK-01…03 - mark M30.1–M30.3 n/a. Without the
+    bank scans leave out the photometric set.'
   weeks: 2
   steps:
   - id: M30.1
@@ -1718,11 +1766,15 @@ milestones:
     time: 1 h
     needs:
     - MSK-02 driver
-    - MSK-03 ULN2803A
+    - 2 × MSK-03 MOSFET modules
+    - TLS-09 double-sided tape
     do:
-    - ULN2803A into the breadboard. LED − leads → its outputs (lever connector to a cut jumper each); inputs ← Pico GP8–15 (jumpers); driver supply switched by `M62 P1`.
+    - '**STOP - blocked (stage 10 design.md): skip this step and M30.3; tick them n/a.** The text below is kept for the reviewed design.'
+    - Both MOSFET modules on the deck beside the controller tray (M2 into spare pilots, or double-sided tape); driver MSK-02 pins up beside them, female jumper ends on its pins.
+    - Each LED's + lead → driver +Vo (lever connector); its − lead → one module OUT terminal (screw). Module DC+ / DC− ← driver +Vo / −Vo. Inputs ← ESP32-S3 GPIO 8–14 and 21, input GND ← ESP32-S3 GND. Driver
+      supply switched by the SKR Pico HB output (`M62 P3`).
     verify:
-    - 'Continuity: each GP pin → its ULN input; each output → one LED cathode.'
+    - 'Continuity: each GP pin → its module input; each OUT terminal → one LED cathode.'
     record: Tick the boxes; `make done id=M30.2`.
   - id: M30.3
     title: Band test
@@ -1771,12 +1823,12 @@ milestones:
     title: Mount the scan camera
     time: 45 min
     needs:
-    - scan post at x = 674.4 (M12.2)
-    - 4 × M2.5 × 8 (CAM-08, or the CAM-07 screws moving with the camera)
+    - scan post at x = 674.4 (M12.1)
+    - 4 × M2 × 8 + 1 × M2 × 16 (FRM-06)
     - CAM-04 camera + CAM-05 lens (optional kit), or the measuring camera moved here
     do:
-    - The scan post stands on the outrigger at x = 674.4 mm since M12.2 (lens 650 mm from the zero point, 15° down).
-    - 'Camera board on the scan plate''s standoffs (4 × M2.5 × 8); plate on the post: lens centre 168 mm above the zero point (318 mm above the board), looking 15° down.'
+    - The scan post stands on the outrigger at x = 674.4 mm since M12.1 (lens 650 mm from the zero point, 15° down).
+    - 'Camera board on the scan plate''s standoffs (4 × M2 × 8); plate on the post, M2 × 16 into its pilot: lens centre 168 mm above the zero point (318 mm above the deck), looking 15° down.'
     - Focus on the zero point (M17.3 method) and lock the lens; aperture stop on.
     - Plug it in; `machine.yaml` → `scan.camera_index` = its index (usually 1); `opengonio scan plan`.
     verify:
@@ -2097,17 +2149,18 @@ milestones:
     - STA-05 OLED
     - STA-06 jumpers
     do:
-    - OLED SDA → GP16, SCL → GP17, VCC → 3V3, GND → GND.
-    - '`bash scripts/pico.sh`'
+    - 'OLED SDA → ESP32-S3 J3-4 (GPIO 1), SCL → J3-5 (GPIO 2), VIN → J1-2 (3V3), GND → J3-22. With the AS7341 fitted: plug the OLED into the sensor''s second STEMMA QT socket instead (README → Wiring →
+      8).'
+    - '`bash scripts/hub.sh`'
     verify:
     - Screen shows `OpenGonio ready` and the button names.
     fail:
-    - 'Blank: address not 0x3C — some boards are 0x3D; change it in `firmware/pico-hub/main.py`.'
+    - 'Blank: address not 0x3C — some boards are 0x3D; change it in `firmware/hub/main.py`.'
     record: Tick the boxes; `make done id=M40.2`.
 - id: M41
   stage: 15-standalone
   title: Pi Zero station set up
-  goal: Pi drives the E4 over WiFi and grabs camera frames.
+  goal: Pi drives the SKR Pico over USB and grabs camera frames.
   weeks: 1
   steps:
   - id: M41.1
@@ -2132,9 +2185,10 @@ milestones:
     - cut jumpers
     do:
     - Set the buck to 5.1 V **before** connecting the Pi (meter on its output).
-    - 'Two cameras: a powered USB hub on the Pi''s OTG port (STA-04) carries both.'
-    - 'Buck input: a thin pair under the jack''s `+` / `−` screws in the power box (adapter unplugged first).'
-    - Wire buck output, UART and Pico power per `phases/15-standalone/design.md` (Pi GPIO14 → Pico GP1, GPIO15 ← GP0, GND, Pi 5V → Pico VSYS).
+    - A powered USB hub on the Pi's OTG port (STA-04) carries the camera(s) and the SKR Pico's USB-C cable.
+    - 'Buck input: a thin pair into the FUSED and GND lever connectors in the power box (after the fuse, before the e-stop; 5-way connectors if 3-way are full): pack BAT+ lever open first.'
+    - 'Wire buck output, UART and hub power per README → Wiring → 9: buck 5.1 V → Pi pin 2, buck − → Pi pin 14; Pi pin 8 (GPIO14 TX) → hub J3-16 (GPIO 48), Pi pin 10 (GPIO15 RX) ← hub J3-17 (GPIO 47), Pi
+      pin 6 → hub J3-1 (GND), Pi pin 4 (5V) → hub J1-21 (5V); never with the hub''s USB in the laptop at the same time.'
     verify:
     - Buck output 5.05–5.15 V under the Pi's load.
     record: Tick the boxes; `make done id=M41.2`.

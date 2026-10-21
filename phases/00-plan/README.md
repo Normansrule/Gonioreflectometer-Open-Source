@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/architecture.svg" width="100%" alt="Plan">
 
-$31.98 · total so far $31.98 / $630
+$63.96 · total so far $63.96 / $630
 
 [Design](design.md) · [Research](research.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -59,11 +59,11 @@ The four answers in phases/00-plan/design.md → Results; commit.
 
 ### M01.3 Explore the simulator
 
-**Time** 30 min · **Needs** docs/index.html in a browser
+**Time** 30 min · **Needs** docs/lab.html in a browser
 
 #### Do
 
-1. Open `docs/index.html`. Drag to orbit; scroll to zoom; double-click to reset.
+1. Open `docs/lab.html`. Drag to orbit; scroll to zoom; double-click to reset.
 2. Press ▶ Demo. Drag *Build stage* from 1 to 17 and watch parts appear.
 3. Set M4 = 60, M3 = 30. Then M4 = 60, M3 = 25.
 4. Calibration lab: hidden table error +0.8°; press *Run calibrate mirror*; then drag *lamp drift* to 0.2 %.
@@ -147,7 +147,7 @@ Tick the boxes; `make done id=M02.1`.
 #### Verify
 
 - [ ] First: `"safe": true`, `theta_i` = `theta_r` = 30.0.
-- [ ] Second prints `G53 G1 X80.0000 Y25.0000 F600`.
+- [ ] Second prints `G53 G1 X60.0000 Y205.0000 F600` (grblHAL counts from each home switch: M4 80 − 20, M3 25 + 180).
 - [ ] Third: `"safe": false` (light would hit the camera) and exit code 2.
 
 #### If a check fails
@@ -222,7 +222,7 @@ Printed parts fit first time. · 0/4 steps done · ~1.8 h hands-on · ~1 wk
 
 #### Do
 
-1. Order TLS-01 (enclosed printer for ABS), FIL-01 (black ABS 1 kg), TLS-03 hex keys, TLS-06 calipers, plus FRM-06 (M3/M4/M5 screws) and FRM-08 (608 bearings) for the fit test; set them `ordered` with `paid:` in `PARTS.md`.
+1. Order TLS-01 (enclosed printer for ABS), FIL-01 (black ABS, 4 × 1 kg), TLS-03 hex keys, TLS-06 calipers, plus FRM-06 (M2 screws) and FRM-08 (608 bearings) for the fit test; set them `ordered` with `paid:` in `PARTS.md`.
 2. No printer? Skip TLS-01 and send the STL files to a print service or makerspace in black ABS; tell them the settings in M03.3.
 
 #### Verify
@@ -246,7 +246,7 @@ Commit the dated BOM.
 #### Verify
 
 - [ ] Coupon imports as one solid (Parts list: 1 part, not a mesh).
-- [ ] The assembly opens with the plywood, lazy Susan, arm, table and both cameras in place.
+- [ ] The assembly opens with the printed deck, lazy Susan, arm, table and both cameras in place.
 
 #### If a check fails
 
@@ -281,13 +281,13 @@ Tick the boxes; `make done id=M03.3`.
 
 ### M03.4 Set clearances
 
-**Time** 30 min · **Needs** 5 × M3 × 10 from FRM-06 · FRM-08 608 bearings (3) · TLS-03 hex key 2.5 mm · TLS-06 calipers
+**Time** 30 min · **Needs** 5 × M2 × 10 from FRM-06 · FRM-08 608 bearings (3) · TLS-03 hex key 1.5 mm · TLS-06 calipers
 
 #### Do
 
-1. Drive one M3 × 10 into each of the 5 holes (2.5 → 2.9 mm) with the hex key, slowly, until the head touches; back it out.
+1. Drive one M2 × 10 into each of the 5 holes (1.5 → 1.9 mm) with the hex key, slowly, until the head touches; back it out.
 2. Push a 608 into each of the 3 pockets by thumb.
-3. Pick the smallest hole where the screw goes all the way without splitting the coupon and holds when you pull on it → `M3_TAP` = that hole Ø.
+3. Pick the smallest hole where the screw goes all the way without splitting the coupon and holds when you pull on it → `M2_TAP` = that hole Ø (every printed pilot in the machine uses it).
 4. Pick the pocket where the 608 presses in and does not fall out upside down → `CLEAR` = pocket Ø − 22.0.
 5. Set both at the top of `tools/cad/parts.py`.
 6. Once: `.venv/bin/pip install cadquery numpy-stl matplotlib`; then `make parts`.
@@ -308,4 +308,4 @@ Commit: `make publish m="M03.4 clearances set"`.
 
 > **Safety:** ABS gives off fumes (styrene) while printing: enclosed printer, door shut, in a ventilated room you don't sleep in; open the door only after it cools.
 
-[Sources](../../REFERENCES.md): R1 · R2 · R5 · R6 · R7 · R8 · R24 · R27 · R30 · R47 · R50 · R56 · R63 · R64 · R68 · R69 · R79 · R80 · S3 · S18 · S20 · G1 · G2 · G6 · G7 · G33 · G35 · G36 · G38 · T1 · T4 · T11 · T17 · T35 · T38 · T40 · V19 · V20 · N6 · N12 · N14 · N50 · H28 · H29 · H35 · H44 · H56 · H57 · H58 · H60 · P1 · P15 · P17 · P23 · P31 · P32 · C3 · K1 · K5 · K19 · L1 · L4 · L9 · L18 · L21 · L22 · L23 · F9 · F10 · F11 · F14 · F15 · F17 · E5
+[Sources](../../REFERENCES.md): R1 · R2 · R5 · R6 · R7 · R8 · R47 · R50 · R63 · R64 · R68 · R69 · R79 · R80 · R85 · S3 · S18 · S20 · G1 · G2 · G6 · G7 · G33 · G35 · G36 · G38 · T1 · T4 · T11 · T17 · T35 · T38 · T40 · V19 · V20 · N6 · N12 · N14 · N50 · H28 · H29 · H35 · H44 · H56 · H57 · H58 · H60 · P1 · P15 · P17 · P23 · P31 · P32 · P49 · P53 · P54 · P55 · P57 · C3 · C12 · K1 · K5 · K19 · L1 · L4 · L9 · L18 · L21 · L22 · L23 · F9 · F10 · F11 · F14 · F15 · F17 · E5

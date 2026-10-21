@@ -61,20 +61,20 @@ def flow(x1, y1, x2, y2, color, label="", dur="1s"):
 
 def architecture() -> str:
     b = ""
-    b += box(30, 20, 250, 62, "Power", "60 W adapter · fuse · E-STOP", ORANGE)
+    b += box(30, 20, 250, 62, "Power", "24 V Li-ion pack · USB-C charge · E-STOP", ORANGE)
     b += box(30, 110, 250, 70, "Laptop (mode 1)", "control · capture · processing", GREEN)
     b += box(30, 205, 250, 70, "Pi Zero 2 W (mode 2)", "no laptop: runs jobs, saves data", GREEN)
     b += box(30, 320, 250, 62, "USB camera (fixed)", "on the laptop or the Pi", BLUE)
-    b += box(450, 70, 280, 90, "FYSETC E4 · FluidNC", "ESP32 · 4 × TMC2209 · WebUI", PURPLE)
-    b += box(450, 280, 280, 90, "Pico panel", "buttons · OLED · e-stop sense · LEDs", PURPLE)
+    b += box(450, 70, 280, 90, "BTT SKR Pico · grblHAL", "RP2040 · 4 × TMC2209 · USB-C", PURPLE)
+    b += box(450, 280, 280, 90, "ESP32-S3 hub", "buttons · OLED · e-stop sense · LEDs", PURPLE)
     b += box(900, 20, 270, 62, "M1 – M4 steppers", "optical homing · safety switches", BLUE)
     b += box(900, 100, 270, 62, "Lights", "white COB · 8-band LEDs", YELLOW)
-    b += box(900, 180, 270, 52, "PAUSE button", "feed hold on the E4", ORANGE)
+    b += box(900, 180, 270, 52, "PAUSE button", "on the hub: plan stops after the pose", ORANGE)
     b += box(900, 260, 270, 62, "Buttons + OLED", "NEXT · START · STOP · HOME · LIGHT", ORANGE)
-    b += box(900, 345, 270, 52, "Phone (no computer)", "WebUI: jog, home", MUTED)
-    b += flow(280, 51, 450, 95, ORANGE, "24 V")
-    b += flow(280, 140, 450, 115, PURPLE, "USB · WiFi · BT")
-    b += flow(280, 240, 450, 135, GREEN, "WiFi")
+    b += box(900, 345, 270, 52, "E-stop", "cuts motor power in hardware", MUTED)
+    b += flow(280, 51, 450, 95, ORANGE, "18–24 V")
+    b += flow(280, 140, 450, 115, PURPLE, "USB-C")
+    b += flow(280, 240, 450, 135, GREEN, "USB-C")
     b += flow(280, 155, 450, 300, PURPLE, "USB")
     b += flow(280, 255, 450, 330, GREEN, "UART")
     b += flow(155, 320, 155, 275, BLUE)
@@ -90,7 +90,7 @@ def axes() -> str:
     poses, active = m3d.demo_poses()
     body = f"""<text x="40" y="44" class="t b" font-size="20">Four axes, one zero point</text>
 <text x="40" y="70" class="m" font-size="13">each axis moves in turn [R1]</text>
-<text x="40" y="330" class="m" font-size="12">M4 ring 12 in · M3, M2 5:1 · M1 4:1</text>
+<text x="40" y="330" class="m" font-size="12">M4 ring 12 in, 24:1 · M3, M2 5:1 · M1 direct drive</text>
 <text x="40" y="350" class="m" font-size="12">orange square = sample · blue = fixed camera</text>
 {m3d.machine(m3d.View(560, 225, 0.68), poses, active, labels=(40, 120))}"""
     return svg(1000, 420, body)
@@ -203,19 +203,19 @@ def scanner() -> str:
 
 
 def power_flow() -> str:
-    steps = ["Wall", "GST60A24 60 W", "Jack (screws)", "Fuse 3.15 A T", "E-STOP (NC)", "J3 over-travel", "24 V out", "FYSETC E4"]
+    steps = ["USB-C charger", "PD trigger 20 V", "CC/CV 24.0 V 1 A", "Battery 6S + BMS", "Fuse 3.15 A T", "E-STOP (NC)", "J3 over-travel", "SKR Pico"]
     w, gap, y = 128, 18, 50
     b = ""
     for i, s in enumerate(steps):
         x = 20 + i * (w + gap)
-        col = ORANGE if s == "E-STOP" else (PURPLE if "E4" in s else LINE)
+        col = ORANGE if s.startswith("E-STOP") else (PURPLE if "SKR" in s else GREEN if s.startswith("Battery") else LINE)
         b += f'<rect x="{x}" y="{y}" width="{w}" height="48" rx="8" fill="{PANEL}" stroke="{col}" stroke-width="2"/>'
         b += f'<text x="{x + w / 2}" y="{y + 29}" class="t" font-size="13" text-anchor="middle">{s}</text>'
         if i:
             b += f'<line x1="{x - gap}" y1="{y + 24}" x2="{x}" y2="{y + 24}" stroke="{YELLOW}" stroke-width="2"/>'
     b += (f'<circle cy="{y + 24}" r="5" fill="{YELLOW}"><animate attributeName="cx" from="20" to="{20 + 8 * (w + gap) - gap}" '
           f'dur="3s" repeatCount="indefinite"/></circle>')
-    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">Mains stays in the adapter. E-STOP or an over-travel switch cuts 24 V to the E4 and motors; the laptop keeps running. Every join: screw terminal or lever connector, no solder.</text>'
+    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">A 24 V Li-ion pack with its own protection board runs the machine (~6 h per charge); USB-C charges it to 24.0 V, plugged in or not. No mains. E-STOP (also the off switch) or an over-travel switch cuts motor power; the laptop keeps running. Screw terminals and lever connectors only.</text>'
     return svg(1200, 150, b)
 
 
@@ -256,7 +256,34 @@ def examples() -> None:
         curve(Path(d) / "mirror_40", load_config(), cal=Calibration())
         shutil.copy(Path(d) / "mirror_40" / "curve.svg", OUT / "example-mirror.svg")
         shutil.copy(Path(d) / "plastic" / "fit.svg", OUT / "example-fit.svg")
-    print("wrote docs/assets/example-mirror.svg, example-fit.svg")
+        site_examples(Path(d))
+    print("wrote docs/assets/example-mirror.svg, example-fit.svg, docs/og/sim-examples.js")
+
+
+def site_examples(d: Path) -> None:
+    """docs/og/sim-examples.js: the same simulated runs as data, so the website draws them in its own colours."""
+    import csv
+    import json
+
+    def rows(run: str) -> list[dict]:
+        with open(d / run / "curve.csv", newline="", encoding="utf-8") as f:
+            return list(csv.DictReader(f))
+    num = lambda v: float(v) if v not in ("", None) else None   # noqa: E731
+    mirror = [[num(r["M3"]), num(r["centre_mean"])] for r in rows("mirror_40")]
+    plastic = [[num(r["theta_i"]), num(r["phi_i"]), num(r["theta_r"]), num(r["phi_r"]), num(r["brdf_per_sr"])]
+               for r in rows("plastic")]
+    fit = json.loads((d / "plastic" / "fit.json").read_text(encoding="utf-8"))
+    summary = json.loads((d / "summary.json").read_text(encoding="utf-8"))["steps"]
+    data = {"note": "simulated machine (opengonio.sim), not a measurement",
+            "mirror_40": {"m4": 80, "rows": mirror},
+            "plastic": {"made_with": {"base_color": 0.2, "roughness": 0.3, "metallic": 0.0},
+                        "rows": plastic, "fit": {k: fit[k] for k in ("base_color", "roughness", "metallic", "rms_pct_of_peak", "rows")},
+                        "holdout": {k: fit["holdout"][k] for k in ("rows_held_out", "rule", "rms_pct_of_peak")}},
+            "matte_brdf": {"expected": 0.159, "got": summary.get("6 matte brdf (expect 0.159)")},
+            "drift_check": summary.get("7 drifting lamp")}
+    (ROOT / "docs" / "og" / "sim-examples.js").write_text(
+        "// Written by tools/make_assets.py (`make build`) from a simulated run: do not edit by hand.\nwindow.SIM_EXAMPLES = "
+        + json.dumps(data, separators=(",", ":")) + ";\n", encoding="utf-8")
 
 
 def main() -> None:

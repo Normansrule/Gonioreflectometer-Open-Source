@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Interference check of the whole-machine assembly (tools/cad/assembly.py), in the shown pose and across each
-axis' travel: M4 light arm 20-324 deg, M3 table a full turn, M2 tilt -90..90 deg (from software/config/machine.yaml),
-plus sight lines from both cameras and the lamp to the zero point in the shown pose.
-Every pair of parts whose solids overlap by more than 1 mm^3 is listed; exit 1 if any.
+"""Interference check of the whole-machine assembly (tools/cad/assembly.py): the shown pose, each axis across its
+configured travel (software/config/machine.yaml: M4 light arm, M3 table, M2 tilt, M1 spin), a coarse grid of mixed
+poses (every axis away from the shown pose at once, keep-out-safe poses only), and sight lines from both cameras and
+the lamp to the zero point. Pose transforms: tools/cad/poses.py (one convention, unit-tested against the kinematics).
 
-    python tools/cad/interference.py            # static pose + sweeps (~1-2 min)
+Every checked pair ends in one of three states:
+    CLEAR               solids overlap by <= 1 mm^3
+    INTERSECTION        solids overlap by more than 1 mm^3 (a clash)
+    COMPUTATION_ERROR   the Boolean failed or returned a non-finite / negative volume: NOT treated as clear
+Exit 0 only if every pair is CLEAR and every sight line is open; 1 for clashes or blocked views; 2 for computation errors.
+
+    python tools/cad/interference.py            # static pose + sweeps + mixed poses (a few minutes)
     python tools/cad/interference.py --static   # shown pose only
 
 Needs cadquery. Dummies are envelopes, so a hit near a dummy means "check with the real part", not always a clash.
@@ -19,19 +25,30 @@ from pathlib import Path
 
 import cadquery as cq
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parents[1] / "software" / "src"))
 import assembly as A  # noqa: E402
+import poses as P0  # noqa: E402
 
 TOL = 1.0                                     # mm^3
 SKIP: list[tuple[str, str]] = [("LSR-05b", "LSR-03")]   # (name prefix, name prefix) pairs that overlap by design:
                                                        # the lamp cap preloads the heatsink by PRELOAD (0.3 mm)
-# Sweeps: moving group, rotation axis point + direction, angles relative to the shown pose (deg).
-SWEEPS = {
-    "arm":   ((0, 0, 0), (0, 0, 1), [m4 - 90 for m4 in list(range(20, 324, 20)) + [324]]),   # shown at M4 = 90
-    "table": ((0, 0, 0), (0, 0, 1), list(range(30, 360, 30))),
-    "tilt":  ((0, 0, 150), (0, 1, 0), [m2 - 90 for m2 in range(-90, 91, 30) if m2 != 90]),  # shown at M2 = 90
-}
-MOVES_WITH = {"arm": {"arm"}, "table": {"table", "tilt"}, "tilt": {"tilt"}}
+ERRORS: list[str] = []                                 # pairs whose Boolean failed (COMPUTATION_ERROR)
+
+
+def ranges() -> dict[str, tuple[float, float]]:
+    """Travel of every axis from machine.yaml (all phases: the CAD shows the finished machine)."""
+    from opengonio.gantry.config import load_config
+    cfg = load_config()
+    return {k: (a.min_deg, a.max_deg) for k, a in cfg.axes.items()}
+
+
+def safe(pose: dict) -> bool:
+    """Poses the software allows (keep-out between the arm and the stage); others are never commanded."""
+    from opengonio.gantry.collision import pose_is_safe
+    from opengonio.gantry.config import load_config
+    return pose_is_safe(load_config(), pose)
 
 
 def parts() -> list[tuple[str, cq.Shape, str]]:
@@ -61,25 +78,31 @@ def hits(group_a, group_b) -> list[tuple[float, str, str]]:
     for (n1, s1, b1), (n2, s2, b2) in pairs:
         if skipped(n1, n2) or not overlap(b1, b2):
             continue
+        err, v = None, None
         try:
             v = s1.intersect(s2).Volume()
-        except Exception:                                          # noqa: BLE001 - a failed boolean is reported
-            v = -1.0
-        if abs(v) > TOL:
+        except Exception as exc:                                   # noqa: BLE001 - a failed Boolean is an error, not clear
+            err = exc
+        state = P0.classify(v, err, TOL)
+        if state == P0.INTERSECTION:
             res.append((v, n1, n2))
+        elif state == P0.COMPUTATION_ERROR:
+            ERRORS.append(f"{n1} x {n2}: {err or f'volume {v}'}")
     return res
 
 
-def posed(ps, m4: float, m3: float, m2: float):
-    """Parts moved from the shown pose (M4 = 90, M3 = 0, M2 = 90) to (m4, m3, m2) degrees."""
+def move(s, g: str, pose: dict):
+    for pt, d, a in P0.rotations(g, pose):
+        s = s.rotate(cq.Vector(*pt), cq.Vector(*pt) + cq.Vector(*d), a)
+    return s
+
+
+def posed(ps, m4: float, m3: float, m2: float, m1: float = 0.0):
+    """Parts moved from the shown pose (M4 = 90, M3 = 0, M2 = 90, M1 = 0) to the given angles (tools/cad/poses.py)."""
+    pose = {"M4": m4, "M3": m3, "M2": m2, "M1": m1}
     out = []
     for n, s, g, _ in ps:
-        if g == "tilt":
-            s = s.rotate(cq.Vector(0, 0, 150), cq.Vector(0, 1, 150), 90 - m2)
-        if g in ("table", "tilt"):
-            s = s.rotate(cq.Vector(0, 0, 0), cq.Vector(0, 0, 1), m3)
-        if g == "arm":
-            s = s.rotate(cq.Vector(0, 0, 0), cq.Vector(0, 0, 1), m4 - 90)
+        s = move(s, g, pose)
         out.append((n, s, g, s.BoundingBox()))
     return out
 
@@ -93,8 +116,17 @@ def rays(ps, eyes: dict, targets: list) -> list[str]:
             ray = cq.Solid.makeCylinder(1.0, d.Length - 6, cq.Vector(*a) + n * 3, n)
             rb = ray.BoundingBox()
             for name, s, _, b in ps:
-                if overlap(rb, b) and ray.intersect(s).Volume() > 0.01:
-                    out.append(f"{eye} -> sample point {tuple(round(v) for v in t)} blocked by {name}")
+                if not overlap(rb, b):
+                    continue
+                err, v = None, None
+                try:
+                    v = ray.intersect(s).Volume()
+                except Exception as exc:                           # noqa: BLE001 - never read as "clear"
+                    err = exc
+                if P0.classify(v, err, 0.01) == P0.COMPUTATION_ERROR:
+                    ERRORS.append(f"sight line {eye} x {name}: {err or f'volume {v}'}")
+                elif v > 0.01:
+                    out.append(f"{eye} -> sample point {tuple(round(x) for x in t)} blocked by {name}")
     return sorted(set(out))
 
 
@@ -132,27 +164,47 @@ def main() -> int:
     for b in blocked:
         print("  " + b)
     bad += len(blocked)
-    if args.static:
-        return 1 if bad else 0
-    for axis, (pt, d, angles) in SWEEPS.items():
-        moving = [(n, s) for n, s, g, _ in ps if g in MOVES_WITH[axis]]
-        still = [(n, s, b) for n, s, g, b in ps if g not in MOVES_WITH[axis]]
-        worst = {}
-        for ang in angles:
-            mv = []
-            for n, s in moving:
-                r = s.rotate(cq.Vector(*pt), cq.Vector(*pt) + cq.Vector(*d), ang)
-                mv.append((n, r, r.BoundingBox()))
-            for v, n1, n2 in hits(mv, still):
-                k = (n1, n2)
-                if v > worst.get(k, (0, 0))[0]:
-                    worst[k] = (v, ang)
-        print(f"{axis} sweep ({len(angles)} positions): {len(worst)} clashes")
-        for (n1, n2), (v, ang) in sorted(worst.items(), key=lambda kv: -kv[1][0]):
-            print(f"  {v:9.1f} mm3  {n1}  x  {n2}  (at {ang:+d} deg from the shown pose)")
+    if not args.static:
+        rg = ranges()
+        for axis, poses in P0.axis_sweeps(rg).items():
+            moving = P0.moves_with(axis)
+            worst = sweep(ps, poses, lambda g1, g2: (g1 in moving) != (g2 in moving), axis)
+            print(f"{axis} sweep ({len(poses)} positions, {rg[axis][0]:g}..{rg[axis][1]:g} deg): {len(worst)} clashes")
+            report(worst)
+            bad += len(worst)
+        mixed = [p for p in P0.mixed_poses(rg, 4) if safe(p)]
+        worst = sweep(ps, mixed, lambda g1, g2: g1 != g2, None)
+        print(f"mixed poses ({len(mixed)} keep-out-safe combinations of all axes): {len(worst)} clashes")
+        report(worst)
         bad += len(worst)
+    if ERRORS:
+        print(f"COMPUTATION_ERROR {len(ERRORS)} pair(s): the Boolean failed, interference unknown")
+        for e in sorted(set(ERRORS)):
+            print("  " + e)
+        return 2
     print("OK  no interference" if not bad else f"FAIL {bad} clashes")
     return 1 if bad else 0
+
+
+def sweep(ps, poses: list[dict], pair_moves, axis: str | None) -> dict:
+    """Worst overlap per part pair over `poses`; only pairs whose relative position changes are checked."""
+    worst = {}
+    for pose in poses:
+        mv = [(n, move(s, g, pose), g) for n, s, g, _ in ps]
+        boxed = [(n, s, s.BoundingBox(), g) for n, s, g in mv]
+        for (n1, s1, b1, g1), (n2, s2, b2, g2) in itertools.combinations(boxed, 2):
+            if not pair_moves(g1, g2):
+                continue
+            for v, a, b in hits([(n1, s1, b1)], [(n2, s2, b2)]):
+                if v > worst.get((a, b), (0, None))[0]:
+                    worst[(a, b)] = (v, pose[axis] if axis else pose)
+    return worst
+
+
+def report(worst: dict) -> None:
+    for (n1, n2), (v, at) in sorted(worst.items(), key=lambda kv: -kv[1][0]):
+        where = f"at {at:g} deg" if isinstance(at, float) else "at " + " ".join(f"{k}={v_:g}" for k, v_ in at.items())
+        print(f"  {v:9.1f} mm3  {n1}  x  {n2}  ({where})")
 
 
 if __name__ == "__main__":

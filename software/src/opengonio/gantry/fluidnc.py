@@ -1,9 +1,10 @@
-"""FluidNC client over USB serial, Bluetooth serial (COM / rfcomm port) or WiFi telnet.
+"""Motion-controller client for grbl-family firmware: grblHAL (BTT SKR Pico, USB-C) or FluidNC (ESP32 boards).
 
-Protocol (FluidNC docs [R20]-[R30]):
+Common protocol (grblHAL core [R83], FluidNC docs [R20]-[R30]):
   line commands answer "ok" or "error:N";  realtime: "?" status, "!" hold, "~" resume, 0x18 reset
   status: <Idle|MPos:x,y,z,a|FS:0,0|Pn:XY>   (values in axis order, unlabelled)
-  $H home all, $HX one axis;  $MD / $ME motors disable / enable;  M62/M63 P<n> user outputs
+  $H home all, $HX one axis;  M62/M63 P<n> digital outputs
+Firmware differences are in DIALECTS (driver re-init, motor sleep/wake, machine position after homing).
 """
 from __future__ import annotations
 
@@ -14,6 +15,28 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 AXIS_ORDER = "XYZABC"
+
+DIALECTS = {
+    # grblHAL: Trinamic plugin re-inits the TMC2209s with M122 I [R84]; $SLP = sleep (needs $62=1, leave with a reset) [R83];
+    # homing with $22 "force set origin" puts the machine position at 0 on the switch [R83].
+    "grblhal": {"reinit": "M122 I", "sleep": "$SLP", "wake": None, "origin_at_home": True, "usb_vid": 0x2E8A},
+    # FluidNC: $MI re-init [R28]; $MD / $ME motors off / on; homing.mpos_mm puts the machine position at home_deg.
+    "fluidnc": {"reinit": "$MI", "sleep": "$MD", "wake": "$ME", "origin_at_home": False, "usb_vid": 0x1A86},
+}
+
+
+def dialect(cfg) -> dict:
+    """Controller dialect from machine.yaml controller.firmware (default grblhal)."""
+    name = str(cfg.controller.get("firmware", "grblhal")).lower()
+    if name not in DIALECTS:
+        raise ValueError(f"controller.firmware must be one of {sorted(DIALECTS)}, not {name!r}")
+    return DIALECTS[name]
+
+
+def home_mpos(cfg) -> dict[str, float]:
+    """Controller machine position right after homing each axis (keyed by controller axis letter)."""
+    zero = dialect(cfg)["origin_at_home"]
+    return {a.fluidnc_axis: (0.0 if zero else a.home_deg) for a in cfg.axes.values()}
 STATUS_RE = re.compile(r"<([A-Za-z]+)(?::\d+)?\|MPos:([-\d.,]+)(?:\|.*?Pn:([A-Z]*))?")
 
 
@@ -24,18 +47,18 @@ class Transport(Protocol):
 
 
 class SerialTransport:  # pragma: no cover - needs hardware
-    """USB serial (CH340 on the E4) or a paired Bluetooth SPP port [R44][R45][R46]."""
+    """USB serial: the SKR Pico's USB-C (RP2040, USB VID 0x2E8A) or an ESP32 board's CH340 (0x1A86)."""
 
-    def __init__(self, port: str = "auto", baud: int = 115200):
+    def __init__(self, port: str = "auto", baud: int = 115200, usb_vid: int = 0x2E8A):
         import serial
         from serial.tools import list_ports
         if port == "auto":
-            ch340 = [p.device for p in list_ports.comports() if p.vid == 0x1A86]
-            if not ch340:
-                raise RuntimeError("no CH340 port found; set controller.port in machine.yaml")
-            port = ch340[0]
+            found = [p.device for p in list_ports.comports() if p.vid == usb_vid]
+            if not found:
+                raise RuntimeError(f"no controller with USB VID {usb_vid:#06x} found; set controller.port in machine.yaml")
+            port = found[0]
         self.s = serial.Serial(port, baud, timeout=0.1)
-        time.sleep(2.0)                      # ESP32 resets when the port opens
+        time.sleep(2.0)                      # ESP32 boards reset when the port opens; harmless wait on the RP2040
         self.s.reset_input_buffer()
 
     def write(self, data: bytes) -> None:
@@ -50,7 +73,7 @@ class SerialTransport:  # pragma: no cover - needs hardware
 
 
 class TcpTransport:  # pragma: no cover - needs hardware
-    """WiFi: FluidNC telnet server on port 23 [R24]."""
+    """WiFi: FluidNC telnet server on port 23 [R24] (ESP32 boards only; the SKR Pico has no WiFi)."""
 
     def __init__(self, host: str = "fluidnc.local", port: int = 23):
         self.sock = socket.create_connection((host, port), timeout=5)
@@ -134,7 +157,7 @@ class FluidNC:
                 return s
             if s.state in ("Alarm", "Door"):
                 raise FluidNCError(f"controller in {s.state}")
-            if s.state == "Hold":               # PAUSE button: wait as long as it takes
+            if s.state == "Hold":               # feed hold ('!'): wait as long as it takes
                 deadline = time.monotonic() + self.timeout_s
             time.sleep(poll_s)
         raise FluidNCError("timeout waiting for Idle")
@@ -152,21 +175,33 @@ class FluidNC:
 
 @dataclass
 class RecordingTransport:
-    """Offline stand-in: answers 'ok' and records every line (dry runs, tests)."""
+    """Offline stand-in: answers 'ok', records every line and tracks the machine position like the controller
+    (G53 G1 moves the axes, $H<axis> puts an axis at homes[axis]) so endpoint checks work in dry runs and tests.
+    for_machine() sets homes from the configured firmware: 0 for grblHAL, home_deg for FluidNC."""
     lines: list[str] = field(default_factory=list)
     pending: list[str] = field(default_factory=list)
     mpos: dict[str, float] = field(default_factory=lambda: dict.fromkeys(AXIS_ORDER[:4], 0.0))
+    homes: dict[str, float] = field(default_factory=dict)
+    state: str = "Idle"
 
     def write(self, data: bytes) -> None:
         txt = data.decode()
         if txt == "?":
-            vals = ",".join(f"{self.mpos[a]:.3f}" for a in AXIS_ORDER[:4])
-            self.pending.append(f"<Idle|MPos:{vals}|FS:0,0>")
+            vals = ",".join(f"{self.mpos[a]:.4f}" for a in AXIS_ORDER[:4])
+            self.pending.append(f"<{self.state}|MPos:{vals}|FS:0,0>")
             return
         if len(txt) == 1:                 # other realtime bytes
             self.lines.append(repr(txt))
             return
-        self.lines.append(txt.strip())
+        line = txt.strip()
+        if line.startswith("$H") and len(line) == 3 and line[2] in self.mpos:
+            self.mpos[line[2]] = self.homes.get(line[2], self.mpos[line[2]])
+        elif line.startswith("G53 G1"):
+            for k, v in re.findall(r"([XYZA])(-?[\d.]+)", line.split("F")[0]):
+                self.mpos[k] = float(v)
+        elif line == "$I":
+            self.pending.append("[VER:recording transport]")
+        self.lines.append(line)
         self.pending.append("ok")
 
     def readline(self, timeout: float) -> str:
@@ -174,3 +209,10 @@ class RecordingTransport:
 
     def close(self) -> None:
         pass
+
+    @classmethod
+    def for_machine(cls, cfg) -> "RecordingTransport":
+        """Homes like the real controller of the configured firmware (home_mpos)."""
+        t = cls()
+        t.homes = home_mpos(cfg)
+        return t

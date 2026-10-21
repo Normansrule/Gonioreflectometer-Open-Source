@@ -1,0 +1,148 @@
+/* OpenGonio design tokens and base: the raking-light world, shared by the website (docs/) and the control app
+   (software/src/opengonio/app/static/, copied by `make build`). Edit here; DESIGN.md explains the system.
+   SPDX-License-Identifier: CC-BY-SA-4.0 (fonts: SIL OFL 1.1, see fonts/) */
+
+@font-face {
+  font-family: "Gloock";
+  src: url("fonts/gloock-latin-400.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Hanken Grotesk";
+  src: url("fonts/hanken-grotesk-latin-wght.woff2") format("woff2");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  /* the room: velvet ground, bone ink, one tungsten light */
+  --ground: #0c0b0a;
+  --ground-2: #151310;
+  --ground-3: #1e1b17;
+  --ground-4: #2a2620;
+  --ink: #efe9df;
+  --ink-2: #b9b1a5;
+  --ink-3: #8c857a;          /* large text and non-text marks only (>= 3:1) */
+  --rule: #2e2a24;           /* tables and inputs only */
+  --light: #ffc978;          /* 3000 K: the lamp, and the one primary action */
+  --light-ink: #1b1306;
+  --light-text: #ffcf8a;
+  --light-glow: rgba(255, 201, 120, 0.16);
+  --light-mark: #ffc978;     /* tungsten as a mark on the ground (switches, bars, handles): >= 3:1 */
+  --focus: var(--light-mark);
+  /* conservation scale bar: the only other colours, used for data and status */
+  --patch-white: #f2f0eb;
+  --patch-grey: #7b7975;     /* 18 % grey card */
+  --patch-black: #111110;
+  --patch-red: #e06a5a;
+  --patch-green: #7fb276;
+  --patch-blue: #86a4e0;
+
+  --font-display: "Gloock", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-text: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* five type steps */
+  --step-small: 0.875rem;                                   /* 14px */
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);  /* 17-19px */
+  --step-lead: clamp(1.25rem, 1.08rem + 0.7vw, 1.75rem);
+  --step-head: clamp(2rem, 1.25rem + 3vw, 3.5rem);
+  --step-display: clamp(2.75rem, 1rem + 6vw, 6rem);
+
+  /* spacing scale (4px base) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px;
+  --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 144px; --s-11: 216px;
+  --margin: clamp(20px, 4vw, 56px);
+  --radius: 2px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --t-press: 140ms;
+  --t-ui: 200ms;
+  --t-exposure: 600ms;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  /* the lightbox: neutral grey-card ground, the same lamp */
+  --ground: #e6e5e2;
+  --ground-2: #dcdbd7;
+  --ground-3: #d0cec9;
+  --ground-4: #c2c0ba;
+  --ink: #141311;
+  --ink-2: #45423d;
+  --ink-3: #625e57;
+  --rule: #bdbab3;
+  --light: #ffb547;
+  --light-ink: #1b1306;
+  --light-text: #7c4500;
+  --light-glow: rgba(255, 181, 71, 0.22);
+  --light-mark: #9a5a00;
+  --patch-red: #a8392b;
+  --patch-green: #3e6f36;
+  --patch-blue: #2f5aa8;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ground: #e6e5e2; --ground-2: #dcdbd7; --ground-3: #d0cec9; --ground-4: #c2c0ba;
+    --ink: #141311; --ink-2: #45423d; --ink-3: #625e57; --rule: #bdbab3;
+    --light: #ffb547; --light-ink: #1b1306; --light-text: #7c4500; --light-glow: rgba(255, 181, 71, 0.22); --light-mark: #9a5a00;
+    --patch-red: #a8392b; --patch-green: #3e6f36; --patch-blue: #2f5aa8;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 var(--step-body)/1.55 var(--font-text);
+  font-feature-settings: "kern", "liga";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img, svg, canvas, video { display: block; max-width: 100%; }
+h1, h2, h3 { margin: 0; font-weight: 400; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+.display { font-family: var(--font-display); letter-spacing: -0.02em; line-height: 1.02; }
+.num { font-variant-numeric: tabular-nums; }
+
+a { color: inherit; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 0.22em;
+    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); transition: text-decoration-color var(--t-ui) ease; }
+@media (hover: hover) and (pointer: fine) { a:hover { text-decoration-color: currentColor; } }
+
+::selection { background: var(--light); color: var(--light-ink); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: var(--radius); }
+* { scrollbar-color: var(--ground-4) var(--ground); scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ground); }
+::-webkit-scrollbar-thumb { background: var(--ground-4); border: 2px solid var(--ground); }
+input, select, textarea, button { font: inherit; color: inherit; caret-color: var(--light); }
+
+/* the one solid light element: the primary action */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: 44px; padding: 0 var(--s-5);
+  border: 0; border-radius: var(--radius);
+  background: var(--ground-3); color: var(--ink);
+  font-weight: 500; font-size: var(--step-small); letter-spacing: 0.01em;
+  text-decoration: none; cursor: pointer;
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-ui) ease;
+}
+.btn:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .btn:hover { background: var(--ground-4); } }
+.btn-light { background: var(--light); color: var(--light-ink); }
+@media (hover: hover) and (pointer: fine) { .btn-light:hover { background: color-mix(in srgb, var(--light) 88%, white); } }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: absolute; left: var(--s-4); top: -100px; z-index: 50; }
+.skip:focus { top: var(--s-4); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}

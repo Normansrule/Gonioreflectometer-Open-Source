@@ -1,90 +1,464 @@
-<img src="docs/assets/hero.svg" width="100%" alt="OpenGonio">
+<img src="docs/assets/screens/site-hero-dark.jpg" width="100%" alt="The OpenGonio website: three samples (white PTFE, a mirror, printed black plastic) under one warm lamp, beside the title A printable gonioreflectometer">
 
 # Gonioreflectometer-Open-Source
 
-Measures how materials reflect light, then scans objects in 3D. Runs from a laptop, or on its own with buttons and a Pi Zero. $576.06 total (cap $630). **No soldering, drilling, sawing or crimping:** a 3D printer, screwdrivers, a wire stripper, a utility knife and a multimeter are the whole tool kit. Based on Ansari-Asl et al. 2024 [R1]. This README is the main guide; every section links to the files you need.
+Measures how materials reflect light — the bidirectional reflectance distribution function (BRDF) — and scans objects in 3D. Four motorised axes turn the sample and a lamp around a fixed camera. Runs from a laptop or on its own. Design after [Ansari-Asl et al. (2024)](https://doi.org/10.3390/jimaging10030055).
 
-[Interactive simulator](docs/index.html) (drag to orbit, build stage by stage, click parts, pick materials) · [Papers (PDF)](papers/) · [All references](REFERENCES.md)
+- **Printed parts, M2 screws and electronic modules.** The deck, posts and arms are 3D printed; every join is an M2 screw into a printed pilot (M3 only into the motors); electronics are modules joined by screw terminals, lever connectors and plug-in leads. A circuit-board version is specified for later: [pcb/](pcb/README.md).
+- **No soldering, drilling, sawing or crimping.** Tools: 3D printer, hex keys, screwdrivers, wire stripper, knife, multimeter.
+- **Every part from Digi-Key, Amazon or Adafruit**, each with a 3D model (STEP + STL) in this repo. Prices checked October 2026.
 
-| | |
+**Key features**
+
+- **Reflectance, in and out of the plane.** A lamp on a 12 inch ring (M4), a turning table (M3), a tilt (M2) and a spin (M1) put light and view anywhere over a flat sample up to 50 mm; a fixed camera records every pose.
+- **A material at the end.** `opengonio` turns a run into a reflectance curve (CSV, comma-separated values) and fits base colour, roughness and metallic for glTF, Blender, Unity and Unreal.
+- **3D scans** of small objects from the same machine (stages 11–13).
+- **A control app** in the browser or a desktop window: connect, home, jog, light, capture and see the curve ([Website and app](#website-and-app)).
+- **Every control works without hardware.** A simulated machine with a hidden table error runs the whole chain; `make sim` ends `ALL PASS`.
+- **Honest numbers.** Every claim says whether it is simulated, modeled or measured ([Status](#status)).
+
+**[How it works](wiki/How-it-works.md) · [Wiring](#wiring) · [Build steps](#build) · [Wiki](wiki/Home.md) · [Paper (PDF)](paper/build/opengonio.pdf) · [Website](docs/index.html) · [Lab](docs/lab.html) · [Parts spreadsheet](exports/bom/opengonio-bom.xlsx) · [Your parts list](PARTS.md)**
+
+<!-- budget:start -->
+| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided | Tools to buy (kept, separate) |
+|---:|---:|---:|---:|---:|---:|
+| $569.10 | $524.12 | $44.98 | $0.00 | 4/107 parts | $469.76 |
+
+Optional spectral sensor +\$19.90 · Optional standalone kit +\$71.68 · Optional no-switching camera kit +\$90.10 · Optional colour kit (bands + polarizers) +\$103.95
+<!-- budget:end -->
+
+**Cost scope.** "Plan" is every core part for the white-light instrument at listed prices (October 2026), before shipping and tax. It leaves out the tools (bought once, kept), the optional kits on the line above, and the laptop.
+
+## At a glance
+
+| | Choice | To the laptop |
+|---|---|---|
+| Motion board | BTT SKR Pico V1.0 running grblHAL: 4 × TMC2209 drivers, 4 home inputs, lamp and fan outputs | USB-C |
+| Button + sensor hub | ESP32-S3-DevKitC-1 (owned) running MicroPython: 2 keypads, motor-power sense, optional OLED / spectral sensor | USB-C |
+| Motors | NEMA 17 17HS4401 5-pack for M4 arm, M3 table, M2 tilt (+2 spare) · 17HS08-1004S pancake for M1 spin (both bought) | — |
+| Camera | Arducam 12 MP IMX477 USB camera, 16 mm M12 lens at f/8 | USB |
+| Light | Citizen COB, CRI 97, 350 mA constant-current driver switched by the SKR Pico | — |
+| Power | 24 V 6S Li-ion pack with protection board, charged over USB-C (20 V PD → 24.0 V, 1 A), 3.15 A fuse, latching e-stop | — |
+| Prints | black ABS (cuts stray reflections), enclosed printer, M2 self-tapping screws | — |
+
+**Contents:** [Status](#status) · [Electronics](#electronics) · [Mechanical](#mechanical) · [Printed parts](#printed-parts) · [Tools](#tools) · [Wiring](#wiring) · [Build](#build) · [Software](#software) · [Website and app](#website-and-app) · [Project structure](#project-structure) · [Design](#design) · [Licence](#licence)
+
+## Status
+
+**Design stage: no machine has been built or measured yet.** The software, CAD and build steps exist and are tested on a simulated machine; every hardware claim below is a design value until a built machine's run folder backs it. Full evidence table, uncertainty budget and acceptance tests: [evaluation specification](docs/specification/evaluation.md).
+
+| Capability | Evidence today |
 |---|---|
-| **Start** | [Start here](#start-here) · [Two ways to run](#two-ways-to-run) · [The machine](#the-machine) |
-| **Build** | [Stages and milestones](#stages-and-milestones) · [Budget](#budget) · [Tools and joins](#tools-and-joins) · [3D files and making parts](#3d-files-and-making-parts) · [Commands](#commands) |
-| **Measure** | [Test materials](#test-materials) · [Theory and equations](#theory-and-equations) |
-| **Change** | [Tweak and extend](#tweak-and-extend) |
-| **Find** | [Repository map](#repository-map) · [References](#references) · [Licence](#licence) |
+| In-plane and out-of-plane BRDF, white light, flat samples ≤ 50 mm | simulated end to end (`make sim`) |
+| Absolute BRDF against a polytetrafluoroethylene (PTFE) reference, camera response, lamp drift checks | simulated; uncertainty not characterized |
+| Repeatability ≤ 0.1° per axis | modeled (step size); not measured |
+| No part collisions over every axis' travel | modeled (CAD sweep + mixed poses) |
+| AS7341 spectral readings (8 visible bands + clear + NIR) | not characterized (firmware untested) |
+| Colour LED bank (stage 10) | **blocked**: driver circuit unsafe as designed, do not power |
+| 3D scan: visual hull | simulated |
+| 3D scan: photometric stereo | simulated; needs the blocked LED bank |
+| 24 V Li-ion pack charged over USB-C, ≈ 6 h per charge | modeled from listing values |
+| Electrical safety | not certified (no mains in the machine: Li-ion pack with protection board, fuse, e-stop) |
 
-## Start here
+Try it without hardware: `make setup && source .venv/bin/activate && make sim` ends with `ALL PASS`. Installed from a wheel instead of the repository: `opengonio init` puts an editable `machine.yaml` in `~/.config/opengonio/`.
 
-1. **Set up once:** publish the repo ([commands](#publish-and-update-the-private-github-repo-ubuntu)), then `make setup`. Decide your parts in [PARTS.md](PARTS.md).
-2. **Try the software without hardware:** [Try without hardware](#try-without-hardware).
-3. **Do the steps in order.** `make next` prints the next one; its stage checklist has the full instructions.
-4. **After each step:** `make done id=M05.1` closes its GitHub issue, ticks it in the checklists and figures, and publishes.
+## Electronics
 
-Every step (= one GitHub issue) is **Time · Needs** → **Do** (numbered actions) → **Verify** (a measurement with a pass number) → **If a check fails** (what to look at first) → **Record** (the file to fill in). To change or extend anything, see [Tweak and extend](#tweak-and-extend).
+Click a picture for the 3D view. **STEP** / **STL**: true-size model to download · **open model**: the maker's own model · **maker**: the maker's CAD page.
 
-## Two ways to run
+<!-- bom-electronics:start -->
+| | Part | Qty | Price | Buy | 3D model |
+|:-:|---|:-:|--:|---|---|
+| <a href="cad/bought/PWR-21_battery_6s_24v_5ah.stl"><img src="docs/assets/parts/PWR-21_battery_6s_24v_5ah.png" width="48" height="48" alt="PWR-21"></a> | **PWR-21** 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS) | 1 | \$41.99 | [Amazon](https://www.amazon.com/dp/B0FHPST5TP) | [STEP](cad/bought/PWR-21_battery_6s_24v_5ah.step?raw=true) · [STL](cad/bought/PWR-21_battery_6s_24v_5ah.stl?raw=true) |
+| <a href="cad/bought/PWR-27_usb_c_pd_trigger.stl"><img src="docs/assets/parts/PWR-27_usb_c_pd_trigger.png" width="48" height="48" alt="PWR-27"></a> | **PWR-27** USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals | 1 | \$9.99 | [Amazon](https://www.amazon.com/dp/B0HHNFY7HT) | [STEP](cad/bought/PWR-27_usb_c_pd_trigger.step?raw=true) · [STL](cad/bought/PWR-27_usb_c_pd_trigger.stl?raw=true) |
+| <a href="cad/bought/PWR-29_drok_cc_cv_35w.stl"><img src="docs/assets/parts/PWR-29_drok_cc_cv_35w.png" width="48" height="48" alt="PWR-29"></a> | **PWR-29** DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W) | 1 | \$16.99 | [Amazon](https://www.amazon.com/dp/B07VNDGFT6) | [STEP](cad/bought/PWR-29_drok_cc_cv_35w.step?raw=true) · [STL](cad/bought/PWR-29_drok_cc_cv_35w.stl?raw=true) |
+| <a href="cad/bought/PWR-04_fuse_holder_inline_5x20.stl"><img src="docs/assets/parts/PWR-04_fuse_holder_inline_5x20.png" width="48" height="48" alt="PWR-04"></a> | **PWR-04** Inline 5 x 20 mm fuse holder, 16 AWG (2-pack) | 1 | \$6.19 | [Amazon](https://www.amazon.com/dp/B07SM5YJ97) | [STEP](cad/bought/PWR-04_fuse_holder_inline_5x20.step?raw=true) · [STL](cad/bought/PWR-04_fuse_holder_inline_5x20.stl?raw=true) |
+| <a href="cad/bought/PWR-05_fuse_5x20.stl"><img src="docs/assets/parts/PWR-05_fuse_5x20.png" width="48" height="48" alt="PWR-05"></a> | **PWR-05** Fuse 3.15 A time-lag 5 x 20 mm | 1 | \$10.99 | [Amazon](https://www.amazon.com/dp/B00Y3OJUFK) | [STEP](cad/bought/PWR-05_fuse_5x20.step?raw=true) · [STL](cad/bought/PWR-05_fuse_5x20.stl?raw=true) |
+| <a href="cad/bought/PWR-28_estop_22mm_1no1nc.stl"><img src="docs/assets/parts/PWR-28_estop_22mm_1no1nc.png" width="48" height="48" alt="PWR-28"></a> | **PWR-28** Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack) | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B09JP4JKY6) | [STEP](cad/bought/PWR-28_estop_22mm_1no1nc.step?raw=true) · [STL](cad/bought/PWR-28_estop_22mm_1no1nc.stl?raw=true) |
+| <a href="cad/bought/PWR-10_pc817_opto_module_24v.stl"><img src="docs/assets/parts/PWR-10_pc817_opto_module_24v.png" width="48" height="48" alt="PWR-10"></a> | **PWR-10** Optocoupler module PC817, 24 V input, screw terminals (2-pack) | 1 | \$6.99 | [Amazon](https://www.amazon.com/dp/B0B5382ZT7) | [STEP](cad/bought/PWR-10_pc817_opto_module_24v.step?raw=true) · [STL](cad/bought/PWR-10_pc817_opto_module_24v.stl?raw=true) |
+| <a href="cad/bought/PWR-15_wire_18awg_pair.stl"><img src="docs/assets/parts/PWR-15_wire_18awg_pair.png" width="48" height="48" alt="PWR-15"></a> | **PWR-15** 18 AWG silicone wire red/black, 1 m pair | 1 | \$7.98 | [Amazon](https://www.amazon.com/dp/B01708AYYQ) | [STEP](cad/bought/PWR-15_wire_18awg_pair.step?raw=true) · [STL](cad/bought/PWR-15_wire_18awg_pair.stl?raw=true) |
+| <a href="cad/bought/PWR-20_lever_connector_221_412.stl"><img src="docs/assets/parts/PWR-20_lever_connector_221_412.png" width="48" height="48" alt="PWR-20"></a> | **PWR-20** Lever wire connectors, WAGO 221 assortment (28) | 1 | \$20.95 | [Amazon](https://www.amazon.com/dp/B0CJ5QF3VX) | [STEP](cad/bought/PWR-20_lever_connector_221_412.step?raw=true) · [STL](cad/bought/PWR-20_lever_connector_221_412.stl?raw=true) · [maker](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) |
+| <a href="cad/bought/CTL-01_btt_skr_pico_envelope.stl"><img src="docs/assets/parts/CTL-01_btt_skr_pico_envelope.png" width="48" height="48" alt="CTL-01"></a> | **CTL-01** BIGTREETECH SKR Pico V1.0 (RP2040, 4 × TMC2209 UART, USB-C) | 1 | \$35.99 | [Amazon](https://www.amazon.com/dp/B09MYKL9MP) | [STEP](cad/bought/CTL-01_btt_skr_pico_envelope.step?raw=true) · [STL](cad/bought/CTL-01_btt_skr_pico_envelope.stl?raw=true) · [maker](https://github.com/bigtreetech/SKR-Pico/blob/master/3D/BTT%20SKR%20Pico%20V1.0.step) |
+| <a href="cad/bought/CTL-03_usb_cable_e4.stl"><img src="docs/assets/parts/CTL-03_usb_cable_e4.png" width="48" height="48" alt="CTL-03"></a> | **CTL-03** USB-A to USB-C data cables, 3 ft (2-pack) | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B07DD5YHMH) | [STEP](cad/bought/CTL-03_usb_cable_e4.step?raw=true) · [STL](cad/bought/CTL-03_usb_cable_e4.stl?raw=true) |
+| <a href="cad/bought/CTL-05_membrane_keypad_1x4.stl"><img src="docs/assets/parts/CTL-05_membrane_keypad_1x4.png" width="48" height="48" alt="CTL-05"></a> | **CTL-05** Membrane keypad 1 x 4 | 1 | \$7.89 | [Amazon](https://www.amazon.com/dp/B076WS74VN) | [STEP](cad/bought/CTL-05_membrane_keypad_1x4.step?raw=true) · [STL](cad/bought/CTL-05_membrane_keypad_1x4.stl?raw=true) |
+| <img src="docs/assets/parts/icon-cable.svg" width="48" height="48" alt="CTL-06"> | **CTL-06** JST-XH pre-crimped lead kit | 1 | \$10.99 | [Amazon](https://www.amazon.com/dp/B0F8HMQRRN) | [STEP](cad/bought/CTL-06_jst_xh_lead_3pin.step?raw=true) · [STL](cad/bought/CTL-06_jst_xh_lead_3pin.stl?raw=true) · [open model](cad/open/CTL-06_kicad_JST_XH_B3B_header.step?raw=true) |
+| <a href="cad/bought/CTL-07_jumper_wire_mf.stl"><img src="docs/assets/parts/CTL-07_jumper_wire_mf.png" width="48" height="48" alt="CTL-07"></a> | **CTL-07** Jumper wires male-female 20 cm (120) | 1 | \$6.98 | [Amazon](https://www.amazon.com/dp/B0BHNM91FX) | [STEP](cad/bought/CTL-07_jumper_wire_mf.step?raw=true) · [STL](cad/bought/CTL-07_jumper_wire_mf.stl?raw=true) |
+| <a href="cad/bought/LAR-02_nema17_17hs4401.stl"><img src="docs/assets/parts/LAR-02_nema17_17hs4401.png" width="48" height="48" alt="LAR-02"></a> | **LAR-02** NEMA 17 stepper 42 Ncm 1.5 A, 38 mm (5-pack: M4, M3, M2 + 2 spare) | 1 | \$32.99 | [Amazon](https://www.amazon.com/dp/B088B756MY) | [STEP](cad/bought/LAR-02_nema17_17hs4401.step?raw=true) · [STL](cad/bought/LAR-02_nema17_17hs4401.stl?raw=true) |
+| <a href="cad/bought/LAR-05_tcst2103_endstop_module.stl"><img src="docs/assets/parts/LAR-05_tcst2103_endstop_module.png" width="48" height="48" alt="LAR-05"></a> | **LAR-05** Optical endstop module, slot type (6-pack) | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B0719K9Z9R) | [STEP](cad/bought/LAR-05_tcst2103_endstop_module.step?raw=true) · [STL](cad/bought/LAR-05_tcst2103_endstop_module.stl?raw=true) · [maker](https://www.vishay.com/en/product/81147/) |
+| <a href="cad/bought/LAR-06_me8108_limit_switch.stl"><img src="docs/assets/parts/LAR-06_me8108_limit_switch.png" width="48" height="48" alt="LAR-06"></a> | **LAR-06** Roller-lever limit switch, screw terminals (2) | 1 | \$6.99 | [Amazon](https://www.amazon.com/dp/B09TDBH593) | [STEP](cad/bought/LAR-06_me8108_limit_switch.step?raw=true) · [STL](cad/bought/LAR-06_me8108_limit_switch.stl?raw=true) |
+| <a href="cad/bought/CAM-01_arducam_b0433_imx477_usb.stl"><img src="docs/assets/parts/CAM-01_arducam_b0433_imx477_usb.png" width="48" height="48" alt="CAM-01"></a> | **CAM-01** USB camera 12 MP IMX477, M12 mount (UVC) | 1 | \$59.99 | [Amazon](https://www.amazon.com/dp/B0C1G73QZD) | [STEP](cad/bought/CAM-01_arducam_b0433_imx477_usb.step?raw=true) · [STL](cad/bought/CAM-01_arducam_b0433_imx477_usb.stl?raw=true) |
+| <a href="cad/bought/LSR-06_te_lumawise_z35_2213678_5.stl"><img src="docs/assets/parts/LSR-06_te_lumawise_z35_2213678_5.png" width="48" height="48" alt="LSR-06"></a> | **LSR-06** Solderless COB holder 13.5 mm (TE LUMAWISE Z35) | 1 | \$3.50 | [Digi-Key](https://www.digikey.com/en/products/detail/te-connectivity-amp-connectors/2213678-5/6174915) | [STEP](cad/bought/LSR-06_te_lumawise_z35_2213678_5.step?raw=true) · [STL](cad/bought/LSR-06_te_lumawise_z35_2213678_5.stl?raw=true) · [maker](https://www.te.com/) |
+| <a href="cad/bought/LSR-01_citizen_clu7a3_cob.stl"><img src="docs/assets/parts/LSR-01_citizen_clu7a3_cob.png" width="48" height="48" alt="LSR-01"></a> | **LSR-01** COB LED CRI 97, 12 V, 13.5 mm (Citizen CLU7A3) | 1 | \$5.91 | [Digi-Key](https://www.digikey.com/en/products/detail/citizen/CLU7A3-0403E1-303H7X5/17053751) | [STEP](cad/bought/LSR-01_citizen_clu7a3_cob.step?raw=true) · [STL](cad/bought/LSR-01_citizen_clu7a3_cob.stl?raw=true) |
+| <a href="cad/bought/LSR-02_meanwell_nldd_350h.stl"><img src="docs/assets/parts/LSR-02_meanwell_nldd_350h.png" width="48" height="48" alt="LSR-02"></a> | **LSR-02** Constant-current driver 350 mA | 1 | \$5.41 | [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/NLDD-350H/13913618) | [STEP](cad/bought/LSR-02_meanwell_nldd_350h.step?raw=true) · [STL](cad/bought/LSR-02_meanwell_nldd_350h.stl?raw=true) · [maker](https://www.meanwellusa.com/) |
+| <a href="cad/bought/SPN-01_nema17_17hs08_1004s_pancake.stl"><img src="docs/assets/parts/SPN-01_nema17_17hs08_1004s_pancake.png" width="48" height="48" alt="SPN-01"></a> | **SPN-01** NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) | 1 | \$11.99 | [Amazon](https://www.amazon.com/dp/B00PNEQ79Q) | [STEP](cad/bought/SPN-01_nema17_17hs08_1004s_pancake.step?raw=true) · [STL](cad/bought/SPN-01_nema17_17hs08_1004s_pancake.stl?raw=true) · [maker](https://files.omc-stepperonline.com/17HS08-1004S.STEP) |
+| | **Total** | | **\$337.67** | | |
+<!-- bom-electronics:end -->
 
-| | Laptop mode | Standalone mode (stage 15) |
+## Mechanical
+
+<!-- bom-mechanical:start -->
+| | Part | Qty | Price | Buy | 3D model |
+|:-:|---|:-:|--:|---|---|
+| <img src="docs/assets/parts/icon-hardware.svg" width="48" height="48" alt="FIL-01"> | **FIL-01** ABS filament 1.75 mm, black, 1 kg (4 spools) | 4 | 4 × \$15.99 | [Amazon](https://www.amazon.com/dp/B0DDPSXDHG) | - |
+| <a href="cad/bought/FRM-06_screws_m2_samples.stl"><img src="docs/assets/parts/FRM-06_screws_m2_samples.png" width="48" height="48" alt="FRM-06"></a> | **FRM-06** M2 socket screw kit, 4–25 mm, with nuts and washers (900 pcs) | 1 | \$7.58 | [Amazon](https://www.amazon.com/dp/B0DCKCN2WM) | [STEP](cad/bought/FRM-06_screws_m2_samples.step?raw=true) · [STL](cad/bought/FRM-06_screws_m2_samples.stl?raw=true) |
+| <a href="cad/bought/FRM-07_screw_m3x8.stl"><img src="docs/assets/parts/FRM-07_screw_m3x8.png" width="48" height="48" alt="FRM-07"></a> | **FRM-07** Socket screw kit M2/M3/M4 with nuts (820 pcs): M3 for the motors | 1 | \$9.88 | [Amazon](https://www.amazon.com/dp/B0D636MJ1N) | [STEP](cad/bought/FRM-07_screw_m3x8.step?raw=true) · [STL](cad/bought/FRM-07_screw_m3x8.stl?raw=true) |
+| <a href="cad/bought/FRM-08_bearing_608_2rs.stl"><img src="docs/assets/parts/FRM-08_bearing_608_2rs.png" width="48" height="48" alt="FRM-08"></a> | **FRM-08** 608-2RS bearings (10) | 1 | \$4.99 | [Amazon](https://www.amazon.com/dp/B0CX8CDL7D) | [STEP](cad/bought/FRM-08_bearing_608_2rs.step?raw=true) · [STL](cad/bought/FRM-08_bearing_608_2rs.stl?raw=true) |
+| <a href="cad/bought/LAR-01_lazy_susan_12in.stl"><img src="docs/assets/parts/LAR-01_lazy_susan_12in.png" width="48" height="48" alt="LAR-01"></a> | **LAR-01** 12 in lazy Susan bearing | 1 | \$13.99 | [Amazon](https://www.amazon.com/dp/B0CQXFVDN7) | [STEP](cad/bought/LAR-01_lazy_susan_12in.step?raw=true) · [STL](cad/bought/LAR-01_lazy_susan_12in.stl?raw=true) · [maker](https://www.mcmaster.com/1443T2) |
+| <a href="cad/bought/LAR-03_gt2_belt_open_1m.stl"><img src="docs/assets/parts/LAR-03_gt2_belt_open_1m.png" width="48" height="48" alt="LAR-03"></a> | **LAR-03** GT2 6 mm open belt (5 m) | 1 | \$7.59 | [Amazon](https://www.amazon.com/dp/B0BSMNZ53S) | [STEP](cad/bought/LAR-03_gt2_belt_open_1m.step?raw=true) · [STL](cad/bought/LAR-03_gt2_belt_open_1m.stl?raw=true) |
+| <img src="docs/assets/parts/icon-pulley.svg" width="48" height="48" alt="LAR-04"> | **LAR-04** GT2 20T pulley 5 mm bore (5-pack) | 1 | \$3.99 | [Amazon](https://www.amazon.com/dp/B0DJQC42DT) | [STEP](cad/bought/LAR-04_gt2_pulley_20t_5mm.step?raw=true) · [STL](cad/bought/LAR-04_gt2_pulley_20t_5mm.stl?raw=true) · [open model](cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step?raw=true) |
+| <a href="cad/bought/TBL-02_gt2_belt_232_loop.stl"><img src="docs/assets/parts/TBL-02_gt2_belt_232_loop.png" width="48" height="48" alt="TBL-02"></a> | **TBL-02** GT2 6 mm closed belt 232 mm | 1 | \$8.19 | [Amazon](https://www.amazon.com/dp/B0FRFGBS6J) | [STEP](cad/bought/TBL-02_gt2_belt_232_loop.step?raw=true) · [STL](cad/bought/TBL-02_gt2_belt_232_loop.stl?raw=true) |
+| <a href="cad/bought/TBL-05_bolt_m8x75_nut.stl"><img src="docs/assets/parts/TBL-05_bolt_m8x75_nut.png" width="48" height="48" alt="TBL-05"></a> | **TBL-05** M8 x 75 hex bolt, partial thread + M8 nut (fixed table axle) | 1 | \$15.37 | [Amazon](https://www.amazon.com/dp/B0D83HW8ZM) | [STEP](cad/bought/TBL-05_bolt_m8x75_nut.step?raw=true) · [STL](cad/bought/TBL-05_bolt_m8x75_nut.stl?raw=true) |
+| <a href="cad/bought/CAM-02_m12_lens_16mm.stl"><img src="docs/assets/parts/CAM-02_m12_lens_16mm.png" width="48" height="48" alt="CAM-02"></a> | **CAM-02** M12 lens 16 mm, ≥ 1/2 in format, low distortion | 1 | \$30.11 | [Amazon](https://www.amazon.com/dp/B0HJWVFD7R) | [STEP](cad/bought/CAM-02_m12_lens_16mm.step?raw=true) · [STL](cad/bought/CAM-02_m12_lens_16mm.stl?raw=true) |
+| <a href="cad/bought/LSR-03_heatsink_40x40x11.stl"><img src="docs/assets/parts/LSR-03_heatsink_40x40x11.png" width="48" height="48" alt="LSR-03"></a> | **LSR-03** Heatsink 40 x 40 mm (from a pack) | 1 | \$6.99 | [Amazon](https://www.amazon.com/dp/B07D4FVC61) | [STEP](cad/bought/LSR-03_heatsink_40x40x11.step?raw=true) · [STL](cad/bought/LSR-03_heatsink_40x40x11.stl?raw=true) |
+| <a href="cad/bought/ENC-02_felt_9x12in.stl"><img src="docs/assets/parts/ENC-02_felt_9x12in.png" width="48" height="48" alt="ENC-02"></a> | **ENC-02** Black felt sheet | 1 | \$6.99 | [Amazon](https://www.amazon.com/dp/B0FXKGNV95) | [STEP](cad/bought/ENC-02_felt_9x12in.step?raw=true) · [STL](cad/bought/ENC-02_felt_9x12in.stl?raw=true) |
+| <a href="cad/bought/CAL-01_ptfe_tile_50mm_3x3mm.stl"><img src="docs/assets/parts/CAL-01_ptfe_tile_50mm_3x3mm.png" width="48" height="48" alt="CAL-01"></a> | **CAL-01** PTFE sheets 100 x 100 x 3 mm (2): white tile = 3 stacked 50 mm squares | 1 | \$16.99 | [Amazon](https://www.amazon.com/dp/B0F83XRXTV) | [STEP](cad/bought/CAL-01_ptfe_tile_50mm_3x3mm.step?raw=true) · [STL](cad/bought/CAL-01_ptfe_tile_50mm_3x3mm.stl?raw=true) |
+| <a href="cad/bought/CAL-02_mirror_tile_50mm.stl"><img src="docs/assets/parts/CAL-02_mirror_tile_50mm.png" width="48" height="48" alt="CAL-02"></a> | **CAL-02** Glass mirror tile ~50 mm | 1 | \$11.49 | [Amazon](https://www.amazon.com/dp/B01H0ZU1QA) | [STEP](cad/bought/CAL-02_mirror_tile_50mm.step?raw=true) · [STL](cad/bought/CAL-02_mirror_tile_50mm.stl?raw=true) |
+| <a href="cad/bought/CAL-04_charuco_glass_4x6in.stl"><img src="docs/assets/parts/CAL-04_charuco_glass_4x6in.png" width="48" height="48" alt="CAL-04"></a> | **CAL-04** ChArUco print + picture-frame glass | 1 | \$4.31 | [Amazon](https://www.amazon.com/dp/B000Y79K32) | [STEP](cad/bought/CAL-04_charuco_glass_4x6in.step?raw=true) · [STL](cad/bought/CAL-04_charuco_glass_4x6in.stl?raw=true) |
+| <a href="cad/bought/TLT-02_gt2_belt_280_loop.stl"><img src="docs/assets/parts/TLT-02_gt2_belt_280_loop.png" width="48" height="48" alt="TLT-02"></a> | **TLT-02** GT2 6 mm closed belt 280 mm | 1 | \$7.49 | [Amazon](https://www.amazon.com/dp/B07RK1TX8C) | [STEP](cad/bought/TLT-02_gt2_belt_280_loop.step?raw=true) · [STL](cad/bought/TLT-02_gt2_belt_280_loop.stl?raw=true) |
+| <a href="cad/bought/TLT-05_bolt_m8x35_nut.stl"><img src="docs/assets/parts/TLT-05_bolt_m8x35_nut.png" width="48" height="48" alt="TLT-05"></a> | **TLT-05** M8 x 35 hex bolts, half thread (10-pack; 2 used) | 1 | \$9.19 | [Amazon](https://www.amazon.com/dp/B08KSVMT7W) | [STEP](cad/bought/TLT-05_bolt_m8x35_nut.step?raw=true) · [STL](cad/bought/TLT-05_bolt_m8x35_nut.stl?raw=true) |
+| <a href="cad/bought/SCN-01_mounting_putty_blob.stl"><img src="docs/assets/parts/SCN-01_mounting_putty_blob.png" width="48" height="48" alt="SCN-01"></a> | **SCN-01** Mounting putty 2 oz | 1 | \$2.33 | [Amazon](https://www.amazon.com/dp/B003LZMHIY) | [STEP](cad/bought/SCN-01_mounting_putty_blob.step?raw=true) · [STL](cad/bought/SCN-01_mounting_putty_blob.stl?raw=true) |
+| | **Total** | | **\$231.43** | | |
+<!-- bom-mechanical:end -->
+
+## Printed parts
+
+Black ABS (acrylonitrile butadiene styrene) on an enclosed printer, ≈ 2.7 kg, half of it the nine deck tiles ([print list](cad/PRINT.md), [deck map](phases/03-frame/deck-map.svg)). Print the tolerance coupon (PLAN-01) first: it sets the M2 pilot size. Whole machine: [assembly STEP](cad/assembly/opengonio_assembly.step) (Onshape, FreeCAD) · [glTF](exports/cad/opengonio_assembly.glb) (Blender, web).
+
+<!-- bom-printed:start -->
+| | Part | Stage | Download |
+|:-:|---|---|---|
+| <a href="phases/00-plan/3d/PLAN-01_tolerance_coupon.stl"><img src="docs/assets/parts/PLAN-01_tolerance_coupon.png" width="48" height="48" alt="PLAN-01"></a> | **PLAN-01** tolerance coupon | [00 Plan](phases/00-plan/) | [STL](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl?raw=true) · [STEP](phases/00-plan/3d/PLAN-01_tolerance_coupon.step?raw=true) |
+| <a href="phases/01-power/3d/PWR-18a_power_box.stl"><img src="docs/assets/parts/PWR-18a_power_box.png" width="48" height="48" alt="PWR-18a"></a> | **PWR-18a** power box | [01 Power box](phases/01-power/) | [STL](phases/01-power/3d/PWR-18a_power_box.stl?raw=true) · [STEP](phases/01-power/3d/PWR-18a_power_box.step?raw=true) |
+| <a href="phases/01-power/3d/PWR-18b_power_lid.stl"><img src="docs/assets/parts/PWR-18b_power_lid.png" width="48" height="48" alt="PWR-18b"></a> | **PWR-18b** power lid | [01 Power box](phases/01-power/) | [STL](phases/01-power/3d/PWR-18b_power_lid.stl?raw=true) · [STEP](phases/01-power/3d/PWR-18b_power_lid.step?raw=true) |
+| <a href="phases/02-controller/3d/CTL-10a_button_panel.stl"><img src="docs/assets/parts/CTL-10a_button_panel.png" width="48" height="48" alt="CTL-10a"></a> | **CTL-10a** button panel | [02 Controller and buttons](phases/02-controller/) | [STL](phases/02-controller/3d/CTL-10a_button_panel.stl?raw=true) · [STEP](phases/02-controller/3d/CTL-10a_button_panel.step?raw=true) |
+| <a href="phases/02-controller/3d/CTL-10b_controller_tray.stl"><img src="docs/assets/parts/CTL-10b_controller_tray.png" width="48" height="48" alt="CTL-10b"></a> | **CTL-10b** controller tray | [02 Controller and buttons](phases/02-controller/) | [STL](phases/02-controller/3d/CTL-10b_controller_tray.stl?raw=true) · [STEP](phases/02-controller/3d/CTL-10b_controller_tray.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01a_deck_tile_SW.stl"><img src="docs/assets/parts/FRM-01a_deck_tile_SW.png" width="48" height="48" alt="FRM-01a"></a> | **FRM-01a** deck tile SW | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01a_deck_tile_SW.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01a_deck_tile_SW.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01b_deck_tile_S.stl"><img src="docs/assets/parts/FRM-01b_deck_tile_S.png" width="48" height="48" alt="FRM-01b"></a> | **FRM-01b** deck tile S | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01b_deck_tile_S.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01b_deck_tile_S.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01c_deck_tile_SE.stl"><img src="docs/assets/parts/FRM-01c_deck_tile_SE.png" width="48" height="48" alt="FRM-01c"></a> | **FRM-01c** deck tile SE | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01c_deck_tile_SE.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01c_deck_tile_SE.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01d_deck_tile_W.stl"><img src="docs/assets/parts/FRM-01d_deck_tile_W.png" width="48" height="48" alt="FRM-01d"></a> | **FRM-01d** deck tile W | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01d_deck_tile_W.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01d_deck_tile_W.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01e_deck_tile_C.stl"><img src="docs/assets/parts/FRM-01e_deck_tile_C.png" width="48" height="48" alt="FRM-01e"></a> | **FRM-01e** deck tile C | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01e_deck_tile_C.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01e_deck_tile_C.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01f_deck_tile_E.stl"><img src="docs/assets/parts/FRM-01f_deck_tile_E.png" width="48" height="48" alt="FRM-01f"></a> | **FRM-01f** deck tile E | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01f_deck_tile_E.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01f_deck_tile_E.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01g_deck_tile_NW.stl"><img src="docs/assets/parts/FRM-01g_deck_tile_NW.png" width="48" height="48" alt="FRM-01g"></a> | **FRM-01g** deck tile NW | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01g_deck_tile_NW.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01g_deck_tile_NW.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01h_deck_tile_N.stl"><img src="docs/assets/parts/FRM-01h_deck_tile_N.png" width="48" height="48" alt="FRM-01h"></a> | **FRM-01h** deck tile N | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01h_deck_tile_N.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01h_deck_tile_N.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-01i_deck_tile_NE.stl"><img src="docs/assets/parts/FRM-01i_deck_tile_NE.png" width="48" height="48" alt="FRM-01i"></a> | **FRM-01i** deck tile NE | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01i_deck_tile_NE.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01i_deck_tile_NE.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-02a_outrigger_bar_1.stl"><img src="docs/assets/parts/FRM-02a_outrigger_bar_1.png" width="48" height="48" alt="FRM-02a"></a> | **FRM-02a** outrigger bar 1 | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-02a_outrigger_bar_1.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-02a_outrigger_bar_1.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-02b_outrigger_bar_2.stl"><img src="docs/assets/parts/FRM-02b_outrigger_bar_2.png" width="48" height="48" alt="FRM-02b"></a> | **FRM-02b** outrigger bar 2 | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-02b_outrigger_bar_2.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-02b_outrigger_bar_2.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-02c_scan_post_bar_1.stl"><img src="docs/assets/parts/FRM-02c_scan_post_bar_1.png" width="48" height="48" alt="FRM-02c"></a> | **FRM-02c** scan post bar 1 | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-02c_scan_post_bar_1.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-02c_scan_post_bar_1.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-02d_scan_post_bar_2.stl"><img src="docs/assets/parts/FRM-02d_scan_post_bar_2.png" width="48" height="48" alt="FRM-02d"></a> | **FRM-02d** scan post bar 2 | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-02d_scan_post_bar_2.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-02d_scan_post_bar_2.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-09c_protractor_segment.stl"><img src="docs/assets/parts/FRM-09c_protractor_segment.png" width="48" height="48" alt="FRM-09c"></a> | **FRM-09c** protractor segment | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-09c_protractor_segment.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-09c_protractor_segment.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-09d_bar_saddle.stl"><img src="docs/assets/parts/FRM-09d_bar_saddle.png" width="48" height="48" alt="FRM-09d"></a> | **FRM-09d** bar saddle | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-09d_bar_saddle.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-09d_bar_saddle.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-09e_post_socket.stl"><img src="docs/assets/parts/FRM-09e_post_socket.png" width="48" height="48" alt="FRM-09e"></a> | **FRM-09e** post socket | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-09e_post_socket.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-09e_post_socket.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-09f_end_foot.stl"><img src="docs/assets/parts/FRM-09f_end_foot.png" width="48" height="48" alt="FRM-09f"></a> | **FRM-09f** end foot | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-09f_end_foot.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-09f_end_foot.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-09h_camera_pillar.stl"><img src="docs/assets/parts/FRM-09h_camera_pillar.png" width="48" height="48" alt="FRM-09h"></a> | **FRM-09h** camera pillar | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-09h_camera_pillar.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-09h_camera_pillar.step?raw=true) |
+| <a href="phases/03-frame/3d/FRM-09i_bar_coupler.stl"><img src="docs/assets/parts/FRM-09i_bar_coupler.png" width="48" height="48" alt="FRM-09i"></a> | **FRM-09i** bar coupler | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-09i_bar_coupler.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-09i_bar_coupler.step?raw=true) |
+| <a href="phases/04-light-arm/3d/LAR-08a_rim_segment.stl"><img src="docs/assets/parts/LAR-08a_rim_segment.png" width="48" height="48" alt="LAR-08a"></a> | **LAR-08a** rim segment | [04 Light arm (M4)](phases/04-light-arm/) | [STL](phases/04-light-arm/3d/LAR-08a_rim_segment.stl?raw=true) · [STEP](phases/04-light-arm/3d/LAR-08a_rim_segment.step?raw=true) |
+| <a href="phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl"><img src="docs/assets/parts/LAR-08b_ring_motor_mount.png" width="48" height="48" alt="LAR-08b"></a> | **LAR-08b** ring motor mount | [04 Light arm (M4)](phases/04-light-arm/) | [STL](phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl?raw=true) · [STEP](phases/04-light-arm/3d/LAR-08b_ring_motor_mount.step?raw=true) |
+| <a href="phases/04-light-arm/3d/LAR-08c_arm_segment.stl"><img src="docs/assets/parts/LAR-08c_arm_segment.png" width="48" height="48" alt="LAR-08c"></a> | **LAR-08c** arm segment | [04 Light arm (M4)](phases/04-light-arm/) | [STL](phases/04-light-arm/3d/LAR-08c_arm_segment.stl?raw=true) · [STEP](phases/04-light-arm/3d/LAR-08c_arm_segment.step?raw=true) |
+| <a href="phases/04-light-arm/3d/LAR-08e_cross_clamp.stl"><img src="docs/assets/parts/LAR-08e_cross_clamp.png" width="48" height="48" alt="LAR-08e"></a> | **LAR-08e** cross clamp | [04 Light arm (M4)](phases/04-light-arm/) | [STL](phases/04-light-arm/3d/LAR-08e_cross_clamp.stl?raw=true) · [STEP](phases/04-light-arm/3d/LAR-08e_cross_clamp.step?raw=true) |
+| <a href="phases/04-light-arm/3d/LAR-08f_upright_bar.stl"><img src="docs/assets/parts/LAR-08f_upright_bar.png" width="48" height="48" alt="LAR-08f"></a> | **LAR-08f** upright bar | [04 Light arm (M4)](phases/04-light-arm/) | [STL](phases/04-light-arm/3d/LAR-08f_upright_bar.stl?raw=true) · [STEP](phases/04-light-arm/3d/LAR-08f_upright_bar.step?raw=true) |
+| <a href="phases/04-light-arm/3d/LAR-08g_arm_bar.stl"><img src="docs/assets/parts/LAR-08g_arm_bar.png" width="48" height="48" alt="LAR-08g"></a> | **LAR-08g** arm bar | [04 Light arm (M4)](phases/04-light-arm/) | [STL](phases/04-light-arm/3d/LAR-08g_arm_bar.stl?raw=true) · [STEP](phases/04-light-arm/3d/LAR-08g_arm_bar.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07a_table_drum.stl"><img src="docs/assets/parts/TBL-07a_table_drum.png" width="48" height="48" alt="TBL-07a"></a> | **TBL-07a** table drum | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07a_table_drum.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07a_table_drum.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07b_home_flag.stl"><img src="docs/assets/parts/TBL-07b_home_flag.png" width="48" height="48" alt="TBL-07b"></a> | **TBL-07b** home flag | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07b_home_flag.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07b_home_flag.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07c_table_motor_bracket.stl"><img src="docs/assets/parts/TBL-07c_table_motor_bracket.png" width="48" height="48" alt="TBL-07c"></a> | **TBL-07c** table motor bracket | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07c_table_motor_bracket.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07c_table_motor_bracket.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07d_table_post.stl"><img src="docs/assets/parts/TBL-07d_table_post.png" width="48" height="48" alt="TBL-07d"></a> | **TBL-07d** table post | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07d_table_post.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07d_table_post.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07f_spacers.stl"><img src="docs/assets/parts/TBL-07f_spacers.png" width="48" height="48" alt="TBL-07f"></a> | **TBL-07f** spacers | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07f_spacers.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07f_spacers.step?raw=true) |
+| <a href="phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl"><img src="docs/assets/parts/CAM-03a_aperture_stop_f8.png" width="48" height="48" alt="CAM-03a"></a> | **CAM-03a** aperture stop f8 | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl?raw=true) · [STEP](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.step?raw=true) |
+| <a href="phases/06-camera-light/3d/CAM-03b_camera_plate.stl"><img src="docs/assets/parts/CAM-03b_camera_plate.png" width="48" height="48" alt="CAM-03b"></a> | **CAM-03b** camera plate | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/CAM-03b_camera_plate.stl?raw=true) · [STEP](phases/06-camera-light/3d/CAM-03b_camera_plate.step?raw=true) |
+| <a href="phases/06-camera-light/3d/LSR-05a_lamp_tube.stl"><img src="docs/assets/parts/LSR-05a_lamp_tube.png" width="48" height="48" alt="LSR-05a"></a> | **LSR-05a** lamp tube | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl?raw=true) · [STEP](phases/06-camera-light/3d/LSR-05a_lamp_tube.step?raw=true) |
+| <a href="phases/06-camera-light/3d/LSR-05b_lamp_cap.stl"><img src="docs/assets/parts/LSR-05b_lamp_cap.png" width="48" height="48" alt="LSR-05b"></a> | **LSR-05b** lamp cap | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/LSR-05b_lamp_cap.stl?raw=true) · [STEP](phases/06-camera-light/3d/LSR-05b_lamp_cap.step?raw=true) |
+| <a href="phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl"><img src="docs/assets/parts/CAL-06a_ptfe_holder.png" width="48" height="48" alt="CAL-06a"></a> | **CAL-06a** ptfe holder | [07 Calibrate → game material](phases/07-calibrate/) | [STL](phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl?raw=true) · [STEP](phases/07-calibrate/3d/CAL-06a_ptfe_holder.step?raw=true) |
+| <a href="phases/07-calibrate/3d/CAL-06b_mirror_holder.stl"><img src="docs/assets/parts/CAL-06b_mirror_holder.png" width="48" height="48" alt="CAL-06b"></a> | **CAL-06b** mirror holder | [07 Calibrate → game material](phases/07-calibrate/) | [STL](phases/07-calibrate/3d/CAL-06b_mirror_holder.stl?raw=true) · [STEP](phases/07-calibrate/3d/CAL-06b_mirror_holder.step?raw=true) |
+| <a href="phases/07-calibrate/3d/CAL-06c_ball_holder.stl"><img src="docs/assets/parts/CAL-06c_ball_holder.png" width="48" height="48" alt="CAL-06c"></a> | **CAL-06c** ball holder | [07 Calibrate → game material](phases/07-calibrate/) | [STL](phases/07-calibrate/3d/CAL-06c_ball_holder.stl?raw=true) · [STEP](phases/07-calibrate/3d/CAL-06c_ball_holder.step?raw=true) |
+| <a href="phases/07-calibrate/3d/ENC-04a_dowel_socket.stl"><img src="docs/assets/parts/ENC-04a_dowel_socket.png" width="48" height="48" alt="ENC-04a"></a> | **ENC-04a** dowel socket | [07 Calibrate → game material](phases/07-calibrate/) | [STL](phases/07-calibrate/3d/ENC-04a_dowel_socket.stl?raw=true) · [STEP](phases/07-calibrate/3d/ENC-04a_dowel_socket.step?raw=true) |
+| <a href="phases/08-tilt/3d/TLT-07a_tilt_yoke.stl"><img src="docs/assets/parts/TLT-07a_tilt_yoke.png" width="48" height="48" alt="TLT-07a"></a> | **TLT-07a** tilt yoke | [08 Tilt (M2)](phases/08-tilt/) | [STL](phases/08-tilt/3d/TLT-07a_tilt_yoke.stl?raw=true) · [STEP](phases/08-tilt/3d/TLT-07a_tilt_yoke.step?raw=true) |
+| <a href="phases/08-tilt/3d/TLT-07b_pulley_100T.stl"><img src="docs/assets/parts/TLT-07b_pulley_100T.png" width="48" height="48" alt="TLT-07b"></a> | **TLT-07b** pulley 100T | [08 Tilt (M2)](phases/08-tilt/) | [STL](phases/08-tilt/3d/TLT-07b_pulley_100T.stl?raw=true) · [STEP](phases/08-tilt/3d/TLT-07b_pulley_100T.step?raw=true) |
+| <a href="phases/08-tilt/3d/TLT-07c_tilt_cradle.stl"><img src="docs/assets/parts/TLT-07c_tilt_cradle.png" width="48" height="48" alt="TLT-07c"></a> | **TLT-07c** tilt cradle | [08 Tilt (M2)](phases/08-tilt/) | [STL](phases/08-tilt/3d/TLT-07c_tilt_cradle.stl?raw=true) · [STEP](phases/08-tilt/3d/TLT-07c_tilt_cradle.step?raw=true) |
+| <a href="phases/09-spin/3d/SPN-07a_spin_platter.stl"><img src="docs/assets/parts/SPN-07a_spin_platter.png" width="48" height="48" alt="SPN-07a"></a> | **SPN-07a** spin platter | [09 Spin (M1)](phases/09-spin/) | [STL](phases/09-spin/3d/SPN-07a_spin_platter.stl?raw=true) · [STEP](phases/09-spin/3d/SPN-07a_spin_platter.step?raw=true) |
+| <a href="phases/10-color/3d/MSK-06a_led_ring.stl"><img src="docs/assets/parts/MSK-06a_led_ring.png" width="48" height="48" alt="MSK-06a"></a> | **MSK-06a** led ring | [10 Colour add-ons (optional)](phases/10-color/) | [STL](phases/10-color/3d/MSK-06a_led_ring.stl?raw=true) · [STEP](phases/10-color/3d/MSK-06a_led_ring.step?raw=true) |
+| <a href="phases/10-color/3d/MSK-06b_led_mast.stl"><img src="docs/assets/parts/MSK-06b_led_mast.png" width="48" height="48" alt="MSK-06b"></a> | **MSK-06b** led mast | [10 Colour add-ons (optional)](phases/10-color/) | [STL](phases/10-color/3d/MSK-06b_led_mast.stl?raw=true) · [STEP](phases/10-color/3d/MSK-06b_led_mast.step?raw=true) |
+| <a href="phases/10-color/3d/SPC-03a_spectral_tube.stl"><img src="docs/assets/parts/SPC-03a_spectral_tube.png" width="48" height="48" alt="SPC-03a"></a> | **SPC-03a** spectral tube | [10 Colour add-ons (optional)](phases/10-color/) | [STL](phases/10-color/3d/SPC-03a_spectral_tube.stl?raw=true) · [STEP](phases/10-color/3d/SPC-03a_spectral_tube.step?raw=true) |
+| <a href="phases/11-scan-capture/3d/SCN-03a_riser_20.stl"><img src="docs/assets/parts/SCN-03a_riser_20.png" width="48" height="48" alt="SCN-03a"></a> | **SCN-03a** riser 20 | [11 3D scan: capture](phases/11-scan-capture/) | [STL](phases/11-scan-capture/3d/SCN-03a_riser_20.stl?raw=true) · [STEP](phases/11-scan-capture/3d/SCN-03a_riser_20.step?raw=true) |
+| <a href="phases/11-scan-capture/3d/SCN-03b_riser_40.stl"><img src="docs/assets/parts/SCN-03b_riser_40.png" width="48" height="48" alt="SCN-03b"></a> | **SCN-03b** riser 40 | [11 3D scan: capture](phases/11-scan-capture/) | [STL](phases/11-scan-capture/3d/SCN-03b_riser_40.stl?raw=true) · [STEP](phases/11-scan-capture/3d/SCN-03b_riser_40.step?raw=true) |
+| <a href="phases/11-scan-capture/3d/SCN-03c_riser_60.stl"><img src="docs/assets/parts/SCN-03c_riser_60.png" width="48" height="48" alt="SCN-03c"></a> | **SCN-03c** riser 60 | [11 3D scan: capture](phases/11-scan-capture/) | [STL](phases/11-scan-capture/3d/SCN-03c_riser_60.stl?raw=true) · [STEP](phases/11-scan-capture/3d/SCN-03c_riser_60.step?raw=true) |
+| <a href="phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.stl"><img src="docs/assets/parts/SCN-03d_scan_camera_plate_15.png" width="48" height="48" alt="SCN-03d"></a> | **SCN-03d** scan camera plate 15 | [11 3D scan: capture](phases/11-scan-capture/) | [STL](phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.stl?raw=true) · [STEP](phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.step?raw=true) |
+| <a href="phases/15-standalone/3d/STA-07a_pi_zero_mount.stl"><img src="docs/assets/parts/STA-07a_pi_zero_mount.png" width="48" height="48" alt="STA-07a"></a> | **STA-07a** pi zero mount | [15 Standalone (no laptop)](phases/15-standalone/) | [STL](phases/15-standalone/3d/STA-07a_pi_zero_mount.stl?raw=true) · [STEP](phases/15-standalone/3d/STA-07a_pi_zero_mount.step?raw=true) |
+<!-- bom-printed:end -->
+
+## Tools
+
+<!-- bom-tools:start -->
+| Tool | Price | Buy |
+|---|--:|---|
+| **TLS-01** Enclosed FDM 3D printer for ABS (Elegoo Centauri 2) | \$279.00 | [Amazon](https://www.amazon.com/dp/B0GZYZY956) |
+| **TLS-02** Screwdriver set (Phillips #1/#2 + flat 2–3 mm) | \$9.99 | [Amazon](https://www.amazon.com/dp/B07RFD9JWZ) |
+| **TLS-03** Hex keys 1.5 / 2 / 2.5 / 3 / 4 mm | \$9.99 | [Amazon](https://www.amazon.com/dp/B0CJBRYQF3) |
+| **TLS-04** Wire stripper / cutter 10–24 AWG | \$10.49 | [Amazon](https://www.amazon.com/dp/B07TS6KCXD) |
+| **TLS-05** Multimeter with temperature probe | \$34.99 | [Amazon](https://www.amazon.com/dp/B071JL6LLL) |
+| **TLS-06** Digital calipers 150 mm | \$14.59 | [Amazon](https://www.amazon.com/dp/B0D2386QN9) |
+| **TLS-07** Tape measure 3 m (metric) + phone level app | \$1.48 | [Amazon](https://www.amazon.com/dp/B0BRFTX359) |
+| **TLS-08** Inkjet printer, US Letter, prints at 100 % | \$49.99 | [Amazon](https://www.amazon.com/dp/B0GKJZ864R) |
+| **TLS-09** CA glue, double-sided tape, utility knife, 400-grit sandpaper | \$29.28 | [Amazon](https://www.amazon.com/dp/B00I4CWHD4) |
+| **TLS-10** 13 mm spanner (or an adjustable wrench) | \$7.00 | [Amazon](https://www.amazon.com/dp/B00Q01OBLC) |
+| **TLS-11** Printer paper, Letter, 500 sheets | \$6.97 | [Amazon](https://www.amazon.com/dp/B01FV0F8H8) |
+| **LAR-09** Laser module class 2 (650 nm, < 1 mW); mirror = one CAL-02 tile | \$15.99 | [Amazon](https://www.amazon.com/dp/B00ZR80S9S) |
+| **Total** (kept after the build; not in the machine cap) | **\$469.76** | |
+<!-- bom-tools:end -->
+
+## Wiring
+
+<!-- wiring:start -->
+<img src="docs/assets/wiring.svg" width="100%" alt="Wiring overview">
+
+Every connection, pin by pin. No solder, no crimps: screw terminals, lever connectors (WAGO 221), plug-in leads and jumper wires. Source: [`docs/wiring.yaml`](docs/wiring.yaml) (`make build` writes this section; `make check` compares it with the firmware). **Press the e-stop and unplug the USB-C charger before touching any terminal.**
+
+**Jump to:** [Power box: battery, charger, fuse, e-stop](#1--power-box-battery-charger-fuse-e-stop) · [Motor power: e-stop → over-travel switch → SKR Pico](#2--motor-power-e-stop--over-travel-switch--skr-pico) · [SKR Pico: motors](#3--skr-pico-motors) · [SKR Pico: endstops (home switches)](#4--skr-pico-endstops-home-switches) · [Lamp (white COB)](#5--lamp-white-cob) · [Hub: keypads and motor-power sense](#6--hub-keypads-and-motor-power-sense) · [USB data](#7--usb-data) · [Optional add-ons](#8--optional-add-ons) · [Standalone station (no laptop, optional)](#9--standalone-station-no-laptop-optional) · [Not wired: colour LED bank](#10--not-wired-colour-led-bank) · [SKR Pico port map](#skr-pico-port-map) · [ESP32-S3 header map](#esp32-s3-header-map)
+
+### 1 · Power box: battery, charger, fuse, e-stop
+
+*Stage 01.* 18 AWG (PWR-15) red for `+`, black for `−`. Strip 11 mm for lever connectors, 8 mm for screw terminals; twist the strands; tug-test every wire. Pack leads go in **last** (M06). Trigger DIP switch on 20 V.
+
+<img src="docs/assets/wiring/wiring-01.svg" width="100%" alt="1 · Power box: battery, charger, fuse, e-stop: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **USB-C charger ≥ 30 W (the laptop's)** · USB-C | **USB-C PD trigger (PWR-27)** · USB-C in | USB-C cable (the charger's own) | through the +X wall opening; charger ≥ 30 W with a 20 V profile |
+| 2 | **USB-C PD trigger (PWR-27)** · OUT + | **CC/CV charger (PWR-29)** · IN + | 18 AWG red, short | screw terminals |
+| 3 | **USB-C PD trigger (PWR-27)** · OUT − | **CC/CV charger (PWR-29)** · IN − | 18 AWG black, short | screw terminals |
+| 4 | **Battery pack (PWR-21)** · red lead | **Lever connector BAT+ (2-way)** · 1 | pack lead | insert last (M06) |
+| 5 | **Fuse holder (PWR-04)** · lead A | **Lever connector BAT+ (2-way)** · 2 | holder lead | 3.15 A T fuse inside (PWR-05) |
+| 6 | **Fuse holder (PWR-04)** · lead B | **Lever connector FUSED (3-way)** · 1 | holder lead |  |
+| 7 | **CC/CV charger (PWR-29)** · OUT + | **Lever connector FUSED (3-way)** · 2 | 18 AWG red, short | charges the pack through the fuse |
+| 8 | **Lever connector FUSED (3-way)** · 3 | **E-stop (PWR-28)** · NC 1 | 18 AWG red | the NC contact block, not NO |
+| 9 | **Battery pack (PWR-21)** · black lead | **Lever connector GND (3-way)** · 1 | pack lead | insert last (M06) |
+| 10 | **CC/CV charger (PWR-29)** · OUT − | **Lever connector GND (3-way)** · 2 | 18 AWG black, short |  |
+| 11 | **Lever connector GND (3-way)** · 3 | **Lever connector MOT− (3-way, on the tray)** · 1 | 18 AWG black (the whole run to the tray) | out through the +Y slot; until M10.3 straight into SKR Pico POWER GND |
+| 12 | **Lever connector MOT− (3-way, on the tray)** · 2 | **SKR Pico (CTL-01)** · POWER GND | 10 cm 18 AWG black offcut | from M10.3 |
+
+### 2 · Motor power: e-stop → over-travel switch → SKR Pico
+
+*Stage 01–04.* One red wire. Until M14.1 it runs straight from the e-stop to the SKR Pico; M14.1 cuts it at the over-travel switch. Press the e-stop before touching any terminal.
+
+<img src="docs/assets/wiring/wiring-02.svg" width="100%" alt="2 · Motor power: e-stop → over-travel switch → SKR Pico: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **E-stop (PWR-28)** · NC 2 | **Over-travel switch (LAR-06)** · COM | 18 AWG red | out through the +Y (J3) slot |
+| 2 | **Over-travel switch (LAR-06)** · NC | **Lever connector MOT+ (3-way, on the tray)** · 1 | 18 AWG red | NO terminal stays empty; until M10.3 straight into SKR Pico POWER 12/24V |
+| 3 | **Lever connector MOT+ (3-way, on the tray)** · 2 | **SKR Pico (CTL-01)** · POWER 12/24V | 10 cm 18 AWG red offcut | from M10.3 |
+
+### 3 · SKR Pico: motors
+
+*Stage 02–09.* Motor sockets are 4-pin JST-XH 2.54 mm. Pins 1–4 = `2B 1B 1A 2A` (pin diagram, left to right). The schematic puts one driver coil on pins 1 + 4 (`2B`, `2A`) and the other on pins 2 + 3 (`1B`, `1A`). The 5-pack cables plug straight in. Check with the motor plugged in: meter on Ω at the plug's back, 1–4 and 2–3 each read a few ohms. Buzzing without turning = coil pairs crossed (move plug contacts until that check passes); wrong direction = `$3` in software, not wiring.
+
+<img src="docs/assets/wiring/wiring-03.svg" width="100%" alt="3 · SKR Pico: motors: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **M4 motor, light arm (LAR-02)** · 6-pin socket | **SKR Pico (CTL-01)** · X pins 1–4 (2B 1B 1A 2A) | 5-pack cable (1 m) | grblHAL X · stage 04 |
+| 2 | **M3 motor, table (TBL-01)** · 6-pin socket | **SKR Pico (CTL-01)** · Y pins 1–4 (2B 1B 1A 2A) | 5-pack cable (1 m) | grblHAL Y · stage 05 |
+| 3 | **M2 motor, tilt (TLT-01)** · 6-pin socket | **SKR Pico (CTL-01)** · Z1 pins 1–4 (2B 1B 1A 2A) | 5-pack cable (1 m) | grblHAL Z · stage 08 (Z2 is the same driver: leave empty) |
+| 4 | **M1 pancake, spin (SPN-01)** · coil pair 1 (2 bare leads) | **Lever connector (WAGO 221-412)** · pair 1 (2 × 221-412) | motor leads, 11 mm stripped, folded double | pancake has bare leads: find the pairs first (M27.1) |
+| 5 | **Lever connector (WAGO 221-412)** · pair 1 (2 × 221-412) | **SKR Pico (CTL-01)** · E pin 1 (2B) + E pin 4 (2A) | spare 5-pack cable (6-pin plug cut off): the wires in plug pins 1 and 4 | driver coil 2B / 2A |
+| 6 | **M1 pancake, spin (SPN-01)** · coil pair 2 (2 bare leads) | **Lever connector (WAGO 221-412)** · pair 2 (2 × 221-412) | motor leads, 11 mm stripped, folded double |  |
+| 7 | **Lever connector (WAGO 221-412)** · pair 2 (2 × 221-412) | **SKR Pico (CTL-01)** · E pins 2–3 (1B 1A) | same cable: the wires in plug pins 2 and 3 | driver coil 1B / 1A · grblHAL A · stage 09 |
+
+### 4 · SKR Pico: endstops (home switches)
+
+*Stage 02–09.* STOP ports are 3-pin JST-XH: pin 1 signal, pin 2 GND, pin 3 5 V. Leads: 3 CTL-06 pre-crimped wires in a 3-pin XH housing at the board end. At the module, put each wire on the pin with the matching printed label (S/OUT, G/GND, V/VCC): the module's pin order may differ from the board's. Before plugging in, meter the module's V pin to STOP pin 3 (beep). The SKR Pico buffers these inputs, so the module's 5 V signal is safe.
+
+<img src="docs/assets/wiring/wiring-04.svg" width="100%" alt="4 · SKR Pico: endstops (home switches): pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **M4 endstop (LAR-05)** · S / G / V (by label) | **SKR Pico (CTL-01)** · X-STOP pins 1–3 (IO4 GND 5V) | CTL-06 lead | M4 home at 20° · `Pn:X` |
+| 2 | **M3 endstop (TBL-04)** · S / G / V (by label) | **SKR Pico (CTL-01)** · Y-STOP pins 1–3 (IO3 GND 5V) | CTL-06 lead | M3 home · `Pn:Y` |
+| 3 | **M2 endstop (TLT-04)** · S / G / V (by label) | **SKR Pico (CTL-01)** · Z-STOP pins 1–3 (IO25 GND 5V) | CTL-06 lead | M2 home · `Pn:Z` |
+| 4 | **M1 endstop (SPN-04)** · S / G / V (by label) | **SKR Pico (CTL-01)** · E0-STOP pins 1–3 (IO16 GND 5V) | CTL-06 lead | M1 home · `Pn:A` (needs a 4-axis grblHAL build) |
+
+### 5 · Lamp (white COB)
+
+*Stage 06.* The driver sits pins-up in its frame on the tray; female jumper ends push onto its pins. A cut jumper = one female end, the other end stripped. HE is a low-side switch: its `IO23` terminal is the switched `−`.
+
+<img src="docs/assets/wiring/wiring-05.svg" width="100%" alt="5 · Lamp (white COB): pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **Lamp driver NLDD-350H (LSR-02)** · +Vin | **SKR Pico (CTL-01)** · HE 12/24V | cut M-F jumper, bare end under the HE screw | HE `+`: always at motor-power voltage |
+| 2 | **Lamp driver NLDD-350H (LSR-02)** · −Vin | **SKR Pico (CTL-01)** · HE IO23 | cut M-F jumper, bare end under the HE screw | HE `−`, switched: `M62 P4` on / `M63 P4` off (check with `$PINS`) |
+| 3 | **Lamp driver NLDD-350H (LSR-02)** · +Vo | **COB lamp in holder (LSR-01 + LSR-06)** · red (+) lead | chain of 5 M-F jumpers + lever connector at the lamp | slack for 20–324° of arm travel |
+| 4 | **Lamp driver NLDD-350H (LSR-02)** · −Vo | **COB lamp in holder (LSR-01 + LSR-06)** · black (−) lead | chain of 5 M-F jumpers + lever connector |  |
+| 5 | **Lamp driver NLDD-350H (LSR-02)** · DIM | — | not connected | no dimming: on/off only |
+
+### 6 · Hub: keypads and motor-power sense
+
+*Stage 02.* ESP32-S3-DevKitC-1, header pin numbers from Espressif's user guide and pin-layout drawing: J1 = the long header on the side of the connector marked UART, J3 = the side of the connector marked USB; pin 1 at the antenna end, pins 21–22 next to the USB-C connectors. The hub is mounted upside down (pins up), which mirrors the top-view drawing: wire it before mounting, or count pins from the antenna end; clones don't always print labels underneath. Male–female jumpers (CTL-07). The keypads' 5-pin tails: find the common pin with the meter first (M07.2). Both keypad commons share one GND pin through a 3-way lever connector, so a GND pin stays free for the Pi (stage 15).
+
+<img src="docs/assets/wiring/wiring-06.svg" width="100%" alt="6 · Hub: keypads and motor-power sense: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **Keypad A (CTL-05)** · common | **Lever connector keypad GND (3-way)** · 1 | M-F jumper, female end cut and stripped | fold the stripped end double in the lever connector |
+| 2 | **Keypad A (CTL-05)** · key 1 | **ESP32-S3 hub (CTL-02)** · J1-4 (GPIO4) | M-F jumper | HOME |
+| 3 | **Keypad A (CTL-05)** · key 2 | **ESP32-S3 hub (CTL-02)** · J1-5 (GPIO5) | M-F jumper | START |
+| 4 | **Keypad A (CTL-05)** · key 3 | **ESP32-S3 hub (CTL-02)** · J1-6 (GPIO6) | M-F jumper | STOP |
+| 5 | **Keypad A (CTL-05)** · key 4 | **ESP32-S3 hub (CTL-02)** · J1-7 (GPIO7) | M-F jumper | LIGHT |
+| 6 | **Keypad B (CTL-05)** · common | **Lever connector keypad GND (3-way)** · 2 | M-F jumper, female end cut and stripped | fold double |
+| 7 | **Lever connector keypad GND (3-way)** · 3 | **ESP32-S3 hub (CTL-02)** · J1-22 (GND) | M-F jumper, male end cut and stripped | GND · frees J3-1 for the Pi (stage 15) |
+| 8 | **Keypad B (CTL-05)** · key 1 | **ESP32-S3 hub (CTL-02)** · J1-8 (GPIO15) | M-F jumper | NEXT |
+| 9 | **Keypad B (CTL-05)** · key 2 | **ESP32-S3 hub (CTL-02)** · J1-9 (GPIO16) | M-F jumper | PAUSE (stops after the current pose) |
+| 10 | **Keypad B (CTL-05)** · key 3, key 4 | — | not connected | spare keys |
+| 11 | **Lever connector MOT+ (3-way, on the tray)** · 3 | **Opto module (PWR-10)** · IN+ | cut M-F jumper, stripped end folded double | 24 V module; its resistor is on board |
+| 12 | **Lever connector MOT− (3-way, on the tray)** · 3 | **Opto module (PWR-10)** · IN− | cut M-F jumper, stripped end folded double | a thin jumper beside 18 AWG under one screw does not clamp |
+| 13 | **Opto module (PWR-10)** · VCC | **ESP32-S3 hub (CTL-02)** · J1-1 (3V3) | M-F jumper | 3V3 (not 5 V: the GPIO is 3.3 V) |
+| 14 | **Opto module (PWR-10)** · GND | **ESP32-S3 hub (CTL-02)** · J3-21 (GND) | M-F jumper | GND |
+| 15 | **Opto module (PWR-10)** · OUT | **ESP32-S3 hub (CTL-02)** · J1-10 (GPIO17) | M-F jumper | motion-power sense: low = motor power on |
+
+### 7 · USB data
+
+*Stage 02, 06.* Three USB ports on the laptop (Windows + WSL: `usbipd attach` each one). Use data cables, not charge-only.
+
+<img src="docs/assets/wiring/wiring-07.svg" width="100%" alt="7 · USB data: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **SKR Pico (CTL-01)** · USB-C | **Laptop** · USB-A | CTL-03 USB-A to USB-C | VID 0x2E8A · grblHAL serial |
+| 2 | **ESP32-S3 hub (CTL-02)** · USB (not UART) | **Laptop** · USB-A | CTL-03 USB-A to USB-C | VID 0x303A · panel + sensors |
+| 3 | **Camera (CAM-01)** · USB | **Laptop** · USB-A | camera's own cable | UVC camera |
+
+### 8 · Optional add-ons
+
+*Stage 02, 10, 15.* Only when you fit the part. The OLED and the AS7341 share one I2C bus (OLED 0x3C: check, some are 0x3D; AS7341 0x39): with both fitted, wire the AS7341 to the hub and plug the OLED into the AS7341's second STEMMA QT socket (a STEMMA QT cable, not in the parts list yet [TBD]). Fan plug: check it fits FAN1 before relying on it.
+
+<img src="docs/assets/wiring/wiring-08.svg" width="100%" alt="8 · Optional add-ons: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **40 mm fan (CTL-08, optional)** · red (+) | **SKR Pico (CTL-01)** · FAN1 12/24V | fan lead | `M62 P2` (check with `$PINS`); advised above 0.8 A per motor |
+| 2 | **40 mm fan (CTL-08, optional)** · black (−) | **SKR Pico (CTL-01)** · FAN1 IO17 | fan lead | switched side |
+| 3 | **AS7341 sensor (SPC-01, optional)** · VIN (red) | **ESP32-S3 hub (CTL-02)** · J1-2 (3V3) | SPC-02 JST-SH to female | 3V3 |
+| 4 | **AS7341 sensor (SPC-01, optional)** · GND (black) | **ESP32-S3 hub (CTL-02)** · J3-22 (GND) | SPC-02 | GND |
+| 5 | **AS7341 sensor (SPC-01, optional)** · SCL (yellow) | **ESP32-S3 hub (CTL-02)** · J3-5 (GPIO2) | SPC-02 | first I2C pair |
+| 6 | **AS7341 sensor (SPC-01, optional)** · SDA (blue) | **ESP32-S3 hub (CTL-02)** · J3-4 (GPIO1) | SPC-02 | first I2C pair |
+| 7 | **OLED (STA-05, optional)** · VIN | **ESP32-S3 hub (CTL-02)** · J1-2 (3V3) | female–female jumper (STA-06) | only without the AS7341; with it, chain the OLED as above |
+| 8 | **OLED (STA-05, optional)** · GND | **ESP32-S3 hub (CTL-02)** · J3-22 (GND) | F-F jumper | only without the AS7341 |
+| 9 | **OLED (STA-05, optional)** · SCL | **ESP32-S3 hub (CTL-02)** · J3-5 (GPIO2) | F-F jumper | only without the AS7341 |
+| 10 | **OLED (STA-05, optional)** · SDA | **ESP32-S3 hub (CTL-02)** · J3-4 (GPIO1) | F-F jumper | only without the AS7341 |
+| 11 | **Alignment laser (LAR-09, tool)** · + / − | **SKR Pico (CTL-01)** · RGB pin 3 (5V) / RGB pin 1 (GND) | 2 jumpers | bench tool: 5 V and GND of the unused RGB port |
+
+### 9 · Standalone station (no laptop, optional)
+
+*Stage 15.* The Pi runs jobs; the hub talks to it over UART at 3.3 V. Hub module must be an ESP32-S3-WROOM-1 (3.3 V flash, as the N8R8 / N16R8 / plain boards in the parts list): on modules with 1.8 V flash, GPIO 47/48 run at 1.8 V and the Pi's 3.3 V TX would overdrive GPIO 48 (check the ESP32-S3 datasheet before using another module). Never power the hub from the Pi while its USB is in the laptop. Set the buck to 5.1 V **before** connecting the Pi. The powered USB hub is not in the parts list yet: part and its supply [TBD] (stage 15).
+
+<img src="docs/assets/wiring/wiring-09.svg" width="100%" alt="9 · Standalone station (no laptop, optional): pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **Pi Zero 2 W (STA-01)** · pin 8 (GPIO14 TXD) | **ESP32-S3 hub (CTL-02)** · J3-16 (GPIO48) | F-F jumper | Pi GPIO14 TX → hub GPIO48 RX |
+| 2 | **Pi Zero 2 W (STA-01)** · pin 10 (GPIO15 RXD) | **ESP32-S3 hub (CTL-02)** · J3-17 (GPIO47) | F-F jumper | Pi GPIO15 RX ← hub GPIO47 TX |
+| 3 | **Pi Zero 2 W (STA-01)** · pin 6 (GND) | **ESP32-S3 hub (CTL-02)** · J3-1 (GND) | F-F jumper | GND (UART and hub-power return) |
+| 4 | **Pi Zero 2 W (STA-01)** · pin 4 (5V) | **ESP32-S3 hub (CTL-02)** · J1-21 (5V) | F-F jumper | Pi 5V powers the hub (5V pin) |
+| 5 | **Lever connector FUSED (3-way)** · 4 (5-way) | **5 V buck (STA-03, optional)** · IN+ | thin red pair | after the fuse, before the e-stop: swap FUSED and GND for 5-way connectors |
+| 6 | **Lever connector GND (3-way)** · 4 (5-way) | **5 V buck (STA-03, optional)** · IN− | thin black pair |  |
+| 7 | **5 V buck (STA-03, optional)** · OUT+ | **Pi Zero 2 W (STA-01)** · pin 2 (5V) | cut F jumper | 5.1 V |
+| 8 | **5 V buck (STA-03, optional)** · OUT− | **Pi Zero 2 W (STA-01)** · pin 14 (GND) | cut F jumper | GND |
+| 9 | **SKR Pico (CTL-01)** · USB-C (+ camera USB) | **Powered USB hub ([TBD], optional)** · ports | same cables as with the laptop | hub on the Pi's micro-USB data port through the OTG adapter (STA-04); hub supply [TBD] |
+
+### 10 · Not wired: colour LED bank
+
+*Stage 10.* **BLOCKED (audit F09): do not wire or power.** The NLDD-350H cannot regulate one colour LED. Reserved pins, so nothing else takes them: SKR Pico HB (`M62 P3`, refused in software) and hub GPIO 8–14, 21.
+
+<img src="docs/assets/wiring/wiring-10.svg" width="100%" alt="10 · Not wired: colour LED bank: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **Colour LED bank (MSK-01…03)** · band 1 input | **ESP32-S3 hub (CTL-02)** · J1-12 (GPIO8) | - | reserved |
+| 2 | **Colour LED bank (MSK-01…03)** · band 2 input | **ESP32-S3 hub (CTL-02)** · J1-15 (GPIO9) | - | reserved |
+| 3 | **Colour LED bank (MSK-01…03)** · band 3 input | **ESP32-S3 hub (CTL-02)** · J1-16 (GPIO10) | - | reserved |
+| 4 | **Colour LED bank (MSK-01…03)** · band 4 input | **ESP32-S3 hub (CTL-02)** · J1-17 (GPIO11) | - | reserved |
+| 5 | **Colour LED bank (MSK-01…03)** · band 5 input | **ESP32-S3 hub (CTL-02)** · J1-18 (GPIO12) | - | reserved |
+| 6 | **Colour LED bank (MSK-01…03)** · band 6 input | **ESP32-S3 hub (CTL-02)** · J1-19 (GPIO13) | - | reserved |
+| 7 | **Colour LED bank (MSK-01…03)** · band 7 input | **ESP32-S3 hub (CTL-02)** · J1-20 (GPIO14) | - | reserved |
+| 8 | **Colour LED bank (MSK-01…03)** · band 8 input | **ESP32-S3 hub (CTL-02)** · J3-18 (GPIO21) | - | reserved |
+| 9 | **Colour LED bank (MSK-01…03)** · driver supply | **SKR Pico (CTL-01)** · HB IO21 | - | reserved |
+
+### SKR Pico port map
+
+Ports as named on the board; pins in the maker pin diagram's order [C12]. `·` = free.
+
+| Port | Pins | Used by |
 |---|---|---|
-| Who runs jobs | laptop (`opengonio`) | Pi Zero 2 W (`opengonio station`) |
-| Inputs | laptop or buttons | buttons + OLED menu; phone WebUI for jogging |
-| Data | processed live | saved on the Pi → laptop `opengonio pull` + `opengonio verify` |
-| Extra cost | $0 | $38 kit (optional) |
+| X | motor socket, XH 4-pin | M4 motor, light arm |
+| Y | motor socket, XH 4-pin | M3 motor, table |
+| Z1 | motor socket, XH 4-pin | M2 motor, tilt |
+| Z2 | second socket on the Z driver | · |
+| E | motor socket, XH 4-pin | Lever connector |
+| X-STOP | IO4 · GND · 5V | M4 endstop |
+| Y-STOP | IO3 · GND · 5V | M3 endstop |
+| Z-STOP | IO25 · GND · 5V | M2 endstop |
+| E0-STOP | IO16 · GND · 5V | M1 endstop |
+| HE | MOSFET output: IO23 (switched −) · 12/24V | Lamp driver NLDD-350H |
+| HB | MOSFET output: IO21 (switched −) · 12/24V | Colour LED bank (blocked) |
+| FAN1 | IO17 (switched −) · 12/24V | 40 mm fan |
+| FAN2 | IO18 · 12/24V | · |
+| FAN3 | IO20 · 12/24V | · |
+| RGB | GND · IO24 · 5V | Alignment laser |
+| POWER | screw terminal: GND · 12/24V | Lever connector MOT− / Lever connector MOT+ |
+| USB-C | data to the laptop | Laptop / Powered USB hub |
 
-<img src="docs/assets/architecture.svg" width="100%" alt="Laptop mode and standalone mode">
+### ESP32-S3 header map
 
-## The machine
+Pin numbers as in Espressif's user guide (J1 on one long edge, J3 on the other). `·` = free; *italic* = kept free for an optional part the firmware already supports; *avoid* = strapping, console, USB or memory pins.
 
-<img src="docs/assets/axes.svg" width="100%" alt="Four axes, one zero point">
+| J1 pin | Label | Used by | | J3 pin | Label | Used by |
+|---:|---|---|---|---:|---|---|
+| 1 | 3V3 | Opto module | | 1 | GND | Pi Zero 2 W |
+| 2 | 3V3 | AS7341 sensor / OLED | | 2 | TX | avoid: UART0 console |
+| 3 | RST | avoid: reset (EN) | | 3 | RX | avoid: UART0 console |
+| 4 | GPIO4 | Keypad A | | 4 | GPIO1 | AS7341 sensor / OLED |
+| 5 | GPIO5 | Keypad A | | 5 | GPIO2 | AS7341 sensor / OLED |
+| 6 | GPIO6 | Keypad A | | 6 | GPIO42 | *AS5600 encoder 2 SCL (optional)* |
+| 7 | GPIO7 | Keypad A | | 7 | GPIO41 | *AS5600 encoder 2 SDA (optional)* |
+| 8 | GPIO15 | Keypad B | | 8 | GPIO40 | *AS5600 encoder 1 SCL (optional)* |
+| 9 | GPIO16 | Keypad B | | 9 | GPIO39 | *AS5600 encoder 1 SDA (optional)* |
+| 10 | GPIO17 | Opto module | | 10 | GPIO38 | *AS5600 encoder 3 SDA (optional; RGB LED on v1.1 boards)* |
+| 11 | GPIO18 | *AS5600 encoder 3 SCL (optional)* | | 11 | GPIO37 | avoid: flash / PSRAM (octal modules) |
+| 12 | GPIO8 | Colour LED bank (blocked) | | 12 | GPIO36 | avoid: flash / PSRAM (octal modules) |
+| 13 | GPIO3 | avoid: strapping pin | | 13 | GPIO35 | avoid: flash / PSRAM (octal modules) |
+| 14 | GPIO46 | avoid: strapping pin | | 14 | GPIO0 | avoid: strapping pin (BOOT button) |
+| 15 | GPIO9 | Colour LED bank (blocked) | | 15 | GPIO45 | avoid: strapping pin |
+| 16 | GPIO10 | Colour LED bank (blocked) | | 16 | GPIO48 | Pi Zero 2 W |
+| 17 | GPIO11 | Colour LED bank (blocked) | | 17 | GPIO47 | Pi Zero 2 W |
+| 18 | GPIO12 | Colour LED bank (blocked) | | 18 | GPIO21 | Colour LED bank (blocked) |
+| 19 | GPIO13 | Colour LED bank (blocked) | | 19 | GPIO20 | avoid: USB D+ (the USB connector) |
+| 20 | GPIO14 | Colour LED bank (blocked) | | 20 | GPIO19 | avoid: USB D− (the USB connector) |
+| 21 | 5V | Pi Zero 2 W | | 21 | GND | Opto module |
+| 22 | GND | Lever connector keypad GND | | 22 | GND | AS7341 sensor / OLED |
 
-| Axis | Moves | Range | Drive | Step (1/16) | Built in |
-|---|---|---|---|---|---|
-| M4 | light arm around the sample | 20–324° | GT2 belt on 12 in ring, 24:1 | 0.0047° | stage 04 |
-| M3 | table (sample yaw) | ±180° | 20T → 100T, 5:1 | 0.0225° | stage 05 |
-| M2 | sample tilt (yoke) | ±90° | 20T → 100T, 5:1 | 0.0225° | stage 08 |
-| M1 | sample spin (platter) | ±180° | direct drive (pancake motor), 1/64 microstep | 0.028° | stage 09 |
+<!-- wiring:end -->
 
-Measuring camera fixed on +X at 350 mm; scan camera fixed at 650 mm, 15° up, looking over it, so no camera ever moves or refocuses (one-camera option: move it, $81 cheaper). Light 300 mm from the zero point. Optical homing on every axis, over-travel switches in the e-stop loop, 30 mm keep-out and 5° minimum light–camera angle [R1].
-
-**Why the light is on a side ring.** Reflectance depends only on the light and camera directions *relative to the sample*, and the table (M3) and tilt (M2) already turn the sample to every direction an overhead light could reach. A horizontal ring keeps the arm's weight on the bearing (the motor only moves it), stays low and stiff, and keeps cables out of the light path. A light on the camera axis (coaxial, via a beam splitter) sees only back-scatter, not the mirror peak, and loses ~75 % of the light in the splitter; it stays a possible later add-on for retroreflective materials.
-
-### Two sensors, two jobs
-
-| | Camera (IMX477, fixed, 350 mm) | Spectral sensor (AS7341, above the camera) |
-|---|---|---|
-| Measures | images: brightness per pixel, 3 colours | 10 bands 415–680 nm + clear + NIR, one spot |
-| Used for | angles (mirror test), textures (SVBRDF), 3D scan, calibration | colour spectrum vs angle (spectral BRDF) |
-| Command | `opengonio capture … ` | `opengonio capture … --spectral` (or `--no-camera`) |
-| Stage | 06 | 10 (optional, +$17) |
-
-## Stages and milestones
+## Build
 
 <!-- next:start -->
-**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 140 steps done
+**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 138 steps done
 <!-- next:end -->
 
-18 stages, 48 milestones; each step is one GitHub issue: **Time · Needs → Do → Verify → If a check fails → Record**. Finished a step? `make done id=M05.1` closes its issue and ticks it here, in the stage checklist and in the figures.
-
-Each stage folder: `README.md` (checklist) · `design.md` · `research.md` · `bom.csv` · `test.csv` · `3d/` (only the ones it needs).
-
-<img src="docs/assets/phases.svg" width="100%" alt="Stages">
+Each step: **Time · Needs → Do → Verify → If it fails → Record**. `make next` prints the next step; `make done id=M05.1` ticks it and closes its issue.
 
 <!-- phases:start -->
 | # | Stage | Milestones | Hours | Done | Cost |
 |---:|---|---|---:|---:|---:|
-| 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | 6.7 h | 0/12 | $32 |
-| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Wire the power box, M06 First power-on | 3 h | 0/9 | $104 |
-| 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Keypads work with the laptop, M10 Controller box closed | 4.8 h | 0/13 | $80 |
-| 03 | [Frame](phases/03-frame/) | M11 Place the base mounts, M12 Assemble the frame | 3.3 h | 0/7 | $72 |
+| 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | 6.7 h | 0/12 | $64 |
+| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Wire the power box, M06 First power-on | 3.7 h | 0/10 | $131 |
+| 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Keypads work with the laptop, M10 Controller box closed | 4.5 h | 0/12 | $71 |
+| 03 | [Frame](phases/03-frame/) | M11 Print and join the deck, M12 Assemble the frame | 2.8 h | 0/5 | $22 |
 | 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | 5.4 h | 0/9 | $75 |
 | 05 | [Table (M3)](phases/05-table/) | M15 Table axis built, M16 Table homes and repeats | 3.2 h | 0/7 | $24 |
-| 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | 5.8 h | 0/11 | $118 |
+| 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | 5.8 h | 0/11 | $112 |
 | 07 | [Calibrate → game material](phases/07-calibrate/) | M21 Dark box, M22 Camera response and angle calibration, M23 Brightness calibration, M24 First game material | 4.8 h | 0/11 | $40 |
 | 08 | [Tilt (M2)](phases/08-tilt/) | M25 Tilt yoke built and homed, M26 Full isotropic scan | 3.8 h | 0/8 | $17 |
-| 09 | [Spin (M1)](phases/09-spin/) | M27 Spin wired and homed, M28 Anisotropic material measured | 2.2 h | 0/5 | $12 |
+| 09 | [Spin (M1)](phases/09-spin/) | M27 Spin wired and homed, M28 Anisotropic material measured | 2.3 h | 0/5 | $12 |
 | 10 | [Colour add-ons (optional)](phases/10-color/) | M29 Spectral sensor (optional kit), M30 LED bank and polarizers (optional kit) | 5.5 h | 0/8 | — |
-| 11 | [3D scan: capture](phases/11-scan-capture/) | M31 Scan hardware, M32 Camera position calibrated, M33 First full scan | 2.5 h | 0/7 | $3 |
+| 11 | [3D scan: capture](phases/11-scan-capture/) | M31 Scan hardware, M32 Camera position calibrated, M33 First full scan | 2.5 h | 0/7 | $2 |
 | 12 | [3D scan: mesh](phases/12-scan-mesh/) | M34 Quick 3D preview, M35 Full mesh | 2.2 h | 0/6 | — |
 | 13 | [Material on the 3D model](phases/13-object-material/) | M36 Textures on the mesh, M37 Object in a game engine | 6 h | 0/4 | — |
 | 14 | [Laptop app](phases/14-laptop-app/) | M38 Control page, M39 Presets and resume | 16 h | 0/6 | — |
@@ -93,1172 +467,69 @@ Each stage folder: `README.md` (checklist) · `design.md` · `research.md` · `b
 | 17 | [Upgrades (optional)](phases/17-upgrades/) | M46 Adaptive sampling, M47 Space carving, M48 Compare with MERL / RGL data | 13 h | 0/3 | — |
 <!-- phases:end -->
 
-### All milestones and issues
+## Software
 
-Each issue holds Do / Verify / Record; click *open* for the full steps.
+```bash
+make setup && source .venv/bin/activate   # once
+make sim                                  # simulated machine, ends "ALL PASS"
+make all                                  # docs, checks, tests, paper, exports
+make ci                                   # the GitHub checks on a clean clone, before pushing
+```
 
-<!-- issues:start -->
-| Milestone | Steps (issues) | Checklist |
-|---|---|---|
-| M01 · Read and decide | M01.1 Get the papers (20 min) · M01.2 Read R1 (2 h) · M01.3 Explore the simulator (30 min) · M01.4 Decide the parts (45 min) | [open](phases/00-plan/README.md#m01--read-and-decide) |
-| M02 · Software runs on the laptop | M02.1 Install (20 min) · M02.2 Dry run (10 min) · M02.3 Simulated machine (20 min) · M02.4 Practice a full measurement (30 min) | [open](phases/00-plan/README.md#m02--software-runs-on-the-laptop) |
-| M03 · CAD and printer ready | M03.1 Order the printer, filament and first tools (30 min) · M03.2 Onshape document (30 min) · M03.3 Print the coupon (15 min) · M03.4 Set clearances (30 min) | [open](phases/00-plan/README.md#m03--cad-and-printer-ready) |
-| M04 · Order power parts | M04.1 Order (30 min) · M04.2 Print the box (15 min) · M04.3 Check parts (20 min) | [open](phases/01-power/README.md#m04--order-power-parts) |
-| M05 · Wire the power box | M05.1 Box hardware (20 min) · M05.2 Main wiring (45 min) · M05.3 Checks with power off (10 min) | [open](phases/01-power/README.md#m05--wire-the-power-box) |
-| M06 · First power-on | M06.1 First 24 V and polarity (15 min) · M06.2 E-stop and unplug (10 min) · M06.3 Heat (15 min) | [open](phases/01-power/README.md#m06--first-power-on) |
-| M07 · Order controller parts | M07.1 Order (30 min) · M07.2 Unpack and check (10 min) | [open](phases/02-controller/README.md#m07--order-controller-parts) |
-| M08 · One motor turns from the laptop | M08.1 USB into Ubuntu (15 min) · M08.2 Flash FluidNC (20 min) · M08.3 Bench motor (20 min) | [open](phases/02-controller/README.md#m08--one-motor-turns-from-the-laptop) |
-| M09 · Keypads work with the laptop | M09.1 Hub firmware (15 min) · M09.2 Wire the keypads (30 min) · M09.3 Panel drives the motor (20 min) | [open](phases/02-controller/README.md#m09--keypads-work-with-the-laptop) |
-| M10 · Controller box closed | M10.1 Print and mount (30 min) · M10.2 WiFi and Bluetooth (30 min) · M10.3 Flags and homing (30 min) · M10.4 E-stop sense on the breadboard (30 min) · M10.5 Heat (10 min) | [open](phases/02-controller/README.md#m10--controller-box-closed) |
-| M11 · Place the base mounts | M11.1 Order frame parts (20 min) · M11.2 Print the template and mounts (30 min) · M11.3 Screw down the mounts (45 min) | [open](phases/03-frame/README.md#m11--place-the-base-mounts) |
-| M12 · Assemble the frame | M12.1 Feet (15 min) · M12.2 Outrigger, camera pillar and scan post (45 min) · M12.3 Protractor scales (30 min) · M12.4 Mount the boxes (15 min) | [open](phases/03-frame/README.md#m12--assemble-the-frame) |
-| M13 · Ring drive built | M13.1 Measure and set the rim (30 min) · M13.2 Print ring parts (15 min) · M13.3 Lazy Susan, rim and belt (1.25 h) · M13.4 Motor (30 min) · M13.5 Arm (45 min) | [open](phases/04-light-arm/README.md#m13--ring-drive-built) |
-| M14 · Light arm homes and repeats | M14.1 Home switch (45 min) · M14.2 Config and homing (20 min) · M14.3 Angle check (20 min) · M14.4 Repeatability (45 min) | [open](phases/04-light-arm/README.md#m14--light-arm-homes-and-repeats) |
-| M15 · Table axis built | M15.1 Print table parts (10 min) · M15.2 Fixed axle and drum (45 min) · M15.3 Drive belt (30 min) | [open](phases/05-table/README.md#m15--table-axis-built) |
-| M16 · Table homes and repeats | M16.1 Flag and homing (30 min) · M16.2 Angle check (15 min) · M16.3 Repeatability (45 min) · M16.4 Both axes and collision guard (15 min) | [open](phases/05-table/README.md#m16--table-homes-and-repeats) |
-| M17 · Camera sees the zero point | M17.1 Camera reaches the software (30 min) · M17.2 Mount (1.25 h) · M17.3 Focus (30 min) · M17.4 Centre (15 min) · M17.5 Lock exposure and colour (30 min) | [open](phases/06-camera-light/README.md#m17--camera-sees-the-zero-point) |
-| M18 · Lamp on and safe | M18.1 Lamp assembly (1 h) · M18.2 Switch and heat (20 min) · M18.3 Warm-up time (15 min) | [open](phases/06-camera-light/README.md#m18--lamp-on-and-safe) |
-| M19 · Mirror test | M19.1 Mirror sweeps (30 min) | [open](phases/06-camera-light/README.md#m19--mirror-test) |
-| M20 · First reflectance curves | M20.1 Paper (20 min) · M20.2 Glossy plastic (20 min) | [open](phases/06-camera-light/README.md#m20--first-reflectance-curves) |
-| M21 · Dark box | M21.1 Darken the room (20 min) · M21.2 Stray light test (15 min) · M21.3 Dark level (10 min) | [open](phases/07-calibrate/README.md#m21--dark-box) |
-| M22 · Camera response and angle calibration | M22.1 Camera response (20 min) · M22.2 Angle offset (45 min) | [open](phases/07-calibrate/README.md#m22--camera-response-and-angle-calibration) |
-| M23 · Brightness calibration | M23.1 White reference (15 min) · M23.2 PTFE check (20 min) · M23.3 Reciprocity (30 min) | [open](phases/07-calibrate/README.md#m23--brightness-calibration) |
-| M24 · First game material | M24.1 Measure (40 min) · M24.2 Fit (10 min) · M24.3 In a game engine (1 h) | [open](phases/07-calibrate/README.md#m24--first-game-material) |
-| M25 · Tilt yoke built and homed | M25.1 Print (10 min) · M25.2 Cradle, platter and stub axles (1 h) · M25.3 Tilt drive and flag (45 min) · M25.4 Home and repeat (1 h) · M25.5 Zero point stays (20 min) | [open](phases/08-tilt/README.md#m25--tilt-yoke-built-and-homed) |
-| M26 · Full isotropic scan | M26.1 Plan check (5 min) · M26.2 Run (10 min) · M26.3 Fit and compare (15 min) | [open](phases/08-tilt/README.md#m26--full-isotropic-scan) |
-| M27 · Spin wired and homed | M27.1 Wire the spin motor (30 min) · M27.2 Home and repeat (45 min) | [open](phases/09-spin/README.md#m27--spin-wired-and-homed) |
-| M28 · Anisotropic material measured | M28.1 Spin sweep (30 min) · M28.2 Anisotropic set (10 min) · M28.3 Why it needs 4 angles (15 min) | [open](phases/09-spin/README.md#m28--anisotropic-material-measured) |
-| M29 · Spectral sensor (optional kit) | M29.1 Mount (30 min) · M29.2 Wire and read (20 min) · M29.3 Aim angle (10 min) · M29.4 Spectral curves (45 min) | [open](phases/10-color/README.md#m29--spectral-sensor-optional-kit) |
-| M30 · LED bank and polarizers (optional kit) | M30.1 Print and fit LEDs (2 h) · M30.2 Driver wiring (1 h) · M30.3 Band test (15 min) · M30.4 Polarizers (30 min) | [open](phases/10-color/README.md#m30--led-bank-and-polarizers-optional-kit) |
-| M31 · Scan hardware | M31.1 Print risers and scan plate (10 min) · M31.2 Mount the scan camera (45 min) · M31.3 Putty hold (S3) (20 min) | [open](phases/11-scan-capture/README.md#m31--scan-hardware) |
-| M32 · Camera position calibrated | M32.1 ChArUco board (20 min) · M32.2 Calibrate (30 min) | [open](phases/11-scan-capture/README.md#m32--camera-position-calibrated) |
-| M33 · First full scan | M33.1 Background pass (10 min) · M33.2 Cube scan (15 min) | [open](phases/11-scan-capture/README.md#m33--first-full-scan) |
-| M34 · Quick 3D preview | M34.1 Visual hull (15 min) · M34.2 Look at it (15 min) | [open](phases/12-scan-mesh/README.md#m34--quick-3d-preview) |
-| M35 · Full mesh | M35.1 COLMAP mesh (20 min) · M35.2 Measure the cube (S5) (20 min) · M35.3 Photometric sphere (S6, optional kit) (30 min) · M35.4 Scan a model car (S7) (30 min) | [open](phases/12-scan-mesh/README.md#m35--full-mesh) |
-| M36 · Textures on the mesh | M36.1 Write the texture tool (4 h) · M36.2 Bake the car (1 h) | [open](phases/13-object-material/README.md#m36--textures-on-the-mesh) |
-| M37 · Object in a game engine | M37.1 Export glTF (30 min) · M37.2 Side by side (30 min) | [open](phases/13-object-material/README.md#m37--object-in-a-game-engine) |
-| M38 · Control page | M38.1 Server and status (3 h) · M38.2 Jog, home, light (3 h) · M38.3 Live camera (2 h) · M38.4 Run a plan with progress (3 h) | [open](phases/14-laptop-app/README.md#m38--control-page) |
-| M39 · Presets and resume | M39.1 Presets (2 h) · M39.2 Resume (3 h) | [open](phases/14-laptop-app/README.md#m39--presets-and-resume) |
-| M40 · Panel screen | M40.1 Order the kit (15 min) · M40.2 OLED (20 min) | [open](phases/15-standalone/README.md#m40--panel-screen) |
-| M41 · Pi Zero station set up | M41.1 SD card (20 min) · M41.2 Buck and UART (45 min) · M41.3 Install the station (20 min) | [open](phases/15-standalone/README.md#m41--pi-zero-station-set-up) |
-| M42 · Job with no laptop | M42.1 Mirror job (20 min) · M42.2 Stop and restart (10 min) | [open](phases/15-standalone/README.md#m42--job-with-no-laptop) |
-| M43 · Laptop collects and verifies | M43.1 Pull and verify (15 min) | [open](phases/15-standalone/README.md#m43--laptop-collects-and-verifies) |
-| M44 · Docs complete | M44.1 Final 3D files (1 h) · M44.2 Photos (1 h) · M44.3 Test build (30 min) | [open](phases/16-release/README.md#m44--docs-complete) |
-| M45 · Public release | M45.1 Go public (30 min) · M45.2 OSHWA certification (1 h) · M45.3 Tag the release (10 min) | [open](phases/16-release/README.md#m45--public-release) |
-| M46 · Adaptive sampling | M46.1 Adaptive plan (4 h) | [open](phases/17-upgrades/README.md#m46--adaptive-sampling) |
-| M47 · Space carving | M47.1 Photo-consistency carving (6 h) | [open](phases/17-upgrades/README.md#m47--space-carving) |
-| M48 · Compare with MERL / RGL data | M48.1 Compare (3 h) | [open](phases/17-upgrades/README.md#m48--compare-with-merl--rgl-data) |
-<!-- issues:end -->
+**More:** [commands](wiki/Commands.md) · [theory](wiki/Theory.md) · [machine](wiki/Machine.md) · [CAD](wiki/CAD.md) · [joins without tools](wiki/Tools-and-joins.md) · [test materials](wiki/Test-materials.md) · [extend](wiki/Extend.md) · [repository map](wiki/Repository-map.md) · [other software](exports/README.md) · [references](REFERENCES.md) ([APA](wiki/Bibliography.md))
 
-## Budget
+## Website and app
 
-<img src="docs/assets/budget.svg" width="100%" alt="Cost per stage">
+One look, two places: the website explains the instrument, the app drives it. Both are plain HTML, CSS and JavaScript with no build step, and share one set of design tokens (`docs/og/`).
 
-**Your working parts list: [PARTS.md](PARTS.md).** Every part I suggested, with why. Tick the ones you agree with, mark `have` / `ordered` / `swap` / `skip`, write `paid:` and notes, right on GitHub (open it → ✏️ → *Commit changes*). The *parts-sync* action then updates the parts lists, budget and checklists.
+<img src="docs/assets/screens/site-lamp.gif" width="49%" alt="The hero samples under a lamp that follows the pointer: the white tile dims and brightens, the mirror flashes when the lamp reaches the mirror angle, and the printed layer lines light up under grazing light"> <img src="docs/assets/screens/app-dark.jpg" width="49%" alt="The control app on the simulated machine: axis sliders, the lamp switch with the colour LED bank shown as blocked, a top view of the pose, the camera frame, and a mirror sweep curve marked verify PASS">
 
-<!-- budget:start -->
-| Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided | Tools to buy (kept, separate) |
-|---:|---:|---:|---:|---:|---:|
-| $576.06 | $576.06 | $0.00 | $0.00 | 0/112 parts | $417.80 |
+**Website** ([`docs/`](docs/index.html), published with GitHub Pages; also opens straight from disk). The first screen is a Web Graphics Library (WebGL) render of three samples (white PTFE, a mirror and printed black ABS) under one lamp that follows your pointer or the arrow keys, shaded with the same model the software fits. Below it: the machine, how a measurement happens, real outputs of the simulated machine, the evidence table, and the eighteen build stages. [`docs/lab.html`](docs/lab.html) keeps the interactive tools: the machine simulator, the BRDF explorer, the calibration lab and the 3D-scan planner.
 
-Optional spectral sensor +$19.90 · Optional standalone kit +$71.68 · Optional no-switching camera kit +$90.10 · Optional colour kit (bands + polarizers) +$93.01
-<!-- budget:end -->
+**App** (`opengonio app`, stage 14). Connect, home, jog each axis (or drag the lamp in the top view), switch the lamp, grab a camera frame, run a mirror sweep, in-plane grid or isotropic set, and read `verify`'s verdict and the curve. STOP (or Esc) is always live; the colour LED bank stays blocked. On the simulated machine everything works; on a real machine it uses the same code as the command line and is **untested**, because no machine has been built yet.
 
-Every part comes from **Digi-Key, Amazon or Adafruit** (cheapest listing that meets the spec; packs shared across rows). Adafruit and some Digi-Key prices checked 2026-10-09; Amazon prices are estimates (`Price` = estimate) until checked at checkout. Per-stage specs: `phases/NN/bom.csv` · check: `python3 tools/bom_check.py --strict`.
+```bash
+make setup && source .venv/bin/activate         # once
+opengonio app --sim mirror                       # simulated machine in your browser (materials: mirror, ptfe, matte, paper, plastic)
+pip install "./software[desktop]" && opengonio app --sim mirror --window   # the same app in a desktop window (pywebview)
+opengonio app                                    # the machine over USB (untested)
+```
 
-## Tools and joins
+The app listens on `127.0.0.1:8747` only and refuses requests from other web pages and other host names; runs go to `data/app/` (`--data` to change). Its application programming interface (API) is a few JavaScript Object Notation (JSON) endpoints, listed at the top of [`software/src/opengonio/app/server.py`](software/src/opengonio/app/server.py).
 
-Nothing is assumed owned except a laptop: the tools are rows `TLS-01`–`TLS-10` with prices, a separate total from the machine's (printer $279 of it; a print service or makerspace replaces it). Prints are black ABS, which needs an enclosed printer and a ventilated room. The parts were picked so nothing needs a soldering iron, drill, saw, crimper or heat-set inserts. Mark them `have` / `ordered` in [PARTS.md](PARTS.md).
-
-| Tool | Used for | Amazon pick (row in PARTS.md; prices are estimates) |
-|---|---|---|
-| Enclosed 3D printer for ABS (≥ 220 × 220 × 200 mm) | every printed part (black ABS) | [Elegoo Centauri 2](https://www.amazon.com/dp/B0GZYZY956) (TLS-01, $279.00), or a print service |
-| Screwdrivers: Phillips #2, flat 2–3 mm | wood screws; screw terminals | [10-pc magnetic, 5 Phillips + 5 slotted](https://www.amazon.com/dp/B07RFD9JWZ) (TLS-02, $9.99) |
-| Hex keys 1.5–4 mm | socket and grub screws | [9-pc metric ball-end 1.5–10 mm](https://www.amazon.com/dp/B0CJBRYQF3) (TLS-03, $9.99) |
-| Wire stripper / cutter 10–24 AWG | strip 11 mm for lever connectors; cut jumpers and belt | [Self-adjusting stripper 10–24 AWG](https://www.amazon.com/dp/B07TS6KCXD) (TLS-04, $10.49) |
-| Multimeter with temperature probe | every electrical check; LED, driver and box temperatures | [TRMS 6000-count, temperature](https://www.amazon.com/dp/B071JL6LLL) (TLS-05, $34.99) |
-| Digital calipers 150 mm | print fit, coupon, positions | [150 mm digital caliper, stainless](https://www.amazon.com/dp/B0D2386QN9) (TLS-06, $14.59) |
-| Tape measure + phone level app | camera distance; level and square checks | [3 m stainless tape measure](https://www.amazon.com/dp/B0BRFTX359) (TLS-07, $1.48) |
-| Paper printer at 100 % (or a print shop) | placement template, ChArUco boards, focus grid | print shop or library (TLS-08) |
-| 13 mm spanner or adjustable wrench | M8 nuts on the table axle and tilt stub axles | [13 mm combination wrench 18283](https://www.amazon.com/dp/B00Q01OBLC) (TLS-10, $7.00) |
-| CA glue, double-sided tape, utility knife, 400-grit paper | rim belt, scales; cut (4–6 light passes) and sand the 3 mm PTFE white tile | four Amazon listings (TLS-09) |
-
-| Join | How, without solder or drilling | Parts |
-|---|---|---|
-| Wire to wire | strip 11 mm, lever connector (thin jumper wire: fold the stripped end double) | PWR-20 [P47] |
-| Wire to terminal | stripped, twisted wire under the screw (2 wires may share one) | PWR-03 jack, PWR-13 e-stop, LAR-06, E4 VIN |
-| Wire to a pin | jumper wire (cut one in half for pin → bare wire); XH leads crimped on both ends for endstops; PH→XH cables for motors | CTL-07 [C10], CTL-06, CTL-11 [C11] |
-| Small parts (opto, resistor, LED driver, ULN2803A) | push into the breadboard | PWR-19 [P46] |
-| Boards | Pico H and Pi Zero 2 WH come with headers soldered | CTL-02 [C8], STA-01 |
-| COB LED | sits in a solderless holder with poke-in wire terminals; the lamp cap clamps it | LSR-06 [L23] |
-| Printed part to plywood | #8 Type 17 wood screws start without a pilot hole; [placement template](phases/03-frame/placement-template.svg) shows where | FRM-12 [F8] |
-| Screw into a printed part | M3 self-taps into 2.7 mm holes (`M3_TAP`, set from the coupon) | FRM-06 |
-| Axles | M8 bolts instead of shafts: the table drum turns on two 608s around a fixed bolt (one nut clamps the inner races); the tilt cradle turns on two stub bolts; spin is direct drive. No shaft to cut, no flat to file | TBL-05, TLT-05, SPN-01 |
-
-Trade-off: the solderless power box has no reverse-polarity MOSFET, surge diode or bulk capacitor. The adapter plug is keyed, the jack's screw terminals are marked + / −, and step M06.1 checks polarity with the meter before anything is connected; the E4 has its own input capacitors.
-
-## 3D files and making parts
-
-<img src="docs/assets/parts.png" width="100%" alt="All printed parts">
-
-**Every part has a 3D model in the repo** — list and status per part: [cad/README.md](cad/README.md).
-
-| Folder | What |
+| | |
 |---|---|
-| `phases/NN/3d/` | printed parts: **STEP** (Onshape: Insert → Import, editable solid) and **STL** (slicer) |
-| [`cad/bought/`](cad/bought) | dummy models of every bought part at true size (motors, boards, bearings, belts, camera, lens…) |
-| [`cad/open/`](cad/open) | real open-licence models (Adafruit MIT, KiCad CC-BY-SA + exception) |
-| [`cad/assembly/opengonio_assembly.step`](cad/assembly) | the whole machine, one STEP: import this into Onshape to start |
-| `cad/vendor/` (not committed) | real vendor models: `bash scripts/get_cad.sh` |
-| [`cad/PRINT.md`](cad/PRINT.md) | print list: how many of each, size vs build volume, ≈ grams of ABS (core ≈ 1.0 kg) |
+| <img src="docs/assets/screens/site-results.jpg" alt="Website section What a run gives you: a simulated mirror sweep, a plastic fitted back to the numbers it was made with, an absolute matte BRDF and a fit-quality plot"> | <img src="docs/assets/screens/site-build.jpg" alt="Website section Built in eighteen stages: a simulator picture that changes with the stage you are reading"> |
+| <img src="docs/assets/screens/site-hero-light.jpg" alt="The website in its light theme"> | <img src="docs/assets/screens/app-connect.jpg" alt="The app before connecting: choose the simulated machine or the machine over USB, which is marked untested"> |
 
-`make cad` regenerates dummies + assembly and runs `make cad-check` (no collisions across every axis' travel, clear sight lines from both cameras and the lamp to the sample); `make cad-zip` packs every STEP into `dist/opengonio-cad.zip` (one Onshape import).
+## Project structure
 
-<!-- parts:start -->
-| Stage | Printed parts (STL) |
+| Folder | What is in it |
 |---|---|
-| [00 Plan](phases/00-plan/3d/) | [PLAN-01](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) tolerance coupon |
-| [01 Power box](phases/01-power/3d/) | [PWR-18a](phases/01-power/3d/PWR-18a_power_box.stl) power box · [PWR-18b](phases/01-power/3d/PWR-18b_power_lid.stl) power lid |
-| [02 Controller and buttons](phases/02-controller/3d/) | [CTL-10a](phases/02-controller/3d/CTL-10a_button_panel.stl) button panel · [CTL-10b](phases/02-controller/3d/CTL-10b_controller_tray.stl) controller tray |
-| [03 Frame](phases/03-frame/3d/) | [FRM-09a](phases/03-frame/3d/FRM-09a_og40_adapter.stl) og40 adapter · [FRM-09b](phases/03-frame/3d/FRM-09b_foot.stl) foot · [FRM-09c](phases/03-frame/3d/FRM-09c_protractor_segment.stl) protractor segment · [FRM-09d](phases/03-frame/3d/FRM-09d_extrusion_saddle.stl) extrusion saddle · [FRM-09e](phases/03-frame/3d/FRM-09e_post_socket.stl) post socket · [FRM-09f](phases/03-frame/3d/FRM-09f_end_foot.stl) end foot · [FRM-09g](phases/03-frame/3d/FRM-09g_washers.stl) washers · [FRM-09h](phases/03-frame/3d/FRM-09h_camera_pillar.stl) camera pillar |
-| [04 Light arm (M4)](phases/04-light-arm/3d/) | [LAR-08a](phases/04-light-arm/3d/LAR-08a_rim_segment.stl) rim segment · [LAR-08b](phases/04-light-arm/3d/LAR-08b_ring_motor_mount.stl) ring motor mount · [LAR-08c](phases/04-light-arm/3d/LAR-08c_arm_segment.stl) arm segment · [LAR-08e](phases/04-light-arm/3d/LAR-08e_cross_clamp.stl) cross clamp |
-| [05 Table (M3)](phases/05-table/3d/) | [TBL-07a](phases/05-table/3d/TBL-07a_table_drum.stl) table drum · [TBL-07b](phases/05-table/3d/TBL-07b_home_flag.stl) home flag · [TBL-07c](phases/05-table/3d/TBL-07c_table_motor_bracket.stl) table motor bracket · [TBL-07d](phases/05-table/3d/TBL-07d_table_post.stl) table post · [TBL-07f](phases/05-table/3d/TBL-07f_spacers.stl) spacers |
-| [06 Camera and light](phases/06-camera-light/3d/) | [CAM-03a](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) aperture stop f8 · [CAM-03b](phases/06-camera-light/3d/CAM-03b_camera_plate.stl) camera plate · [LSR-05a](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) lamp tube · [LSR-05b](phases/06-camera-light/3d/LSR-05b_lamp_cap.stl) lamp cap |
-| [07 Calibrate → game material](phases/07-calibrate/3d/) | [CAL-06a](phases/07-calibrate/3d/CAL-06a_ptfe_holder.stl) ptfe holder · [CAL-06b](phases/07-calibrate/3d/CAL-06b_mirror_holder.stl) mirror holder · [CAL-06c](phases/07-calibrate/3d/CAL-06c_ball_holder.stl) ball holder · [ENC-04a](phases/07-calibrate/3d/ENC-04a_dowel_socket.stl) dowel socket |
-| [08 Tilt (M2)](phases/08-tilt/3d/) | [TLT-07a](phases/08-tilt/3d/TLT-07a_tilt_yoke.stl) tilt yoke · [TLT-07b](phases/08-tilt/3d/TLT-07b_pulley_100T.stl) pulley 100T · [TLT-07c](phases/08-tilt/3d/TLT-07c_tilt_cradle.stl) tilt cradle |
-| [09 Spin (M1)](phases/09-spin/3d/) | [SPN-07a](phases/09-spin/3d/SPN-07a_spin_platter.stl) spin platter |
-| [10 Colour add-ons (optional)](phases/10-color/3d/) | [MSK-06a](phases/10-color/3d/MSK-06a_led_ring.stl) led ring · [MSK-06b](phases/10-color/3d/MSK-06b_led_mast.stl) led mast · [SPC-03a](phases/10-color/3d/SPC-03a_spectral_tube.stl) spectral tube |
-| [11 3D scan: capture](phases/11-scan-capture/3d/) | [SCN-03a](phases/11-scan-capture/3d/SCN-03a_riser_20.stl) riser 20 · [SCN-03b](phases/11-scan-capture/3d/SCN-03b_riser_40.stl) riser 40 · [SCN-03c](phases/11-scan-capture/3d/SCN-03c_riser_60.stl) riser 60 · [SCN-03d](phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.stl) scan camera plate 15 |
-| [15 Standalone (no laptop)](phases/15-standalone/3d/) | [STA-07a](phases/15-standalone/3d/STA-07a_pi_zero_mount.stl) pi zero mount |
-<!-- parts:end -->
-
-- **Starter geometry, generated:** `python tools/cad/parts.py` (CadQuery; parameters at the top). Print the [tolerance coupon](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) first and set `CLEAR` / `M3_TAP`.
-- **Vendor models:** `bash scripts/get_cad.sh` → `cad/vendor/` (not committed); browser-only downloads: `bash scripts/get_cad.sh --from /mnt/c/Users/aleks/Downloads`.
-- **Base:** [1:1 placement template](phases/03-frame/placement-template.svg) (print at 100 %, check the 100 mm bar; screws go through the paper) · [placement map](phases/03-frame/design.md).
-- **Wiring:** [power netlist](phases/01-power/design.md) · [controller pins](phases/02-controller/design.md) · [standalone wiring](phases/15-standalone/design.md).
-- **Onshape:** [set-up steps](phases/00-plan/design.md#onshape-set-up) — import the STEP files, edit, export STEP + STL back.
-
-## Commands
-
-### Try without hardware
-
-```bash
-make setup && source .venv/bin/activate     # once; `source …` again in every new terminal
-make all                                     # build + check + tests
-make sim                                     # simulated machine: mirror → calibrate → dark → gamma → white → matte → drift → fit; ends "ALL PASS"
-opengonio check-pose M4=60 M3=30             # angles + collision check for one pose
-opengonio --sim plastic capture inplane --step 10 --out data/sim/plastic && opengonio curve data/sim/plastic
-opengonio scan demo --out demo               # 3D scan pipeline on a synthetic object
-```
-
-`--sim MATERIAL` (mirror, ptfe, matte, paper, plastic) runs any `capture` on a simulated machine; `--sim-error M3=0.8` hides an angle error in it, `--sim-drift 0.3` dims its lamp 0.3 % per shot and `--sim-gamma 2.2` makes its camera non-linear, so you can watch `verify` and `calibrate` find them. The [Calibration lab](docs/index.html#calibrate) shows the same thing interactively.
-
-### Measure and calibrate
-
-<img src="docs/assets/measure.svg" width="100%" alt="Measuring loop: capture, verify, calibrate, curve, fit">
-
-```bash
-opengonio capture warmup --minutes 10        # stage 06: lamp settle time -> lights.white.warmup_s
-opengonio capture mirror --theta 40          # mirror sweep -> data/mirror_40/ (images + manifest.json)
-opengonio verify data/mirror_40              # PASS / WARN / FAIL: missing images, angles, lamp drift, saturation
-opengonio curve data/mirror_40               # curve.csv + curve.svg (picture of the run)
-opengonio calibrate mirror data/mirror_*     # angle offset -> software/config/calibration.yaml
-opengonio capture dark      && opengonio calibrate dark data/dark            # lamp-off level
-opengonio capture linearity && opengonio calibrate linearity data/linearity  # camera response (gamma)
-opengonio capture white     && opengonio calibrate white data/white          # PTFE at 45:0 -> absolute units
-opengonio capture inplane --step 10 --out data/paper && opengonio curve data/paper   # brdf_per_sr column
-opengonio fit data/paper                     # base colour, roughness, metallic -> fit.json (+ Blender/Unreal/Unity values), fit.svg
-opengonio capture isotropic --step 15        # stage 08: out-of-plane set from BRDF angles (inverse kinematics)
-opengonio capture spin --theta 30            # stage 09: sample spun 0–180° (brushed metal)
-opengonio scan hull --out scan_cube --voxel 0.5   # stage 12: silhouettes -> hull.ply + object size
-opengonio scan ps --out scan_ball --sphere        # stage 12: photometric stereo -> normals, error on a sphere
-opengonio calibrate show                     # every value, its date, and what is stale or not measured yet
-```
-
-| Mirror run before calibration (`curve.svg`) | Material fit (`fit.svg`) |
-|---|---|
-| <img src="docs/assets/example-mirror.svg" width="100%" alt="Mirror sweep: peak 0.4 degrees left of M3 = M4/2"> | <img src="docs/assets/example-fit.svg" width="100%" alt="Fitted GGX curves through measured points"> |
-
-Both from the simulated machine (`make build` regenerates them): the mirror peak sits 0.4° left of the orange line until `calibrate mirror` runs; the fit recovers the simulated plastic (base 0.2, roughness 0.3).
-
-Every run shoots its first pose again at the end (`ref_start.png`, `ref_end.png`); `verify` fails the run if the lamp changed by more than `drift_limit_pct` (2 %). Every `manifest.json` carries `schema`, units and the calibration used, so old data can be re-processed later.
-
-### Flash and move the motors
-
-Full steps (incl. WSL USB): [firmware.md](phases/02-controller/design.md).
-
-```bash
-bash scripts/e4.sh flash                  # FluidNC onto the E4 over USB
-bash scripts/e4.sh wifi "YourWiFi" "YourPassword"   # then press E4 reset
-bash scripts/e4.sh config fluidnc.local   # upload config.yaml, then press E4 reset
-bash scripts/e4.sh test                   # home, move, motors off
-bash scripts/pico.sh                      # button hub
-```
-
-### Standalone mode (no laptop)
-
-[Wiring and setup](phases/15-standalone/design.md).
-
-```bash
-bash scripts/station.sh aleks@opengonio.local     # once: installs the station on the Pi Zero 2 W
-# on the machine: NEXT = choose job, START = run, STOP = abort
-opengonio pull aleks@opengonio.local              # later, on the laptop
-opengonio verify data/*                           # PASS / WARN / FAIL per job
-```
-
-### Publish and update the private GitHub repo (Ubuntu)
-
-```bash
-# 1. Tools
-sudo apt update && sudo apt install -y git python3-venv unzip curl
-sudo mkdir -p -m 755 /etc/apt/keyrings
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-sudo apt update && sudo apt install -y gh
-
-# 2. Log in (workflow scope lets the CI file push)
-gh auth login --hostname github.com --git-protocol https --web --scopes workflow
-gh auth setup-git
-
-# 3. Unzip (WSL: /mnt/c/Users/<you>/Downloads)
-mkdir -p ~/projects && cd ~/projects
-unzip -q ~/Downloads/Gonioreflectometer-Open-Source.zip
-cd Gonioreflectometer-Open-Source
-
-# 4. Private repo, push, milestones, issues
-bash scripts/publish.sh
-
-# 5. Check
-gh repo view --web
-```
-
-Other account over SSH: `OWNER=<user> REMOTE=git@<host-alias>:<user>/Gonioreflectometer-Open-Source.git bash scripts/publish.sh`
-
-**Every update after that** (pushes, then syncs milestones and issues with `.github/phases.yml`):
-
-```bash
-cd ~/projects/Gonioreflectometer-Open-Source
-
-# your own edits (same as: make publish m="…")
-bash scripts/update.sh "M05.1 done"
-
-# a new zip (keeps your history; replaces repo files with the zip's)
-bash scripts/update.sh "update from new zip" /mnt/c/Users/<you>/Downloads/Gonioreflectometer-Open-Source.zip
-bash scripts/get_papers.sh
-```
-
-## Test materials
-
-θi = M4 − M3 (light from the normal), θr = M3 (camera from the normal), in-plane. Isotropic needs 3 angles (M4, M3, M2); anisotropic needs 4 (adds M1).
-
-| Material | Type | Light (M4) · camera (θr = M3) | What to look for |
-|---|---|---|---|
-| PTFE white reference | isotropic, diffuse | 45° · 0° (CIE 45°:0°) | flat response; calibrates brightness [N30] |
-| Matte paper | isotropic, diffuse | 60° · sweep M3 | ≈ cos θr |
-| First-surface mirror | isotropic, specular | 60° · 30° | peak at M3 = M4/2; calibrates angles |
-| Glossy plastic (acrylic, LEGO) | isotropic, glossy | 40/80/120° · M4/2 ± 10° | lobe width → roughness |
-| Metallic car paint | isotropic, flake | 90° · 35° (15° off specular) | sparkle, colour shift [N8] |
-| Brushed aluminium | **anisotropic** | 60° · 30°, spin M1 0–180° | highlight stretches across the brushing [G9] |
-| Satin ribbon | **anisotropic** | 70° · 35°, M2 15°, M1 15° steps | two lobes vs direction |
-| Velvet / retroreflective tape | back-scatter | 20° (closest allowed) · 10° | peak toward the light |
-| 3D scan: matte print, painted toy | object | lamp 30°, scan camera 650 mm / 15° up, M2 85→25°, M1 36 steps | spray shiny parts matte |
-
-## Theory and equations
-
-- **Bidirectional reflectance distribution function (BRDF):** how much light arriving from one direction leaves toward another. The machine sets both directions: the light arm (M4) sets where light comes from; the fixed camera is where it goes; the sample axes (M3, M2, M1) turn the sample between them.
-- **Isotropic vs anisotropic:** most materials look the same when spun about their normal (3 angles). Brushed metal, satin and hair do not (4 angles), so they need M1.
-- **Microfacet model:** a rough surface is many tiny mirrors; GGX describes how they are tilted, Fresnel how much each reflects, Smith how they shadow each other. Fitting roughness, colour and metalness to measurements gives a game-engine material.
-- **Mirror check:** a mirror only reflects when the incident and reflected angles are equal, so with no tilt the peak must sit at M3 = M4 / 2. That calibrates the angles.
-- **Calibration:** the mirror peak gives the angle offset; a lamp-off image gives the dark level; a PTFE tile (≈ 99 % white, diffuse) at 45° turns camera counts into absolute BRDF units; repeating the first pose at the end of every run shows whether the lamp drifted.
-- **3D scan:** the camera never moves, so every photo's pose is known from the axes; silhouettes give a quick shape (visual hull), photogrammetry gives the full mesh, and (with the optional LED bank) lights from several known directions give surface detail (photometric stereo).
-
-**BRDF and reflection equation** [R2][G1]
-
-```math
-f_r(\omega_i\to\omega_r)=\frac{dL_r(\omega_i\to\omega_r)}{dE_i}\;[\mathrm{sr}^{-1}],\qquad L_r(x,\omega_r)=\int_{H^2} f_r\,L_i(x,\omega_i)\cos\theta_i\,d\omega_i
-```
-
-**Reciprocity, isotropy, energy** [R2]
-
-```math
-f_r(\omega_r\to\omega_i)=f_r(\omega_i\to\omega_r),\qquad f_r^{\mathrm{iso}}=f_r(\theta_i,\theta_r,|\varphi_r-\varphi_i|),\qquad \int_{H^2} f_r\cos\theta_r\,d\omega_r\le 1
-```
-
-**Anisotropic (needs M1)** [G9]
-
-```math
-f_r^{\mathrm{aniso}}=f_r(\theta_i,\varphi_i,\theta_r,\varphi_r)\quad\text{(4 angles; } \varphi \text{ measured from the brushing direction)}
-```
-
-**Mirror, Snell, total internal reflection** [R2]
-
-```math
-\hat R=\hat I-2(\hat I\cdot\hat N)\hat N,\qquad \eta_i\sin\theta_i=\eta_t\sin\theta_t,\qquad 1-\mu^2\left(1-(\hat I\cdot\hat N)^2\right)<0
-```
-
-**Fresnel (Schlick), Lambert** [R7][R2]
-
-```math
-F(\theta)=F_0+(1-F_0)(1-\cos\theta)^5,\quad F_0=\left(\tfrac{\eta-1}{\eta+1}\right)^2,\qquad f_{r,d}=\frac{\rho_d}{\pi}
-```
-
-**Fitted model (Lambert + GGX)** [R6][T11][T17]
-
-```math
-f_r=(1-m)(1-F)\frac{\rho}{\pi}+\frac{D\,G_2\,F}{4\cos\theta_i\cos\theta_r},\quad D=\frac{\alpha^2}{\pi\left((h\cdot n)^2(\alpha^2-1)+1\right)^2},\quad h=\frac{\omega_i+\omega_r}{\lVert\omega_i+\omega_r\rVert}
-```
-
-**Sample orientation and angles** [R1]
-
-```math
-R=R_z(M_3)\,R_y(-M_2)\,R_x(M_1),\quad \omega^s=R^\top\omega^w,\quad \theta=\arccos(\omega^s\cdot\hat n),\quad \varphi=\mathrm{atan2}(\omega^s_z,\omega^s_y)
-```
-
-**Light and camera directions** [R1]
-
-```math
-\hat l=R_z(M_4)\,\hat x,\qquad \hat c=\hat x\;(\text{fixed}),\qquad \omega_i(p)=\frac{P_L-p}{\lVert P_L-p\rVert},\quad \omega_r(p)=\frac{P_C-p}{\lVert P_C-p\rVert}
-```
-
-**In-plane geometry (M2 = M1 = 0)** [R1]
-
-```math
-\theta_r=M_3,\qquad \theta_i=M_4-M_3,\qquad \text{specular: } M_3=\tfrac{M_4}{2}
-```
-
-**Step size** 
-
-```math
-\Delta\theta=\frac{360^\circ}{200\cdot 16\cdot G}\;\Rightarrow\;0.0047^\circ\,(M_4,\,G=24),\;0.0225^\circ\,(M_3,M_2);\;M_1\text{ direct at }1/64\text{: }0.028^\circ
-```
-
-**Optics** [R1]
-
-```math
-\frac{1}{p'}-\frac{1}{p}=\frac{1}{f},\quad m=\frac{p'}{p},\quad d_{\mathrm{Airy}}=2.44\,\lambda N,\quad \mathrm{DOF}\approx\frac{2Nc(1+m)}{m^2}
-```
-
-**HDR** [R5]
-
-```math
-g(Z_{ij})=\ln E_i+\ln\Delta t_j
-```
-
-**Repeatability from the mirror** [R1]
-
-```math
-\Delta\theta_L=\frac{s\,p_{px}\,P}{f\,D_L}
-```
-
-**Calibration: angle offset, camera response, absolute BRDF, lamp drift** [R1][R2][R5]
-
-```math
-\delta_{M3}\leftarrow\delta_{M3}-\overline{\left(M_3^{\mathrm{peak}}-\tfrac{M_4}{2}\right)},\qquad
-\ln(C-C_d)=\tfrac{1}{\gamma}\ln t+k,\qquad C_{\mathrm{lin}}=(C-C_d)^{\gamma}
-```
-
-```math
-f_r=\frac{C_{\mathrm{lin}}}{C_{w,\mathrm{lin}}}\cdot\frac{\rho_w}{\pi}\cdot\frac{\cos 45^\circ}{\cos\theta_i},\qquad
-\mathrm{drift}=\frac{C_{\mathrm{end}}-C_{\mathrm{start}}}{C_{\mathrm{start}}-C_d}\le 2\,\%
-```
-
-$C$ = camera counts (centre of the sample), $C_d$ = lamp off, $t$ = exposure, $\gamma$ = camera response (1 = linear), $C_w$ = PTFE at $\theta_i=45^\circ$, $\rho_w$ = PTFE reflectance, $\delta$ = angle offset (true = commanded + $\delta$). Same exposure for all shots.
-
-**Out-of-plane poses from BRDF angles (inverse kinematics, stages 08–09)** [R1][R2]
-
-```math
-\cos\alpha=\cos\theta_i\cos\theta_r+\sin\theta_i\sin\theta_r\cos\Delta\varphi,\quad M_4=\alpha,\quad
-\hat n=a\hat c+b\hat l+g(\hat c\times\hat l),\quad M_2=\arcsin n_z,\quad M_3=\mathrm{atan2}(n_y,n_x)
-```
-
-$a, b$ from $\hat n\cdot\hat c=\cos\theta_r$, $\hat n\cdot\hat l=\cos\theta_i$; $g$ from $|\hat n|=1$. Light on the camera axis ($\alpha<20^\circ$) is out of reach, so pure back-scatter is not measured.
-
-**3D scan: projection, view elevation** [S1][S11]
-
-```math
-\lambda[u,v,1]^\top=K(R_{oc}p_O+t_{oc}),\quad R_{oc}=R_{wc}RP,\qquad \epsilon=90^\circ-M_2+e_{cam}
-```
-
-**3D scan: camera calibration (AX = YB)** [V15]
-
-```math
-\min_{X,Y}\sum_i\left\lVert\log\left(A_i^{-1}XB_iY\right)\right\rVert^2
-```
-
-**3D scan: visual hull, photometric stereo** [S5][S4]
-
-```math
-V=\bigcap_j\{p:\pi_j(p)\in S_j\},\qquad I=L\,g,\;g=L^{+}I,\;\rho=\lVert g\rVert,\;\hat n=g/\rho
-```
-
-Full notes: [theory.md](phases/00-plan/research.md) · [scan methods](phases/12-scan-mesh/research.md).
-
-## Tweak and extend
-
-Everything is generated from a few source files. Edit the source, run `make all`, then `make publish m="…"`.
-
-| To change… | Edit | Then |
-|---|---|---|
-| a step, a milestone, a pass number | `.github/phases.yml` (`do`, `verify`, `fail`, `record`, `time`, `wait`, `needs`) | `make all` |
-| mark a step done | — | `make done id=M05.1` (closes the issue, refreshes ticks and figures) |
-| add a stage / milestone / step | `python tools/new.py stage 18-name "Title"` · `milestone 04-light-arm "Title" "Goal"` · `step M14 "Title"` | fill the TODO lines, `make all` |
-| agree / have / ordered / swap / skip a part, what you paid | [PARTS.md](PARTS.md) (also on GitHub in the browser) | `make` locally, or nothing: *parts-sync* runs on GitHub |
-| a part's spec, price or link; a new part | `phases/NN/bom.csv` (or `python tools/new.py part …`) | `make all` (budget is re-checked) |
-| a printed part's size | the PARAMETERS block or the part function in `tools/cad/parts.py` | `make parts` |
-| a printed part, by hand | import `phases/NN/3d/*.step` into Onshape, export STEP + STL back | `make all` |
-| machine geometry, ports, gear ratios (what you **built**) | `software/config/machine.yaml` | `make all` (simulator numbers update too) |
-| angle offsets, dark level, white reference (what you **measured**) | written by `opengonio calibrate …` into `software/config/calibration.yaml` | commit it |
-| lamp warm-up, drift limit | `lights.white.warmup_s` (machine.yaml) · `drift_limit_pct` (calibration.yaml) | — |
-| what you paid | `Paid USD` column in `phases/NN/bom.csv` | `make` prints *spent so far* |
-| mark a stage done | — | `make release s=06` (tag `v0.6` + every STEP/STL as a zip on GitHub) |
-| motor board settings | `firmware/fluidnc/config.yaml` | `bash scripts/e4.sh config` |
-| buttons, screen, spectral sensor | `firmware/pico-hub/main.py` | `bash scripts/pico.sh` |
-| a reference | `python tools/new.py ref G "Source" "Used for (phase NN)"`; cite as `[G53]` | `make all` |
-| how-to text for a stage | `phases/NN/design.md` (how) · `research.md` (why) | `make check` |
-| a test result | `phases/NN/test.csv` | commit |
-
-Rules that keep it simple:
-- **Generated, don't edit by hand:** `phases/NN/README.md`, `phases/NN/3d/README.md`, the tables between `<!-- … -->` markers in this README, `docs/assets/*.svg`, `docs/assets/steps/*.svg`, `docs/machine.js`, `docs/plan.js`, `.github/progress.json`, `optics.md`, `power_budget.md`, `placement-template.svg`.
-- **Specs vs decisions:** `bom.csv` holds what a part is (spec, price, link); `PARTS.md` holds what you decided (status, paid, note). `make` copies decisions into `bom.csv` (`Status`, `Own`, `Paid USD`), so edit those three only in `PARTS.md`. Zip updates never overwrite your `PARTS.md`.
-- **Math on GitHub:** `make check` rejects TeX macros GitHub refuses (operator-name and new-command macros); write `\mathrm{atan2}`.
-- **Built vs measured:** `machine.yaml` holds design values; `calibration.yaml` holds measured ones with dates. `verify` warns when a calibration is older than 30 days.
-- **Simulator = software:** the web simulator reads `docs/machine.js`, generated from `machine.yaml`; `make check` fails if they differ.
-- **Test without hardware first:** a code change must keep `make sim` at `ALL PASS`.
-- **Go back:** `git checkout v0.6` returns to the state when stage 06 passed (`git checkout main` to return).
-- **Every step has a time and a pass number:** `make check` rejects a step without Do / Verify, with a malformed `time`, or with `TODO` left in it.
-- **Milestone IDs never change** once published: new ones get the next free number, so GitHub issue history stays attached.
-- **`make check`** lists every problem in one place: milestone format, parts lists, the budget cap, reference IDs, broken links, machine and calibration config.
-- **Measurement data** goes in `data/<job>/`: `manifest.json`, `curve.csv` and `spectral.csv` are committed; images stay local.
-
-## Repository map
-
-```
-README.md            this guide
-PARTS.md             your working parts list: decisions, paid, notes (edit on GitHub)
-Makefile             make help · setup · build · parts · cad · cad-check · cad-zip · check · test · all · sim · next · done · release · publish
-REFERENCES.md        487 sources (also listed below)
-phases/NN-name/      one folder per stage
-  README.md          checklist: Do / Verify / Record (generated)
-  design.md          how it is built (wiring, dimensions, notes)
-  research.md        why (requirements, methods)
-  bom.csv            parts to buy, prices, links
-  test.csv           test log you fill in
-  3d/                printed parts: .step (Onshape) + .stl (slicer)
-cad/                README.md (model per part) · PRINT.md (print list) · bought/ dummies · open/ open models · assembly/ whole machine · vendor/ (local)
-firmware/            FluidNC config (E4) · MicroPython hub (Pico)
-software/            opengonio: control, capture, calibration, simulator, scanning
-  config/            machine.yaml (built) · calibration.yaml (measured)
-tools/               check.py (health) · new.py (add things) · roadmap, BOM, figures, CAD parts, placement template, export_machine
-scripts/             e4.sh · pico.sh · station.sh · publish.sh · update.sh · release.sh · get_papers.sh · get_cad.sh
-docs/                interactive simulator (index.html, machine.js, plan.js) + figures (assets/, assets/steps/NN.svg)
-papers/              PDFs: open/ (committed) · personal/ (local only)
-data/                measurement jobs: manifest.json, curve.csv, spectral.csv (images stay local; data/sim/ not committed)
-.github/phases.yml   stages + milestones (source of every checklist and issue)
-.github/progress.json  closed steps, pulled from GitHub by `make done` / `make publish`
-```
-
-## References
-
-514 sources, grouped by ID prefix; IDs are cited throughout the repo. Full table with "used for": [REFERENCES.md](REFERENCES.md).
-
-<!-- refs:start -->
-### Primary design references
-
-- **R1** M. Ansari-Asl, M. Barbieri, G. Obein, J. Y. Hardeberg, "Optical and Electromechanical Design and Implementation of an Advanced Multispectral Device to Capture Material Appearance," *J. Imaging* 10(3):55, 2024. doi:[10.3390/jimaging10030055](https://doi.org/10.3390/jimaging10030055) · [article](https://www.mdpi.com/2313-433X/10/3/55) — *Main design reference: layout, homing, safety, kinematics, optics, tests*
-- **R2** P. Hanrahan, *Reflection Models I: Ideal Materials*, CS348b Lecture 10, Stanford University, Spring 2016 (slides provided by the user) — *BRDF equations (phase 00 theory)*
-- **R3** Stanford Spherical Gantry — [graphics.stanford.edu/projects/gantry](https://graphics.stanford.edu/projects/gantry/) — *First-draft architecture*
-- **R4** Stanford Spherical Gantry specifications — [link](https://graphics.stanford.edu/projects/gantry/design/specifications.html) — *First-draft sizing*
-
-### Theory and algorithms
-
-- **R5** P. Debevec, J. Malik, "Recovering High Dynamic Range Radiance Maps from Photographs," SIGGRAPH 1997 — [PDF](https://pauldebevec.com/Research/HDR/debevec-siggraph97.pdf), [ACM](https://dl.acm.org/doi/10.1145/258734.258884) — *Camera response + HDR for 8-bit UVC frames*
-- **R6** B. Walter, S. Marschner, H. Li, K. Torrance, "Microfacet Models for Refraction through Rough Surfaces," EGSR 2007 (bibliographic; not fetched) — *GGX distribution*
-- **R7** C. Schlick, "An Inexpensive BRDF Model for Physically-based Rendering," Computer Graphics Forum 13(3), 1994 (bibliographic; cited via [R2]) — *Schlick Fresnel*
-- **R8** R. Cook, K. Torrance, "A Reflectance Model for Computer Graphics," ACM TOG 1(1), 1982 (bibliographic; cited via [R2]) — *Cook-Torrance colour shift*
-- **R9** C. Ericson, *Real-Time Collision Detection*, Morgan Kaufmann, 2005, §5.1.9 (bibliographic) — *Segment-segment distance in the collision model*
-
-### Other rigs and data
-
-- **R10** Cornell gonioreflectometer — [link](http://w1.graphics.cornell.edu/research/measure/gonio.html) — *Comparison*
-- **R11** S. Westin et al., Cornell three-axis gonioreflectometer, SPIE 5878-29 — [PDF](https://www.graphics.cornell.edu/~westin/SPIE_5878-29_Gonio.pdf) — *Comparison*
-- **R12** Cornell measurement data — [link](https://www.graphics.cornell.edu/online/measurements/) — *Validation data*
-- **R13** MERL BRDF database — [merl.com/brdf](https://www.merl.com/brdf/) — *Validation data*
-- **R14** W. Matusik et al., MERL TR2003-83 — [PDF](https://www.merl.com/publications/docs/TR2003-83.pdf) — *Comparison*
-- **R15** J. Dupuy, W. Jakob, "An Adaptive Parameterization for Efficient Material Acquisition and Rendering," 2018 — [link](https://rgl.epfl.ch/publications/Dupuy2018Adaptive) — *Adaptive sampling (phase 17)*
-- **R16** RGL-EPFL material database — [link](https://rgl.epfl.ch/pages/lab/material-database) — *Validation data*
-- **R17** J. Filip et al., specular BRDF with a goniometer, 2017 — [PDF](https://staff.utia.cas.cz/filip/papers/filip17brdf.pdf) — *Comparison*
-- **R18** UTIA BTF database — [link](https://btf.utia.cas.cz/?faq=) — *BTF context*
-- **R19** X-Rite TAC7 — [product](https://www.xrite.com/categories/appearance/tac7) — *Commercial multi-light capture*
-- **R37** F. Schröder, master's thesis, 2019 — [link](https://f-schroeder.github.io/publication/masterthesis/) — *DIY prior art*
-- **R38** GatherLab/Goniometer — [GitHub](https://github.com/GatherLab/Goniometer) — *Consulted; emission goniometer, not used*
-- **R39** X-Rite TAC7 user guide — [PDF](https://www.xrite.com/-/media/xrite/files/manuals_and_userguides/t/tac7_user_guide_en.pdf) — *Context*
-- **R40** X-Rite PANTORA — [link](https://www.xrite.com/pantora-software) — *Context*
-
-### 3D photo scanner
-
-- **S1** COLMAP output format — [format.html](https://colmap.github.io/format.html) ([source](https://colmap.github.io/_sources/format.rst.txt)); camera models — [cameras](https://colmap.github.io/_sources/cameras.rst.txt); PINHOLE params comment in [models.h](https://github.com/colmap/colmap/blob/ff8842e7d9e985bd0dd87169f61d5aaeb309ab32/src/colmap/sensor/models.h#L197) — *COLMAP text model, quaternions*
-- **S2** COLMAP FAQ, "Reconstruct sparse/dense model from known camera poses" — [faq.html](https://colmap.github.io/faq.html); CLI — [cli.html](https://colmap.github.io/cli.html) — *`run_colmap.sh` command sequence, meshing*
-- **S3** J. L. Schönberger, J.-M. Frahm, "Structure-from-Motion Revisited," CVPR 2016 — [CVF](https://openaccess.thecvf.com/content_cvpr_2016/html/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.html), [PDF](https://openaccess.thecvf.com/content_cvpr_2016/papers/Schonberger_Structure-From-Motion_Revisited_CVPR_2016_paper.pdf); J. L. Schönberger, E. Zheng, M. Pollefeys, J.-M. Frahm, "Pixelwise View Selection for Unstructured Multi-View Stereo," ECCV 2016 — [doi:10.1007/978-3-319-46487-9_31](https://link.springer.com/chapter/10.1007/978-3-319-46487-9_31), [mlanthology](https://mlanthology.org/eccv/2016/schonberger2016eccv-pixelwise/); COLMAP licence (BSD) — [license](https://colmap.github.io/license.html) — *Photogrammetry engine*
-- **S4** R. J. Woodham, "Photometric method for determining surface orientation from multiple images," *Optical Engineering* 19(1), 1980 — [doi:10.1117/12.7972479](https://www.spiedigitallibrary.org/journals/optical-engineering/volume-19/issue-1/191139/Photometric-Method-For-Determining-Surface-Orientation-From-Multiple-Images/10.1117/12.7972479.short) — *Photometric stereo*
-- **S5** A. Laurentini, "The Visual Hull Concept for Silhouette-Based Image Understanding," *IEEE TPAMI* 16(2), 1994 — [doi:10.1109/34.273735](https://dl.acm.org/doi/10.1109/34.273735) — *Visual hull*
-- **S6** R. Szeliski, "Rapid Octree Construction from Image Sequences," *CVGIP: Image Understanding* 58(1), 1993 — [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S1049966083710296) — *Voxel carving*
-- **S7** K. N. Kutulakos, S. M. Seitz, "A Theory of Shape by Space Carving," *IJCV*, 2000 — [doi:10.1023/A:1008191222954](https://link.springer.com/article/10.1023/A:1008191222954), [PDF (Toronto)](https://www.cs.toronto.edu/~kyros/pubs/00.ijcv.carve.pdf), [PDF (CMU)](https://www.cs.cmu.edu/~seitz/papers/kutu-ijcv00.pdf) — *Space carving*
-- **S8** MVTec HALCON `photometric_stereo` reference — [link](https://www.mvtec.com/doc/halcon/13/en/photometric_stereo.html) — *≥ 3 images, non-coplanar light directions*
-- **S9** A. W. Fitzgibbon, G. Cross, A. Zisserman, "Automatic 3D Model Construction for Turn-Table Sequences," SMILE 1998 — [doi:10.1007/3-540-49437-5_11](https://link.springer.com/chapter/10.1007/3-540-49437-5_11), [open copy](https://ora.ox.ac.uk/objects/uuid:f4e19b7a-4606-4f63-b532-6a0d0bf19845) — *Turntable (rotating-object) reconstruction*
-- **S10** Meshroom / AliceVision — [alicevision.org](https://alicevision.org/), [Meshroom](https://alicevision.org/view/meshroom.html), [GitHub](https://github.com/alicevision/meshroom), [licence MPL2](https://github.com/alicevision/meshroom/blob/develop/COPYING.md) — *Alternative reconstruction*
-- **S11** OpenCV `solvePnP` — [docs](https://docs.opencv.org/4.13.0/d5/d1f/calib3d_solvePnP.html) — *Camera axis convention, pose checks*
-- **S12** OpenCV ChArUco calibration — [tutorial](https://docs.opencv.org/4.13.0/da/d13/tutorial_aruco_calibration.html), [detection](https://docs.opencv.org/4.13.0/df/d4a/tutorial_charuco_detection.html) — *Scan-mode intrinsics, scanning mat*
-- **S13** D. Schnieders, K.-Y. K. Wong, "Camera and light calibration from reflections on a sphere," *CVIU*, 2013 — [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S1077314213001082), [PDF](https://i.cs.hku.hk/~kykwong/publications/dschnieders_cviu2013.pdf) — *Chrome-ball light calibration*
-- **S14** Yu, Chen, Da, "Geometric calibration for photometric stereo under near-field point light sources using spheres," *Optics & Laser Technology* 180, 2025 — [link](https://www.sciencedirect.com/science/article/pii/S0030399224010156) — *Near-light correction (phase 11)*
-- **S15** D. B. Goldman, B. Curless, A. Hertzmann, S. M. Seitz, "Shape and Spatially-Varying BRDFs from Photometric Stereo," ICCV 2005 — [doi:10.1109/ICCV.2005.219](https://mlanthology.org/iccv/2005/goldman2005iccv-shape/) — *Material on the mesh (phase 13)*
-- **S16** Blender manual: [PLY](https://docs.blender.org/manual/en/latest/files/import_export/ply.html), [OBJ](https://docs.blender.org/manual/en/latest/files/import_export/obj.html), [glTF 2.0](https://docs.blender.org/manual/en/latest/addons/scene_gltf2.html), [formats](https://docs.blender.org/manual/en/latest/files/import_export/index.html) — *Mesh import check*
-- **S17** OpenMVS — [GitHub](https://github.com/cdcseacave/openMVS), [licence AGPL](https://github.com/cdcseacave/openMVS/blob/develop/COPYRIGHT.md) — *Optional dense/mesh stage*
-- **S18** RealityScan (formerly RealityCapture) — [licence](https://www.realityscan.com/license), [2.0 rename](https://www.realityscan.com/news/realityscan-20-new-release-brings-powerful-new-features-to-a-rebranded-realitycapture), [CG Channel 2.0](https://www.cgchannel.com/2025/06/epic-games-to-rebrand-realitycapture-as-realityscan-2-0/), [CG Channel 2.2](https://www.cgchannel.com/2026/06/epic-games-releases-realityscan-2-2-with-amd-gpu-support/) — *Optional reconstruction*
-- **S19** QuakeHold! museum putty — [SOS Products](https://www.sosproducts.com/quakehold-museum-putty-p/64810.htm), [Fire Supply Depot](https://www.firesupplydepot.com/quakehold-museum-putty-white-22111.html) — *Heavier-object option*
-- **S20** Loctite Fun-Tak 2 oz — [Staples](https://www.staples.com/Loctite-Fun-Tak-2-oz-Mounting-Adhesive-Putty-1270884/product_1480018), [Amazon](https://www.amazon.com/Loctite-Fun-Tak-Mounting-2-Ounce-1270884-12/dp/B074R72PSH) — *$3.49 object mount*
-
-### Measurement devices and datasets
-
-
-#### Foundations, surveys and books
-
-- **G1** F. E. Nicodemus, J. C. Richmond, J. J. Hsia, I. W. Ginsberg, T. Limperis, "Geometrical Considerations and Nomenclature for Reflectance," *NBS Monograph* 160, 1977 — [doi:10.6028/NBS.MONO.160](https://doi.org/10.6028/NBS.MONO.160) · [archive.org](https://archive.org/details/geometricalconsi160nico) — *BRDF definition, units, nomenclature (phases 00, 07)*
-- **G2** J. Dorsey, H. Rushmeier, F. Sillion, *Digital Modeling of Material Appearance*, Morgan Kaufmann, 2008, ISBN 978-0-12-221181-2 — [front matter PDF](https://booksite.elsevier.com/samplechapters/9780122211812/Sample_Chapters/01~Front_Matter.pdf) · [O'Reilly](https://www.oreilly.com/library/view/digital-modeling-of/9780122211812/) — *Measurement chapter, device taxonomy (phase 00)*
-- **G3** D. Guarnera, G. C. Guarnera, A. Ghosh, C. Denk, M. Glencross, "BRDF Representation and Acquisition," *Computer Graphics Forum* 35(2):625–650, 2016 — [doi:10.1111/cgf.12867](https://doi.org/10.1111/cgf.12867) · [York](https://pure.york.ac.uk/portal/en/publications/brdf-representation-and-acquisition/) — *Survey of acquisition devices, models (phase 08)*
-- **G4** M. Weinmann, R. Klein, "Advances in Geometry and Reflectance Acquisition (course notes)," *SIGGRAPH Asia 2015 Courses*, 2015 — [doi:10.1145/2818143.2818165](https://doi.org/10.1145/2818143.2818165) — *Joint shape + reflectance capture (phases 11, 13)*
-- **G5** J. Filip, M. Haindl, "Bidirectional Texture Function Modeling: A State of the Art Survey," *IEEE TPAMI* 31(11), 2009 — [doi:10.1109/TPAMI.2008.246](https://doi.org/10.1109/TPAMI.2008.246) — *BTF capture and representation (phase 09)*
-- **G6** Y. Zou, L. Zhang, J. Zhang, B. Li, X. Lv, "Developmental Trends in the Application and Measurement of the Bidirectional Reflection Distribution Function," *Sensors* 22(5):1739, 2022 — [doi:10.3390/s22051739](https://doi.org/10.3390/s22051739) · [HTML](https://mdpi.com/1424-8220/22/5/1739/htm) — *Recent review of BRDF instruments (phase 00)*
-- **G7** G. Obein, "The measurement of appearance," *Proc. Int. School of Physics "Enrico Fermi"* 206:175–186, 2021 — [doi:10.3254/ENFI210025](https://doi.org/10.3254/ENFI210025) — *Metrology view of appearance (phase 00)*
-
-#### Classic gonioreflectometers and image-based BRDF measurement
-
-- **G8** J. F. Murray-Coleman, A. M. Smith, "The Automated Measurement of BRDFs and their Application to Luminaire Modeling," *J. Illuminating Engineering Society* 19:87–99, 1990 — [doi:10.1080/00994480.1990.10747944](https://doi.org/10.1080/00994480.1990.10747944) — *Early automated gonioreflectometer (phase 08)*
-- **G9** G. J. Ward, "Measuring and Modeling Anisotropic Reflection," *ACM SIGGRAPH Computer Graphics* 26(2):265–272, 1992 — [doi:10.1145/142920.134078](https://doi.org/10.1145/142920.134078) · [PDF](https://cseweb.ucsd.edu/~ravir/6998/papers/p265-ward.pdf) — *Imaging gonioreflectometer, anisotropic fit (phase 09)*
-- **G10** D. R. White, P. Saunders, S. J. Bonsey, J. van de Ven, H. Edgar, "Reflectometer for measuring the bidirectional reflectance of rough surfaces," *Applied Optics* 37(16):3450–3454, 1998 — [doi:10.1364/AO.37.003450](https://doi.org/10.1364/AO.37.003450) — *Four-axis rotating-arm gonio design (phases 03, 04)*
-- **G11** K. J. Dana, B. van Ginneken, S. K. Nayar, J. J. Koenderink, "Reflectance and Texture of Real-World Surfaces," *ACM TOG* 18(1):1–34, 1999 — [doi:10.1145/300776.300778](https://doi.org/10.1145/300776.300778) · [PDF](https://cave.cs.columbia.edu/old/publications/pdfs/Dana_TOG99.pdf) — *CUReT robot-arm BTF capture/dataset (phases 09, 17)*
-- **G12** S. R. Marschner, S. H. Westin, E. P. F. Lafortune, K. E. Torrance, "Image-based bidirectional reflectance distribution function measurement," *Applied Optics* 39(16):2592–2600, 2000 — [doi:10.1364/AO.39.002592](https://doi.org/10.1364/AO.39.002592) — *Camera-based BRDF from curved samples (phases 06, 07)*
-- **G13** J. Y. Han, K. Perlin, "Measuring Bidirectional Texture Reflectance with a Kaleidoscope," *ACM TOG* 22(3) (SIGGRAPH), 2003 — [doi:10.1145/882262.882341](https://doi.org/10.1145/882262.882341) — *Mirror-based multi-view BTF alternative (phase 17)*
-- **G14** K. J. Dana, J. Wang, "Device for convenient measurement of spatially varying bidirectional reflectance," *JOSA A* 21(1):1–12, 2004 — [doi:10.1364/JOSAA.21.000001](https://doi.org/10.1364/JOSAA.21.000001) — *Curved-mirror SVBRDF camera (phase 09)*
-- **G15** W. Matusik, H. Pfister, M. Brand, L. McMillan, "Efficient Isotropic BRDF Measurement," *Proc. 14th Eurographics Workshop on Rendering*, 241–247, 2003 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) — *Sphere-sample MERL acquisition method (phase 17)*
-- **G16** A. Ngan, F. Durand, W. Matusik, "Experimental Analysis of BRDF Models," *Eurographics Symposium on Rendering*, 2005 — [EG DL](https://diglib.eg.org/items/b3a3223e-ad94-4366-8ae7-fce371c08d04) · [PDF](https://people.csail.mit.edu/wojciech/BRDFAnalysis/BRDFAnalysis.pdf) · [MERL TR2005-151](https://www.merl.com/publications/docs/TR2005-151.pdf) — *Model-fit comparison, anisotropic cylinder rig (phases 07, 09)*
-- **G17** M. Ben-Ezra, J. Wang, B. Wilburn, X. Li, L. Ma, "An LED-Only BRDF Measurement Device," *CVPR*, 2008 — [doi:10.1109/CVPR.2008.4587766](https://doi.org/10.1109/CVPR.2008.4587766) · [mlanthology](https://mlanthology.org/cvpr/2008/benezra2008cvpr-led/) — *LEDs as emitters/sensors, multispectral (phase 10)*
-- **G18** M. Kurt, L. Szirmay-Kalos, J. Křivánek, "An Anisotropic BRDF Model for Fitting and Monte Carlo Rendering," *ACM SIGGRAPH Computer Graphics* 44(1):1–15, 2010 — [doi:10.1145/1722991.1722996](https://doi.org/10.1145/1722991.1722996) — *Anisotropic fit to measured data (phase 09)*
-- **G19** A. Sole, I. Farup, P. Nussbaum, S. Tominaga, "Evaluating an image-based bidirectional reflectance distribution function measurement setup," *Applied Optics* 57(8):1918–1928, 2018 — [doi:10.1364/AO.57.001918](https://doi.org/10.1364/AO.57.001918) — *Validating camera BRDF vs commercial (phase 07)*
-- **G20** A. Sole, *Image-Based Bidirectional Reflectance Measurement of Non-Diffuse and Gonio-Chromatic Materials*, PhD thesis, NTNU, 2019 — [NTNU Colourlab theses](https://www.ntnu.edu/colourlab/phd-theses) — *Image-based BRDF method details (phase 07)*
-
-#### National metrology institute instruments and references
-
-- **G21** P. Y. Barnes, E. A. Early, A. C. Parr, *NIST Measurement Services: Spectral Reflectance*, NIST Special Publication 250-48, 1998 — [PDF](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication250-48.pdf) · [GovInfo](https://www.govinfo.gov/app/details/GOVPUB-C13-7ab8bd6b271101964fdf6c44e8b0bf14) — *STARR reference reflectometer, uncertainty (phase 07)*
-- **G22** J. E. Proctor, P. Y. Barnes, "NIST High Accuracy Reference Reflectometer-Spectrophotometer," *J. Res. NIST* 101(5):619, 1996 — [PDF](https://nvlpubs.nist.gov/nistpubs/jres/101/5/j5proc.pdf) · [archive.org](https://archive.org/details/jresv101n5p619) — *STARR design, absolute BRDF (phase 07)*
-- **G23** H. Patrick, C. Cooksey, T. A. Germer, M. E. Nadal, C. Zarobila, "Bidirectional reflectance capabilities of the NIST Robotic Optical Scattering Instrument," *Applied Optics* 60(28):8774, 2021 — [doi:10.1364/AO.435117](https://doi.org/10.1364/AO.435117) · [NIST](https://www.nist.gov/publications/bidirectional-reflectance-capabilities-nist-robotic-optical-scattering-instrument-rosi) — *Robot-arm reference gonio, STARR comparison (phase 08)*
-- **G24** C. Durell, D. Scharpf, G. McKee, M. L'Heureux, G. Georgiev, G. Obein, C. Cooksey, "Creation and Validation of Sintered PTFE BRDF Targets & Standards," *Proc. SPIE* 9639, paper 49, 2015 — [PDF](https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=919590) — *PTFE white reference BRDF (phase 07)*
-- **G25** A. Höpe, D. Hünerhoff, K.-O. Hauer, "Robot-based Gonioreflectometer," in *Industrial Robotics: Programming, Simulation and Applications* (ed. L. K. Huat), pp. 624–632, 2006 — [PDF](https://cdn.intechopen.com/pdfs/284/InTech-Robot_based_gonioreflectometer.pdf) — *PTB robot sample holder concept (phase 08)*
-- **G26** A. Höpe, K.-O. Hauer, "Three-dimensional appearance characterization of diffuse standard reflection materials," *Metrologia* 47(3):295, 2010 — [doi:10.1088/0026-1394/47/3/021](https://doi.org/10.1088/0026-1394/47/3/021) — *Non-Lambertian behaviour of white standards (phase 07)*
-- **G27** A. Höpe et al., "ARGon3: '3D appearance robot-based gonioreflectometer' at PTB," *Rev. Sci. Instrum.* 83(4):045102, 2012 — [AIP](https://pubs.aip.org/aip/rsi/article/83/4/045102/355039/ARGon3-3D-appearance-robot-based) — *Camera-based spatially resolved gonio (phase 09)*
-- **G28** A. Höpe et al., "Multidimensional reflectometry for industry (xD-Reflect) an European research project," *Proc. SPIE* 9018:901804, 2014 — [doi:10.1117/12.2035981](https://doi.org/10.1117/12.2035981) · [project](https://www.xdreflect.eu/project-publications/) — *Gonio colour, sparkle, gloss metrology (phase 10)*
-- **G29** E. Molloy, H. Patrick, K.-O. Hauer, D. Hünerhoff, T. Quast, "Comparison of bidirectional reflectance distribution function scales over the hemisphere," *Applied Optics* 65(18):6358–6365, 2026 — [doi:10.1364/AO.603369](https://doi.org/10.1364/AO.603369) — *Inter-lab BRDF agreement limits (phase 07)*
-- **G30** R. Le Breton, G. Ged, G. Obein, "Out of plane BRDF measurement at LNE-Cnam using 'ConDOR' our primary goniospectrophotometer," *Proc. 28th CIE Session*, 1401–1407, 2015 — [Obein publications](https://inm.cnam.fr/gael-obein-71373.kjsp) — *High-resolution out-of-plane gonio (phase 08)*
-- **G31** D. Saha, L. Gevaux, J. R. Frisvad, G. Obein, "Bidirectional reflectance measurements over a micrometric surface area using a goniospectrophotometer," *Rev. Sci. Instrum.* 95(5):055114, 2024 — [doi:10.1063/5.0193490](https://doi.org/10.1063/5.0193490) · [DTU](https://orbit.dtu.dk/en/publications/bidirectional-reflectance-measurements-over-a-micrometric-surface) — *Small-spot BRDF, spatial resolution (phase 17)*
-- **G32** RGL-EPFL, customized PAB pgII gonio-photometer (instrument page) — [rgl.epfl.ch/pages/lab/pgII](https://rgl.epfl.ch/pages/lab/pgII) — *Reference instrument behind RGL data (phase 17)*
-
-#### Lineage of the main design reference (NTNU / LNE-CNAM)
-
-- **G33** M. Ansari-Asl, M. Barbieri, G. Obein, J. Y. Hardeberg, "Advancing Material Appearance Measurement: A Cost-effective Multispectral Imaging System for Capturing SVBRDF and BTF," *London Imaging Meeting* 4:104–108, 2023 — [doi:10.2352/lim.2023.4.1.25](https://doi.org/10.2352/lim.2023.4.1.25) · [Zenodo](https://zenodo.org/records/10404932) — *Precursor of R1 rig layout (phases 00, 05)*
-- **G34** M. Ansari-Asl, J.-B. Thomas, J. Y. Hardeberg, "Camera Response Function Assessment in Multispectral HDR Imaging," *IS&T Electronic Imaging (Color Imaging XXVII)*, COLOR-141, 2022 — [doi:10.2352/EI.2022.34.15.COLOR-141](https://doi.org/10.2352/EI.2022.34.15.COLOR-141) — *Measured vs Debevec CRF for HDR (phase 07)*
-- **G35** M. Ansari-Asl, *Development of a Multispectral Camera-Based Device for Goniometric Acquisition of Spatially Varying Reflectance Properties*, PhD thesis, NTNU, 2026 — [NTNU Colourlab theses](https://www.ntnu.edu/colourlab/phd-theses) — *Full design record of R1 (phase 00)*
-- **G36** A. Sole, D. Gigilashvili, H. Midtfjord, D. Guarnera, G. C. Guarnera, J.-B. Thomas, J. Y. Hardeberg, "On the Acquisition and Reproduction of Material Appearance," *CCIW 2019*, LNCS 11418:26–38, 2019 — [doi:10.1007/978-3-030-13940-7_3](https://doi.org/10.1007/978-3-030-13940-7_3) — *NTNU appearance-capture context (phase 00)*
-- **G37** S. Chitnis, A. Sole, S. Chandran, "Spectral Bidirectional Reflectance Distribution Function Simplification," *J. Imaging* 11(1):18, 2025 — [doi:10.3390/jimaging11010018](https://doi.org/10.3390/jimaging11010018) — *Fewer spectral bands per BRDF (phase 10)*
-
-#### Low-cost, robotic and portable devices
-
-- **G38** J. Filip, R. Vávra, M. Krupička, "Rapid Material Appearance Acquisition Using Consumer Hardware," *Sensors* 14(10):19785–19805, 2014 — [doi:10.3390/s141019785](https://doi.org/10.3390/s141019785) — *Toy-gantry low-cost BTF prior art (phases 00, 03)*
-- **G39** R. A. Lyngby, J. B. Matthiassen, J. R. Frisvad, A. B. Dahl, H. Aanæs, "Using a Robotic Arm for Measuring BRDFs," *SCIA 2019*, LNCS 11482:184–196, 2019 — [doi:10.1007/978-3-030-20205-7_16](https://doi.org/10.1007/978-3-030-20205-7_16) — *Hand-eye calibration for BRDF rigs (phase 11)*
-- **G40** J. Riviere, P. Peers, A. Ghosh, "Mobile Surface Reflectometry," *Computer Graphics Forum* 35:191–202, 2016 — [doi:10.1111/cgf.12719](https://doi.org/10.1111/cgf.12719) — *Phone-flash SVBRDF capture baseline (phase 09)*
-
-#### Spherical, polarized and linear-light illumination; SVBRDF capture
-
-- **G41** A. Ghosh, T. Chen, P. Peers, C. A. Wilson, P. Debevec, "Estimating Specular Roughness and Anisotropy from Second Order Spherical Gradient Illumination," *Eurographics Symposium on Rendering*, 2009 — [PDF](https://www.cs.wm.edu/~ppeers/publications/Ghosh2009ESR/Ghosh_EGSR2009.pdf) — *Polarized diffuse/specular separation (phase 10)*
-- **G42** A. Ghosh, T. Chen, P. Peers, C. A. Wilson, P. Debevec, "Circularly Polarized Spherical Illumination Reflectometry," *ACM SIGGRAPH Asia*, 2010 — [project](https://vgl.ict.usc.edu/Research/CPSIR/) · [PDF](https://vgl.ict.usc.edu/Research/CPSIR/CPSIR_SIGGRAPH_Asia2010.pdf) — *Polarization-based index/specular estimation (phase 10)*
-- **G43** G. Chen, Y. Dong, P. Peers, J. Zhang, X. Tong, "Reflectance Scanning: Estimating Shading Frame and BRDF with Generalized Linear Light Sources," *ACM TOG* 33(4), 2014 — [doi:10.1145/2601097.2601180](https://doi.org/10.1145/2601097.2601180) — *Linear-light SVBRDF scanning (phase 09)*
-- **G44** M. Aittala, T. Weyrich, J. Lehtinen, "Practical SVBRDF Capture in the Frequency Domain," *ACM TOG* 32(4) (SIGGRAPH), 2013 — [doi:10.1145/2461912.2461978](https://doi.org/10.1145/2461912.2461978) — *Screen-pattern SVBRDF capture (phase 09)*
-- **G45** S.-H. Baek, T. Zeltner, H. Ku, I. Hwang, X. Tong, W. Jakob, M. H. Kim, "Image-based Acquisition and Modeling of Polarimetric Reflectance," *ACM TOG* 39(4):139, 2020 — [doi:10.1145/3386569.3392387](https://doi.org/10.1145/3386569.3392387) — *Polarimetric BRDF capture (phase 10)*
-
-#### Sampling strategies
-
-- **G46** J. B. Nielsen, H. W. Jensen, R. Ramamoorthi, "On Optimal, Minimal BRDF Sampling for Reflectance Acquisition," *ACM TOG* 34(6):186, 2015 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) — *Few-sample BRDF from MERL basis (phase 17)*
-- **G47** R. Vávra, J. Filip, "Minimal Sampling for Effective Acquisition of Anisotropic BRDFs," *Computer Graphics Forum* 35(7):299–309, 2016 — [cited in PBR 4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) — *Anisotropic sparse sampling (phase 17)*
-- **G48** R. Vávra, J. Filip, "Adaptive slices for acquisition of anisotropic BRDF," *Computational Visual Media* 4(1):55–69, 2018 — [doi:10.1007/s41095-017-0099-z](https://doi.org/10.1007/s41095-017-0099-z) — *Adaptive 1D-slice sampling (phase 17)*
-
-#### BTF capture setups (Bonn)
-
-- **G49** C. Schwartz, R. Sarlette, M. Weinmann, M. Rump, R. Klein, "Design and Implementation of Practical Bidirectional Texture Function Measurement Devices Focusing on the Developments at the University of Bonn," *Sensors* 14(5):7753–7819, 2014 — [doi:10.3390/s140507753](https://doi.org/10.3390/s140507753) — *BTF device requirements, HDR, calibration (phase 09)*
-- **G50** C. Schwartz, R. Sarlette, M. Weinmann, R. Klein, "DOME II: A Parallelized BTF Acquisition System," *Eurographics Workshop on Material Appearance Modeling*, 25–31, 2013 — [doi:10.2312/MAM.MAM2013.025-031](https://doi.org/10.2312/MAM.MAM2013.025-031) — *Camera-array dome comparison (phase 09)*
-
-#### Datasets and data formats
-
-- **G51** W. Matusik, H. Pfister, M. Brand, L. McMillan, "BRDF Database – Bidirectional Reflectance Distribution Function" (MERL 100 materials, CC-BY-SA-4.0), Zenodo, 2023 — [doi:10.5281/zenodo.8101681](https://doi.org/10.5281/zenodo.8101681) — *Licensed MERL copy for comparison (phase 17)*
-- **G52** D. Lanevski et al., "Machine-readable universal data format for bidirectional reflectance distribution function and BiRDview—An open-source web-based application for viewing and comparing bidirectional reflectance data," *Color Research & Application*, 2022 — [doi:10.1002/col.22790](https://doi.org/10.1002/col.22790) — *BRDF export format, viewer (phase 14)*
-
-### Reflectance models and material formats
-
-
-#### Rendering theory and textbooks
-
-- **T1** J. T. Kajiya, "The Rendering Equation," *Proc. SIGGRAPH '86, Computer Graphics* 20(4):143–150, 1986 — [doi:10.1145/15922.15902](https://doi.org/10.1145/15922.15902) · [PDF](https://www.cs.cmu.edu/afs/cs/academic/class/15462-s13/www/lec_slides/86kajiyaRenderingEquation.pdf) — *Reflection/rendering equation background (phases 00, 07)*
-- **T2** M. Pharr, W. Jakob, G. Humphreys, *Physically Based Rendering: From Theory to Implementation*, 4th ed., MIT Press, 2023 — [pbr-book.org/4ed](https://www.pbr-book.org/4ed/Reflection_Models/Further_Reading) · [MIT Press](https://mitpress.mit.edu/9780262048026/physically-based-rendering/) — *BRDF, microfacet, sampling reference (phases 07, 08)*
-- **T3** E. Veach, "Robust Monte Carlo Methods for Light Transport Simulation," PhD thesis, Stanford University, 1997 — [PDF](https://graphics.stanford.edu/papers/veach_thesis/thesis-bw.pdf) · [dblp](https://dblp.dagstuhl.de/rec/phd/us/Veach97.html) — *Reciprocity, importance sampling theory (phases 08, 17)*
-- **T4** T. Weyrich, J. Lawrence, H. P. A. Lensch, S. Rusinkiewicz, T. Zickler, "Principles of Appearance Acquisition and Representation," *Foundations and Trends in Computer Graphics and Vision* 4(2):75–191, 2009 — [doi:10.1561/0600000022](https://doi.org/10.1561/0600000022) · [PDF](https://gfx.cs.princeton.edu/pubs/Weyrich_2009_POA/0600000022.pdf) — *Measurement-to-representation overview (phases 00, 08, 09)*
-- **T5** R. Montes, C. Ureña, "An Overview of BRDF Models," Tech. Rep. LSI-2012-001, Univ. of Granada, 2012 — [PDF](https://digibug.ugr.es/bitstream/handle/10481/19751/rmontes_LSI-2012-001TR.pdf) — *Model catalogue for choosing fits (phases 07, 08)*
-- **T6** M. Nimier-David, D. Vicini, T. Zeltner, W. Jakob, "Mitsuba 2: A Retargetable Forward and Inverse Renderer," *ACM TOG* 38(6):203, 2019 — [doi:10.1145/3355089.3356498](https://doi.org/10.1145/3355089.3356498) · [project](https://tizianzeltner.com/projects/NimierDavidVicini2019Mitsuba2/) — *Differentiable reference renderer for fit checks (phase 17)*
-- **T7** Mitsuba 3 documentation, "BSDFs" (roughconductor, measured, …) — [mitsuba.readthedocs.io](https://mitsuba.readthedocs.io/en/stable/src/generated/plugins_bsdfs.html) — *Render fitted vs RGL measured BSDF (phase 17)*
-
-#### Classic analytic reflectance models
-
-- **T8** B. T. Phong, "Illumination for Computer Generated Pictures," *Communications of the ACM* 18(6):311–317, 1975 — [doi:10.1145/360825.360839](https://doi.org/10.1145/360825.360839) — *Baseline lobe model for comparisons (phase 07)*
-- **T9** J. F. Blinn, "Models of Light Reflection for Computer Synthesized Pictures," *Proc. SIGGRAPH '77*, 192–198, 1977 — [doi:10.1145/563858.563893](https://doi.org/10.1145/563858.563893) — *Half-vector lobe, legacy export mapping (phase 07)*
-- **T10** K. E. Torrance, E. M. Sparrow, "Theory for Off-Specular Reflection from Roughened Surfaces," *JOSA* 57(9):1105–1114, 1967 — [doi:10.1364/JOSA.57.001105](https://doi.org/10.1364/JOSA.57.001105) · [ADS](https://ui.adsabs.harvard.edu/abs/1967JOSA...57.1105T/abstract) — *Microfacet theory, off-specular peak (phase 08)*
-- **T11** T. S. Trowbridge, K. P. Reitz, "Average Irregularity Representation of a Rough Surface for Ray Reflection," *JOSA* 65(5):531–536, 1975 — [doi:10.1364/JOSA.65.000531](https://doi.org/10.1364/JOSA.65.000531) · [ADS](https://ui.adsabs.harvard.edu/abs/1975JOSA...65..531T/abstract) — *Origin of GGX/TR distribution (phase 07)*
-- **T12** B. G. Smith, "Geometrical Shadowing of a Random Rough Surface," *IEEE Trans. Antennas and Propagation* 15(5):668–671, 1967 — [ADS](https://ui.adsabs.harvard.edu/abs/1967ITAP...15..668S/abstract) · [NTRS](https://ntrs.nasa.gov/citations/19670062103) — *Smith masking-shadowing term (phases 07, 08)*
-- **T13** M. Oren, S. K. Nayar, "Generalization of Lambert's Reflectance Model," *Proc. SIGGRAPH '94*, 239–246, 1994 — [doi:10.1145/192161.192213](https://doi.org/10.1145/192161.192213) — *Rough-diffuse alternative to Lambert (phases 07, 08)*
-- **T14** E. P. F. Lafortune, S.-C. Foo, K. E. Torrance, D. P. Greenberg, "Non-Linear Approximation of Reflectance Functions," *Proc. SIGGRAPH '97*, 117–126, 1997 — [doi:10.1145/258734.258801](https://doi.org/10.1145/258734.258801) — *Multi-lobe fit, retroreflection (phase 08)*
-- **T15** M. Ashikhmin, P. Shirley, "An Anisotropic Phong BRDF Model," *Journal of Graphics Tools* 5(2):25–32, 2000 — [doi:10.1080/10867651.2000.10487522](https://doi.org/10.1080/10867651.2000.10487522) — *Anisotropic fit alternative (phase 09)*
-- **T16** S. Rusinkiewicz, "A New Change of Variables for Efficient BRDF Representation," *Rendering Techniques '98* (EGWR), 11–22, 1998 — [doi:10.1007/978-3-7091-6453-2_2](https://doi.org/10.1007/978-3-7091-6453-2_2) · [project](https://gfx.cs.princeton.edu/gfx/pubs/Rusinkiewicz_1998_ANC/index.php) — *Half/difference angle data layout (phases 08, 17)*
-
-#### Microfacet theory and sampling (modern)
-
-- **T17** E. Heitz, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs," *JCGT* 3(2):48–107, 2014 — [PDF](https://jcgt.org/published/0003/02/03/paper.pdf) · [HAL](https://hal.science/hal-01024289/) — *Correct Smith G for GGX fit (phases 07, 08)*
-- **T18** E. Heitz, E. d'Eon, "Importance Sampling Microfacet-Based BSDFs using the Distribution of Visible Normals," *Computer Graphics Forum* 33(4):103–112, 2014 — [doi:10.1111/cgf.12417](https://doi.org/10.1111/cgf.12417) — *Sampling fitted GGX in renders (phases 14, 17)*
-- **T19** E. Heitz, "Sampling the GGX Distribution of Visible Normals," *JCGT* 7(4):1–13, 2018 — [PDF](https://jcgt.org/published/0007/04/01/paper.pdf) — *Simple VNDF sampler code (phase 14)*
-- **T20** J. Dupuy, A. Benyoub, "Sampling Visible GGX Normals with Spherical Caps," *Computer Graphics Forum* 42(8), 2023 — [doi:10.1111/cgf.14867](https://doi.org/10.1111/cgf.14867) — *Faster VNDF sampling (phase 14)*
-- **T21** E. Heitz, J. Hanika, E. d'Eon, C. Dachsbacher, "Multiple-Scattering Microfacet BSDFs with the Smith Model," *ACM TOG* 35(4):58, 2016 — [doi:10.1145/2897824.2925943](https://doi.org/10.1145/2897824.2925943) — *Energy loss at high roughness (phase 08)*
-- **T22** E. Turquin, "Practical Multiple Scattering Compensation for Microfacet Models," Weta Digital tech. report, 2019 — [PDF](https://blog.selfshadow.com/publications/turquin/ms_comp_final.pdf) — *Energy compensation when fitting rough metals (phase 07)*
-- **T23** M. M. Bagher, C. Soler, N. Holzschuch, "Accurate Fitting of Measured Reflectances Using a Shifted Gamma Micro-facet Distribution," *Computer Graphics Forum* 31(4), 2012 — [HAL](https://inria.hal.science/hal-00702304) — *Long-tail NDF fitting option (phase 17)*
-- **T24** M. Ribardière, B. Bringier, D. Meneveaux, L. Simonot, "STD: Student's t-Distribution of Slopes for Microfacet Based BSDFs," *Computer Graphics Forum* 36(2), 2017 — [doi:10.1111/cgf.13137](https://doi.org/10.1111/cgf.13137) — *Generalised GGX tail fitting (phase 17)*
-
-#### Fitting measured data and evaluating fits
-
-- **T25** J. Löw, J. Kronander, A. Ynnerman, J. Unger, "BRDF Models for Accurate and Efficient Rendering of Glossy Surfaces," *ACM TOG* 31(1):9, 2012 — [doi:10.1145/2077341.2077350](https://doi.org/10.1145/2077341.2077350) · [PDF](https://liu.diva-portal.org/smash/get/diva2:683489/FULLTEXT01.pdf) — *Fit error metric, glossy model choice (phases 07, 08)*
-- **T26** J. Dupuy, E. Heitz, J.-C. Iehl, P. Poulin, V. Ostromoukhov, "Extracting Microfacet-based BRDF Parameters from Arbitrary Materials with Power Iterations," *Computer Graphics Forum* 34(4):21–30, 2015 — [doi:10.1111/cgf.12675](https://doi.org/10.1111/cgf.12675) · [HAL](https://inria.hal.science/hal-01168516) — *Robust NDF extraction for GGX fit (phases 08, 09)*
-- **T27** G. Lavoué, N. Bonneel, J.-P. Farrugia, C. Soler, "Perceptual Quality of BRDF Approximations: Dataset and Metrics," *Computer Graphics Forum* 40(2), 2021 — [doi:10.1111/cgf.142636](https://doi.org/10.1111/cgf.142636) · [PDF](https://perso.liris.cnrs.fr/nbonneel/BVQM_CGF.pdf) — *Perceptual fit-quality metric (phases 07, 17)*
-- **T28** B. Kavoosighafi et al., "Perceived Quality of BRDF Models," *Computer Graphics Forum*, 2025 — [doi:10.1111/cgf.70162](https://doi.org/10.1111/cgf.70162) — *Which model looks best when fitted (phase 17)*
-- **T29** A. Sztrajman, G. Rainer, T. Ritschel, T. Weyrich, "Neural BRDF Representation and Importance Sampling," *Computer Graphics Forum* 40, 2021 — [doi:10.1111/cgf.14335](https://doi.org/10.1111/cgf.14335) · [project](https://reality.cs.ucl.ac.uk/projects/reflectance-remapping/sztrajman2021neural.html) — *Neural fit stretch; remap to analytic (phase 17)*
-
-#### Fresnel and optical constants
-
-- **T30** M. Born, E. Wolf, *Principles of Optics*, 7th ed., Cambridge University Press, 1999 (60th anniv. ed. 2019) — [Cambridge](https://www.cambridge.org/9781108477437) — *Exact Fresnel equations, polarisation (phases 07, 10)*
-- **T31** O. Gulbrandsen, "Artist Friendly Metallic Fresnel," *JCGT* 3(4):64–72, 2014 — [PDF](https://jcgt.org/published/0003/04/03/paper.pdf) — *Map n,k to reflectivity/edge tint (phase 07)*
-- **T32** M. N. Polyanskiy, "Refractiveindex.info Database of Optical Constants," *Scientific Data* 11:94, 2024 — [doi:10.1038/s41597-023-02898-2](https://doi.org/10.1038/s41597-023-02898-2) · [GitHub](https://github.com/polyanskiy/refractiveindex.info-database) — *Metal F0 sanity check vs mirror, chrome (phases 06, 07)*
-
-#### Production shading models (course notes)
-
-- **T33** B. Burley, "Physically-Based Shading at Disney," SIGGRAPH 2012 course *Practical Physically Based Shading in Film and Game Production* — [PDF](https://static1.squarespace.com/static/58586fa5ebbd1a60e7d76d3e/t/593a3afa46c3c4a376d779f6/1496988449807/s2012_pbs_disney_brdf_notes_v2.pdf) · [course](https://blog.selfshadow.com/publications/s2012-shading-course/) — *Principled parameters, MERL-based design (phases 07, 17)*
-- **T34** B. Burley, "Extending the Disney BRDF to a BSDF with Integrated Subsurface Scattering," SIGGRAPH 2015 course notes — [PDF](https://blog.selfshadow.com/publications/s2015-shading-course/burley/s2015_pbs_disney_bsdf_notes.pdf) — *Anisotropic alpha mapping, sheen (phase 09)*
-- **T35** B. Karis, "Real Shading in Unreal Engine 4," SIGGRAPH 2013 course *Physically Based Shading in Theory and Practice* — [PDF](https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf) · [slides](https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_slides.pdf) — *UE GGX/Smith/Schlick, α = roughness² (phase 07)*
-- **T36** S. Lagarde, C. de Rousiers, "Moving Frostbite to Physically Based Rendering 3.0," SIGGRAPH 2014 course notes — [PDF](https://seblagarde.wordpress.com/wp-content/uploads/2015/07/course_notes_moving_frostbite_to_pbr_v3.pdf) · [post](https://seblagarde.wordpress.com/2015/07/14/siggraph-2014-moving-frostbite-to-physically-based-rendering/) — *Validation against references, photometric units (phase 07)*
-- **T37** C. Kulla, A. Conty, "Revisiting Physically Based Shading at Imageworks," SIGGRAPH 2017 course — [slides](https://blog.selfshadow.com/publications/s2017-shading-course/imageworks/s2017_pbs_imageworks_slides_v2.pdf) · [sheen supplement](https://blog.selfshadow.com/publications/s2017-shading-course/imageworks/s2017_pbs_imageworks_sheen.pdf) — *Energy compensation, Charlie sheen (phases 07, 09)*
-- **T38** N. Hoffman, "Physics and Math of Shading," SIGGRAPH 2015 course *Physically Based Shading in Theory and Practice* — [slides](https://blog.selfshadow.com/publications/s2015-shading-course/hoffman/s2015_pbs_physics_math_slides.pdf) · [course](https://blog.selfshadow.com/publications/s2015-shading-course/) — *Plain-language theory for docs (phases 00, 07)*
-- **T39** R. Guy, M. Agopian, "Physically Based Rendering in Filament," Google — [docs](https://google.github.io/filament/Filament.md.html) — *Readable real-time BRDF derivations (phases 07, 14)*
-
-#### Material exchange formats and engine docs
-
-- **T40** Khronos Group, *glTF 2.0 Specification* v2.0.1, §3.9.2 Metallic-Roughness Material and Appendix B BRDF Implementation — [spec](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#metallic-roughness-material) — *Core export target and BRDF (phases 07, 13)*
-- **T41** Khronos, KHR_materials_anisotropy — [README](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_anisotropy/README.md) — *Export fitted anisotropy (phase 09)*
-- **T42** Khronos, KHR_materials_sheen, KHR_materials_clearcoat — [sheen](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_sheen/README.md) · [clearcoat](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_clearcoat/README.md) — *Fabric and coated-sample export (phase 09)*
-- **T43** Khronos, KHR_materials_specular, KHR_materials_ior — [specular](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_specular/README.md) · [ior](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_ior/README.md) — *Export measured dielectric F0 (phase 07)*
-- **T44** Khronos, KHR_texture_transform — [README](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_transform/README.md) — *SVBRDF texture tiling on models (phases 09, 13)*
-- **T45** Khronos, glTF Sample Viewer — [GitHub](https://github.com/KhronosGroup/glTF-Sample-Viewer) — *Reference check of exported .glb (phases 07, 13)*
-- **T46** Epic Games, "Physically Based Materials in Unreal Engine" — [docs](https://dev.epicgames.com/documentation/en-us/unreal-engine/physically-based-materials-in-unreal-engine); "Importing glTF Files Into Unreal Engine" — [docs](https://dev.epicgames.com/documentation/unreal-engine/importing-gltf-files-into-unreal-engine) — *Unreal export mapping (phases 07, 13)*
-- **T47** Unity, HDRP "Lit Shader" — [docs](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@14.0/manual/Lit-Shader.html); Unity glTFast — [docs](https://docs.unity3d.com/Packages/com.unity.cloud.gltfast@6.9/manual/index.html) — *Unity export mapping (phases 07, 13)*
-- **T48** Blender Manual, "Principled BSDF" — [docs](https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/principled.html) — *Check exports in Blender (phases 07, 13)*
-- **T49** I. Georgiev, J. Portsmouth, Z. Andersson, A. Herubel, A. King, S. Ogaki, F. Servant, *Autodesk Standard Surface* v1.0.1 — [spec](https://autodesk.github.io/standard-surface/) · [GitHub](https://github.com/Autodesk/standard-surface) — *DCC/film material mapping (phase 07)*
-- **T50** Z. Andersson, P. Edmondson, J. Guertault, A. Herubel, P. Kutz, A. Machizaud, J. Portsmouth, F. Servant, J. Stone, "OpenPBR Surface: An Open Shading Model for Physically Based Materials," *DigiPro 2025* — [doi:10.1145/3744199.3744632](https://doi.org/10.1145/3744199.3744632) · [spec v1.1.1](https://academysoftwarefoundation.github.io/OpenPBR/) — *Future-proof export, F82-tint metals (phases 07, 16)*
-- **T51** ASWF, MaterialX Specification and Physically Based Shading Nodes — [GitHub](https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/documents/Specification/MaterialX.PBRSpec.md) · [v1.38 PDF](https://materialx.org/assets/MaterialX.v1.38.PBRSpec.pdf) — *Renderer-neutral material file (phases 13, 16)*
-
-#### Spectral rendering
-
-- **T52** B. Smits, "An RGB-to-Spectrum Conversion for Reflectances," *Journal of Graphics Tools* 4(4):11–22, 1999 — [doi:10.1080/10867651.1999.10487511](https://doi.org/10.1080/10867651.1999.10487511) — *Baseline RGB↔spectrum for 8 bands (phase 10)*
-- **T53** W. Jakob, J. Hanika, "A Low-Dimensional Function Space for Efficient Spectral Upsampling," *Computer Graphics Forum* 38(2):147–155, 2019 — [doi:10.1111/cgf.13626](https://doi.org/10.1111/cgf.13626) · [RGL](https://rgl.epfl.ch/publications/Jakob2019Spectral) — *Smooth spectra from fitted RGB albedo (phase 10)*
-- **T54** C. Peters, S. Merzbach, J. Hanika, C. Dachsbacher, "Using Moments to Represent Bounded Signals for Spectral Rendering," *ACM TOG* 38(4):136, 2019 — [doi:10.1145/3306346.3322964](https://doi.org/10.1145/3306346.3322964) — *Compact storage of 8-band reflectance (phase 10)*
-- **T55** A. Wilkie, S. Nawaz, M. Droske, A. Weidlich, J. Hanika, "Hero Wavelength Spectral Sampling," *Computer Graphics Forum* 33(4):123–131, 2014 — [doi:10.1111/cgf.12419](https://doi.org/10.1111/cgf.12419) — *Spectral preview render of measured bands (phases 10, 14)*
-
-### Calibration, HDR, photometric stereo and 3D scanning
-
-
-#### Geometric camera calibration
-
-- **V1** Z. Zhang, "A Flexible New Technique for Camera Calibration," *IEEE TPAMI* 22(11):1330–1334, 2000 — [doi:10.1109/34.888718](https://doi.org/10.1109/34.888718) — *Planar-target intrinsics (phase 06)*
-- **V2** R. Y. Tsai, "A Versatile Camera Calibration Technique for High-Accuracy 3D Machine Vision Metrology Using Off-the-Shelf TV Cameras and Lenses," *IEEE J. Robotics and Automation* 3(4):323–344, 1987 — [doi:10.1109/JRA.1987.1087109](https://doi.org/10.1109/JRA.1987.1087109) — *Classic calibration background (phase 06)*
-- **V3** J. Heikkilä, O. Silvén, "A Four-step Camera Calibration Procedure with Implicit Image Correction," *Proc. CVPR* 1997, pp. 1106–1112 — [doi:10.1109/CVPR.1997.609468](https://doi.org/10.1109/CVPR.1997.609468) — *Distortion model and correction (phase 06)*
-- **V4** D. C. Brown, "Close-Range Camera Calibration," *Photogrammetric Engineering* 37(8):855–866, 1971 — [Semantic Scholar](https://www.semanticscholar.org/paper/Close-Range-Camera-Calibration-Brown/1150007b62a3c7dac99c2c8f85c63bfab74891af) — *Radial/tangential lens distortion (phase 06)*
-- **V5** J.-Y. Bouguet, "Camera Calibration Toolbox for Matlab," Caltech DATA, 2022 release — [doi:10.22002/D1.20164](https://doi.org/10.22002/D1.20164) · [record](https://data.caltech.edu/records/jx9cx-fdh55) — *Reference calibration workflow (phase 06)*
-- **V6** T. Schöps, V. Larsson, M. Pollefeys, T. Sattler, "Why Having 10,000 Parameters in Your Camera Model Is Better Than Twelve," *Proc. CVPR* 2020 — [CVF](https://openaccess.thecvf.com/content_CVPR_2020/html/Schops_Why_Having_10000_Parameters_in_Your_Camera_Model_Is_Better_CVPR_2020_paper.html) · [PDF](https://arxiv.org/pdf/1912.02908) — *Calibration accuracy limits (phase 17)*
-- **V7** S. Garrido-Jurado, R. Muñoz-Salinas, F. J. Madrid-Cuevas, M. J. Marín-Jiménez, "Automatic Generation and Detection of Highly Reliable Fiducial Markers under Occlusion," *Pattern Recognition* 47(6):2280–2292, 2014 — [doi:10.1016/j.patcog.2014.01.005](https://doi.org/10.1016/j.patcog.2014.01.005) — *ArUco markers on ChArUco board (phases 06, 11)*
-- **V8** R. Hartley, A. Zisserman, *Multiple View Geometry in Computer Vision*, 2nd ed., Cambridge University Press, 2004 — [doi:10.1017/CBO9780511811685](https://doi.org/10.1017/CBO9780511811685) — *Projection, triangulation, bundle adjustment (phases 06, 11)*
-- **V9** R. Szeliski, *Computer Vision: Algorithms and Applications*, 2nd ed., Springer (Texts in Computer Science), 2022 — [doi:10.1007/978-3-030-34372-9](https://doi.org/10.1007/978-3-030-34372-9) · [free PDF](https://szeliski.org/Book/download.php) — *General CV reference (phases 06, 07, 08, 09, 10, 11, 12, 13)*
-
-#### Hand-eye and robot-world calibration (AX=XB, AX=YB)
-
-- **V10** R. Y. Tsai, R. K. Lenz, "A New Technique for Fully Autonomous and Efficient 3D Robotics Hand/Eye Calibration," *IEEE Trans. Robotics and Automation* 5(3):345–358, 1989 — [doi:10.1109/70.34770](https://doi.org/10.1109/70.34770) — *Hand-eye AX=XB baseline (phase 11)*
-- **V11** F. C. Park, B. J. Martin, "Robot Sensor Calibration: Solving AX=XB on the Euclidean Group," *IEEE Trans. Robotics and Automation* 10(5):717–721, 1994 — [doi:10.1109/70.326576](https://doi.org/10.1109/70.326576) — *Lie-group hand-eye solver (phase 11)*
-- **V12** K. Daniilidis, "Hand-Eye Calibration Using Dual Quaternions," *Int. J. Robotics Research* 18(3):286–298, 1999 — [doi:10.1177/02783649922066213](https://doi.org/10.1177/02783649922066213) — *Simultaneous rotation/translation hand-eye (phase 11)*
-- **V13** H. Zhuang, Z. S. Roth, R. Sudhakar, "Simultaneous Robot/World and Tool/Flange Calibration by Solving Homogeneous Transformation Equations of the Form AX=YB," *IEEE Trans. Robotics and Automation* 10(4):549–554, 1994 — [doi:10.1109/70.313105](https://doi.org/10.1109/70.313105) — *AX=YB formulation (phase 11)*
-- **V14** F. Dornaika, R. Horaud, "Simultaneous Robot-World and Hand-Eye Calibration," *IEEE Trans. Robotics and Automation* 14(4):617–622, 1998 — [doi:10.1109/70.704233](https://doi.org/10.1109/70.704233) — *AX=YB nonlinear solution (phase 11)*
-- **V15** M. Shah, "Solving the Robot-World/Hand-Eye Calibration Problem Using the Kronecker Product," *J. Mechanisms and Robotics* 5(3):031007, 2013 — [doi:10.1115/1.4024473](https://doi.org/10.1115/1.4024473) · [NIST](https://www.nist.gov/publications/solving-robot-worldhand-eye-calibration-problem-using-kronecker-product) — *Closed-form AX=YB (OpenCV SHAH) (phase 11)*
-- **V16** A. Tabb, K. M. Ahmad Yousef, "Solving the Robot-World Hand-Eye(s) Calibration Problem with Iterative Methods," *Machine Vision and Applications*, 2017 — [doi:10.1007/s00138-017-0841-7](https://doi.org/10.1007/s00138-017-0841-7) · [code](https://github.com/amy-tabb/RWHEC-Tabb-AhmadYousef) — *Reprojection-error AX=YB refinement (phase 11)*
-- **V17** I. Ali, O. Suominen, A. Gotchev, E. Ruiz Morales, "Methods for Simultaneous Robot-World-Hand–Eye Calibration: A Comparative Study," *Sensors* 19(12):2837, 2019 — [doi:10.3390/s19122837](https://doi.org/10.3390/s19122837) · [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC6631330/) — *Choosing an AX=YB method (phase 11)*
-- **V18** OpenCV, Camera Calibration and 3D Reconstruction (`calibrateHandEye`, `calibrateRobotWorldHandEye`) — [docs 4.13.0](https://docs.opencv.org/4.13.0/d9/d0c/group__calib3d.html) — *Hand-eye implementation (phase 11)*
-
-#### Radiometric calibration and HDR capture
-
-- **V19** T. Mitsunaga, S. K. Nayar, "Radiometric Self Calibration," *Proc. CVPR* 1999, pp. 374–380 — [doi:10.1109/CVPR.1999.786966](https://doi.org/10.1109/CVPR.1999.786966) — *Polynomial response curve (phase 07)*
-- **V20** M. A. Robertson, S. Borman, R. L. Stevenson, "Estimation-Theoretic Approach to Dynamic Range Enhancement Using Multiple Exposures," *J. Electronic Imaging* 12(2):219–228, 2003 — [doi:10.1117/1.1557695](https://doi.org/10.1117/1.1557695); earlier "Dynamic Range Improvement Through Multiple Exposures," ICIP 1999 — [academia.edu](https://www.academia.edu/11184116/Dynamic_Range_Improvement_Through_Multiple_Exposures) — *Weighted HDR merge (OpenCV Robertson) (phase 07)*
-- **V21** M. D. Grossberg, S. K. Nayar, "What Is the Space of Camera Response Functions?," *Proc. CVPR* 2003 — [PDF](https://cave.cs.columbia.edu/old/publications/pdfs/Grossberg_CVPR03.pdf); "Modeling the Space of Camera Response Functions," *IEEE TPAMI* 26(10):1272–1282, 2004 — [doi:10.1109/TPAMI.2004.88](https://doi.org/10.1109/TPAMI.2004.88) — *Response-curve prior (EMoR) (phase 07)*
-- **V22** S. W. Hasinoff, F. Durand, W. T. Freeman, "Noise-Optimal Capture for High Dynamic Range Photography," *Proc. CVPR* 2010, pp. 553–560 — [doi:10.1109/CVPR.2010.5540167](https://doi.org/10.1109/CVPR.2010.5540167) · [project](https://people.csail.mit.edu/hasinoff/hdrnoise) — *Choosing exposure brackets (phase 07)*
-- **V23** M. Granados, B. Ajdin, M. Wand, C. Theobalt, H.-P. Seidel, H. P. A. Lensch, "Optimal HDR Reconstruction with Linear Digital Cameras," *Proc. CVPR* 2010 — [project](https://vcai.mpi-inf.mpg.de/projects/opthdr/) · [mlanthology](https://mlanthology.org/cvpr/2010/granados2010cvpr-optimal/) — *Noise-weighted HDR merge (phase 07)*
-- **V24** E. Reinhard, G. Ward, S. Pattanaik, P. Debevec, W. Heidrich, K. Myszkowski, *High Dynamic Range Imaging: Acquisition, Display, and Image-Based Lighting*, 2nd ed., Morgan Kaufmann, 2010 — [O'Reilly](https://www.oreilly.com/library/view/high-dynamic-range/9780123749147/) — *HDR formats and theory (phase 07)*
-
-#### Photometric stereo
-
-- **V25** A. Hertzmann, S. M. Seitz, "Example-Based Photometric Stereo: Shape Reconstruction with General, Varying BRDFs," *IEEE TPAMI* 27(8):1254–1264, 2005 — [doi:10.1109/TPAMI.2005.158](https://doi.org/10.1109/TPAMI.2005.158) · [PDF](https://grail.cs.washington.edu/projects/sam/HertzmannSeitzPAMI2005.pdf) — *Reference-sphere PS for glossy objects (phase 11)*
-- **V26** R. Basri, D. Jacobs, I. Kemelmacher, "Photometric Stereo with General, Unknown Lighting," *IJCV* 72(3):239–257, 2007 — [doi:10.1007/s11263-006-8815-7](https://doi.org/10.1007/s11263-006-8815-7) · [project](https://www.wisdom.weizmann.ac.il/~vision/photostereo/) — *Spherical-harmonic lighting PS (phase 12)*
-- **V27** J. Ackermann, M. Goesele, "A Survey of Photometric Stereo Techniques," *Foundations and Trends in Computer Graphics and Vision* 9(3–4):149–254, 2015 — [doi:10.1561/0600000065](https://doi.org/10.1561/0600000065) · [PDF](http://mesh.brown.edu/3DP-2018/refs/Ackermann-now2015.pdf) — *PS method overview (phases 11, 12)*
-- **V28** B. Shi et al., "A Benchmark Dataset and Evaluation for Non-Lambertian and Uncalibrated Photometric Stereo," *Proc. CVPR* 2016 — [CVF](https://openaccess.thecvf.com/content_cvpr_2016/html/Shi_A_Benchmark_Dataset_CVPR_2016_paper.html); extended in *IEEE TPAMI* 41(2), 2019 — [IEEE](https://ieeexplore.ieee.org/document/8281537/); DiLiGenT data — [site](https://sites.google.com/site/photometricstereodata/single) — *PS validation dataset (phase 12)*
-- **V29** R. Mecca, A. Wetzler, A. M. Bruckstein, R. Kimmel, "Near Field Photometric Stereo with Point Light Sources," *SIAM J. Imaging Sciences* 7(4):2732–2770, 2014 — [doi:10.1137/140968100](https://doi.org/10.1137/140968100) — *Near-light PS model (phase 12)*
-- **V30** Y. Quéau, B. Durix, T. Wu, D. Cremers, F. Lauze, J.-D. Durou, "LED-Based Photometric Stereo: Modeling, Calibration and Numerical Solution," *J. Mathematical Imaging and Vision* 60(3):313–340, 2018 — [doi:10.1007/s10851-017-0761-1](https://doi.org/10.1007/s10851-017-0761-1) — *LED anisotropy and falloff model (phases 11, 12)*
-- **V31** F. Logothetis, Y. Quéau, R. Mecca, R. Cipolla, "Semi-calibrated Near-Light Photometric Stereo," *SSVM* 2017, LNCS — [doi:10.1007/978-3-319-58771-4_52](https://doi.org/10.1007/978-3-319-58771-4_52) — *Unknown LED intensities (phase 12)*
-- **V32** H. Santo, M. Waechter, Y. Matsushita, "Deep Near-Light Photometric Stereo for Spatially Varying Reflectances," *ECCV* 2020 — [doi:10.1007/978-3-030-58598-3_9](https://doi.org/10.1007/978-3-030-58598-3_9) — *Learned near-light PS option (phase 17)*
-- **V33** T. Papadhimitri, P. Favaro, "A New Perspective on Uncalibrated Photometric Stereo," *Proc. CVPR* 2013 — [PDF](https://openaccess.thecvf.com/content_cvpr_2013/papers/Papadhimitri_A_New_Perspective_2013_CVPR_paper.pdf) · [mlanthology](https://mlanthology.org/cvpr/2013/papadhimitri2013cvpr-new/) — *Perspective uncalibrated PS fallback (phase 12)*
-- **V34** S. Ikehata, "CNN-PS: CNN-Based Photometric Stereo for General Non-convex Surfaces," *ECCV* 2018 — [doi:10.1007/978-3-030-01267-0_1](https://doi.org/10.1007/978-3-030-01267-0_1) · [PDF](https://www.ecva.net/papers/eccv_2018/papers_ECCV/papers/Ikehata_CNN-PS_CNN-based_Photometric_ECCV_2018_paper.pdf) — *Learned PS for glossy objects (phase 17)*
-- **V35** Y. Quéau, J.-D. Durou, J.-F. Aujol, "Normal Integration: A Survey," *J. Mathematical Imaging and Vision* 60(4):576–593, 2018 — [doi:10.1007/s10851-017-0773-x](https://doi.org/10.1007/s10851-017-0773-x) · [code](https://github.com/yqueau/normal_integration) — *Normals to depth map (phase 12)*
-- **V36** D. Nehab, S. Rusinkiewicz, J. Davis, R. Ramamoorthi, "Efficiently Combining Positions and Normals for Precise 3D Geometry," *ACM TOG (SIGGRAPH)* 24(3), 2005 — [project](https://gfx.cs.princeton.edu/pubs/Nehab_2005_ECP/index.php) — *Fuse PS normals with mesh (phase 12)*
-
-#### Multi-view reconstruction, visual hulls, meshing
-
-- **V37** N. Snavely, S. M. Seitz, R. Szeliski, "Photo Tourism: Exploring Photo Collections in 3D," *ACM TOG* 25(3):835–846, 2006 — [doi:10.1145/1141911.1141964](https://doi.org/10.1145/1141911.1141964) — *Incremental SfM background (phase 12)*
-- **V38** Y. Furukawa, J. Ponce, "Accurate, Dense, and Robust Multiview Stereopsis," *IEEE TPAMI* 32(8):1362–1376, 2010 — [doi:10.1109/TPAMI.2009.161](https://doi.org/10.1109/TPAMI.2009.161) — *Patch-based MVS (PMVS) (phase 12)*
-- **V39** Y. Furukawa, C. Hernández, "Multi-View Stereo: A Tutorial," *Foundations and Trends in Computer Graphics and Vision* 9(1–2):1–148, 2015 — [doi:10.1561/0600000052](https://doi.org/10.1561/0600000052) — *MVS overview (phase 12)*
-- **V40** C. Griwodz et al., "AliceVision Meshroom: An Open-Source 3D Reconstruction Pipeline," *Proc. ACM MMSys* 2021 — [doi:10.1145/3458305.3478443](https://doi.org/10.1145/3458305.3478443) · [HAL](https://hal.science/hal-03351139v1) — *Alternative pipeline citation (phase 12)*
-- **V41** W. Matusik, C. Buehler, R. Raskar, S. J. Gortler, L. McMillan, "Image-Based Visual Hulls," *Proc. SIGGRAPH* 2000 — [doi:10.1145/344779.344951](https://doi.org/10.1145/344779.344951) · [project](https://people.csail.mit.edu/wojciech/IBVH/index.html) — *Silhouette visual hull (phase 12)*
-- **V42** C. Hernández Esteban, F. Schmitt, "Silhouette and Stereo Fusion for 3D Object Modeling," *Computer Vision and Image Understanding* 96(3):367–392, 2004 — [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S1077314204000542) · [PDF (3DIM'03)](https://carlos-hernandez.org/papers/hernandez_3dim03.pdf) — *Hull + stereo fusion on turntable (phase 12)*
-- **V43** W. E. Lorensen, H. E. Cline, "Marching Cubes: A High Resolution 3D Surface Construction Algorithm," *Proc. SIGGRAPH* 1987 — [doi:10.1145/37401.37422](https://doi.org/10.1145/37401.37422) — *Voxel grid to mesh (phase 12)*
-- **V44** B. Curless, M. Levoy, "A Volumetric Method for Building Complex Models from Range Images," *Proc. SIGGRAPH* 1996 — [doi:10.1145/237170.237269](https://doi.org/10.1145/237170.237269) — *TSDF fusion of depth maps (phase 12)*
-- **V45** M. Kazhdan, M. Bolitho, H. Hoppe, "Poisson Surface Reconstruction," *Eurographics Symp. Geometry Processing* 2006 — [EG DL](https://diglib.eg.org/items/245d6ba1-0209-4365-a4a4-16ce46421620) · [PDF](https://hhoppe.com/poissonrecon.pdf) — *Oriented points to mesh (phase 12)*
-- **V46** M. Kazhdan, H. Hoppe, "Screened Poisson Surface Reconstruction," *ACM TOG* 32(3):29, 2013 — [doi:10.1145/2487228.2487237](https://doi.org/10.1145/2487228.2487237) · [PDF](https://www.cs.jhu.edu/~misha/Fall13b/Papers/Kazhdan13.pdf) — *Default meshing step (phase 12)*
-- **V47** Q.-Y. Zhou, J. Park, V. Koltun, "Open3D: A Modern Library for 3D Data Processing," arXiv:1801.09847, 2018 — [arXiv](https://arxiv.org/abs/1801.09847) — *Point cloud/mesh library (phases 12, 13, 14)*
-
-#### Reflectance capture rigs and polarization
-
-- **V48** P. Debevec, T. Hawkins, C. Tchou, H.-P. Duiker, W. Sarokin, M. Sagar, "Acquiring the Reflectance Field of a Human Face," *Proc. SIGGRAPH* 2000 — [doi:10.1145/344779.344855](https://doi.org/10.1145/344779.344855) · [PDF](https://cseweb.ucsd.edu/~ravir/6160/papers/p145-debevec.pdf) — *Light-stage relighting concept (phases 09, 11)*
-- **V49** W.-C. Ma, T. Hawkins, P. Peers, C.-F. Chabert, M. Weiss, P. Debevec, "Rapid Acquisition of Specular and Diffuse Normal Maps from Polarized Spherical Gradient Illumination," *EGSR* 2007 — [EG DL](https://diglib.eg.org/items/da04b92c-39fe-41d1-a658-a8535521521c) · [PDF](https://vgl.ict.usc.edu/Research/FaceScanning/EGSR2007_SGI_low.pdf) — *Polarized diffuse/specular normals (phase 10)*
-- **V50** A. Ghosh, G. Fyffe, B. Tunwattanapong, J. Busch, X. Yu, P. Debevec, "Multiview Face Capture Using Polarized Spherical Gradient Illumination," *ACM TOG* 30(6), 2011 — [doi:10.1145/2070781.2024163](https://doi.org/10.1145/2070781.2024163) — *Multi-view polarized capture (phases 10, 11)*
-- **V51** S. K. Nayar, X.-S. Fang, T. Boult, "Separation of Reflection Components Using Color and Polarization," *IJCV* 21(3):163–186, 1997 — [doi:10.1023/A:1007937815113](https://doi.org/10.1023/A:1007937815113) — *Diffuse/specular split with polarizer (phase 10)*
-- **V52** L. B. Wolff, "Polarization-Based Material Classification from Specular Reflection," *IEEE TPAMI* 12(11):1059–1071, 1990 — [doi:10.1109/34.61705](https://doi.org/10.1109/34.61705) — *Polarization physics background (phase 10)*
-
-#### Open-source turntable scanners
-
-- **V53** OpenScan (Raspberry Pi photogrammetry scanner) — [openscan.eu](https://openscan.eu/pages/openscan-mini) · [GitHub OpenScan3](https://github.com/OpenScan-org/OpenScan3) · [docs](https://openscan-org.github.io/OpenScan-Doc/) — *DIY scanner prior art (phase 11)*
-- **V54** FabScan, Media Computing Group, RWTH Aachen University — [project](https://hci.rwth-aachen.de/fabscan) · [FabScan Pi (Hackaday.io)](https://hackaday.io/project/5857-fabscan-pi-3d-laser-scanner) — *Turntable laser scanner prior art (phase 11)*
-- **V55** BQ Ciclop scanner + Horus software — [Ciclop GitHub](https://github.com/bqlabs/ciclop) · [Horus GitHub](https://github.com/bqlabs/horus) · [Horus docs](https://horus.readthedocs.io/en/release-0.2/source/getting-started/) — *Turntable calibration UX reference (phases 11, 14)*
-
-#### Texturing and UV unwrapping
-
-- **V56** B. Lévy, S. Petitjean, N. Ray, J. Maillot, "Least Squares Conformal Maps for Automatic Texture Atlas Generation," *ACM TOG (SIGGRAPH)* 21(3):362–371, 2002 — [doi:10.1145/566654.566590](https://doi.org/10.1145/566654.566590) · [HAL](https://inria.hal.science/inria-00100754/) — *LSCM UV unwrapping (phase 13)*
-- **V57** xatlas, mesh parameterization / UV unwrapping library — [GitHub](https://github.com/jpcy/xatlas) — *Automatic UV atlas (phase 13)*
-- **V58** M. Waechter, N. Moehrle, M. Goesele, "Let There Be Color! Large-Scale Texturing of 3D Reconstructions," *ECCV* 2014 — [doi:10.1007/978-3-319-10602-1_54](https://doi.org/10.1007/978-3-319-10602-1_54) — *View selection for mesh textures (phase 13)*
-
-### Standards, colour, optics and safety
-
-
-#### Appearance and scatter measurement standards (ASTM)
-
-- **N1** ASTM International, "Standard Practice for Goniometric Optical Scatter Measurements," ASTM E2387-19, 2019 — [ASTM store](https://store.astm.org/e2387-19.html) — *BRDF/BTDF measurement practice (phases 07, 08)*
-- **N2** ASTM International, "Standard Practice for Angle Resolved Optical Scatter Measurements on Specular or Diffuse Surfaces," ASTM E1392 (withdrawn 2003) — [ASTM](https://www.astm.org/DATABASE.CART/WITHDRAWN/E1392.htm) — *Historical BRDF practice cited by Labsphere (phase 07)*
-- **N3** ASTM International, "Standard Practice for Goniophotometry of Objects and Materials," ASTM E167-96 (withdrawn 2005) — [ASTM store](https://store.astm.org/e0167-96.html) — *Goniophotometer geometry conventions (phase 06)*
-- **N4** ASTM International, "Standard Test Method for Specular Gloss," ASTM D523 — [ASTM store](https://store.astm.org/standards/d523) — *20/60/85° gloss cross-check (phase 07)*
-- **N5** ASTM International, "Standard Test Methods for Measurement of Gloss of High-Gloss Surfaces by Abridged Goniophotometry," ASTM E430-23, 2023 — [ASTM store](https://store.astm.org/standards/e430) — *Haze/distinctness-of-image near specular (phases 08, 17)*
-- **N6** ASTM International, "Standard Terminology of Appearance," ASTM E284-25, 2025 — [doi:10.1520/E0284-25](https://doi.org/10.1520/E0284-25) · [ASTM store](https://store.astm.org/standards/e284) — *Docs glossary terms (phase 00)*
-- **N7** ASTM International, "Standard Practice for Specifying the Geometry of Multiangle Spectrophotometers," ASTM E2175-01(2026) — [ASTM store](https://store.astm.org/standards/e2175) — *Reporting light/camera angle geometry (phase 08)*
-- **N8** ASTM International, "Standard Test Method for Multiangle Color Measurement of Metal Flake Pigmented Materials," ASTM E2194-14(2025) — [doi:10.1520/E2194-14R25](https://doi.org/10.1520/E2194-14R25) · [ASTM store](https://store.astm.org/standards/e2194) — *Aspecular angles for metallic samples (phases 08, 09)*
-- **N9** ASTM International, "Standard Practice for Obtaining Spectrometric Data for Object-Color Evaluation," ASTM E1164-23, 2023 — [ASTM store](https://store.astm.org/standards/e1164) — *Spectral data and calibration practice (phase 10)*
-- **N10** ISO, "Paints and varnishes — Determination of gloss value at 20°, 60° and 85°," ISO 2813:2014 — [ISO catalogue](https://www.iso.org/standard/56807.html) — *Gloss reference geometry (phase 07)*
-- **N11** M. E. Nadal, E. A. Thompson, "NIST Reference Goniophotometer for Specular Gloss Measurements," *J. Coatings Technology* 73(917):73–80, 2001 — [PDF](https://www.paint.org/wp-content/uploads/2021/09/jctJUNE01-Nadal.pdf) — *Reference-instrument design and uncertainty (phases 06, 17)*
-
-#### CIE colorimetry, appearance and colour rendering
-
-- **N12** CIE, *A Framework for the Measurement of Visual Appearance*, CIE 175:2006 (ISBN 978-3-901906-52-7) — [CIE](https://cie.co.at/publications/framework-measurement-visual-appearance) — *Colour/gloss/translucency/texture scope (phase 00)*
-- **N13** CIE, *Colorimetry, 4th Edition*, CIE 015:2018 — [doi:10.25039/TR.015.2018](https://doi.org/10.25039/TR.015.2018) · [CIE](https://cie.co.at/publications/colorimetry-4th-edition) — *XYZ, CIELAB, illuminants from spectra (phase 10)*
-- **N14** CIE, *ILV: International Lighting Vocabulary, 2nd Edition*, CIE S 017/E:2020 — [doi:10.25039/S017.2020](https://doi.org/10.25039/S017.2020) · [CIE](https://cie.co.at/publications/ilv-international-lighting-vocabulary-2nd-edition-0) — *Radiometric/photometric terminology (phase 00)*
-- **N15** CIE, *Method of Measuring and Specifying Colour Rendering Properties of Light Sources*, CIE 13.3-1995 (ISBN 978-3-900734-57-2) — [CIE](https://cie.co.at/publications/method-measuring-and-specifying-colour-rendering-properties-light-sources) — *COB CRI (Ra) meaning (phases 04, 10)*
-- **N16** CIE, *CIE 2017 Colour Fidelity Index for Accurate Scientific Use*, CIE 224:2017 — [doi:10.25039/TR.224.2017](https://doi.org/10.25039/TR.224.2017) · [CIE](https://cie.co.at/publications/cie-2017-colour-fidelity-index-accurate-scientific-use) — *Rf for white and LED-bank spectra (phase 10)*
-- **N17** K. A. G. Smet, CRI_CIE_Rf_2017 calculator (MATLAB/Excel) — [GitHub](https://github.com/ksmet1977/CRI_CIE_Rf_2017) — *Checking our Rf implementation (phase 10)*
-- **N18** IES, *Technical Memorandum: IES Method for Evaluating Light Source Color Rendition*, ANSI/IES TM-30-24 — [IES store](https://store.ies.org/product/technical-memorandum-ies-method-for-evaluating-light-source-color-rendition/?v=eb65bcceaa5f) · [ANSI](https://webstore.ansi.org/standards/iesna/ansiiestm3024) — *Rf/Rg report for light sources (phase 10)*
-- **N19** M. P. Royer, "Analysis of Color Rendition Specification Criteria," *Proc. SPIE* 10940 (Light-Emitting Devices, Materials, and Applications), 2019 — [DOE](https://www.energy.gov/cmei/ssl/articles/analysis-color-rendition-specification-criteria) — *Choosing Rf/Rg acceptance thresholds (phase 10)*
-- **N20** Y. Ohno, "Spectral design considerations for white LED color rendering," *Optical Engineering* 44(11), 2005 — [doi:10.1117/1.2130694](https://doi.org/10.1117/1.2130694) — *Designing the 8-band LED spectrum (phase 10)*
-
-#### Colour science books
-
-- **N21** G. Wyszecki, W. S. Stiles, *Color Science: Concepts and Methods, Quantitative Data and Formulae*, 2nd ed., Wiley, 1982 — review [doi:10.1002/col.5080080421](https://doi.org/10.1002/col.5080080421) — *Colorimetric data and formulae (phase 10)*
-- **N22** M. D. Fairchild, *Color Appearance Models*, 3rd ed., Wiley, 2013 — [doi:10.1002/9781118653128](https://doi.org/10.1002/9781118653128) — *Appearance/white point for renders (phases 10, 13)*
-- **N23** R. W. G. Hunt, M. R. Pointer, *Measuring Colour*, 4th ed., Wiley, 2011 — [doi:10.1002/9781119975595](https://doi.org/10.1002/9781119975595) — *Practical colour measurement geometry (phase 10)*
-
-#### Camera characterization and colour encoding
-
-- **N24** EMVA, *Standard 1288: Standard for Characterization of Image Sensors and Cameras*, Release 4.0 (Linear), 2021 — [EMVA](https://www.emva.org/standards-technology/emva-1288/) · [PDF](https://corp.dxomark.com/wp-content/uploads/2026/06/EMVA1288Linear_4.0Release.pdf) — *IMX477 linearity, noise, dark current tests (phases 06, 07)*
-- **N25** ISO, "Photography — Electronic still picture imaging — Resolution and spatial frequency responses," ISO 12233:2023 (revised by ISO 12233:2024, "Digital cameras — Resolution and spatial frequency responses") — [ISO catalogue](https://www.iso.org/standard/79169.html) — *Slanted-edge SFR of 16 mm lens (phase 06)*
-- **N26** ISO, "Photography — Electronic still-picture imaging — Noise measurements," ISO 15739:2023 — [ISO catalogue](https://www.iso.org/standard/82233.html) — *Noise and dynamic range for HDR (phase 07)*
-- **N27** ISO, "Graphic technology and photography — Colour characterisation of digital still cameras (DSCs) — Part 1: Stimuli, metrology and test procedures," ISO 17321-1:2012 — [ISO (2006 ed., revised by 2012)](https://www.iso.org/standard/35835.html) · [2012 ed. catalogue](https://standards.iteh.ai/catalog/standards/iso/4256cfe1-8683-4b48-a68b-45aff0db2c4e/iso-17321-1-2012) — *Camera spectral sensitivity/colour matrix (phase 10)*
-- **N28** IEC, "Multimedia systems and equipment — Colour measurement and management — Part 2-1: Colour management — Default RGB colour space — sRGB," IEC 61966-2-1:1999 (+AMD1:2003) — [ANSI webstore](https://webstore.ansi.org/standards/iec/iec61966ed1999) · [IEC AMD1](https://webstore.iec.ch/en/publication/6168) — *sRGB transfer function for texture export (phases 07, 13)*
-- **N29** M. Stokes, M. Anderson, S. Chandrasekar, R. Motta, "A Standard Default Color Space for the Internet — sRGB," v1.10, 1996 — [W3C](https://www.w3.org/Graphics/Color/sRGB.html) — *Linear vs gamma-encoded texture handling (phase 13)*
-
-#### Reflectance standards (PTFE / Spectralon)
-
-- **N30** V. R. Weidner, J. J. Hsia, "Reflection properties of pressed polytetrafluoroethylene powder," *J. Opt. Soc. Am.* 71(7):856–861, 1981 — [doi:10.1364/JOSA.71.000856](https://doi.org/10.1364/JOSA.71.000856) — *PTFE white reference reflectance (phase 07)*
-- **N31** V. R. Weidner, J. J. Hsia, B. Adams, "Laboratory intercomparison study of pressed polytetrafluoroethylene powder reflectance standards," *Appl. Opt.* 24(14):2225, 1985 — [doi:10.1364/AO.24.002225](https://doi.org/10.1364/AO.24.002225) — *PTFE reference repeatability (phase 07)*
-- **N32** J. J. Hsia, P. Y. Barnes, "45°/0° reflectance factors of pressed polytetrafluoroethylene (PTFE) powder," NIST Technical Note 1413, 1995 — [doi:10.6028/NIST.TN.1413](https://doi.org/10.6028/NIST.TN.1413) — *45/0 PTFE factor for our geometry (phase 07)*
-- **N33** P. Y. Barnes, E. A. Early, A. C. Parr, "Spectral Reflectance," NIST Special Publication 250-48, 1998 — [doi:10.6028/NIST.SP.250-48](https://doi.org/10.6028/NIST.SP.250-48) — *Traceable reflectance calibration method (phase 07)*
-- **N34** Labsphere, *Technical Guide: Reflectance Materials and Coatings* (Spectralon >99 % 400–1500 nm) — [PDF](https://www.systems-eng.co.jp/dcms_media/other/Guide_Reflectance_Materials_Coatings.pdf) — *Spectralon vs DIY PTFE choice (phase 07)*
-- **N35** A. Springsteen, "Reflectance Spectroscopy: An Overview of Classification and Techniques," in *Applied Spectroscopy: A Compact Reference for Practitioners*, Academic Press, 1998, pp. 193–224 — [doi:10.1016/B978-012764070-9/50008-1](https://doi.org/10.1016/B978-012764070-9/50008-1) — *Reflectance geometry nomenclature (phase 07)*
-- **N36** A. Springsteen, "Standards for Reflectance Measurements," in *Applied Spectroscopy: A Compact Reference for Practitioners*, Academic Press, 1998, pp. 247–267 — [doi:10.1016/B978-012764070-9/50010-X](https://doi.org/10.1016/B978-012764070-9/50010-X) — *Choosing white/grey/black references (phase 07)*
-
-#### Multispectral imaging with LED illumination
-
-- **N37** J.-I. Park, M.-H. Lee, M. D. Grossberg, S. K. Nayar, "Multispectral Imaging Using Multiplexed Illumination," *ICCV* 2007, pp. 1–8 — [doi:10.1109/ICCV.2007.4409090](https://doi.org/10.1109/ICCV.2007.4409090) — *Multiplexed LED band capture (phase 10)*
-- **N38** R. Shrestha, J. Y. Hardeberg, "Multispectral imaging using LED illumination and an RGB camera," *Color and Imaging Conf.* 21(1):8–13, 2013 — [doi:10.2352/CIC.2013.21.1.art00003](https://doi.org/10.2352/cic.2013.21.1.art00003) — *LED bank + RGB camera reflectance (phase 10)*
-- **N39** R. Shrestha, J. Y. Hardeberg, "Evaluation and comparison of multispectral imaging systems," *Color and Imaging Conf.* 22(1), 2014 — [doi:10.2352/CIC.2014.22.1.art00018](https://doi.org/10.2352/cic.2014.22.1.art00018) — *Spectral accuracy metrics (phases 10, 17)*
-- **N40** R. Shrestha, J. Y. Hardeberg, "How Are LED Illumination Based Multispectral Imaging Systems Influenced by Different Factors?," *ICISP 2014*, LNCS, pp. 61–71 — [doi:10.1007/978-3-319-07998-1_8](https://doi.org/10.1007/978-3-319-07998-1_8) — *Noise/band-count sensitivity of LED bank (phase 10)*
-- **N41** F. H. Imai, R. S. Berns, D.-Y. Tzeng, "A Comparative Analysis of Spectral Reflectance Estimated in Various Spaces Using a Trichromatic Camera System," *J. Imaging Sci. Technol.* 44(4):280–287, 2000 — [doi:10.2352/J.ImagingSci.Technol.2000.44.4.art00003](https://doi.org/10.2352/j.imagingsci.technol.2000.44.4.art00003) — *Spectral reconstruction from camera signals (phase 10)*
-- **N42** F. H. Imai, M. R. Rosen, R. S. Berns, "Comparison of Spectrally Narrow-Band Capture Versus Wide-Band with a Priori Sample Analysis for Spectral Reflectance Estimation," *Color and Imaging Conf.* 8(1):234–241, 2000 — [doi:10.2352/CIC.2000.8.1.art00043](https://doi.org/10.2352/cic.2000.8.1.art00043) — *Narrow-band LEDs vs filters trade-off (phase 10)*
-- **N43** J. Y. Hardeberg, *Acquisition and Reproduction of Color Images: Colorimetric and Multispectral Approaches*, 2001 (book of PhD thesis) — review by M. H. Brill [doi:10.1002/col.10073](https://doi.org/10.1002/col.10073) — *Camera colorimetric/spectral calibration (phase 10)*
-- **N44** J. Y. Hardeberg, "Filter Selection for Multispectral Color Image Acquisition," *J. Imaging Sci. Technol.* 48(2), 2004 — [doi:10.2352/J.ImagingSci.Technol.2004.48.2.art00005](https://doi.org/10.2352/j.imagingsci.technol.2004.48.2.art00005) — *Choosing the 8 LED bands (phase 10)*
-
-#### Optics textbooks
-
-- **N45** R. Kingslake, R. B. Johnson, *Lens Design Fundamentals*, 2nd ed., Academic Press/Elsevier, 2010 (ISBN 978-0-12-374301-5) — e.g. ch. "Aberration Theory" [doi:10.1016/B978-0-12-374301-5.00008-5](https://doi.org/10.1016/b978-0-12-374301-5.00008-5) — *M12 lens f-number/aberration reasoning (phase 06)*
-- **N46** J. W. Goodman, *Introduction to Fourier Optics* (1st ed. 1968; 4th ed. 2017) — review [doi:10.1063/1.3035549](https://doi.org/10.1063/1.3035549) — *Diffraction limit and MTF at f/8 (phase 06)*
-
-#### Photobiological and machine/electrical safety
-
-- **N47** IEC, "Photobiological safety of lamps and lamp systems," IEC 62471 (BS EN 62471) — [BSI record doi:10.3403/30149289](https://doi.org/10.3403/30149289) — *COB and LED-bank eye-safety risk groups (phases 04, 10)*
-- **N48** ISO, "Safety of machinery — Emergency stop function — Principles for design," ISO 13850:2015 (BS EN ISO 13850:2015) — [BSI record doi:10.3403/30265059](https://doi.org/10.3403/30265059) — *E-stop category and reset behaviour (phases 01, 02)*
-- **N49** IEC, "Safety of machinery — Electrical equipment of machines — Part 1: General requirements," IEC 60204-1 (BS EN 60204-1) — [BSI record doi:10.3403/30238348](https://doi.org/10.3403/30238348) — *Power box wiring, colours, stop circuit (phase 01)*
-- **N50** ISO, "Safety of machinery — General principles for design — Risk assessment and risk reduction," ISO 12100:2010 (BS EN ISO 12100:2010) — [BSI record doi:10.3403/30201665](https://doi.org/10.3403/30201665) — *Pinch-point/hazard risk assessment (phases 00, 16)*
-- **N51** IEC, "Audio/video, information and communication technology equipment — Part 1: Safety requirements," IEC 62368-1 (BS EN IEC 62368-1) — [BSI record doi:10.3403/30347376U](https://doi.org/10.3403/30347376u) — *Bought-in PSU safety listing (phase 01)*
-
-### Motion control, electronics and open hardware
-
-
-#### Stepper drivers and microcontrollers
-
-- **H1** Analog Devices (Trinamic), "TMC2209 Datasheet," rev. 1.09 — [PDF](https://www.analog.com/media/en/technical-documentation/data-sheets/tmc2209_datasheet_rev1.09.pdf) · [product](https://www.analog.com/en/products/tmc2209.html) — *Driver registers, UART, current (phase 02)*
-- **H2** Analog Devices (Trinamic), "AN-002: Parameterization of StallGuard2 & CoolStep," application note — [page](https://www.analog.com/en/resources/app-notes/an-002.html) · [PDF](https://www.analog.com/media/en/technical-documentation/app-notes/an-002.pdf) — *Stall-detection thresholds, crash detection (phases 02, 04)*
-- **H3** B. Dwersteg (Analog Devices/Trinamic), "AN-026: Programmable Adaptive Microstep Table," application note — [page](https://www.analog.com/en/resources/app-notes/an-026.html) · [PDF](https://www.analog.com/media/en/technical-documentation/app-notes/an-026.pdf) — *Microstep linearity, even step spacing (phases 08, 09)*
-- **H4** Marlin Firmware, "Trinamic drivers" (StealthChop, SpreadCycle, hybrid threshold, sensorless homing) — [docs](https://marlinfw.org/docs/hardware/tmc_drivers.html) — *StealthChop vs SpreadCycle choice (phase 02)*
-- **H5** Espressif Systems, "ESP32 Technical Reference Manual," v5.8 (GPIO matrix, UART, RMT, LEDC, MCPWM, timers) — [PDF](https://documentation.espressif.com/esp32_technical_reference_manual_en.pdf) — *E4 MCU peripherals, step timing (phase 02)*
-- **H6** Espressif Systems, "ESP32 Series Datasheet," v5.3 — [PDF](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) · [HTML](https://documentation.espressif.com/esp32_datasheet_en.html) — *Strapping pins, electrical limits (phase 02)*
-- **H7** Raspberry Pi Ltd, "RP2040 Datasheet" — [PDF](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf) · [product brief](https://datasheets.raspberrypi.com/rp2040/rp2040-product-brief.pdf) — *Pico GPIO, pull-ups, PIO (phase 02)*
-- **H8** Raspberry Pi Ltd, "Raspberry Pi Pico-series Python SDK: A MicroPython environment for Raspberry Pi microcontrollers" — [PDF](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-python-sdk.pdf) — *MicroPython button-hub firmware (phase 02)*
-
-#### Interface electronics and position sensors
-
-- **H9** Sharp Corporation, "PC817XxNSZ1B Series" photocoupler data sheet, OP18002EN, 2018 — [PDF](https://global.sharp/products/device/lineup/data/pdf/datasheet/PC817XxNSZ1B_e.pdf) — *24 V sense optocoupler, CTR (phase 01)*
-- **H10** Texas Instruments, "ULN200x, ULQ200x High-Voltage, High-Current Darlington Transistor Arrays," SLRS027T, 2025 — [PDF](https://www.ti.com/lit/gpn/ULN2003A) · [product](https://www.ti.com/product/ULN2003A); "ULN2803A Darlington Transistor Array," SLRS049 — [PDF](https://datasheet.octopart.com/ULN2803AN-Texas-Instruments-datasheet-14122296.pdf) — *8-band LED low-side switching (phase 10)*
-- **H11** Vishay Semiconductors, "TCST2103, TCST2202, TCST2300: Transmissive Optical Sensor with Phototransistor Output," doc. 81147 — [PDF](https://www.vishay.com/docs/81147/tcst2103.pdf) · [product](https://www.vishay.com/en/product/81147/) — *Optical homing flag, 1 mm aperture (phases 04, 05)*
-- **H12** ams AG (ams OSRAM), "AS5600 – 12-bit Programmable Contactless Potentiometer," datasheet v1-00, 2014 — [PDF](https://www.mouser.com/pdfdocs/AMS_AS5600_Datasheet_EN.PDF) · [v1-06](https://files.seeedstudio.com/wiki/Grove-12-bit-Magnetic-Rotary-Position-Sensor-AS5600/res/Magnetic%20Rotary%20Position%20Sensor%20AS5600%20Datasheet.pdf) — *Absolute-angle check of axes (phase 17)*
-
-#### Camera interface
-
-- **H13** Sony Semiconductor Solutions, "IMX477-AACK: Diagonal 7.857 mm (Type 1/2.3) 12.3 Mega-Pixel CMOS Image Sensor," flyer, 2018 — [PDF](https://www.sony-semicon.com/files/62/pdf/p-13_IMX477-AACK_Flyer.pdf) — *Pixel pitch 1.55 µm, sensor size (phase 06)*
-- **H14** USB Implementers Forum, "Video Class v1.5 document set" (USB Device Class Definition for Video Devices, rev. 1.5), 2012 — [usb.org](https://www.usb.org/document-library/video-class-v15-document-set) — *UVC exposure/white-balance controls (phase 06)*
-- **H15** Linux kernel documentation, "The Linux USB Video Class (UVC) driver" — [docs](https://www.kernel.org/doc/html/latest/userspace-api/media/drivers/uvcvideo.html) — *uvcvideo controls, extension units (phases 06, 14)*
-
-#### Belt drives and positioning accuracy
-
-- **H16** Gates Corporation, "PowerGrip GT2 Belt Drives – Drive Design Manual" — [PDF](https://docs.rs-online.com/5016/0900766b8002d3b7.pdf) — *GT tooth profile, registration, backlash (phases 04, 05)*
-- **H17** Gates Corporation, "Light Power & Precision Drive Design Manual" (2 mm GT profile, belt tensioning) — [PDF](https://www.gates.com/content/dam/documents-library/catalogs/light-power-and-precision-manual.pdf) — *Small-pitch pulley sizing, tension (phases 04, 05)*
-- **H18** Prusa Research, "Adjusting belt tension (CORE One/+, CORE One INDX, CORE One L/+)," Prusa Knowledge Base — [article](https://help.prusa3d.com/article/adjusting-belt-tension-core-one_845048) · [MK4 article](https://help.prusa3d.com/article/adjusting-belt-tension-mk4-s-mk3-9-s-mk3-5-s-mk3-s_112380) — *Frequency-based belt tension check (phase 04)*
-- **H19** Oriental Motor USA, "Stepper Motor Basics" (step-angle accuracy ±3 arcmin, non-cumulative) — [page](https://www.orientalmotor.com/stepper-motors/technology/stepper-motor-basics.html) · ["Everything You Need to Know About Stepper Motors" PDF](https://www.orientalmotor.com/stepper-motors/technology/pdf/everything-you-need-to-know-about-stepper-motors.pdf) — *Angular error budget per axis (phase 07)*
-- **H20** M. Walter, "How Accurate Is Microstepping Really?," *Hackaday*, 29 Aug 2016 — [article](https://hackaday.com/2016/08/29/how-accurate-is-microstepping-really/) — *Microsteps ≠ accuracy under load (phase 08)*
-- **H21** Dr. Fritz Faulhaber GmbH, "Stepper Motor Technical Note: Microstepping Myths and Realities" — [PDF](https://www.faulhaber.com/fileadmin/user_upload/Support/dff_200276_whitepaper_microstepping_8cb.pdf) — *Incremental torque per microstep (phase 08)*
-- **H22** Zaber Technologies, "Microstepping Tutorial" — [article](https://www.zaber.com/technical-articles/microstepping-tutorial) — *Stiction vs microstep resolution (phase 07)*
-- **H23** C. Chang, T. Tran, "Mastering Precision: Understanding Microstepping in Motion Control," *Analog Dialogue* 59(2), 2025 — [article](https://www.analog.com/en/resources/analog-dialogue/articles/mastering-precision-understanding-microstepping.html) — *Microstep current waveforms, holding torque (phase 02)*
-
-#### Motion firmware, homing and G-code
-
-- **H24** Grbl project (gnea), "An open source, embedded, high performance g-code-parser and CNC milling controller" — [GitHub gnea/grbl](https://github.com/gnea/grbl) · [wiki](https://github.com/gnea/grbl/wiki) — *FluidNC lineage, protocol, homing cycle (phase 02)*
-- **H25** grblHAL, "grblHAL core code and master Wiki" — [GitHub grblHAL/core](https://github.com/grblHAL/core) — *Alternative Grbl-derived firmware (phase 02)*
-- **H26** LinuxCNC, "Homing Configuration" (HOME_SEARCH_VEL, HOME_LATCH_VEL, HOME_OFFSET) — [docs](https://linuxcnc.org/docs/html/config/ini-homing.html) — *Two-speed search/latch homing (phases 04, 05)*
-- **H27** T. R. Kramer, F. M. Proctor, E. R. Messina, "The NIST RS274NGC Interpreter – Version 3," NISTIR 6556, NIST, 2000 — [NIST](https://www.nist.gov/publications/nist-rs274ngc-interpreter-version-3) · [PDF](https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nistir6556.pdf) — *G-code semantics for capture scripts (phase 14)*
-
-#### Open-source hardware practice and licensing
-
-- **H28** J. M. Pearce, "Building Research Equipment with Free, Open-Source Hardware," *Science* 337(6100):1303–1304, 2012 — [doi:10.1126/science.1228183](https://doi.org/10.1126/science.1228183) · [MTU repository](https://digitalcommons.mtu.edu/michigantech-p/12237/) — *Rationale for open lab equipment (phase 00)*
-- **H29** J. M. Pearce, *Open-Source Lab: How to Build Your Own Hardware and Reduce Research Costs*, Elsevier, 2014 — [doi:10.1016/C2012-0-07249-3](https://doi.org/10.1016/C2012-0-07249-3) · [MTU repository](https://digitalcommons.mtu.edu/michigantech-p/5871/) — *Low-cost scientific tool design (phase 00)*
-- **H30** R. Jones, P. Haufe, E. Sells, P. Iravani, V. Olliver, C. Palmer, A. Bowyer, "RepRap – the replicating rapid prototyper," *Robotica* 29(1):177–191, 2011 — [doi:10.1017/S026357471000069X](https://doi.org/10.1017/S026357471000069X) · [PDF](https://fab.cba.mit.edu/classes/865.18/replication/Jones.pdf) — *Printed-part machine heritage (phase 03)*
-- **H31** Open Source Hardware Association, "Open Source Hardware (OSHW) Definition 1.0" — [oshwa.org](https://oshwa.org/definition/) · [best practices](https://oshwa.org/resources/sharing-best-practices/) — *Release documentation criteria (phase 16)*
-- **H32** CERN, "CERN Open Hardware Licence Version 2" (P, W, S variants) — [ohwr.org](https://www.ohwr.org/cernohl) · [CERN-OHL-S-2.0 text](https://ohwr.org/project/cernohl/-/wikis/uploads/819d71bea3458f71fba6cf4fb0f2de6b/cern_ohl_s_v2.txt) · [FAQ](https://gitlab.com/ohwr/project/cernohl/-/wikis/faq) · [OSI page](https://opensource.org/license/cern-ohl-s-2.0) — *Hardware licence choice (phase 16)*
-- **H33** Gathering for Open Science Hardware, "GOSH Manifesto" — [openhardware.science](https://openhardware.science/gosh-manifesto/) — *Project values, accessibility (phase 16)*
-- **H34** J. Bonvoisin, R. Mies, J.-F. Boujut, R. Stark, "What is the 'Source' of Open Source Hardware?," *Journal of Open Hardware* 1(1), 2017 — [doi:10.5334/joh.7](https://doi.org/10.5334/joh.7) · [HAL/RePEc](https://ideas.repec.org/p/hal/journl/hal-01582660.html) — *What files to publish (phase 16)*
-- **H35** J. T. Collins, J. Knapper, J. Stirling, …, R. Bowman, "Robotic microscopy for everyone: the OpenFlexure microscope," *Biomedical Optics Express* 11(5):2447–2460, 2020 — [doi:10.1364/BOE.385729](https://doi.org/10.1364/BOE.385729) · [open access](https://opg.optica.org/boe/fulltext.cfm?uri=boe-11-5-2447&id=429869) — *Model for documented printed instrument (phases 00, 16)*
-- **H36** Elsevier, "Guide for authors – HardwareX" — [ScienceDirect](https://www.sciencedirect.com/journal/hardwarex/publish/guide-for-authors); T. Duncombe, "HardwareX manuscript templates," Zenodo, 2021 — [doi:10.5281/zenodo.5078227](https://doi.org/10.5281/zenodo.5078227) — *Paper structure, BOM, validation (phase 16)*
-
-#### Low-cost open instruments (HardwareX and related)
-
-- **H37** Y. Toschke, J. Klenen, M. Imlau, "Open Photonics: An integrated approach for building a 3D-printed motorized rotation stage system," *HardwareX* 20:e00577, 2024 — [doi:10.1016/j.ohx.2024.e00577](https://doi.org/10.1016/j.ohx.2024.e00577) · [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11639585) — *ESP32 rotation stage, home switch (phases 05, 09)*
-- **H38** D. Schneidereit, L. Kraus, J. C. Meier, O. Friedrich, D. F. Gilbert, "Step-by-step guide to building an inexpensive 3D printed motorized positioning stage for automated high-content screening microscopy," *Biosensors and Bioelectronics* 92:472–481, 2017 — [doi:10.1016/j.bios.2016.10.078](https://doi.org/10.1016/j.bios.2016.10.078) — *Printed stepper stage accuracy (phase 03)*
-- **H39** I. Hietanen, I. T. S. Heikkinen, H. Savin, J. M. Pearce, "Approaches to open source 3-D printable probe positioners and micromanipulators for probe stations," *HardwareX* e00042, 2018 — [doi:10.1016/j.ohx.2018.e00042](https://doi.org/10.1016/j.ohx.2018.e00042) — *Validating printed positioners (phase 07)*
-- **H40** J. Salazar-Vazquez, A. Mendez-Vazquez, "A plug-and-play Hyperspectral Imaging Sensor using low-cost equipment," *HardwareX* e00087, 2020 — [doi:10.1016/j.ohx.2019.e00087](https://doi.org/10.1016/j.ohx.2019.e00087) — *Low-cost spectral imaging prior art (phase 10)*
-- **H41** K. C. Dhankania, J. M. Pearce, "Open Source Laboratory Sample Rotator Mixer and Shaker," *HardwareX*, 2016 — [ScienceDirect](http://www.sciencedirect.com/science/article/pii/S2468067216300049) — *Printed rotary stage prior art (phase 05)*
-- **H42** Public Lab, "Desktop Spectrometry Kit 3.0" and Spectral Workbench — [wiki](https://publiclab.org/wiki/desktop-spectrometry-kit-3-0) · [spectrometer wiki](http://publiclab.org/wiki/spectrometer) · [GitHub](https://github.com/publiclab/spectral-workbench) — *DIY spectral calibration (phase 10)*
-
-#### Design tools and project publishing
-
-- **H43** KiCad EDA — [kicad.org](https://kicad.org/) · [source mirror](https://github.com/KiCad/kicad-source-mirror) · [developer docs](https://dev-docs.kicad.org) — *Power-box and hub schematics (phases 01, 02)*
-- **H44** GitHub Docs, "REST API endpoints for milestones," "…for issues," "…for labels" — [milestones](https://docs.github.com/en/rest/issues/milestones) · [issues](https://docs.github.com/en/rest/issues/issues) · [labels](https://docs.github.com/en/rest/issues/labels) — *Phase milestones and issue scripts (phase 00)*
-- **H45** GitHub Docs, "Configuring a publishing source for your GitHub Pages site" and "Using custom workflows with GitHub Pages" — [publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) · [custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) — *Documentation site deployment (phase 16)*
-
-#### Software dependencies
-
-- **H46** Python Software Foundation, Python language and standard library — [python.org](https://www.python.org) · [docs](https://docs.python.org) · [CPython](https://github.com/python/cpython) — *Laptop app runtime (phase 14)*
-- **H47** C. R. Harris, K. J. Millman, S. J. van der Walt, et al., "Array programming with NumPy," *Nature* 585:357–362, 2020 — [doi:10.1038/s41586-020-2649-2](https://doi.org/10.1038/s41586-020-2649-2) · [numpy.org](https://numpy.org) — *Image arrays, HDR, geometry (phase 07)*
-- **H48** P. Virtanen, R. Gommers, T. E. Oliphant, et al., "SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python," *Nature Methods* 17:261–272, 2020 — [doi:10.1038/s41592-019-0686-2](https://doi.org/10.1038/s41592-019-0686-2) · [scipy.org](https://scipy.org/) — *BRDF least-squares fitting, rotations (phases 07, 08)*
-- **H49** G. Bradski, "The OpenCV Library," *Dr. Dobb's Journal of Software Tools*, 2000 — [citation (OpenCV wiki)](https://github.com/opencv/opencv/wiki/CiteOpenCV) · [opencv.org](https://opencv.org) — *Capture, calibration, ChArUco (phases 06, 11)*
-- **H50** PyYAML (YAML parser and emitter for Python) — [pyyaml.org](https://pyyaml.org/) · [docs](https://pyyaml.org/wiki/PyYAMLDocumentation) · [GitHub](https://github.com/yaml/pyyaml); H. Krekel, B. Oliveira, R. Pfannschmidt, F. Bruynooghe, B. Laugher, F. Bruhin, "pytest," 2004– — [docs](https://docs.pytest.org/en/latest/) · [GitHub](https://github.com/pytest-dev/pytest) — *Config files and test suite (phase 14)*
-
-#### Standalone station
-
-- **H51** Raspberry Pi Zero 2 W — [product](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/) — *Standalone station (phase 15)*
-- **H52** micropython-lib SSD1306 driver — [GitHub](https://github.com/micropython/micropython-lib/tree/master/micropython/drivers/display/ssd1306) — *Panel OLED (phase 15)*
-- **H53** Raspberry Pi configuration, `raspi-config` and UART — [docs](https://www.raspberrypi.com/documentation/computers/configuration.html) — *Pi UART to Pico (phase 15)*
-- **H54** usbipd-win — [GitHub](https://github.com/dorssel/usbipd-win) — *USB boards into WSL (phase 02)*
-- **H55** MicroPython `machine.UART` — [docs](https://docs.micropython.org/en/latest/library/machine.UART.html) — *Pico ↔ Pi link (phase 15)*
-- **H56** CadQuery 2.x, parametric CAD in Python — [PyPI](https://pypi.org/project/cadquery/), [GitHub](https://github.com/CadQuery/cadquery) — *Generated STEP/STL parts (phase 00)*
-- **H57** numpy-stl — [PyPI](https://pypi.org/project/numpy-stl/) — *Parts gallery rendering (phase 00)*
-- **H58** Matplotlib — [matplotlib.org](https://matplotlib.org/) — *Parts gallery rendering (phase 00)*
-- **H59** ams AS7341 11-channel spectral sensor; Adafruit breakout #4698 — [product](https://www.adafruit.com/product/4698) (not fetched; price to confirm) — *Spectral sensor (phase 10)*
-- **H60** W3C, Portable Network Graphics (PNG) Specification — [w3.org/TR/png](https://www.w3.org/TR/png/) — *Built-in PNG reader/writer in `opengonio.imageio` (phase 00)*
-
-### Firmware, protocols, software
-
-- **R20** FluidNC wiki, Axes — [link](http://wiki.fluidnc.com/en/config/axes) — *Axis/homing keys, degrees as units, shared limits*
-- **R21** FluidNC wiki, Trinamic drivers — [link](http://wiki.fluidnc.com/en/config/trinamic_drivers) — *tmc_2209 keys*
-- **R22** FluidNC UART sections — [md](https://raw.githubusercontent.com/bdring/fluidnc-wiki-content/main/config/uart_sections.md) — *uart1 block*
-- **R23** FluidNC example TMC2209 config — [yaml](https://github.com/bdring/fluidnc-config-files/blob/main/official/TMC2209_corexy.yaml) — *Config template*
-- **R24** FluidNC WiFi/Bluetooth — [md](https://raw.githubusercontent.com/bdring/fluidnc-wiki-content/main/features/wifi_bt.md) — *WiFi modes, telnet :23, BT build*
-- **R25** FluidNC Web API — [md](https://raw.githubusercontent.com/bdring/fluidnc-wiki-content/main/features/WebAPI.md) — *Websocket port*
-- **R26** FluidNC user outputs — [md](https://raw.githubusercontent.com/bdring/fluidnc-wiki-content/main/config/user_outputs.md) — *M62/M63 light control*
-- **R27** FluidNC control pins — [link](http://wiki.fluidnc.com/en/config/control) — *Feed-hold (PAUSE) pin*
-- **R28** FluidNC commands and settings — [md](https://raw.githubusercontent.com/bdring/fluidnc-wiki-content/main/features/commands_and_settings.md) — *$H, $HX, $MD, $ME*
-- **R29** FluidNC serial protocol — [md](https://raw.githubusercontent.com/bdring/fluidnc-wiki-content/main/support/serial_protocol.md) — *Status report format*
-- **R30** FluidNC serial port usage (old wiki) — [link](https://github.com/bdring/FluidNC/wiki/Serial-Port-Usage/29e7ed734b79534bf9c8e59aa6ca9fba6ba8c96f) — *115200 8N1*
-- **R31** FluidNC hardware list — [link](https://github.com/bdring/FluidNC/wiki/Hardware-that-Runs-FluidNC/a1d2287bd26a527c9c327af35360ff75a36d6f93) — *E4 supported*
-- **R32** fluidnc-config-files — [GitHub](https://github.com/bdring/fluidnc-config-files) — *Searched for an E4 config*
-- **R33** V1E forum, FluidNC config for FYSETC E4 — [thread](https://forum.v1e.com/t/fluidnc-primo-config-for-fysetc-e4-board/34096) — *E4 TMC addresses*
-- **R34** FluidNC issue #1311 (E4 config) — [link](https://github.com/bdring/FluidNC/issues/1311) — *E4 notes*
-- **R35** OnStepX E4 pin map — [link](https://github.com/hjd1964/OnStepX/blob/main/src/pinmaps/Pins.FYSETC_E4.h) — *E0 UART address*
-- **R36** Arduino-ESP32 Bluetooth docs — [link](https://docs.espressif.com/projects/arduino-esp32/en/latest/api/bluetooth.html) — *BT serial is classic-ESP32 only*
-- **R42** MicroPython rp2 quick reference — [link](https://docs.micropython.org/en/latest/rp2/quickref.html) — *SoftI2C, pins (download page micropython.org/download, not fetched)*
-- **R43** MicroPython machine.PWM — [link](https://docs.micropython.org/en/latest/library/machine.PWM.html) — *Servo PWM (phase 10 option)*
-- **R44** pyserial — [API](https://pyserial.readthedocs.io/en/latest/pyserial_api.html), [intro](https://pyserial.readthedocs.io/en/latest/shortintro.html) — *Serial transport*
-- **R45** Bluetooth COM ports on Windows — [Microsoft Q&A](https://learn.microsoft.com/en-gb/answers/questions/1166304/standard-serial-over-bluetooth-link-select-com-por), [In The Hand](https://inthehand.com/2020/11/22/bluetooth-virtual-com-ports/) — *BT link*
-- **R46** rfcomm(1) — [man page](https://manpages.debian.org/testing/bluez/rfcomm.1.en.html) — *BT link on Linux*
-- **R47** OpenCV video I/O flags — [link](https://docs.opencv.org/4.x/d4/d15/group__videoio__flags__base.html) — *Camera properties*
-- **R48** OpenCV issue #17019 — [link](https://github.com/opencv/opencv/issues/17019) — *Backend-dependent properties*
-- **R49** OpenCV HDR tutorial — [link](https://docs.opencv.org/4.13.0/d2/df0/tutorial_py_hdr.html), [photo.hpp](https://docs.opencv.org/4.13.0/dc/d81/photo_8hpp.html) — *CalibrateDebevec / MergeDebevec*
-- **R50** v4l2-ctl(1) — [man page](https://www.mankier.com/1/v4l2-ctl) — *Manual camera controls*
-- **R51** Linux V4L2 camera controls — [link](https://dri.freedesktop.org/docs/drm/media/uapi/v4l/ext-ctrls-camera.html) — *Exposure units*
-- **R52** Arducam, minimum exposure time — [link](https://docs.arducam.com/UVC-Camera/Adjust-the-minimum-exposure-time/) — *Exposure units*
-- **R53** DirectShow exposure table — [link](https://www.principiaprogramatica.com/2017/06/11/setting-manual-exposure-in-opencv/) — *Windows exposure values*
-- **R54** SpellSight PR (V4L2 control names) — [link](https://github.com/mtaylor45/-SpellSight/pull/14) — *Control names by kernel*
-- **R70** GitHub CLI Linux install — [link](https://github.com/cli/cli/blob/trunk/docs/install_linux.md) — *README publish commands*
-- **R73** KaTeX — [katex.org](https://katex.org/) (loaded from cdn.jsdelivr.net) — *Equations on the Pages site*
-- **R81** FluidNC web installer — [installer.fluidnc.com](https://installer.fluidnc.com/); install walkthrough — [Hackaday.io log](https://hackaday.io/project/194302-convert-a-mach3-cnc-controller-to-grbl-or-fluidnc/log/226954-installing-fluidnc) — *Flashing steps*
-
-### Considered and not used
-
-- **R55** grblHAL RP2040 — [SKR Pico map](https://github.com/grblHAL/RP2040/blob/master/boards/btt_skr_pico_10_map.h), [README](https://github.com/grblHAL/RP2040/blob/master/README.md) — *Alternative firmware*
-- **R56** BTT SKR Pico — [BIQU](https://biqu.equipment/products/btt-skr-pico-v1-0) ($39.85) — *Alternative board*
-- **R57** Klipper Config Reference — [link](https://www.klipper3d.org/Config_Reference.html) — *First draft: firmware*
-- **R58** Moonraker printer API — [link](https://moonraker.readthedocs.io/en/latest/external_api/printer/) — *First draft: host API*
-- **R59** KIAUH — [GitHub](https://github.com/dw-0/kiauh) — *First draft: install*
-- **R60** Raspberry Pi overlays README — [link](https://github.com/raspberrypi/linux/blob/rpi-6.12.y/arch/arm/boot/dts/overlays/README) — *First draft: I2C buses*
-- **R61** Raspberry Pi camera software — [link](https://www.raspberrypi.com/documentation/computers/camera_software.html) — *First draft: camera*
-- **R62** Hackster, Raspberry Pi price rises — [link](https://www.hackster.io/news/raspberry-pi-hikes-prices-by-up-to-150-as-the-ai-bubble-hits-hard-confirms-raspberry-pi-6-plans-711d4384a4dd) — *Decision to avoid buying compute*
-- **R63** PiShop Raspberry Pi 5 prices — [link](https://www.pishop.us/product-category/raspberry-pi/raspberry-pi-5/raspberry-pi-5-boards/) — *Decision to avoid buying compute*
-- **R64** BTT SKR Mini E3 V3 — [BIQU](https://biqu.equipment/products/bigtreetech-skr-mini-e3-v2-0-32-bit-control-board-for-ender-3), [GitHub](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3/tree/master/hardware/BTT%20SKR%20MINI%20E3%20V3.0) — *First draft: controller*
-- **R65** MKS DLC32 — [eBay](https://www.ebay.com/itm/237008535637), [FluidNC #751](https://github.com/bdring/FluidNC/issues/751), [store](https://www.cnccontroller.store/mks-dlc32-v2-1-cnc-controller-with-ts24-touchscreen-32-bit-wifi-grbl-board/) — *Alternative board*
-- **R66** BTT Rodent — [BIQU](https://biqu.equipment/products/bigtreetech-rodent), [Rat Rig](https://ratrig.com/products/bigtreetech-rat-rig-rodent-cnc-controller-tmc2160) — *Alternative board*
-- **R67** MKS TinyBee — [store](https://makerparts3d.com/products/mks-tinybee-3d-printer-control-board-with-esp32-wifi), [GitHub](https://github.com/makerbase-mks/MKS-TinyBee), [FluidNC config](https://github.com/bdring/fluidnc-config-files/blob/main/official/MKS_TinyBee_1_XYZAB.yaml) — *Alternative board*
-- **R68** ESP32-DevKitC-32E — [Grid Connect](https://www.gridconnect.com/products/esp32-devkitc-32e-wroom-module-development-kit) — *DIY alternative*
-- **R69** BTT TMC2209 module — [BIQU](https://biqu.equipment/products/bigtreetech-tmc2209-stepper-motor-driver-for-3d-printer-board-vs-tmc2208) — *DIY alternative*
-- **R79** Seeed XIAO ESP32S3 Sense — [link](https://www.seeedstudio.com/XIAO-ESP32S3-Sense-p-5639.html), [OV5640 add-on](https://www.seeedstudio.com/OV5640-Camera-for-XIAO-ESP32S3-Sense-With-Heat-Sink-p-5739.html) — *Wireless camera alternative (rejected: autofocus)*
-- **R80** Freenove FNK0085 — [store](https://store.freenove.com/products/fnk0085); [espressif issue #10792](https://github.com/espressif/arduino-esp32/issues/10792) — *Wireless camera alternative*
-- **R82** Mean Well STEP files FAQ — [link](https://meanwellpowersupplies.com/technical-articles/faq/where-to-find-mean-well-step-files-3d-files/) — *Where Mean Well CAD lives*
-
-### Licences and publishing
-
-- **R71** SPDX license-list-data — [GitHub](https://github.com/spdx/license-list-data) — *Licence texts in `LICENSES/`*
-- **R72** OSHWA certification — [certification.oshwa.org](https://certification.oshwa.org/) — *Certification checklist*
-
-### Parts: power and electrical
-
-- **P1** MEAN WELL GST60A24-P1J — [Mouser](https://www.mouser.com/ProductDetail/MEAN-WELL/GST60A24-P1J?qs=odmYgEirbwyH6XaEPxnETQ%3D%3D) — *$19.40, STEP listing*
-- **P2** GST60A spec — [PDF](https://www.meanwell.com/Upload/PDF/GST60A/GST60A-SPEC.PDF); [MEAN WELL UK](https://www.meanwell.co.uk/power-supplies/external-power-supplies/gst60a-series) — *Plug, efficiency, Level VI, UL*
-- **P3** GST60A24-P1J — [TRC](https://trcelectronics.com/products/mean-well-gst60a24-p1j), [Jameco](https://www.jameco.com/z/GST60A24-P1J-MEAN-WELL-24-Volt-2500mA-60-Watt-3-Wire-Regulated-Switching-Desktop-Power-Adapter-2-1mm-Plug-Level-VI_2224411.html), [Bravo](https://www.bravoelectro.com/gst60a24-p1j.html), [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/GST60A24-P1J/7703715) — *No-load power, price cross-check, cord sold separately*
-- **P4** Switchcraft 721A — [product](https://www.switchcraft.com/dc-power-jack-0-084-2-1mm-pin-solder-lugs-termination/721a/) — *2.1 mm, 5 A / 24 V · not used since the no-solder, no-drill build*
-- **P5** Switchcraft 721A — [Octopart](https://octopart.com/721a-switchcraft-89444436), [Digi-Key](https://www.digikey.com/en/products/detail/switchcraft-inc/721A/8571716) — *$4.03 · not used since the no-solder, no-drill build*
-- **P6** Littelfuse 01500274ZXU — [Mouser](https://www.mouser.com/ProductDetail/Littelfuse/01500274ZXU?qs=HS3fcsxbgMwxzHo3fy8LGg%3D%3D) — *$3.27*
-- **P7** Infineon IRF4905PBF — [Mouser](https://www.mouser.com/ProductDetail/Infineon-Technologies/IRF4905PBF?qs=9%2BKlkBgLFf39l0HsWdxvdw%3D%3D) — *$2.73 · not used since the no-solder, no-drill build*
-- **P8** IRF4905 — [datasheet](https://www.infineon.com/dgdl/irf4905pbf.pdf?fileId=5546d462533600a4015355e329b1197e), [Digi-Key](https://www.digikey.com/en/products/detail/infineon-technologies/IRF4905PBF/812139), [SnapEDA](https://www.snapeda.com/parts/IRF4905PBF/Infineon/view-part/) — *Rds(on), Vgs · not used since the no-solder, no-drill build*
-- **P9** onsemi 1N4742A — [Mouser](https://www.mouser.com/ProductDetail/onsemi/1N4742A?qs=SSucg2PyLi71ahupZUxJzg%3D%3D) — *$0.28 · not used since the no-solder, no-drill build*
-- **P10** P6KE30A (Littelfuse via Verical, chosen; ST at Mouser compared) — [Mouser](https://www.mouser.com/ProductDetail/STMicroelectronics/P6KE30A?qs=5Uvc6lfWVJxhgPKxz%252Bj4DQ%3D%3D), [Octopart](https://octopart.com/p6ke30a-littelfuse-348661) — *$0.94 · not used since the no-solder, no-drill build*
-- **P11** Nichicon UFW1H101MPD1TD — [Mouser](https://www.mouser.com/ProductDetail/Nichicon/UFW1H101MPD1TD?qs=WJSLByB5Mu30jPPJ2KiG3A%3D%3D) — *$0.59 · not used since the no-solder, no-drill build*
-- **P12** Vishay BAT85S-TAP — [Mouser](https://www.mouser.com/ProductDetail/Vishay-Semiconductors/BAT85S-TAP?qs=yIvl1B2wDi5bZOHuqaPTHw%3D%3D) — *Considered for the sense clamp (replaced by an optocoupler)*
-- **P13** Bulgin C1353ABNAB — [Digi-Key](https://www.digikey.com/en/products/detail/bulgin/C1353ABNAB/9598373) — *10 A DC rating · not used since the no-solder, no-drill build*
-- **P14** Arcolectric C1300ALAAA — [Newark](https://www.newark.com/arcolectric-bulgin-limited/c1300alaaa/rocker-switch-spst-on-off-black/dp/48W5536), [Octopart](https://octopart.com/part/arcolectric/C1300ALAAA) — *Rocker alternative*
-- **P15** IDEC YW1B-V4E01R — [TME](https://www.tme.com/us/en-us/details/yw1b-v4e01r/panel-mount-switches-standard-22mm/idec/) — *$9.96*
-- **P16** IDEC YW series — [datasheet](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/6163/D004450YWapem.pdf) — *DC ratings*
-- **P17** Eaton M22-PV / M22-K01 — [IMC](https://www.imc-direct.com/product_p/m22-pv.htm), [TME](https://www.tme.com/us/en-us/details/m22-k01/panel-mount-accessories/eaton-electric/), [IMC kit](https://www.imc-direct.com/product_p/m22-pv-k01.htm), [Mouser](https://www.mouser.com/en/ProductDetail/Eaton-Electrical/M22-PV-K01?qs=HFfMDpzxxd0QRHbJBijxWA%3D%3D) — *E-stop price comparison*
-- **P18** AMASS XT30U — [rcbattery](https://rcbattery.com/genuine-amass-xt30u-male-female-pair-plugs-5-pairs.html) — *$2.19 / 5 pairs · not used since the no-solder, no-drill build*
-- **P19** realthunder/Connectors_Amass.3dshapes — [GitHub](https://github.com/realthunder/Connectors_Amass.3dshapes) — *XT30 STEP · not used since the no-solder, no-drill build*
-- **P20** 18 AWG silicone pair — [Walmart](https://www.walmart.com/ip/2-Conductor-Parallel-Silicone-Wire-18AWG-18-Gauge-Red-Black-Electrical-Wire-Tinned-Copper-1m-3-3ft/2401235173), [BNTECHGO](https://www.amazon.com/BNTECHGO-Silicone-Flexible-Strands-Stranded/dp/B01AQOI36M) — *$8.09*
-- **P21** Adafruit perfboard 4783 — [link](https://www.adafruit.com/product/4783) — *$2.25 · not used since the no-solder, no-drill build*
-- **P22** Keszoox JST-XH kit — [Amazon](https://www.amazon.com/Keszoox-Connector-Pre-Crimped-Housing-Socket%EF%BC%8810/dp/B09SX4LC13) — *Listing (price not confirmed)*
-- **P23** Schneider XB5AS8442 — [TME](https://www.tme.com/us/en-us/details/xb5as8442/panel-mount-switches-standard-22mm/schneider-electric/), [RSP Supply](https://rspsupply.com/p-83740-schneider-electric-xb5as8442-red-40-emergency-stop-switching-off-pushbutton-22-latching-turn-release.aspx); XB2BS542C — [LCSC](https://www.lcsc.com/product-detail/Pushbutton-Switches_Schneider-XB2BS542C_C5122145.html) — *Rejected (0.5 A DC-13)*
-- **P24** Omron A22E-M-01 — [Octopart](https://octopart.com/a22e-m-01-omron-35187) — *Rejected (price)*
-- **P25** Pololu rocker #1406 — [link](https://www.pololu.com/product/1406) — *Rejected (AC only)*
-- **P26** CW Industries GRB112B802BR1 — [Octopart](https://octopart.com/grb112b802br1-cw+industries-19058098) — *Rejected (14 V DC)*
-- **P27** Switchcraft 722A — [Mouser](https://www.mouser.com/ProductDetail/Switchcraft/722A?qs=MI16PYk8XEPiQCOy7frM9Q%3D%3D) — *Rejected (2.0 mm pin)*
-- **P28** Same Sky PJ-002BH — [link](https://www.sameskydevices.com/product/interconnect/connectors/dc-power-connectors/jacks/pj-002bh) — *Rejected (2.5 mm pin)*
-- **P29** Same Sky PJ-009A — [Octopart](https://octopart.com/part/same-sky/PJ-009A) — *Rejected (2.5 A)*
-- **P30** GST90A24-P1M — [Jameco](https://www.jameco.com/z/GST90A24-P1M-MEAN-WELL-24-Volt-3750mA-90-Watt-3-Wire-Regulated-Switching-Desktop-Power-Adapter-2-5mm-Plug-Level-VI_2223494.html), [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/GST90A24-P1M/7703720) — *Comparison*
-- **P31** GST120A24-P1M (first draft) — [Mouser](https://www.mouser.com/en/ProductDetail/MEAN-WELL/GST120A24-P1M?qs=V113mesSgrhUmhAWUz3R2A%3D%3D), [TRC](https://www.trcelectronics.com/products/mean-well-gst120a24-p1m), [spec](https://www.meanwell.com/Upload/PDF/GST120A/GST120A-SPEC.PDF) — *First draft: supply*
-- **P32** Pololu regulators (first draft) — [D42V55F5](https://www.pololu.com/product/5571), [D42V55F5.3](https://www.pololu.com/product/5572), [D36V50F5](https://www.pololu.com/product/4091), [resources/STEP](https://www.pololu.com/product/4091/resources), [D24V50F5](https://www.pololu.com/product/2851) — *First draft: 5 V rail (removed: no Pi)*
-- **P33** Same Sky PJ-005B (first draft) — [Digi-Key](https://www.digikey.com/en/products/detail/same-sky-formerly-cui-devices/PJ-005B/172263), [datasheet](https://www.sameskydevices.com/product/resource/pj-005b.pdf), [Octopart](https://octopart.com/part/same-sky/PJ-005B); Switchcraft 712A — [Newark](https://www.newark.com/switchcraft/712a/connector-dc-power-jack-5a/dp/37F2993) — *First draft: jack*
-- **P34** Littelfuse (first draft) — [03455LS1H](https://www.newark.com/littelfuse/03455ls1h/fuse-holder-5-x-20mm-panel-mount/dp/67K0280), [021806.3MXP](https://www.newark.com/littelfuse/021806-3mxp/fuse-cartridge-6-3a-5x20mm-slow/dp/42K9390), [03453LS1H](https://www.digikey.com/en/products/detail/littelfuse-inc/03453LS1H/553765) — *First draft: fuse*
-- **P35** Jameco SRC1-1B-DC-1-B (first draft) — *Rejected (momentary)*
-- **P40** StepperOnline 17HS19-2004S1 — [product](https://www.omc-stepperonline.com/nema-17-bipolar-59ncm-84oz-in-2a-42x48mm-4-wires-w-1m-cable-connector-17hs19-2004s1), [datasheet](https://www.omc-stepperonline.com/index.php?route=product/product/get_file&file=110/17HS19-2004S1_Full_Datasheet.pdf), [STEP](https://www.omc-stepperonline.com/index.php?route=product/product/get_file&file=110/17HS19-2004S1.STEP) — *$9.62, coil data*
-- **P41** Kingroon GT2 closed belts — [link](https://kingroon.com/products/gt2-closed-loop-timing-belt-rubber-2gt-6mm-3d-printers-parts-110-112-122-158-200-280-300-400-610-852-mm-synchronous-belts) — *$1.88*
-- **P42** ZYLtech GT2 20T pulley — [link](https://www.zyltech.com/2gt-gt2-6mm-wide-20t-pulley-5mm-6-35mm-or-8mm-bore/) — *$2.95*
-- **P43** TCST2103 optical endstop — [eBay](https://www.ebay.com/itm/182778778905) — *$2.93*
-- **P44** ZYLtech GT2 belt per metre — [link](https://www.zyltech.com/fiber-glass-reinforced-2gt-gt2-timing-belt-custom-length-price-per-meter/) — *$2.50/m*
-- **P45** Adafruit 368 DC jack to screw terminal — [product](https://www.adafruit.com/product/368) — *$2.00, + / − marked, centre-positive*
-- **P46** Adafruit 64 half-size breadboard — [product](https://www.adafruit.com/products/64) — *400 points, solderless*
-- **P47** WAGO 221 lever connectors, 28-piece assortment — [Amazon](https://www.amazon.com/dp/B01N0LRTXZ), [price seen $15.71](https://slickdeals.net/f/18335398-28-piece-wago-221-lever-nuts-splicing-wire-connector-assortment-w-case-15-71-free-shipping-w-prime) — *Solderless joins*
-- **P48** StepperOnline 17HS08-1004S pancake NEMA 17 — [product](https://www.omc-stepperonline.com/hybrid-stepper-motor/nema-17-bipolar-18deg-13ncm-184ozin-1a-35v-42x42x20mm-4-wires-17hs08-1004s.html) — *$7.99, 21.5 mm body, 16 N·cm, 1 A, 5 mm D-shaft*
-
-### Parts: controller
-
-- **C1** FYSETC E4 — [GitHub README](https://github.com/FYSETC/FYSETC-E4), [schematic](https://github.com/FYSETC/FYSETC-E4/blob/main/hardware/FYSETC%20E4_V1.0%20SCH.pdf), [hardware](https://github.com/FYSETC/FYSETC-E4/tree/main/hardware) — *Pin map, specs*
-- **C2** FYSETC E4 wiki — [link](https://wiki.fysetc.com/docs/E4) — *Drivers, CH340, size*
-- **C3** FYSETC E4 store — [link](https://www.fysetc.com/products/fysetc-e4-board-with-built-in-wi-fi-and-bluetooth-4-pcs-tmc2209-240mhz-16m-flash-3d-printer-control-board-based-for-3d-printer) — *$32.00*
-- **C4** E4 listings — [AliExpress 1](https://www.aliexpress.com/item/1005001703930983.html), [AliExpress 2](https://www.aliexpress.com/item/1005001704413148.html), [Amazon.ca](https://www.amazon.ca/Compatible-Bluetooth-TMC2209-Printer-Control/dp/B0FDWPRKS5) — *Availability*
-- **C5** Raspberry Pi Pico — [product](https://www.raspberrypi.com/products/raspberry-pi-pico/), [SparkFun](https://www.sparkfun.com/raspberry-pi-pico.html) — *$4.00*
-- **C6** Pico files — [STEP](https://datasheets.raspberrypi.com/pico/Pico-R3-step.zip), [pinout](https://datasheets.raspberrypi.com/pico/Pico-2-Pinout.pdf), [datasheet](https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf), [docs](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html) — *CAD, pins*
-- **C7** Adafruit USB cables — [4474](https://www.adafruit.com/product/4474), [898](https://www.adafruit.com/product/898) — *Cable prices*
-- **C8** Raspberry Pi Pico H (headers soldered) — [Adafruit 5525](https://www.adafruit.com/product/5525), [Jameco](https://www.jameco.com/z/5525-Adafruit-Industries-Raspberry-Pi-Pico-H-Pico-with-Headers-Soldered_2882023.html) — *No soldering*
-- **C9** Adafruit 1332 membrane 1x4 keypad — [product](https://www.adafruit.com/product/1332) — *Panel keys*
-- **C10** Adafruit 1954 male/female jumper wires 20 x 6 in — [product](https://www.adafruit.com/product/1954), [Jameco](https://www.jameco.com/z/1954-Adafruit-Industries-Premium-Female-Male-Extension-Jumper-Wires-20-X-6_2507535.html) — *Solderless leads*
-- **C11** Stepper cable PH2.0 6-pin to XH2.54 4-pin, 1 m — [Jameco 2333607](https://www.jameco.com/z/JST-PH20-XH4P-Jameco-ValuePro-4-Wire-Stepper-Motor-Cable-4-Pin-Series-PH-2mm-to-6-Pin-XH2-2-54mm-1-Meter_2333607.html) — *$1.95, closeout*
-
-### Parts: camera
-
-- **K1** Arducam B0433 (IMX477 USB, M12) — [product](https://www.arducam.com/12mp-usb-camera-module-with-m12-lens-1-2-3-3840hx3032v-4k30fps-for-windows-linux-macos-and-android.html) — *$59.99, controls*
-- **K2** Arducam UVC selection guide — [link](https://docs.arducam.com/UVC-Camera/USB2-UVC-Camera-Kit/Specs-and-Selection-Guide/) — *Sensor = IMX477*
-- **K3** B0433 datasheet — [PDF](https://www.uctronics.com/download/Amazon/B0433_Arducam_12MP_USB_Camera_Module_Datasheet.pdf) — *Mechanical drawing*
-- **K4** Arducam B0446 (IMX179) — [product](https://www.arducam.com/8mp-imx179-usb-camera-module-with-wide-angle-115h-m12-lens-for-windows-linux-android-and-mac-os.html) — *Fallback ($54.99, manual WB)*
-- **K5** VA Imaging 16 mm M12 lens — [link](https://va-imaging.com/en-us/products/lens-m12-5mp-16mm-f2-0-1-2-va-lm12-5mp-16mm-f2-0-020) — *$21.00*
-- **K6** Arducam forum, B0433 exposure via v4l2 — [link](https://forum.arducam.com/t/b0433-camera-unable-to-change-exposure-time-from-v4l2/7522) — *Discard frames after a change*
-- **K23** SparkFun M2.5 x 8 mm Phillips machine screw — [product](https://www.sparkfun.com/m2-5-0-45x8mm-machine-screw-phillips-head.html) — *$0.15 each*
-- **K7** Arducam forum, IMX477 UVC max exposure — [link](https://forum.arducam.com/t/arducam-imx477-uvc-camera-adapter-board-max-exposure-time/1387) — *~0.5 s limit*
-- **K8** Arducam forum, IMX477 USB 12-bit — [link](https://forum.arducam.com/t/imx477-usb-12bit-capabilities/2466) — *No RAW over UVC*
-- **K9** Arducam USB3.0 Camera Shield Plus — [link](https://docs.arducam.com/USB-Industrial-Camera/USB3.0-Camera-Shield-Plus/USB3.0-Camera-Shield-Plus-Datasheet/) — *RAW option (SDK)*
-- **K10** Arducam B0459 — [link](https://www.arducam.com/arducam-12mp-usb-3-0-camera-with-m12-manual-focus-lens.html) — *Step-up option*
-- **K11** Arducam B0280 — [link](https://www.arducam.com/arducam-high-quality-complete-usb-camera-bundle-12mp-1-2-3-inch-imx477-camera-module-with-6mm-cs-mount-lens-metal-enclosure-tripod-and-usb-cable-b0280.html) — *Compared*
-- **K12** ELP IMX179 — [link](http://www.webcamerausb.com/elpusb30w04mtl36-p-149.html) — *Compared*
-- **K13** Arducam B0304 IMX708 — [link](https://www.uctronics.com/12mp-imx708-usb-uvc-fixed-focus-camera-module-3.html) — *Compared*
-- **K14** Arducam B0362 IMX291 — [link](https://www.arducam.com/arducam-imx291-usb-camera-with-2-8-12mm-lens-b0362.html) — *Compared*
-- **K15** TraceParts Arducam models — [link](https://www.traceparts.com/en/search/arducam-usb-uvc-camera?CatalogPath=ARDUCAM_1206236589:ARDUCAM.020) — *CAD search*
-- **K16** Arducam forum, 3D model request — [link](https://forum.arducam.com/t/searching-for-3d-model-of-b0202/809) — *CAD search*
-- **K17** InnoMaker IMX298 USB — [Amazon](https://www.amazon.com/InnoMaker-4656x3496-Detection-Auto-Focus-Raspberry/dp/B0G2VZP6SL) — *Rejected (autofocus)*
-- **K18** Commonlands CIL160 16 mm — [link](https://commonlands.com/products/16mm-m12-lens) — *Lens upgrade*
-- **K19** Raspberry Pi HQ Camera (first draft) — [CS](https://www.pishop.us/product/raspberry-pi-hq-camera-cs/), [M12](https://www.pishop.us/product/raspberry-pi-hq-camera-m12/), [brief](https://pip-assets.raspberrypi.com/categories/659-raspberry-pi-high-quality-camera/documents/RP-008202-DS-1-hq-camera-product-brief.pdf), [M12 drawing](https://pip-assets.raspberrypi.com/categories/659-raspberry-pi-high-quality-camera/documents/RP-008201-DS-1-hq-camera-m12-mechanical-drawing.pdf) — *First draft: camera*
-- **K20** Raspberry Pi Camera Module 3 (first draft) — [PiShop](https://www.pishop.us/product/raspberry-pi-camera-module-3/), [STEP](https://pip-assets.raspberrypi.com/categories/1207-design-files/documents/RP-008154-DS-1-camera-module-3-step.zip) — *First draft: fallback*
-- **K21** Pi 5 camera cable (first draft) — [PiShop](https://www.pishop.us/product/camera-cable-for-raspberry-pi-5/) — *First draft:*
-- **K22** Arducam LN036 (first draft) — [link](https://www.arducam.com/arducam-telephoto-20-degree-1-2-3-m12-mount-with-lens-adapter-for-raspberry-pi-high-quality-camera.html) — *First draft: lens note*
-
-### Parts: light
-
-- **L1** Cree CXA1304-0000-000C0Y9430H — [Mouser](https://www.mouser.com/ProductDetail/Cree-LED/CXA1304-0000-000C0Y9430H?qs=G0uBbFPHMulh2b3olRHR4A%3D%3D) — *$2.66, CRI 93, 9 V*
-- **L2** Luminus CXM-4 Gen 4 — [datasheet](https://download.luminus.com/datasheets/Luminus_CXM-4_GEN4_Datasheet.pdf) — *18 V class, CRI 95 options*
-- **L3** CXM-4 availability — [Octopart CXM-4-30-95-18](https://octopart.com/part/luminus-devices/CXM-4-30-95-18-AC40-F5-3), [Mouser -50-95-18](https://www.mouser.com/ProductDetail/Luminus-Devices/CXM-4-50-95-18-AC40-F5-3?qs=DPoM0jnrROW%252BbPFMtDMVfQ%3D%3D), [Mouser -30-90-18](https://www.mouser.com/en/ProductDetail/Luminus-Devices/CXM-4-30-90-18-AC40-F5-3?qs=DPoM0jnrROVkRRFTMvUU3g%3D%3D), [Digi-Key -27-80-18](https://www.digikey.com/en/products/detail/luminus-devices-inc/CXM-4-27-80-18-TE60-F7-2/21348065) — *Preferred-if-stocked option*
-- **L4** MEAN WELL NLDD-350H — [Power Supply Mall](https://powersupplymall.com/products/mean-well-nldd-350h-dc-dc-led-driver-cc-350ma-step-down) — *$4.81*
-- **L5** NLDD-350H — [TRC](https://trcelectronics.com/products/mean-well-nldd-350h) — *$5.55, ranges*
-- **L6** NLDD-H spec — [PDF](https://www.meanwell.com/Upload/PDF/NLDD-H/NLDD-H-SPEC.PDF) — *Efficiency, DIM*
-- **L7** Easycargo 40 mm heatsinks — [Amazon](https://www.amazon.com/Easycargo-40x40x11mm-TEC1-12706-Thermoelectric-40mmx40mmx11mm/dp/B07WR7MPB1) — *Listing*
-- **L8** Yuji LEDs — [HD5 CRI 95](https://store.yujiintl.com/products/yujileds-cri-95-5mm-9w-cob-led-2700k-3200k-4000k-hd5), [CRI 98 9 W](https://store.yujiintl.com/products/yujileds-cri-98-9w-cob-led-135l) — *High-CRI upgrade*
-- **L9** Luminus CXM-9 (first draft) — [datasheet](https://download.luminus.com/datasheets/Luminus_CXM-9_GEN6_Datasheet.pdf), [Mouser](https://www.mouser.com/ProductDetail/Luminus-Devices/CXM-9-30-95-36-AA00-F2-3?qs=Qlzq7FOrON4Xiqce7VRkYw%3D%3D) — *Rejected (36 V)*
-- **L10** Bridgelux Vero SE 13 Thrive — [datasheet](https://www.bridgelux.com/sites/default/files/resource_media/Bridgelux%20DS346%20Gen%207%20Vero%20SE%2013%20Thrive%20Array%20Datasheet%20RevA%2020220331.pdf) — *Compared*
-- **L11** LEDiL C13658 clamp — [Digi-Key](https://azcus.digikey.com/en/products/detail/ledil/C13658-CLAMP-VERO13-18/4490851) — *Compared*
-- **L12** LEDSupply heatsinks — [link](https://www.ledsupply.com/led-housing-heatsinks) — *Compared*
-- **L13** MEAN WELL LDD-H — [LEDSupply](https://www.ledsupply.com/led-drivers/mean-well-ldd-h-series-cc-step-down-mode); [LDD-700H Octopart](https://octopart.com/ldd-700h-mean+well-20023764) — *First draft: driver*
-- **L14** NLDD-350H — [RapidLED](https://rapidled.com/products/mean-well-ldd-350h-dimmable-driver) — *First draft: price*
-- **L15** LEDiL ANGELA-S — [Digi-Key](https://www.digikey.com/en/products/detail/ledil/F13379-ANGELA-S/4946614) — *Optic option*
-- **L16** LEDiL Angelina — [cobkits](https://cobkits.com/product/ledil-angelina-reflector-f13838-for-ideal/) — *Rejected (90 deg)*
-- **L17** Generic COB reflector — [Amazon](https://www.amazon.com/10W-100W-Adapter-Reflector-Collimator-Bracket/dp/B00VSNYNCY) — *Compared*
-- **L18** Cree CXA1507 — [Newark](https://www.newark.com/cree-led/cxa1507-0000-000n0ye230g/led-array-cob-warm-wht-3000k-590lm/dp/49AC0147) — *Rejected (35 V)*
-- **L19** 24 V COB strip CRI 90 — [ledupdates](https://ledupdates.com/products/24v-cob-series-cri-90-4000k-natural-white-color-led-strip-light) — *Rejected (roll price)*
-- **L20** Edmund XP42 polarizer film — [link](https://www.edmundoptics.com/p/100-x-100mm-linear-polarizing-film-xp42-40/52988/) — *Compared*
-- **L21** Molex SlimRay CXA13 holders 180555-0001 (110 mm leads) / -0002 (254 mm leads), pre-wired, no solder — [Mouser](https://www.mouser.com/new/molex/molex-slimray-cxa13-led-holders), [Euroimpex](https://euroimpex.krakow.pl/product/details/180555-0001) — *First-draft COB holder: obsolete at Digi-Key (checked 2026-10-10)*
-- **L22** Citizen CLU7A3-0403E1-303H7X5 — [Digi-Key](https://www.digikey.com/en/products/detail/citizen/CLU7A3-0403E1-303H7X5/17053751), [datasheet](https://ce.citizen.co.jp/cms/ce/lighting_led/dl_data/COB_High_Intensity_Type_Version4/datasheet/CLU7A3-0403E1_0824P-202110.pdf) — *White COB: $5.91, CRI 97, 12.2 V, 4.2 mm LES, Tc ≤ 120 °C*
-- **L23** TE LUMAWISE Z35 2213678-5 — [Digi-Key](https://www.digikey.com/en/products/detail/te-connectivity-amp-connectors/2213678-5/6174915), [Z35 overview](https://www.digikey.com/en/product-highlight/t/te-connectivity-amp/lumawise-led-holders-type-z35) — *Solderless COB holder: $3.50, 13.5 mm boards (Citizen CLU700), Ø35 × 3.6 mm, poke-in 18–20 AWG*
-- **L24** MEAN WELL LDH-45B-350 — [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/LDH-45B-350/7704773), [spec](https://files.trcelectronics.com/datasheets/ldh45.pdf) — *Compared: 24 V boost driver for a 37 V COB; not needed with the 12 V CLU7A3*
-
-### Parts: mechanics and frame
-
-- **M1** Bear Woods LZ-12 — [link](https://www.bearwood.com/en-us/products/12-round-lazy-susan-turntable-bearings) — *$13.90*
-- **M2** VXB 12 in aluminium turntable — [link](https://vxb.com/products/12-inch-aluminum-lazy-susan-turntable-bearing) — *Upgrade*
-- **M3** KW12-3 roller micro switches — [Walmart](https://www.walmart.com/ip/10Pcs-Roller-Lever-Arm-Open-Close-Limit-Switch-Kw12-3-Pcb-Microswitch/1344341711) — *$7.00 / 10*
-- **M4** Woodpeckers bearings — [12C](https://woodpeckerscrafts.com/products/12c-ls-bearing), [4 in](https://woodpeckerscrafts.com/products/4c-ls-bearing) — *Compared*
-- **M5** VXB 12 in steel, VXB 4 in — [12 in](https://vxb.com/products/12-inch-lazy-susan-bearing-1000lb-usa), [4 in](https://vxb.com/products/300-lbs-capacity-4-lazy-susan-bearing-5-16-thick-t) — *Compared*
-- **M6** 3 x 3 in turntable (McMaster 6031K16) — [RobotShop](https://www.robotshop.com/en/3x3-ball-bearing-turntable.html) — *Corrected first-draft assumption*
-- **M7** VXB bearings — [608 10-pack](https://vxb.com/products/10-pack-skateboard-bearing-608-2rs-sealed-8x22x7mm), [6806](https://vxb.com/products/6806-2rs-bearing-30x42x7-sealed) — *Compared*
-- **M8** TNutz LF-015-A foot — [link](https://www.tnutz.com/product/lf-015-a/) — *First draft: feet*
-- **M9** ZYLtech extrusion and T-nuts — [2020](https://www.zyltech.com/store/aluminum-extrusion-hardware/2020-t-slot/), [T-nuts](https://www.zyltech.com/100x-zyltech-spring-loaded-t-nuts-for-2020-aluminum-extrusion-m4-or-m5/) — *First draft:*
-- **M10** ME-8108 roller-lever limit switch, screw terminals, 2-pack — [eBay](https://www.ebay.com/itm/156727632134), [spec page](https://st.robu.in/product/me-8108-rotary-adjustable-roller-lever-arm-mini-limit-switch) — *Over-travel, no solder*
-- **F1** Birch plywood 2 x 2 ft — [Lowe's](https://www.lowes.com/pd/1-2-in-Birch-Plywood-Application-as-2-x-2/1000066183) — *Base (price not confirmed)*
-- **F2** OpenBuilds V-Slot 20x20 — [link](https://us.openbuilds.com/v-slot-20x20-linear-rail/) — *$3.29 / 500 mm*
-- **F3** KB-3D M5 T-nut — [link](https://kb-3d.com/store/extrusion-framing/252-t-nut-drop-inroll-in-20-series-6mm-slot-width-m5-threads-1657989339400.html) — *$0.17*
-- **F4** M8 tee nut — [Albany County Fasteners](https://www.albanycountyfasteners.com/metric-t-nuts-zinc-plated-steel-m8-x-125-4-prong-5602-010-042/) — *$0.45 · not used since the no-solder, no-drill build*
-- **F5** Glarks screw kit — [Amazon](https://www.amazon.com/Glarks-510Pcs-Socket-Screws-Assortment/dp/B08HHZHXTP) — *Listing*
-- **F6** M3 heat-set inserts — [Adafruit 4255](https://www.adafruit.com/product/4255), [CNC Kitchen](https://cnckitchenus.store/products/heat-set-insert-m3-x-5-7-100-pieces) — *$5.95 · not used since the no-solder, no-drill build*
-- **F7** 608-2RS 10-pack — [Walmart](https://www.walmart.com/ip/10Pcs-set-608-2RS-Bearing-Deep-Groove-Steel-Sealed-Ball-Bearings-608RS-608-2RS/3999331773) — *$9.90*
-- **F8** #8 x 5/8 in Type 17 pan-head wood screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/578040/wood-screws) — *Self-drilling: no pilot holes (price to confirm)*
-- **F9** AstroAI DM6000AR multimeter with temperature probe — [AstroAI](https://www.astroai.com/digital-multimeter-6000-counts-dm6000ar/ap/100019) — *Tool*
-- **F10** IRWIN VISE-GRIP 2078300 self-adjusting wire stripper 10–24 AWG — [Gexpro](https://www.gexpro.com/p/544823/irwin/self-adjusting-wire-stripper-10-24-awg/038548088457/2078300) — *Tool*
-- **F11** SparkFun 6 in digital calipers — [product](https://www.sparkfun.com/6-digital-calipers.html) — *Tool*
-- **F12** DIN 931 M8 hex bolts, partial thread — [M8 x 75](https://www.fastenersuperstore.com/products/276566/hex-cap-screws), [M8 x 35](https://www.fastenersuperstore.com/products/276362/hex-cap-screws) — *Bolt axles (price to confirm)*
-- **F13** M2.5 x 20 mm Phillips pan machine screws — [Fastener Superstore](https://www.fastenersuperstore.com/products/529783/machine-screws) — *Not used since the scan wedge became the tilted scan plate (kept so IDs stay stable)*
-- **F14** Elegoo Centauri Carbon enclosed CoreXY printer — [All3DP, $300 launch](https://all3dp.com/4/elegoo-opens-preorders-for-300-centauri-carbon-3d-printer/), [Slickdeals $265.99](https://slickdeals.net/f/18984553-elegoo-centauri-carbon-corexy-fdm-3d-printer-265-99-30-shipping-fee); Bambu Lab P1S [$399](https://www.3dtested.com/3d-printing/grab-this-usd399-bambu-lab-p1s-3d-printer-back-down-to-a-record-low-price-for-the-new-year-save-usd300-on-high-speed-enclosed-printer-for-beginners-and-enthusiasts-alike) — *Tool: ABS-capable printer*
-- **F15** Screwdriver sets — [Home Depot](https://www.homedepot.com/b/Tools-Hand-Tools-Screwdrivers-Nut-Drivers-Screwdrivers-Screwdriver-Sets/philips-screwdriver/N-5yc1vZc998Z1z1lpee), [Husky 16-pc ~$15](https://slickdeals.net/f/18741004-husky-ratcheting-pivot-head-screwdriver-16-piece-14-88-fs-home-depot) — *Tool*
-- **F16** SUNLU ABS 1.75 mm 1 kg black — [listing](https://woodartsupply.com/products/sunlu-abs-filament-1-75mm-3d-printer-filament-highly-resistant-durable-heat-resistance-excellent-toughness-compatible-with-99-fdm-3d-printers-1kg-spool-2-2lbs-black) — *Filament (price to confirm)*
-- **F17** SUNLU ABS 1.75 mm black, 1 kg rolls, 3 kg minimum — [SUNLU store, $11.99/kg](https://store.sunlu.com/products/over-3kg-bundle-sale-abs-filament-1kg-roll) — *Filament (checked 2026-10-09)*
-
-### Parts: enclosure, calibration, multispectral
-
-- **E1** Roc-lon blackout fabric — [Walmart](https://www.walmart.com/ip/Roc-lon-54-Blackout-White-Fabric-per-Yard/164714653) — *$6.62 / yd*
-- **E2** Protostar FlockBoard — [link](https://www.fpi-protostar.com/flockboard.htm); flocking — [First Light Optics](https://www.firstlightoptics.com/telescope-flocking-material/protostar-self-adhesive-hi-tack-flocking-material-1m-roll.html) — *Backdrop upgrade*
-- **E3** Oak dowel 1/2 x 36 in — [Home Depot](https://www.homedepot.com/p/Builder-s-Choice-1-2-in-x-36-in-Oak-Round-Dowel-HDDO1236/206184685) — *$4.04*
-- **E4** PTFE (virgin) — [OnlineMetals sheet/plate list](https://www.onlinemetals.com/en/buy/plastic-sheet-plate-ptfe): 1/8 in 6 × 6 in $12.53, 3/8 in 6 × 6 in $22.97; [Online Metal Supply 2 × 2.5 × 2.5 in block](https://onlinemetalsupply.com/2-x-2-5-x-2-5-ptfe-teflon-plastic-sheet-white/) $23.48 — *White tile (CAL-01)*
-- **E5** Edmund #43-876 first-surface mirror — [link](https://www.edmundoptics.com/p/50-x-50mm-enhanced-aluminum-4-6lambda-mirror/5362); also [BMI Surplus](https://bmisurplus.com/product/first-surface-mirror-4-inch-square/), [firstsurfacemirror.com](https://www.firstsurfacemirror.com/product/4-x-4-1-4-wave-glass-first-surface-mirror-13-64-5mm-thickness/) — *Mirror upgrade / price check*
-- **E6** BC Precision 1 in G25 balls — [link](https://www.bcprecision.com/products/1-inch-chrome-steel-ball-bearings-g25) — *$9.95*
-- **E7** Colour targets — [Calibrite CC Mini (B&H)](https://www.bhphotovideo.com/c/product/1649333-REG/calibrite_ccc_mini_colorchecker_classic_mini.html), [SpyderCHECKR 24 (B&H)](https://www.bhphotovideo.com/c/product/1070560-REG/datacolor_sck24_sypdercheckr_24.html) — *Optional, borrow*
-- **E8** Linear polarizer film 10-pack — [Walmart](https://www.walmart.com/ip/5466199163) — *$8.95*
-- **E9** Neewer 18 % gray card — [link](https://neewer.com/products/neewer-18-gray-white-card-set-for-white-balance-exposure-value-66600656) — *Optional*
-- **E10** Opal acrylic 12 x 12 — [Walmart](https://www.walmart.com/ip/1-8-3mm-Milky-White-Acrylic-12-x12-Sheet-Translucent-Plexiglass-Cast-AZM/1515407359) — *Diffuser option*
-- **E11** Micro servos — [Adafruit SG92R](https://www.adafruit.com/product/169), [Pololu FS90](https://www.pololu.com/product/2818) — *Phase 10 option*
-- **E12** Protostar Hi-Tack flocked light-trap material, absorbs > 99 % — [fpi-protostar.com](https://www.fpi-protostar.com/hitack.htm), [First Light Optics](https://www.firstlightoptics.com/telescope-flocking-material.html) — *Stray-light lining behind the sample and inside the lamp tube (phase 07)*
-- **E13** Madison Mill 1/2 x 36 in poplar dowel — [True Value](https://www.truevalue.com/product/163701/madison-mill-1-2-in-x-36-in-poplar-dowel-rod-163701/) — *$2.79, drape posts*
-<!-- refs:end -->
+| `phases/` | the eighteen build stages: checklist, design notes, parts list (`bom.csv`) and 3D files per stage |
+| `software/` | the `opengonio` Python package: motion, camera, capture, verify, calibrate, fit, scan, the simulated machine and the control app (`src/opengonio/app/`) |
+| `firmware/` | MicroPython for the ESP32-S3 button and sensor hub |
+| `cad/` | STEP and STL of every printed and bought part, and the assembly |
+| `docs/` | the website (`index.html`, `lab.html`, shared design files in `og/`), generated figures and wiring diagrams, the evaluation specification |
+| `paper/` | the LaTeX paper and its PDF |
+| `wiki/` | longer guides (`wiki/src/` is the source) |
+| `tools/` | the generators and checks behind `make build` and `make check` |
+| `pcb/` | the optional carrier circuit board, kept in step with the module wiring |
+| `exports/` | Word, Excel and Overleaf copies (generated) |
+
+## Design
+
+**Raking light.** Museum conservators photograph a surface with a lamp held low and moved around it, so texture shows up as light and shadow. That is what this machine does, with a motor and a camera, so it is also how the website and the app look.
+
+- **A dark room.** A velvet near-black ground and bone-coloured text, like a studio painted black so nothing but the sample reflects. A light theme (a neutral grey card) is there for daylight and printing.
+- **One light.** A single warm 3000 K tungsten colour, the colour of the real lamp, used only for the lamp itself and the one main action on a screen. Everything else is ground and ink.
+- **Status from the scale bar.** The only other colours are the red, green and blue patches of a photographer's colour scale, used for data and status (simulated, blocked, pass), always with a word beside them.
+- **Type.** Gloock, a high-contrast display serif, for headlines; Hanken Grotesk for everything else; tabular figures for every number. Both fonts are bundled (SIL Open Font License), so nothing loads from elsewhere.
+- **Motion that means something.** The lamp follows the pointer on a spring and drifts slowly when left alone; sections arrive like light shifting onto them; buttons press in. Interface animations stay under 300 ms. With reduced motion requested, the lamp holds still and nothing slides.
+- **Pictures are the project's own.** Renders of the CAD model, frames from the machine simulator and charts of simulated runs, each labelled as such. There are no photographs, because nothing has been built yet.
+- **Square corners, no gradients, no drop shadows**, spacing on a 4 px scale, every control usable from the keyboard, text contrast at WCAG AA (Web Content Accessibility Guidelines, level AA) in both themes.
+
+The full system (tokens, type scale, components, states) is in [DESIGN.md](DESIGN.md).
 
 ## Licence
 

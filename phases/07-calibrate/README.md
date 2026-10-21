@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/07.svg" width="100%" alt="Steps of stage 07">
 
-$39.78 · total so far $544.06 / $630
+$39.78 · total so far $538.10 / $630
 
 [Design](design.md) · [Research](research.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -22,7 +22,7 @@ Only the lamp lights the sample. · 0/3 steps done · ~45 min hands-on · ~1 wk
 
 #### Verify
 
-- [ ] Standing at the machine, you can't read the template text without the lamp.
+- [ ] Standing at the machine, you can't read this page without the lamp.
 
 #### Record
 

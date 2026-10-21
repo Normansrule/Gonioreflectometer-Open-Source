@@ -10,12 +10,12 @@ Colour spectrum of the spot at the zero point; camera stays for images. · 0/4 s
 
 ### M29.1 Mount
 
-**Time** 30 min (+ print 1 h) · **Needs** SPC-01 AS7341 · SPC-03 print · 2 × M2.5 screws
+**Time** 30 min (+ print 1 h) · **Needs** SPC-01 AS7341 · SPC-03 print · 2 × M2 × 8 + 3 × M2 × 16
 
 #### Do
 
-1. Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it.
-2. Clamp it on the camera pillar just above the camera (M5 × 10 into the z 181 pilot); aim at the zero point.
+1. Print `SPC-03a_spectral_tube.stl`; screw the AS7341 to it (2 × M2 × 8).
+2. Clamp it on the camera pillar just above the camera (M2 × 16 into the z 181 pilot); aim at the zero point.
 
 #### Verify
 
@@ -31,8 +31,8 @@ Tick the boxes; `make done id=M29.1`.
 
 #### Do
 
-1. SDA → Pico GP16, SCL → GP17, VIN → 3V3, GND → GND (same bus as the OLED).
-2. `bash scripts/pico.sh`; `python -m serial.tools.miniterm /dev/ttyACM0 115200`; type `SPEC?`.
+1. SPC-02 cable: SDA (blue) → ESP32-S3 J3-4 (GPIO 1), SCL (yellow) → J3-5 (GPIO 2), VIN (red) → J1-2 (3V3), GND (black) → J3-22 (same bus as the OLED: README → Wiring → 8).
+2. `bash scripts/hub.sh`; `python -m serial.tools.miniterm /dev/ttyACM1 115200` (the hub's port); type `SPEC?`.
 
 #### Verify
 
@@ -83,7 +83,7 @@ Ratios in design.md; commit.
 
 ## M30 · LED bank and polarizers (optional kit)
 
-8 colour bands for images; shine separated from colour. Built it: set `lights.multispectral.built: true`; without it scans leave out the photometric set. · 0/4 steps done · ~3.8 h hands-on · ~2 wk
+Polarizers: shine separated from colour. **LED bank BLOCKED**: its driver circuit is unsafe as designed (stage 10 design.md); do not wire or power MSK-01…03 - mark M30.1–M30.3 n/a. Without the bank scans leave out the photometric set. · 0/4 steps done · ~3.8 h hands-on · ~2 wk
 
 ### M30.1 Print and fit LEDs
 
@@ -104,15 +104,17 @@ Tick the boxes; `make done id=M30.1`.
 
 ### M30.2 Driver wiring
 
-**Time** 1 h · **Needs** MSK-02 driver · MSK-03 ULN2803A
+**Time** 1 h · **Needs** MSK-02 driver · 2 × MSK-03 MOSFET modules · TLS-09 double-sided tape
 
 #### Do
 
-1. ULN2803A into the breadboard. LED − leads → its outputs (lever connector to a cut jumper each); inputs ← Pico GP8–15 (jumpers); driver supply switched by `M62 P1`.
+1. **STOP - blocked (stage 10 design.md): skip this step and M30.3; tick them n/a.** The text below is kept for the reviewed design.
+2. Both MOSFET modules on the deck beside the controller tray (M2 into spare pilots, or double-sided tape); driver MSK-02 pins up beside them, female jumper ends on its pins.
+3. Each LED's + lead → driver +Vo (lever connector); its − lead → one module OUT terminal (screw). Module DC+ / DC− ← driver +Vo / −Vo. Inputs ← ESP32-S3 GPIO 8–14 and 21, input GND ← ESP32-S3 GND. Driver supply switched by the SKR Pico HB output (`M62 P3`).
 
 #### Verify
 
-- [ ] Continuity: each GP pin → its ULN input; each output → one LED cathode.
+- [ ] Continuity: each GP pin → its module input; each OUT terminal → one LED cathode.
 
 #### Record
 

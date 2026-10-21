@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/brdf-lobe.svg" width="100%" alt="Camera and light">
 
-$118.20 · total so far $504.28 / $630
+$111.91 · total so far $498.32 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -20,7 +20,7 @@ Sharp, fixed-exposure image centred on the sample. · 0/5 steps done · ~3 h han
 
 1. WSL's standard kernel has no USB-camera driver, so camera stages run `opengonio` from Windows Python. PowerShell, in the repo folder (`cd \\wsl.localhost\Ubuntu\home\<you>\projects\Gonioreflectometer-Open-Source`):
 2. `py -m venv $HOME\og-win; & $HOME\og-win\Scripts\pip install "./software[hw]"`
-3. `usbipd detach --busid <E4 busid>` (Windows keeps the E4 as a COM port); set `controller.port: COM5` (your port) in `machine.yaml`.
+3. `usbipd detach --busid <SKR Pico busid>` (Windows keeps it as a COM port); set `controller.port: COM5` (your port) in `machine.yaml`.
 4. `& $HOME\og-win\Scripts\opengonio status`
 
 #### Verify
@@ -44,8 +44,8 @@ Which setup you use in phases/06-camera-light/design.md → Results.
 #### Do
 
 1. Order the stage-06 parts ticked in `PARTS.md`, plus CAL-01 PTFE, CAL-02 mirror (stage 07): M17.5–M19 use them. Print `CAM-03a_aperture_stop_f8.stl`, `CAM-03b_camera_plate.stl`, `CAL-06a/b` holders.
-2. Camera board on the plate: 4 × M2.5 × 8 (CAM-07) self-tap into the 6 mm standoffs.
-3. Plate on the camera pillar: slide its clamp down to the pilot hole, M5 × 10 self-taps into it; aperture stop in front of the lens.
+2. Camera board on the plate: 4 × M2 × 8 (FRM-06) self-tap into the 6 mm standoffs.
+3. Plate on the camera pillar: slide its clamp down to the pilot hole, M2 × 16 self-taps into it; aperture stop in front of the lens.
 4. White tile (CAL-01): mark one 100 × 100 mm PTFE sheet into four 50 mm squares (lines at 50 mm both ways); cut each line with the utility knife against a straight edge, 4–6 light passes, never through in one go. Stack 3 squares (9 mm) in the `CAL-06a` holder; sand the top one with 400 grit in circles until evenly matte; blow off the dust, don't touch the face.
 
 #### Verify
@@ -126,15 +126,15 @@ Light switches from the laptop, stays cool and steady. · 0/3 steps done · ~1.6
 #### Do
 
 1. Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. Strip one end of a 15 cm red and a 15 cm black 18 AWG lead (PWR-15) to the length in the holder's instruction sheet; push red into the holder's `+` poke-in, black into `−`.
-2. Holder face-down in the body's round seat, wire entries toward the lead groove (the side away from the clamp), leads along the groove. COB into the holder's square seat, light-emitting face down through the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M3 × 8, leads through its slot; tighten evenly until the heatsink no longer turns.
-3. Lamp clamp onto the horizontal arm (M5 × 10 + T-nut), aperture facing the zero point.
-4. Driver (LSR-02) pins into the breadboard. +Vin row ← 24 V sense row; −Vin row → E4 HE0 `−` (cut jumper under the screw).
-5. Driver +Vo / −Vo rows → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last female end (cut off, stripped, folded double) to the lamp's red (+) / black (−) lead.
+2. Holder face-down in the body's round seat, wire entries toward the lead groove (the side away from the clamp), leads along the groove. COB into the holder's square seat, light-emitting face down through the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M2 × 12, leads through its slot; tighten evenly until the heatsink no longer turns.
+3. Lamp clamp onto the arm bar's outer pilot (M2 × 16), aperture facing the zero point.
+4. Driver (LSR-02) pins up in the short frame on the controller tray (double-sided tape). Female jumper ends onto its pins: +Vin ← SKR Pico HE `+` (terminal marked 12/24V; cut jumper, bare end under the screw); −Vin → SKR Pico HE `−` (terminal marked IO23; output port from M08.2, normally `M62 P4`).
+5. Driver +Vo / −Vo pins → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last end (cut off, stripped, folded double) to the lamp's red (+) / black (−) lead.
 
 #### Verify
 
 - [ ] Each lead holds when tugged (poke-in locked).
-- [ ] Polarity checked with the meter before power: +Vo row → red lead beeps.
+- [ ] Polarity checked with the meter before power: +Vo pin → red lead beeps.
 
 #### Record
 
@@ -155,7 +155,7 @@ Tick the boxes; `make done id=M18.1`.
 
 #### If a check fails
 
-- Lamp always on: driver −Vin on GND instead of HE0.
+- Lamp always on: driver −Vin on GND (or on HE `+`) instead of HE `−` (the terminal marked IO23).
 
 #### Record
 
@@ -258,4 +258,4 @@ Two real materials measured and pictured. · 0/2 steps done · ~40 min hands-on 
 
 > **Safety:** Don't stare into the lamp.
 
-[Sources](../../REFERENCES.md): R1 · G12 · T32 · V1 · V2 · V3 · V4 · V5 · V7 · V8 · V9 · N3 · N11 · N24 · N25 · N45 · N46 · N47 · H13 · H14 · H15 · H49 · K1 · K2 · K3 · K4 · K5 · K6 · K23 · L4 · L5 · L6 · L7 · L21 · L22 · L23
+[Sources](../../REFERENCES.md): R1 · G12 · T32 · V1 · V2 · V3 · V4 · V5 · V7 · V8 · V9 · N3 · N11 · N24 · N25 · N45 · N46 · N47 · H13 · H14 · H15 · H49 · K1 · K2 · K3 · K4 · K5 · K6 · L4 · L5 · L6 · L7 · L21 · L22 · L23

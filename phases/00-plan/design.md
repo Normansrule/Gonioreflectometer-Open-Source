@@ -27,32 +27,34 @@ Origin = sample surface. +Z up. Camera on +X (350 mm; 650 mm for scans). Light a
 
 | Path | How |
 |---|---|
-| Laptop → motors | FluidNC on FYSETC E4: USB, WiFi (telnet :23) or Bluetooth [R24][R30] |
+| Laptop → motors | grblHAL on the BTT SKR Pico over USB-C [C12][R85] (FluidNC ESP32 boards also supported) |
 | Laptop → camera | USB, locked exposure / gain / white balance [R47][R50] |
-| Keys | HOME START STOP LIGHT NEXT (membrane keypads) → Pico → `opengonio panel` |
-| No laptop | Pi Zero 2 W runs `opengonio station`: buttons + OLED pick jobs, images saved on the Pi ([15-standalone](../15-standalone/design.md)); phone WebUI; PAUSE on E4 feed hold [R27] |
-| Stop | E-stop cuts 24 V; software re-inits drivers (`$MI`) and forces re-home |
+| Keys | HOME START STOP LIGHT NEXT (membrane keypads) → ESP32-S3 hub → `opengonio panel` |
+| No laptop | Pi Zero 2 W runs `opengonio station`: buttons + OLED pick jobs, images saved on the Pi ([15-standalone](../15-standalone/design.md)); the Pi drives the SKR Pico over USB |
+| Stop | E-stop cuts motor power; software re-inits drivers (grblHAL `M122 I`) and forces re-home |
 
 ### Interfaces (frozen)
 
-- **OG-40:** 4 holes (4.5 mm: M4 or #8 wood screw) on 40 × 40 mm, Ø6.2 locating hole. Onto the plywood: #8 Type 17 wood screws, no drilling.
-- **Joins (no solder, no crimp):** screw terminals; lever connectors for wire to wire; jumper wires onto pins; breadboard for small parts; JST-XH pre-crimped leads into the E4; 1 m PH→XH cables for the motors; M8 bolts as axles (no shafts to cut).
+- **OG-40:** 4 × M2 holes on 40 × 40 mm, Ø6.2 locating hole.
+- **One screw size:** every printed join and module mount is an M2 socket screw (FRM-06) self-tapping into a 1.7 mm printed pilot (`M2_TAP`, set from the coupon) or through a clearance hole into a nut. Only the NEMA 17 faces keep M3 (the motors' own thread) and the axles M8 bolts.
+- **Deck:** 9 printed 200 mm tiles bolted into a 600 × 600 × 24 mm deck with a pilot boss at every mount point (`PLACE` in `tools/cad/parts.py`; map: `phases/03-frame/deck-map.svg`) and a 40 mm grid of spare pilots. No plywood, no extrusion, no drilling.
+- **Joins (no solder, no crimp):** screw terminals; lever connectors for wire to wire; jumper wires onto pins; modules with screw terminals instead of loose chips (no breadboard); JST-XH pre-crimped leads into the SKR Pico; 1 m PH→XH cables for the motors; M8 bolts as axles (no shafts to cut).
 
 | Code | Connector | Pins |
 |---|---|---|
-| J1 | DC jack → screw terminals (Adafruit 368) | +24 V centre, GND sleeve |
-| J2 | 18 AWG pair → E4 VIN screw terminal | 24 V after e-stop (red), GND (black) |
+| J1 | 6S pack → fuse → lever connectors; USB-C → PD trigger → DROK CC/CV charges it | +18–24 V, GND |
+| J2 | 18 AWG pair → SKR Pico POWER screw terminal | 18–24 V after e-stop (red), GND (black) |
 | J3 | the red wire itself, through the switch's COM–NC screws | over-travel switch (NC) |
-| SENSE | breadboard + jumpers | isolated e-stop sense (PC817) → Pico GP7, GND |
-| M-x | 1 m cable PH2.0-6P → XH2.54-4P (CTL-11) | motor A+ A− B+ B− |
-| E-x | double-ended JST-XH leads (CTL-06), XH housing on the module pins | V, GND, signal (TCST2103); M1 on TH0 takes V from Pico 3V3 |
-| L-x | breadboard rows; jumper chains to the lamp | driver +Vin, −Vin to E4 HE0 −, +Vo/−Vo to the COB holder |
-| KEY | 2 × membrane 1x4, male–female jumpers | 5 keys (+ PAUSE) + common to GND |
+| SENSE | opto module (PWR-10) screw terminals + jumpers | isolated motion-power sense → ESP32-S3 GPIO 17, GND, 3V3 |
+| M-x | the 5-pack's 1 m cables (6-pin motor end → XH2.54 4-pin); M1 pancake: bare leads spliced to a spare cable with lever connectors | SKR Pico socket pins 2B 1B 1A 2A |
+| E-x | double-ended JST-XH leads (CTL-06), XH housing on the module pins | signal, GND, 5 V (TCST2103) from the SKR Pico X/Y/Z/E0-STOP ports |
+| L-x | female jumper ends on the driver's pins; jumper chains to the lamp | driver +Vin to SKR Pico HE 12/24V, −Vin to HE IO23 (switched), +Vo/−Vo to the COB holder |
+| KEY | 2 × membrane 1x4, male–female jumpers; both commons in one lever connector | 5 keys (+ PAUSE) + common to GND (J1-22) |
 
 ## Onshape set-up
 
 1. Create one document, **OpenGonio**, with a Variable Studio `OG globals`: `#clear` `#og40` `#cam_d`=350 `#scan_d`=650 `#light_d`=300 `#zero_h`=150 `#ring_r`=140.
-2. Import the whole machine: **Create → Import** `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, every STEP at once). Origin = plywood top under the zero point (zero point at z = 150 mm), +X toward the camera, +Z up. Printed parts are black, bought parts are dummies (tan) — [cad/README.md](../../cad/README.md) lists the model for every part.
+2. Import the whole machine: **Create → Import** `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, every STEP at once). Origin = deck top under the zero point (zero point at z = 150 mm), +X toward the camera, +Z up. Printed parts are black, bought parts are dummies (tan) — [cad/README.md](../../cad/README.md) lists the model for every part.
 3. Import the starter parts you edit: **Insert → Import** each `phases/NN/3d/*.step`. STEP arrives as editable solids; STL would arrive as a fixed mesh. Real vendor models (`bash scripts/get_cad.sh` → `cad/vendor/`) replace dummies at the same origin.
 4. One Part Studio per stage; name parts by BOM ID (e.g. `PWR-18a`). Run interference check on the assembly.
 5. Release: export STEP + STL back into that stage's `3d/`, commit with `bash scripts/update.sh "…"`.

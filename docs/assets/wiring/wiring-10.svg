@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 411" font-family="Segoe UI,Helvetica,Arial,sans-serif">
+<rect width="1000" height="411" rx="14" fill="#0d1117"/>
+<text x="28" y="34" fill="#f0f6fc" font-size="18" font-weight="600">10 · Not wired: colour LED bank</text>
+<text x="28" y="56" fill="#8b949e" font-size="12">Stage 10 · each line is one wire, from the left pin to the right pin; the number matches the table row below.</text>
+<text x="972" y="34" fill="#f85149" font-size="15" font-weight="700" text-anchor="end">BLOCKED: do not wire or power</text>
+<rect x="28" y="106" width="235" height="227" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="40" y="126" fill="#f0f6fc" font-size="13" font-weight="600">Colour LED bank (MSK-01…03)</text>
+<rect x="34" y="140" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="152" fill="#f0f6fc" font-size="11.5">band 1 input</text>
+<rect x="34" y="160" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="174" fill="#f0f6fc" font-size="11.5">band 2 input</text>
+<rect x="34" y="182" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="194" fill="#f0f6fc" font-size="11.5">band 3 input</text>
+<rect x="34" y="202" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="216" fill="#f0f6fc" font-size="11.5">band 4 input</text>
+<rect x="34" y="224" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="236" fill="#f0f6fc" font-size="11.5">band 5 input</text>
+<rect x="34" y="244" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="258" fill="#f0f6fc" font-size="11.5">band 6 input</text>
+<rect x="34" y="266" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="278" fill="#f0f6fc" font-size="11.5">band 7 input</text>
+<rect x="34" y="286" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="300" fill="#f0f6fc" font-size="11.5">band 8 input</text>
+<rect x="34" y="308" width="223" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="320" fill="#f0f6fc" font-size="11.5">driver supply</text>
+<rect x="413" y="78" width="190" height="206" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="425" y="98" fill="#f0f6fc" font-size="13" font-weight="600">ESP32-S3 hub (CTL-02)</text>
+<rect x="419" y="112" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="124" fill="#f0f6fc" font-size="11.5">J1-12 (GPIO8)</text>
+<rect x="419" y="132" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="146" fill="#f0f6fc" font-size="11.5">J1-15 (GPIO9)</text>
+<rect x="419" y="154" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="166" fill="#f0f6fc" font-size="11.5">J1-16 (GPIO10)</text>
+<rect x="419" y="174" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="188" fill="#f0f6fc" font-size="11.5">J1-17 (GPIO11)</text>
+<rect x="419" y="196" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="208" fill="#f0f6fc" font-size="11.5">J1-18 (GPIO12)</text>
+<rect x="419" y="216" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="230" fill="#f0f6fc" font-size="11.5">J1-19 (GPIO13)</text>
+<rect x="419" y="238" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="250" fill="#f0f6fc" font-size="11.5">J1-20 (GPIO14)</text>
+<rect x="419" y="258" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="272" fill="#f0f6fc" font-size="11.5">J3-18 (GPIO21)</text>
+<rect x="413" y="302" width="190" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="425" y="322" fill="#f0f6fc" font-size="13" font-weight="600">SKR Pico (CTL-01)</text>
+<rect x="419" y="336" width="178" height="18" rx="4" fill="#0d1117"/>
+<text x="427" y="348" fill="#f0f6fc" font-size="11.5">HB IO21</text>
+<path d="M263,148 C338,148 338,120 413,120" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="148" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="120" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="317" cy="142" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="317" y="146" fill="#f0f6fc" font-size="10" text-anchor="middle">1</text>
+<path d="M263,170 C338,170 338,142 413,142" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="170" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="142" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="359" cy="148" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="359" y="152" fill="#f0f6fc" font-size="10" text-anchor="middle">2</text>
+<path d="M263,190 C338,190 338,162 413,162" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="190" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="162" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="338" cy="176" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="338" y="180" fill="#f0f6fc" font-size="10" text-anchor="middle">3</text>
+<path d="M263,212 C338,212 338,184 413,184" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="212" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="184" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="317" cy="205" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="317" y="209" fill="#f0f6fc" font-size="10" text-anchor="middle">4</text>
+<path d="M263,232 C338,232 338,204 413,204" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="232" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="204" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="359" cy="211" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="359" y="215" fill="#f0f6fc" font-size="10" text-anchor="middle">5</text>
+<path d="M263,254 C338,254 338,226 413,226" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="254" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="226" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="338" cy="240" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="338" y="244" fill="#f0f6fc" font-size="10" text-anchor="middle">6</text>
+<path d="M263,274 C338,274 338,246 413,246" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="274" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="246" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="317" cy="268" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="317" y="272" fill="#f0f6fc" font-size="10" text-anchor="middle">7</text>
+<path d="M263,296 C338,296 338,268 413,268" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="296" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="268" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="359" cy="274" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="359" y="278" fill="#f0f6fc" font-size="10" text-anchor="middle">8</text>
+<path d="M263,316 C338,316 338,344 413,344" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>
+<circle cx="263" cy="316" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="413" cy="344" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="338" cy="330" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="338" y="334" fill="#f0f6fc" font-size="10" text-anchor="middle">9</text>
+<line x1="28" y1="393" x2="50" y2="393" stroke="#8b949e" stroke-width="3"/><text x="56" y="397" fill="#8b949e" font-size="11.5">reserved</text>
+</svg>

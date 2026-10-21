@@ -1,0 +1,52 @@
+# After a push that changes the paper, references, parts or wiki sources (including edits made on github.com):
+# rebuild paper/build/opengonio.pdf and exports/ (Word, Overleaf zip, Zotero, Excel BOM, wiki PDF), commit them back.
+name: docs
+on:
+  push:
+    branches: [main]
+    paths: ["paper/*.tex", "REFERENCES.md", "phases/*/bom.csv", "PARTS.md", "wiki/src/**", "tools/**", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: {group: repo-write, cancel-in-progress: false}   # queue with parts-sync: one writer at a time
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with: {ref: main}                                       # latest main, not the triggering commit
+      - uses: actions/setup-python@v6
+        with: {python-version: "3.12"}
+      - name: LaTeX + pandoc (every package the two PDFs load)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends pandoc latexmk biber texlive-base texlive-latex-base \
+            texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers \
+            texlive-bibtex-extra texlive-xetex lmodern fonts-dejavu
+      - run: pip install -e "./software[dev]" pyyaml numpy openpyxl pillow
+      - name: Build docs and bibliography
+        run: set -o pipefail; make build 2>&1 | tee /tmp/step.out
+      - name: Paper PDF
+        run: set -o pipefail; make paper 2>&1 | tee /tmp/step.out
+      - name: Exports
+        run: set -o pipefail; make export 2>&1 | tee /tmp/step.out
+      - name: Commit PDFs and exports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A paper exports wiki README.md PARTS.md phases docs cad
+          git diff --cached --quiet || { git commit -m "Rebuild paper PDF and exports"; git pull --rebase -q; git push; }
+      - name: Show the error
+        if: failure()
+        run: |
+          tail -n 12 /tmp/step.out | sed 's/^/::error::/'
+          [ -f paper/build/opengonio.log ] && grep -A3 '^!' paper/build/opengonio.log | head -12 | sed 's/^/::error::latex: /' || true
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: opengonio-docs
+          path: |
+            paper/build/opengonio.pdf
+            paper/build.log
+            exports/**

@@ -22,11 +22,11 @@ Every bought part has a model in the repo (dummy in `cad/bought/` or open model 
 
 | ID | Part | In the repo | Real model |
 |---|---|---|---|
-| TBL-01 | NEMA 17 stepper 59 Ncm 2 A | [`LAR-02_nema17_17hs19_2004s1.step`](../../../cad/bought/LAR-02_nema17_17hs19_2004s1.step) | [link](https://files.omc-stepperonline.com/17HS19-2004S1.STEP) |
+| TBL-01 | NEMA 17 stepper 42 Ncm 1.5 A, 38 mm | [`LAR-02_nema17_17hs4401.step`](../../../cad/bought/LAR-02_nema17_17hs4401.step) | None published - repo model at 42.3 x 42.3 x 38 mm |
 | TBL-02 | GT2 6 mm closed belt 232 mm | [`TBL-02_gt2_belt_232_loop.step`](../../../cad/bought/TBL-02_gt2_belt_232_loop.step) | None published - use the dummy (belt loop) |
 | TBL-03 | GT2 20T pulley 5 mm bore | [`LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step`](../../../cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step)<br>[`LAR-04_gt2_pulley_20t_5mm.step`](../../../cad/bought/LAR-04_gt2_pulley_20t_5mm.step) | cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step (set bore to 5 mm) |
 | TBL-04 | Optical endstop module, slot type (from the LAR-05 6-pack) | [`LAR-05_tcst2103_endstop_module.step`](../../../cad/bought/LAR-05_tcst2103_endstop_module.step) | [link](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only) |
 | TBL-05 | M8 x 75 hex bolt, partial thread + M8 nut (fixed table axle) | [`TBL-05_bolt_m8x75_nut.step`](../../../cad/bought/TBL-05_bolt_m8x75_nut.step) | Onshape Standard Content: ISO 4014 M8 x 75 hex bolt + ISO 4032 M8 nut |
-| TBL-06 | Axis fasteners (M3/M5 set) | [`FRM-06_screws_m3_m4_m5_samples.step`](../../../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content |
+| TBL-06 | Axis fasteners (M3 motor face + M2 set) | [`FRM-07_screw_m3x8.step`](../../../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content |
 
 Design notes: [../design.md](../design.md).

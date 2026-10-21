@@ -4,21 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opengonio"
-version = "0.6.0"
-description = "Laptop software for OpenGonio, an open-source multispectral gonioreflectometer"
+dynamic = ["version"]                    # from opengonio.__version__ (one place)
+description = "Laptop software for OpenGonio, an open-source gonioreflectometer (white light; optional spectral sensor)"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "pyyaml>=6"]
 
 [project.optional-dependencies]
 hw = ["pyserial>=3.5", "opencv-python>=4.8"]
+desktop = ["pywebview>=5"]                 # `opengonio app --window`: the control app in a native window
 dev = ["pytest>=7"]
 
 [project.scripts]
 opengonio = "opengonio.cli:main"
 
+[tool.setuptools.dynamic]
+version = {attr = "opengonio.__version__"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+opengonio = ["data/machine.yaml",          # synced from config/machine.yaml by `make build`; tests/test_audit.py checks it
+             "app/static/*.html", "app/static/*.css", "app/static/*.js", "app/static/*.svg",
+             "app/static/og/*", "app/static/og/fonts/*"]   # og/ copied from docs/og by `make build`
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

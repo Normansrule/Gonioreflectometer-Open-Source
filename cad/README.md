@@ -15,7 +15,7 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 
 **Checked:** `make cad-check` (`tools/cad/interference.py`) finds no collision between any two parts in the shown pose or anywhere along each axis' travel (M4 20–324°, M3 a full turn, M2 ±90°), and no part in the sight lines from the measuring camera, the scan camera and the lamp to the sample. Run it after every CAD change.
 
-**Start in Onshape:** Create → Import → `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, which holds every STEP). Units are millimetres. Origin: the plywood top under the zero point; +X toward the camera, +Z up. Pose shown: light arm on +Y (M4 = 90°), table at 0 (M3), platter face up (M2 = 90°).
+**Start in Onshape:** Create → Import → `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, which holds every STEP). Units are millimetres. Origin: the deck top under the zero point; +X toward the camera, +Z up. Pose shown: light arm on +Y (M4 = 90°), table at 0 (M3), platter face up (M2 = 90°).
 
 **Dummies vs real models:** a dummy is a plain envelope built from the datasheet dimensions (source in `tools/cad/bought.py`). Where the vendor publishes a model, swap the dummy for the `cad/vendor/` file; the dummy's origin and axes follow the comment in `bought.py` so you can mate the real one in the same place. GT2 pulley (Adafruit 1253) has an 8 mm bore: set it to 5 mm in Onshape.
 
@@ -23,16 +23,16 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 
 | Status | Rows |
 |---|---|
-| Onshape Standard Content + dummy | 10 |
-| dummy only | 40 |
+| Onshape Standard Content + dummy | 8 |
+| dummy only | 48 |
 | no model needed (filament) | 1 |
-| no model needed (laptop) | 1 |
-| no model needed (tool) | 11 |
-| open model | 12 |
-| printed part | 15 |
-| vendor model (download) + dummy | 22 |
+| no model needed (laptop) | 2 |
+| no model needed (tool) | 12 |
+| open model | 7 |
+| printed part | 17 |
+| vendor model (download) + dummy | 12 |
 
-**Dummy only - the maker of the listed part publishes no 3D model (generic parts, stock material, wires, belts). No swap needed: the dummy has the real outside size:** PWR-02 IEC C13 mains cord; PWR-03 DC jack to screw-terminal adapter 2.1 mm; PWR-15 18 AWG silicone wire red/black, 1 m pair; CTL-03 USB A-to-B cable for the E4; CTL-05 Membrane keypad 1 x 4; CTL-07 Jumper wires male-female 150 mm (20); CTL-08 Fan 40 mm 24 V; FRM-01 Baltic birch plywood 1/2 in, 24 x 24 in; LAR-03 GT2 6 mm open belt (5 m); LAR-06 Roller-lever limit switch, screw terminals (2); TBL-02 GT2 6 mm closed belt 232 mm; CAM-01 USB camera 12 MP IMX477, M12 mount (UVC); CAM-02 M12 lens 16 mm, ≥ 1/2 in format, low distortion; LSR-01 COB LED CRI 97, 12 V, 13.5 mm (Citizen CLU7A3); LSR-03 Heatsink 40 x 40 mm (from a pack); LSR-04 Thermal adhesive pad; ENC-01 Blackout fabric, black (2 units); ENC-02 Black felt sheet; ENC-03 Dowels 1/2 x 36 in (10); CAL-01 PTFE sheets 100 x 100 x 3 mm (2): white tile = 3 stacked 50 mm squares; CAL-02 Glass mirror tile ~50 mm; CAL-03 Chrome steel ball 1 in G25 (2); CAL-04 ChArUco print + picture-frame glass; CAL-05 Colour target (ColorChecker Mini or similar); ENC-05 Flocked light-trap sheet, self-adhesive; CAL-07 18 % grey card + white card set (8 x 10 in); TLT-02 GT2 6 mm closed belt 280 mm; MSK-01 Narrow-band 3 W star LEDs, pre-soldered leads (7 bands, 450–660 nm); MSK-04 Heatsink 40 mm (from LSR-03 pack); MSK-05 Linear polarizer film 10 x 10 cm (10); SPC-02 JST-SH 4-pin to female jumper cable 150 mm; SCN-01 Mounting putty 2 oz; SCN-02 ChArUco scanning mat print; CAM-04 Second USB camera 12 MP IMX477, M12 mount (scan camera); CAM-05 Second M12 16 mm lens (scan camera); STA-02 microSD card 32 GB; STA-03 Buck converter 24 V to 5 V 3 A; STA-04 Micro-USB OTG adapter; STA-05 SSD1306 OLED 0.96 in I2C 128x64; STA-06 Jumper wires female-female (10).
+**Dummy only - the maker of the listed part publishes no 3D model (generic parts, stock material, wires, belts). No swap needed: the dummy has the real outside size:** PWR-21 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS); PWR-27 USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals; PWR-29 DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W); PWR-04 Inline 5 x 20 mm fuse holder, 16 AWG (2-pack); PWR-05 Fuse 3.15 A time-lag 5 x 20 mm; PWR-28 Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack); PWR-10 Optocoupler module PC817, 24 V input, screw terminals (2-pack); PWR-15 18 AWG silicone wire red/black, 1 m pair; CTL-03 USB-A to USB-C data cables, 3 ft (2-pack); CTL-05 Membrane keypad 1 x 4; CTL-07 Jumper wires male-female 20 cm (120); CTL-08 Fan 40 mm 24 V; LAR-02 NEMA 17 stepper 42 Ncm 1.5 A, 38 mm (5-pack: M4, M3, M2 + 2 spare); LAR-03 GT2 6 mm open belt (5 m); LAR-06 Roller-lever limit switch, screw terminals (2); TBL-01 NEMA 17 stepper 42 Ncm 1.5 A, 38 mm; TBL-02 GT2 6 mm closed belt 232 mm; CAM-01 USB camera 12 MP IMX477, M12 mount (UVC); CAM-02 M12 lens 16 mm, ≥ 1/2 in format, low distortion; LSR-01 COB LED CRI 97, 12 V, 13.5 mm (Citizen CLU7A3); LSR-03 Heatsink 40 x 40 mm (from a pack); LSR-04 Thermal adhesive pad; ENC-01 Blackout fabric, black (2 units); ENC-02 Black felt sheet; ENC-03 Dowels 1/2 x 36 in (10); CAL-01 PTFE sheets 100 x 100 x 3 mm (2): white tile = 3 stacked 50 mm squares; CAL-02 Glass mirror tile ~50 mm; CAL-03 Chrome steel ball 1 in G25 (2); CAL-04 ChArUco print + picture-frame glass; CAL-05 Colour target (ColorChecker Mini or similar); ENC-05 Flocked light-trap sheet, self-adhesive; CAL-07 18 % grey card + white card set (8 x 10 in); TLT-01 NEMA 17 stepper 42 Ncm 1.5 A, 38 mm; TLT-02 GT2 6 mm closed belt 280 mm; MSK-01 Narrow-band 3 W star LEDs, pre-soldered leads (7 bands, 450–660 nm); MSK-03 4-channel MOSFET switch module, opto-isolated inputs, screw terminals (2 used: 8 channels); MSK-04 Heatsink 40 mm (from LSR-03 pack); MSK-05 Linear polarizer film 10 x 10 cm (10); SPC-02 JST-SH 4-pin to female jumper cable 150 mm; SCN-01 Mounting putty 2 oz; SCN-02 ChArUco scanning mat (printed on TLS-08); CAM-04 Second USB camera 12 MP IMX477, M12 mount (scan camera); CAM-05 Second M12 16 mm lens (scan camera); STA-02 microSD card 32 GB; STA-03 Buck converter 24 V to 5 V 3 A; STA-04 Micro-USB OTG adapter; STA-05 SSD1306 OLED 0.96 in I2C 128x64; STA-06 Jumper wires female-female (10).
 
 ## 00-plan
 
@@ -45,79 +45,76 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 | TLS-05 | Multimeter with temperature probe | Tool | - | - | no model needed (tool) |
 | TLS-06 | Digital calipers 150 mm | Tool | - | - | no model needed (tool) |
 | TLS-07 | Tape measure 3 m (metric) + phone level app | Tool | - | - | no model needed (tool) |
-| TLS-08 | Paper printing at 100 % (print shop or library) | Tool | - | - | no model needed (tool) |
+| TLS-08 | Inkjet printer, US Letter, prints at 100 % | Tool | - | - | no model needed (tool) |
 | TLS-09 | CA glue, double-sided tape, utility knife, 400-grit sandpaper | Tool | - | - | no model needed (tool) |
 | TLS-10 | 13 mm spanner (or an adjustable wrench) | Tool | - | - | no model needed (tool) |
-| FIL-01 | ABS filament 1.75 mm, black, 1 kg (2 spools) | Purchase | - | - | no model needed (filament) |
+| TLS-11 | Printer paper, Letter, 500 sheets | Tool | - | - | no model needed (tool) |
+| FIL-01 | ABS filament 1.75 mm, black, 1 kg (4 spools) | Purchase | - | - | no model needed (filament) |
 
 ## 01-power
 
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
-| PWR-01 | AC adapter 24 V 2.5 A 60 W | Purchase | [`PWR-01_gst60a24_adapter.step`](../cad/bought/PWR-01_gst60a24_adapter.step) | [www.meanwellusa.com](https://www.meanwellusa.com/) (search GST60A → product page → 3D STEP); or the Mouser page's ECAD/CAD model link | vendor model (download) + dummy |
-| PWR-02 | IEC C13 mains cord | Purchase | [`PWR-02_iec_c13_cord.step`](../cad/bought/PWR-02_iec_c13_cord.step) | None published - use the dummy (generic cord) | **dummy only** |
-| PWR-03 | DC jack to screw-terminal adapter 2.1 mm | Purchase | [`PWR-03_dc_jack_screw_terminal.step`](../cad/bought/PWR-03_dc_jack_screw_terminal.step) | None published - use the dummy | **dummy only** |
-| PWR-04 | Inline 5 x 20 mm fuse holder | Purchase | [`PWR-04_inline_fuse_holder.step`](../cad/bought/PWR-04_inline_fuse_holder.step) | Digi-Key product page (Link column) → EDA / CAD Models (free login) | vendor model (download) + dummy |
-| PWR-05 | Fuse 3.15 A time-lag 5 x 20 mm | Purchase | [`PWR-05_fuse_5x20.step`](../cad/bought/PWR-05_fuse_5x20.step) | Digi-Key product page (Link column) → EDA / CAD Models (free login) | vendor model (download) + dummy |
-| PWR-10 | Optocoupler LTV-817 / PC817 (DIP-4) | Purchase | [`PWR-10_kicad_DIP-4_W7.62mm_pc817.step`](../cad/open/PWR-10_kicad_DIP-4_W7.62mm_pc817.step) | in repo (`cad/open/`) | open model |
-| PWR-11 | Resistors 10k (2) | Purchase | [`PWR-11_kicad_R_Axial_DIN0207_resistor.step`](../cad/open/PWR-11_kicad_R_Axial_DIN0207_resistor.step) | in repo (`cad/open/`) | open model |
-| PWR-13 | Emergency stop 22 mm latching, 1 NC | Purchase | [`PWR-13_estop_22mm.step`](../cad/bought/PWR-13_estop_22mm.step) | [us.idec.com](https://us.idec.com/) (search YW1B-V4E01R → CAD → STEP; button + contact block) | vendor model (download) + dummy |
+| PWR-21 | 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS) | Purchase | [`PWR-21_battery_6s_24v_5ah.step`](../cad/bought/PWR-21_battery_6s_24v_5ah.step) | None published - repo model at the listing size 78 x 50 x 72 mm (listing read 2026-10-12; measure on arrival) | **dummy only** |
+| PWR-27 | USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals | Purchase | [`PWR-27_usb_c_pd_trigger.step`](../cad/bought/PWR-27_usb_c_pd_trigger.step) | None published - repo model at an ESTIMATED 60 x 30 mm (no size published; measure on arrival) | **dummy only** |
+| PWR-29 | DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W) | Purchase | [`PWR-29_drok_cc_cv_35w.step`](../cad/bought/PWR-29_drok_cc_cv_35w.step) | None published - repo model at the maker's size 72 x 59 x 32 mm (droking.com) | **dummy only** |
+| PWR-04 | Inline 5 x 20 mm fuse holder, 16 AWG (2-pack) | Purchase | [`PWR-04_fuse_holder_inline_5x20.step`](../cad/bought/PWR-04_fuse_holder_inline_5x20.step) | None published - repo model at an ESTIMATED body Ø12 x 50 mm (no size published; measure on arrival) | **dummy only** |
+| PWR-05 | Fuse 3.15 A time-lag 5 x 20 mm | Purchase | [`PWR-05_fuse_5x20.step`](../cad/bought/PWR-05_fuse_5x20.step) | None needed - 5 x 20 mm cylinder (repo model) | **dummy only** |
+| PWR-28 | Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack) | Purchase | [`PWR-28_estop_22mm_1no1nc.step`](../cad/bought/PWR-28_estop_22mm_1no1nc.step) | None published - repo model at the listing size (40 mm head, 70 mm overall height) | **dummy only** |
+| PWR-10 | Optocoupler module PC817, 24 V input, screw terminals (2-pack) | Purchase | [`PWR-10_pc817_opto_module_24v.step`](../cad/bought/PWR-10_pc817_opto_module_24v.step) | None published - repo model at the maker size 66 x 16.5 x 12 mm | **dummy only** |
 | PWR-15 | 18 AWG silicone wire red/black, 1 m pair | Purchase | [`PWR-15_wire_18awg_pair.step`](../cad/bought/PWR-15_wire_18awg_pair.step) | None published - use the dummy (wire) | **dummy only** |
-| PWR-19 | Half-size breadboard (400 points) | Purchase | [`PWR-19_adafruit_64_halfsize_breadboard.step`](../cad/open/PWR-19_adafruit_64_halfsize_breadboard.step) | in repo (`cad/open/`) | open model |
-| PWR-20 | Lever wire connectors, WAGO 221 assortment (12) | Purchase | [`PWR-20_lever_connector_221_412.step`](../cad/bought/PWR-20_lever_connector_221_412.step) | [www.wago.com](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) (Downloads → STEP) | vendor model (download) + dummy |
+| PWR-20 | Lever wire connectors, WAGO 221 assortment (28) | Purchase | [`PWR-20_lever_connector_221_412.step`](../cad/bought/PWR-20_lever_connector_221_412.step) | [www.wago.com](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) (Downloads → STEP) | vendor model (download) + dummy |
 | PWR-18 | Power box + lid | Print | [`PWR-18a_power_box.step`](../phases/01-power/3d/PWR-18a_power_box.step)<br>[`PWR-18b_power_lid.step`](../phases/01-power/3d/PWR-18b_power_lid.step) | ours (`tools/cad/parts.py`) | printed part |
 
 ## 02-controller
 
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
-| CTL-01 | FYSETC E4 (ESP32, 4x TMC2209, WiFi + Bluetooth) | Purchase | [`CTL-01_fysetc_e4_envelope.step`](../cad/bought/CTL-01_fysetc_e4_envelope.step) | [raw.githubusercontent.com](https://raw.githubusercontent.com/FYSETC/FYSETC-E4/main/hardware/E4%20V1.0B.step) | vendor model (download) + dummy |
-| CTL-02 | Raspberry Pi Pico H (headers soldered) | Purchase | [`CTL-02_pico_h.step`](../cad/bought/CTL-02_pico_h.step) | [pip-assets.raspberrypi.com](https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008311-DS-1-Pico-R3-step.zip) | vendor model (download) + dummy |
-| CTL-03 | USB A-to-B cable for the E4 | Purchase | [`CTL-03_usb_cable_e4.step`](../cad/bought/CTL-03_usb_cable_e4.step) | None published - use the dummy (generic cable) | **dummy only** |
-| CTL-04 | USB-A to micro-B data cable 1 m | Purchase | [`STA-08_adafruit_592_microusb_cable.step`](../cad/open/STA-08_adafruit_592_microusb_cable.step)<br>[`STA-08_usb_cable_micro_b.step`](../cad/bought/STA-08_usb_cable_micro_b.step) | in repo (`cad/open/`) | open model |
+| CTL-01 | BIGTREETECH SKR Pico V1.0 (RP2040, 4 × TMC2209 UART, USB-C) | Purchase | [`CTL-01_btt_skr_pico_envelope.step`](../cad/bought/CTL-01_btt_skr_pico_envelope.step) | [github.com](https://github.com/bigtreetech/SKR-Pico/blob/master/3D/BTT%20SKR%20Pico%20V1.0.step) | vendor model (download) + dummy |
+| CTL-02 | ESP32-S3-DevKitC-1 (owned) | Owned | - | - | no model needed (laptop) |
+| CTL-03 | USB-A to USB-C data cables, 3 ft (2-pack) | Purchase | [`CTL-03_usb_cable_e4.step`](../cad/bought/CTL-03_usb_cable_e4.step) | None published - use the dummy (generic cable) | **dummy only** |
 | CTL-05 | Membrane keypad 1 x 4 | Purchase | [`CTL-05_membrane_keypad_1x4.step`](../cad/bought/CTL-05_membrane_keypad_1x4.step) | None published - use the dummy | **dummy only** |
 | CTL-06 | JST-XH pre-crimped lead kit | Purchase | [`CTL-06_kicad_JST_XH_B3B_header.step`](../cad/open/CTL-06_kicad_JST_XH_B3B_header.step)<br>[`CTL-06_jst_xh_lead_3pin.step`](../cad/bought/CTL-06_jst_xh_lead_3pin.step) | in repo (`cad/open/`) | open model |
-| CTL-07 | Jumper wires male-female 150 mm (20) | Purchase | [`CTL-07_jumper_wire_mf.step`](../cad/bought/CTL-07_jumper_wire_mf.step) | None published - use the dummy (wire) | **dummy only** |
+| CTL-07 | Jumper wires male-female 20 cm (120) | Purchase | [`CTL-07_jumper_wire_mf.step`](../cad/bought/CTL-07_jumper_wire_mf.step) | None published - use the dummy (wire) | **dummy only** |
 | CTL-08 | Fan 40 mm 24 V | Optional | [`CTL-08_fan_40mm.step`](../cad/bought/CTL-08_fan_40mm.step) | None published - use the dummy (generic fan; 40 x 40 x 10 envelope) | **dummy only** |
 | CTL-09 | Laptop (Windows or Linux) | Owned | - | - | no model needed (laptop) |
-| CTL-11 | Stepper cables 1 m, PH2.0 6-pin to XH2.54 4-pin (4-pack) | Purchase | [`CTL-11_kicad_JST_XH_B4B_header.step`](../cad/open/CTL-11_kicad_JST_XH_B4B_header.step)<br>[`CTL-11_kicad_JST_PH_B6B_header.step`](../cad/open/CTL-11_kicad_JST_PH_B6B_header.step)<br>[`CTL-11_stepper_cable_ph_xh.step`](../cad/bought/CTL-11_stepper_cable_ph_xh.step) | in repo (`cad/open/`) | open model |
+| CTL-11 | Stepper cables 1 m, PH2.0 6-pin to XH2.54 4-pin (4-pack) | Optional | [`CTL-11_kicad_JST_XH_B4B_header.step`](../cad/open/CTL-11_kicad_JST_XH_B4B_header.step)<br>[`CTL-11_kicad_JST_PH_B6B_header.step`](../cad/open/CTL-11_kicad_JST_PH_B6B_header.step)<br>[`CTL-11_stepper_cable_ph_xh.step`](../cad/bought/CTL-11_stepper_cable_ph_xh.step) | in repo (`cad/open/`) | open model |
 | CTL-10 | Controller case + button panel | Print | [`CTL-10a_button_panel.step`](../phases/02-controller/3d/CTL-10a_button_panel.step)<br>[`CTL-10b_controller_tray.step`](../phases/02-controller/3d/CTL-10b_controller_tray.step) | ours (`tools/cad/parts.py`) | printed part |
 
 ## 03-frame
 
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
-| FRM-01 | Baltic birch plywood 1/2 in, 24 x 24 in | Purchase | [`FRM-01_plywood_610x610x12.step`](../cad/bought/FRM-01_plywood_610x610x12.step) | None published - use the dummy (stock sheet, 610 x 610 x 12) | **dummy only** |
-| FRM-02 | 2020 V-slot 500 mm (4-pack) | Purchase | [`FRM-02_vslot_2020_500.step`](../cad/bought/FRM-02_vslot_2020_500.step) | [grabcad.com](https://grabcad.com/openbuilds-1/models) (V-Slot 20x20, free login) or Onshape Standard Content | vendor model (download) + dummy |
-| FRM-03 | M5 T-nuts for 2020, 50 drop-in + 50 sliding | Purchase | [`FRM-03_tnut_m5_dropin.step`](../cad/bought/FRM-03_tnut_m5_dropin.step) | Onshape Standard Content (T-slot nut) or [grabcad.com](https://grabcad.com/openbuilds-1/models) | vendor model (download) + dummy |
-| FRM-06 | Socket screw kit M2–M5, 8/10/16/20 mm, with nuts | Purchase | [`FRM-06_screws_m3_m4_m5_samples.step`](../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content: ISO 4762 socket head M3/M4/M5 | Onshape Standard Content + dummy |
+| FRM-01 | Deck: 9 tiles of 200 mm (600 x 600 x 24 mm) | Print | [`FRM-01a_deck_tile_SW.step`](../phases/03-frame/3d/FRM-01a_deck_tile_SW.step)<br>[`FRM-01b_deck_tile_S.step`](../phases/03-frame/3d/FRM-01b_deck_tile_S.step)<br>[`FRM-01c_deck_tile_SE.step`](../phases/03-frame/3d/FRM-01c_deck_tile_SE.step)<br>[`FRM-01d_deck_tile_W.step`](../phases/03-frame/3d/FRM-01d_deck_tile_W.step)<br>[`FRM-01e_deck_tile_C.step`](../phases/03-frame/3d/FRM-01e_deck_tile_C.step)<br>[`FRM-01f_deck_tile_E.step`](../phases/03-frame/3d/FRM-01f_deck_tile_E.step)<br>[`FRM-01g_deck_tile_NW.step`](../phases/03-frame/3d/FRM-01g_deck_tile_NW.step)<br>[`FRM-01h_deck_tile_N.step`](../phases/03-frame/3d/FRM-01h_deck_tile_N.step)<br>[`FRM-01i_deck_tile_NE.step`](../phases/03-frame/3d/FRM-01i_deck_tile_NE.step) | ours (`tools/cad/parts.py`) | printed part |
+| FRM-02 | Printed 20 x 20 bars: outrigger (2 x 250 mm), scan post (2 x 175 mm) | Print | [`FRM-02a_outrigger_bar_1.step`](../phases/03-frame/3d/FRM-02a_outrigger_bar_1.step)<br>[`FRM-02b_outrigger_bar_2.step`](../phases/03-frame/3d/FRM-02b_outrigger_bar_2.step)<br>[`FRM-02c_scan_post_bar_1.step`](../phases/03-frame/3d/FRM-02c_scan_post_bar_1.step)<br>[`FRM-02d_scan_post_bar_2.step`](../phases/03-frame/3d/FRM-02d_scan_post_bar_2.step) | ours (`tools/cad/parts.py`) | printed part |
+| FRM-06 | M2 socket screw kit, 4–25 mm, with nuts and washers (900 pcs) | Purchase | [`FRM-06_screws_m2_samples.step`](../cad/bought/FRM-06_screws_m2_samples.step) | Onshape Standard Content: ISO 4762 socket head M2 | Onshape Standard Content + dummy |
+| FRM-07 | Socket screw kit M2/M3/M4 with nuts (820 pcs): M3 for the motors | Purchase | [`FRM-07_screw_m3x8.step`](../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content: ISO 4762 socket head M3 | Onshape Standard Content + dummy |
 | FRM-08 | 608-2RS bearings (10) | Purchase | [`FRM-08_bearing_608_2rs.step`](../cad/bought/FRM-08_bearing_608_2rs.step) | Onshape Standard Content: ball bearing 608 (8 x 22 x 7) | Onshape Standard Content + dummy |
-| FRM-12 | Wood screws #8 x 5/8 in, Type 17 point (100) | Purchase | [`FRM-12_wood_screw_8x5_8.step`](../cad/bought/FRM-12_wood_screw_8x5_8.step) | Onshape Standard Content (wood screw) or the dummy | Onshape Standard Content + dummy |
-| FRM-09 | OG-40 adapter, feet, 2020 saddles, scan-post socket, camera pillar, end foot, protractor scales | Print | [`FRM-09a_og40_adapter.step`](../phases/03-frame/3d/FRM-09a_og40_adapter.step)<br>[`FRM-09b_foot.step`](../phases/03-frame/3d/FRM-09b_foot.step)<br>[`FRM-09c_protractor_segment.step`](../phases/03-frame/3d/FRM-09c_protractor_segment.step)<br>[`FRM-09d_extrusion_saddle.step`](../phases/03-frame/3d/FRM-09d_extrusion_saddle.step)<br>[`FRM-09e_post_socket.step`](../phases/03-frame/3d/FRM-09e_post_socket.step)<br>[`FRM-09f_end_foot.step`](../phases/03-frame/3d/FRM-09f_end_foot.step)<br>[`FRM-09g_washers.step`](../phases/03-frame/3d/FRM-09g_washers.step)<br>[`FRM-09h_camera_pillar.step`](../phases/03-frame/3d/FRM-09h_camera_pillar.step) | ours (`tools/cad/parts.py`) | printed part |
+| FRM-09 | Ring scale clamps, bar saddles, scan-post socket, camera pillar, end foot, bar couplers | Print | [`FRM-09c_protractor_segment.step`](../phases/03-frame/3d/FRM-09c_protractor_segment.step)<br>[`FRM-09d_bar_saddle.step`](../phases/03-frame/3d/FRM-09d_bar_saddle.step)<br>[`FRM-09e_post_socket.step`](../phases/03-frame/3d/FRM-09e_post_socket.step)<br>[`FRM-09f_end_foot.step`](../phases/03-frame/3d/FRM-09f_end_foot.step)<br>[`FRM-09h_camera_pillar.step`](../phases/03-frame/3d/FRM-09h_camera_pillar.step)<br>[`FRM-09i_bar_coupler.step`](../phases/03-frame/3d/FRM-09i_bar_coupler.step) | ours (`tools/cad/parts.py`) | printed part |
 
 ## 04-light-arm
 
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
 | LAR-01 | 12 in lazy Susan bearing | Purchase | [`LAR-01_lazy_susan_12in.step`](../cad/bought/LAR-01_lazy_susan_12in.step) | [www.mcmaster.com](https://www.mcmaster.com/1443T2) (12 in turntable, CAD tab; close match, not the same part) | vendor model (download) + dummy |
-| LAR-02 | NEMA 17 stepper 59 Ncm 2 A (3-pack: M4, M3, M2) | Purchase | [`LAR-02_nema17_17hs19_2004s1.step`](../cad/bought/LAR-02_nema17_17hs19_2004s1.step) | [files.omc-stepperonline.com](https://files.omc-stepperonline.com/17HS19-2004S1.STEP) | vendor model (download) + dummy |
+| LAR-02 | NEMA 17 stepper 42 Ncm 1.5 A, 38 mm (5-pack: M4, M3, M2 + 2 spare) | Purchase | [`LAR-02_nema17_17hs4401.step`](../cad/bought/LAR-02_nema17_17hs4401.step) | None published - repo model at 42.3 x 42.3 x 38 mm (standard NEMA 17 face) | **dummy only** |
 | LAR-03 | GT2 6 mm open belt (5 m) | Purchase | [`LAR-03_gt2_belt_open_1m.step`](../cad/bought/LAR-03_gt2_belt_open_1m.step) | None published - use the dummy (belt) | **dummy only** |
 | LAR-04 | GT2 20T pulley 5 mm bore (5-pack) | Purchase | [`LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step`](../cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step)<br>[`LAR-04_gt2_pulley_20t_5mm.step`](../cad/bought/LAR-04_gt2_pulley_20t_5mm.step) | in repo (`cad/open/`) | open model |
 | LAR-05 | Optical endstop module, slot type (6-pack) | Purchase | [`LAR-05_tcst2103_endstop_module.step`](../cad/bought/LAR-05_tcst2103_endstop_module.step) | [www.vishay.com](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only: ECAD models, free login) | vendor model (download) + dummy |
 | LAR-06 | Roller-lever limit switch, screw terminals (2) | Purchase | [`LAR-06_me8108_limit_switch.step`](../cad/bought/LAR-06_me8108_limit_switch.step) | None published - use the dummy | **dummy only** |
-| LAR-08 | Belt rim segments, arm segment, M4 motor mount, cross clamp | Print | [`LAR-08a_rim_segment.step`](../phases/04-light-arm/3d/LAR-08a_rim_segment.step)<br>[`LAR-08b_ring_motor_mount.step`](../phases/04-light-arm/3d/LAR-08b_ring_motor_mount.step)<br>[`LAR-08c_arm_segment.step`](../phases/04-light-arm/3d/LAR-08c_arm_segment.step)<br>[`LAR-08e_cross_clamp.step`](../phases/04-light-arm/3d/LAR-08e_cross_clamp.step) | ours (`tools/cad/parts.py`) | printed part |
+| LAR-08 | Belt rim segments, arm segment, M4 motor mount, cross clamp, upright + arm bars | Print | [`LAR-08a_rim_segment.step`](../phases/04-light-arm/3d/LAR-08a_rim_segment.step)<br>[`LAR-08b_ring_motor_mount.step`](../phases/04-light-arm/3d/LAR-08b_ring_motor_mount.step)<br>[`LAR-08c_arm_segment.step`](../phases/04-light-arm/3d/LAR-08c_arm_segment.step)<br>[`LAR-08e_cross_clamp.step`](../phases/04-light-arm/3d/LAR-08e_cross_clamp.step)<br>[`LAR-08f_upright_bar.step`](../phases/04-light-arm/3d/LAR-08f_upright_bar.step)<br>[`LAR-08g_arm_bar.step`](../phases/04-light-arm/3d/LAR-08g_arm_bar.step) | ours (`tools/cad/parts.py`) | printed part |
 | LAR-09 | Laser module class 2 (650 nm, < 1 mW); mirror = one CAL-02 tile | Tool | - | - | no model needed (tool) |
 
 ## 05-table
 
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
-| TBL-01 | NEMA 17 stepper 59 Ncm 2 A | Purchase | [`LAR-02_nema17_17hs19_2004s1.step`](../cad/bought/LAR-02_nema17_17hs19_2004s1.step) | [files.omc-stepperonline.com](https://files.omc-stepperonline.com/17HS19-2004S1.STEP) | vendor model (download) + dummy |
+| TBL-01 | NEMA 17 stepper 42 Ncm 1.5 A, 38 mm | Purchase | [`LAR-02_nema17_17hs4401.step`](../cad/bought/LAR-02_nema17_17hs4401.step) | None published - repo model at 42.3 x 42.3 x 38 mm | **dummy only** |
 | TBL-02 | GT2 6 mm closed belt 232 mm | Purchase | [`TBL-02_gt2_belt_232_loop.step`](../cad/bought/TBL-02_gt2_belt_232_loop.step) | None published - use the dummy (belt loop) | **dummy only** |
 | TBL-03 | GT2 20T pulley 5 mm bore | Purchase | [`LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step`](../cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step)<br>[`LAR-04_gt2_pulley_20t_5mm.step`](../cad/bought/LAR-04_gt2_pulley_20t_5mm.step) | in repo (`cad/open/`) | open model |
 | TBL-04 | Optical endstop module, slot type (from the LAR-05 6-pack) | Purchase | [`LAR-05_tcst2103_endstop_module.step`](../cad/bought/LAR-05_tcst2103_endstop_module.step) | [www.vishay.com](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only) | vendor model (download) + dummy |
 | TBL-05 | M8 x 75 hex bolt, partial thread + M8 nut (fixed table axle) | Purchase | [`TBL-05_bolt_m8x75_nut.step`](../cad/bought/TBL-05_bolt_m8x75_nut.step) | Onshape Standard Content: ISO 4014 M8 x 75 hex bolt + ISO 4032 M8 nut | Onshape Standard Content + dummy |
-| TBL-06 | Axis fasteners (M3/M5 set) | Purchase | [`FRM-06_screws_m3_m4_m5_samples.step`](../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content | Onshape Standard Content + dummy |
+| TBL-06 | Axis fasteners (M3 motor face + M2 set) | Purchase | [`FRM-07_screw_m3x8.step`](../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content | Onshape Standard Content + dummy |
 | TBL-07 | Printed table parts | Print | [`TBL-07a_table_drum.step`](../phases/05-table/3d/TBL-07a_table_drum.step)<br>[`TBL-07b_home_flag.step`](../phases/05-table/3d/TBL-07b_home_flag.step)<br>[`TBL-07c_table_motor_bracket.step`](../phases/05-table/3d/TBL-07c_table_motor_bracket.step)<br>[`TBL-07d_table_post.step`](../phases/05-table/3d/TBL-07d_table_post.step)<br>[`TBL-07f_spacers.step`](../phases/05-table/3d/TBL-07f_spacers.step) | ours (`tools/cad/parts.py`) | printed part |
 
 ## 06-camera-light
@@ -127,7 +124,6 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 | CAM-01 | USB camera 12 MP IMX477, M12 mount (UVC) | Purchase | [`CAM-01_arducam_b0433_imx477_usb.step`](../cad/bought/CAM-01_arducam_b0433_imx477_usb.step) | None published. Drawing: [www.uctronics.com](https://www.uctronics.com/download/Amazon/B0433_Arducam_12MP_USB_Camera_Module_Datasheet.pdf) (38 x 38 mm, holes 34/28 mm) - dummy built from it | **dummy only** |
 | CAM-02 | M12 lens 16 mm, ≥ 1/2 in format, low distortion | Purchase | [`CAM-02_m12_lens_16mm.step`](../cad/bought/CAM-02_m12_lens_16mm.step) | None published - use the dummy (M12 x 0.5 barrel) | **dummy only** |
 | LSR-06 | Solderless COB holder 13.5 mm (TE LUMAWISE Z35) | Purchase | [`LSR-06_te_lumawise_z35_2213678_5.step`](../cad/bought/LSR-06_te_lumawise_z35_2213678_5.step) | [www.te.com](https://www.te.com/) (search 2213678-5 → CAD 3D model) | vendor model (download) + dummy |
-| CAM-07 | M2.5 x 8 mm screws (100-pack) | Purchase | [`CAM-07_screw_m2_5x8.step`](../cad/bought/CAM-07_screw_m2_5x8.step) | Onshape Standard Content: ISO 7380 / ISO 4762 M2.5 x 8 | Onshape Standard Content + dummy |
 | CAM-03 | Camera L-arm, aperture stop (f/8), lens lock | Print | [`CAM-03a_aperture_stop_f8.step`](../phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.step)<br>[`CAM-03b_camera_plate.step`](../phases/06-camera-light/3d/CAM-03b_camera_plate.step) | ours (`tools/cad/parts.py`) | printed part |
 | LSR-01 | COB LED CRI 97, 12 V, 13.5 mm (Citizen CLU7A3) | Purchase | [`LSR-01_citizen_clu7a3_cob.step`](../cad/bought/LSR-01_citizen_clu7a3_cob.step) | None published - use the dummy (datasheet: 13.5 x 13.5 x 1.4 mm, 4.2 mm LES) | **dummy only** |
 | LSR-02 | Constant-current driver 350 mA | Purchase | [`LSR-02_meanwell_nldd_350h.step`](../cad/bought/LSR-02_meanwell_nldd_350h.step) | [www.meanwellusa.com](https://www.meanwellusa.com/) (search NLDD-H → 3D STEP) | vendor model (download) + dummy |
@@ -156,12 +152,12 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
-| TLT-01 | NEMA 17 stepper 59 Ncm 2 A | Purchase | [`LAR-02_nema17_17hs19_2004s1.step`](../cad/bought/LAR-02_nema17_17hs19_2004s1.step) | [files.omc-stepperonline.com](https://files.omc-stepperonline.com/17HS19-2004S1.STEP) | vendor model (download) + dummy |
+| TLT-01 | NEMA 17 stepper 42 Ncm 1.5 A, 38 mm | Purchase | [`LAR-02_nema17_17hs4401.step`](../cad/bought/LAR-02_nema17_17hs4401.step) | None published - repo model at 42.3 x 42.3 x 38 mm | **dummy only** |
 | TLT-02 | GT2 6 mm closed belt 280 mm | Purchase | [`TLT-02_gt2_belt_280_loop.step`](../cad/bought/TLT-02_gt2_belt_280_loop.step) | None published - use the dummy (belt loop) | **dummy only** |
 | TLT-03 | GT2 20T pulley 5 mm bore | Purchase | [`LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step`](../cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step)<br>[`LAR-04_gt2_pulley_20t_5mm.step`](../cad/bought/LAR-04_gt2_pulley_20t_5mm.step) | in repo (`cad/open/`) | open model |
 | TLT-04 | Optical endstop module, slot type (from the LAR-05 6-pack) | Purchase | [`LAR-05_tcst2103_endstop_module.step`](../cad/bought/LAR-05_tcst2103_endstop_module.step) | [www.vishay.com](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only) | vendor model (download) + dummy |
 | TLT-05 | M8 x 35 hex bolts, half thread (10-pack; 2 used) | Purchase | [`TLT-05_bolt_m8x35_nut.step`](../cad/bought/TLT-05_bolt_m8x35_nut.step) | Onshape Standard Content: ISO 4014 M8 x 35 hex bolt + ISO 4032 M8 nut | Onshape Standard Content + dummy |
-| TLT-06 | Axis fasteners (M3/M5 set) | Purchase | [`FRM-06_screws_m3_m4_m5_samples.step`](../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content | Onshape Standard Content + dummy |
+| TLT-06 | Axis fasteners (M3 motor face + M2 set) | Purchase | [`FRM-07_screw_m3x8.step`](../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content | Onshape Standard Content + dummy |
 | TLT-07 | Printed tilt parts | Print | [`TLT-07a_tilt_yoke.step`](../phases/08-tilt/3d/TLT-07a_tilt_yoke.step)<br>[`TLT-07b_pulley_100T.step`](../phases/08-tilt/3d/TLT-07b_pulley_100T.step)<br>[`TLT-07c_tilt_cradle.step`](../phases/08-tilt/3d/TLT-07c_tilt_cradle.step) | ours (`tools/cad/parts.py`) | printed part |
 
 ## 09-spin
@@ -170,7 +166,7 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 |---|---|---|---|---|---|
 | SPN-01 | NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) | Purchase | [`SPN-01_nema17_17hs08_1004s_pancake.step`](../cad/bought/SPN-01_nema17_17hs08_1004s_pancake.step) | [files.omc-stepperonline.com](https://files.omc-stepperonline.com/17HS08-1004S.STEP) | vendor model (download) + dummy |
 | SPN-04 | Optical endstop module, slot type (from the LAR-05 6-pack) | Purchase | [`LAR-05_tcst2103_endstop_module.step`](../cad/bought/LAR-05_tcst2103_endstop_module.step) | [www.vishay.com](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only) | vendor model (download) + dummy |
-| SPN-06 | Axis fasteners (M3/M5 set) | Purchase | [`FRM-06_screws_m3_m4_m5_samples.step`](../cad/bought/FRM-06_screws_m3_m4_m5_samples.step) | Onshape Standard Content | Onshape Standard Content + dummy |
+| SPN-06 | Axis fasteners (M3 motor face + M2 set) | Purchase | [`FRM-07_screw_m3x8.step`](../cad/bought/FRM-07_screw_m3x8.step) | Onshape Standard Content | Onshape Standard Content + dummy |
 | SPN-07 | Spin platter (direct drive) | Print | [`SPN-07a_spin_platter.step`](../phases/09-spin/3d/SPN-07a_spin_platter.step) | ours (`tools/cad/parts.py`) | printed part |
 
 ## 10-color
@@ -179,11 +175,11 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 |---|---|---|---|---|---|
 | MSK-01 | Narrow-band 3 W star LEDs, pre-soldered leads (7 bands, 450–660 nm) | Optional | [`MSK-01_star_led_20mm.step`](../cad/bought/MSK-01_star_led_20mm.step) | None published - use the dummy (20 mm star LED) | **dummy only** |
 | MSK-02 | Constant-current driver 350 mA | Optional | [`LSR-02_meanwell_nldd_350h.step`](../cad/bought/LSR-02_meanwell_nldd_350h.step) | [www.meanwellusa.com](https://www.meanwellusa.com/) (search NLDD-H → 3D STEP) | vendor model (download) + dummy |
-| MSK-03 | Darlington array 8-ch | Optional | [`MSK-03_kicad_DIP-18_W7.62mm_uln2803a.step`](../cad/open/MSK-03_kicad_DIP-18_W7.62mm_uln2803a.step) | in repo (`cad/open/`) | open model |
+| MSK-03 | 4-channel MOSFET switch module, opto-isolated inputs, screw terminals (2 used: 8 channels) | Optional | [`MSK-03_mosfet_module_4ch.step`](../cad/bought/MSK-03_mosfet_module_4ch.step) | None published - use the dummy (4-channel module with terminal blocks) | **dummy only** |
 | MSK-04 | Heatsink 40 mm (from LSR-03 pack) | Optional | [`LSR-03_heatsink_40x40x11.step`](../cad/bought/LSR-03_heatsink_40x40x11.step) | None published - use the dummy (generic heatsink) | **dummy only** |
 | MSK-05 | Linear polarizer film 10 x 10 cm (10) | Optional | [`MSK-05_polarizer_film_100mm.step`](../cad/bought/MSK-05_polarizer_film_100mm.step) | None published - use the dummy (film) | **dummy only** |
 | MSK-06 | LED bank ring on a 40 deg mast, polarizer holders | Print | [`MSK-06a_led_ring.step`](../phases/10-color/3d/MSK-06a_led_ring.step)<br>[`MSK-06b_led_mast.step`](../phases/10-color/3d/MSK-06b_led_mast.step) | ours (`tools/cad/parts.py`) | printed part |
-| SPC-01 | AS7341 10-band spectral sensor breakout (STEMMA QT) | Optional | [`SPC-01_adafruit_4698_as7341.step`](../cad/open/SPC-01_adafruit_4698_as7341.step) | in repo (`cad/open/`) | open model |
+| SPC-01 | AS7341 spectral sensor breakout, 8 visible bands + clear + NIR (STEMMA QT) | Optional | [`SPC-01_adafruit_4698_as7341.step`](../cad/open/SPC-01_adafruit_4698_as7341.step) | in repo (`cad/open/`) | open model |
 | SPC-02 | JST-SH 4-pin to female jumper cable 150 mm | Optional | [`SPC-02_jst_sh_cable.step`](../cad/bought/SPC-02_jst_sh_cable.step) | None published - use the dummy (cable) | **dummy only** |
 | SPC-03 | Spectral sensor tube + mount | Print | [`SPC-03a_spectral_tube.step`](../phases/10-color/3d/SPC-03a_spectral_tube.step) | ours (`tools/cad/parts.py`) | printed part |
 
@@ -192,11 +188,10 @@ Every part in the parts lists has a 3D model you can import into Onshape (Onshap
 | ID | Part | Type | 3D file(s) in the repo | Real model | Status |
 |---|---|---|---|---|---|
 | SCN-01 | Mounting putty 2 oz | Purchase | [`SCN-01_mounting_putty_blob.step`](../cad/bought/SCN-01_mounting_putty_blob.step) | None published - use the dummy (putty) | **dummy only** |
-| SCN-02 | ChArUco scanning mat print | Purchase | [`SCN-02_charuco_mat_print.step`](../cad/bought/SCN-02_charuco_mat_print.step) | None published - use the dummy (print, generated by the software) | **dummy only** |
+| SCN-02 | ChArUco scanning mat (printed on TLS-08) | Purchase | [`SCN-02_charuco_mat_print.step`](../cad/bought/SCN-02_charuco_mat_print.step) | None published - use the dummy (print, generated by the software) | **dummy only** |
 | SCN-03 | Platter risers (20/40/60 mm), scan camera plate (15 deg) | Print | [`SCN-03a_riser_20.step`](../phases/11-scan-capture/3d/SCN-03a_riser_20.step)<br>[`SCN-03b_riser_40.step`](../phases/11-scan-capture/3d/SCN-03b_riser_40.step)<br>[`SCN-03c_riser_60.step`](../phases/11-scan-capture/3d/SCN-03c_riser_60.step)<br>[`SCN-03d_scan_camera_plate_15.step`](../phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.step) | ours (`tools/cad/parts.py`) | printed part |
 | CAM-04 | Second USB camera 12 MP IMX477, M12 mount (scan camera) | Optional | [`CAM-01_arducam_b0433_imx477_usb.step`](../cad/bought/CAM-01_arducam_b0433_imx477_usb.step) | None published - use the dummy (same as CAM-01) | **dummy only** |
 | CAM-05 | Second M12 16 mm lens (scan camera) | Optional | [`CAM-02_m12_lens_16mm.step`](../cad/bought/CAM-02_m12_lens_16mm.step) | None published - use the dummy (same as CAM-02) | **dummy only** |
-| CAM-08 | M2.5 x 8 mm screws (4), second camera | Optional | [`CAM-07_screw_m2_5x8.step`](../cad/bought/CAM-07_screw_m2_5x8.step) | Onshape Standard Content: ISO 7380 / ISO 4762 M2.5 x 8 | Onshape Standard Content + dummy |
 
 ## 15-standalone
 

@@ -2,12 +2,31 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+import os
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-DEFAULT_CONFIG = Path(__file__).resolve().parents[3] / "config" / "machine.yaml"
+REPO_CONFIG = Path(__file__).resolve().parents[3] / "config" / "machine.yaml"      # source checkout
+PACKAGED_CONFIG = Path(__file__).resolve().parents[1] / "data" / "machine.yaml"    # copy shipped in the wheel
+USER_CONFIG = Path(os.environ.get("OPENGONIO_HOME", "~/.config/opengonio")).expanduser() / "machine.yaml"
+
+
+def default_config_path() -> Path:
+    """Which machine.yaml to use when --config is not given, first match wins:
+    $OPENGONIO_CONFIG -> the repository's software/config/machine.yaml (source checkout) ->
+    ~/.config/opengonio/machine.yaml (or $OPENGONIO_HOME; made by `opengonio init`) -> the copy inside the package."""
+    env = os.environ.get("OPENGONIO_CONFIG")
+    if env:
+        return Path(env).expanduser()
+    for p in (REPO_CONFIG, USER_CONFIG):
+        if p.exists():
+            return p
+    return PACKAGED_CONFIG
+
+
+DEFAULT_CONFIG = REPO_CONFIG if REPO_CONFIG.exists() else PACKAGED_CONFIG             # kept for callers and tests
 MICROSTEPS_PER_REV = 200 * 16          # default: 1.8 deg motor at 1/16 (an axis may set its own microsteps)
 
 
@@ -29,7 +48,7 @@ class Axis:
 
     @property
     def steps_per_deg(self) -> float:
-        """FluidNC steps_per_mm, used as steps per output degree."""
+        """Controller steps_per_mm ($10x in grblHAL), used as steps per output degree."""
         return 200 * self.microsteps * self.gear_ratio / 360.0
 
     @property
@@ -62,6 +81,7 @@ class Machine:
     scan: dict[str, Any] = field(default_factory=dict)
     station: dict[str, Any] = field(default_factory=dict)
     spectral: dict[str, Any] = field(default_factory=dict)
+    sample: dict[str, Any] = field(default_factory=dict)      # planar sample size + valid-region rules (roi.py)
 
     @property
     def active_axes(self) -> dict[str, Axis]:
@@ -92,8 +112,11 @@ class Machine:
         return {"M4": 90.0, "M3": 0.0, "M2": 0.0, "M1": 0.0}
 
 
-def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
-    raw = yaml.safe_load(Path(path).read_text())
+def load_config(path: str | Path | None = None) -> Machine:
+    path = Path(path) if path is not None else default_config_path()
+    if not path.exists():
+        raise ConfigError(f"{path} not found: run `opengonio init` or pass --config")
+    raw = yaml.safe_load(path.read_text())
     m = raw["machine"]
     axes = {}
     for k, d in raw["axes"].items():
@@ -103,7 +126,7 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
         if a.min_deg >= a.max_deg or not a.in_range(a.home_deg):
             raise ConfigError(f"{k}: bad range or home")
         if a.home_deg not in (a.min_deg, a.max_deg):
-            raise ConfigError(f"{k}: home switch must sit at a range end (FluidNC soft limits)")
+            raise ConfigError(f"{k}: home switch must sit at a range end (controller soft limits)")
         axes[k] = a
     letters = [a.fluidnc_axis for a in axes.values()]
     if len(set(letters)) != len(letters):
@@ -117,5 +140,5 @@ def load_config(path: str | Path = DEFAULT_CONFIG) -> Machine:
         min_phase_angle_deg=float(m["min_phase_angle_deg"]), repeatability_target_deg=float(m["repeatability_target_deg"]),
         axes=axes, controller=raw.get("controller", {}), hub=raw.get("hub", {}),
         camera=raw.get("camera", {}), lights=raw.get("lights", {}), scan=raw.get("scan", {}),
-        station=raw.get("station", {}), spectral=raw.get("spectral", {}),
+        station=raw.get("station", {}), spectral=raw.get("spectral", {}), sample=raw.get("sample", {}),
     )

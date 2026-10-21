@@ -40,9 +40,13 @@ class VoxelGrid:
 
 def carve(masks: list[np.ndarray], views: list[tuple[np.ndarray, np.ndarray]], K: np.ndarray,
           half_size_mm: float, n: int = 64, center: np.ndarray | None = None,
-          clip_below_z: float | None = None) -> VoxelGrid:
+          clip_below_z: float | None = None, dist=None, max_voxels: int = 20_000_000) -> VoxelGrid:
     """masks: bool images (H, W); views: (R_oc, t_oc) per mask; cube of side 2*half_size around center.
-    clip_below_z: drop voxels below the support plane (nest, riser and platter are not the object)."""
+    clip_below_z: drop voxels below the support plane (nest, riser and platter are not the object).
+    dist: lens distortion (k1 k2 p1 p2) of the calibrated camera. Memory grows as n^3 (~25 bytes per voxel):
+    grids over max_voxels are refused (choose a coarser --voxel)."""
+    if n ** 3 > max_voxels:
+        raise MemoryError(f"{n}^3 = {n ** 3:,} voxels (~{n ** 3 * 25 / 1e9:.1f} GB) exceeds {max_voxels:,}: use a coarser voxel")
     c = np.zeros(3) if center is None else np.asarray(center, float)
     vox = 2.0 * half_size_mm / n
     origin = c - half_size_mm
@@ -54,7 +58,7 @@ def carve(masks: list[np.ndarray], views: list[tuple[np.ndarray, np.ndarray]], K
         keep &= pts[:, 2] >= clip_below_z
     for mask, (R, t) in zip(masks, views):
         h, w = mask.shape
-        uv, z = project(pts[keep], K, R, t)
+        uv, z = project(pts[keep], K, R, t, dist)
         u = np.floor(np.nan_to_num(uv[:, 0], nan=-1.0)).astype(int)
         v = np.floor(np.nan_to_num(uv[:, 1], nan=-1.0)).astype(int)
         inside = (z > 0) & (u >= 0) & (u < w) & (v >= 0) & (v < h)

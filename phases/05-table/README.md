@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/05.svg" width="100%" alt="Steps of stage 05">
 
-$23.56 · total so far $386.08 / $630
+$23.56 · total so far $386.41 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -29,11 +29,11 @@ Tick the boxes; `make done id=M15.1`.
 
 ### M15.2 Fixed axle and drum
 
-**Time** 45 min · **Needs** 2 × FRM-08 608 · TBL-05 M8 × 75 bolt + nut · 1 mm shim + 6 mm spacer (TBL-07f) · 4 × FRM-12 screws · TLS-10 13 mm spanner
+**Time** 45 min · **Needs** 2 × FRM-08 608 · TBL-05 M8 × 75 bolt + nut · 1 mm shim + 6 mm spacer (TBL-07f) · 4 × M2 × 12 (FRM-06) · TLS-10 13 mm spanner
 
 #### Do
 
-1. Bolt up through the post from below, head into the hex pocket. Post on its template outline at (0, 0); 4 wood screws (the bolt is now trapped and can't turn).
+1. Bolt up through the post from below, head into the hex pocket. Post on its 4 pilots at the deck centre; 4 × M2 × 12 (the bolt is now trapped and can't turn).
 2. Press both 608s into the drum. Onto the bolt: 1 mm shim (sits on the post top), the drum (lower 608 onto the bolt), 6 mm spacer down the drum's top hole, M8 nut.
 3. Tighten the nut with the spanner until the drum has no up-down play but still turns freely (the nut presses only the inner races).
 
@@ -53,12 +53,12 @@ Tick the boxes; `make done id=M15.2`.
 
 ### M15.3 Drive belt
 
-**Time** 30 min · **Needs** TBL-01 motor · TBL-02 232 mm belt · TBL-03 pulley · TBL-07c bracket · 4 × M3 × 8
+**Time** 30 min · **Needs** TBL-01 motor · TBL-02 232 mm belt · TBL-03 pulley · TBL-07c bracket · 4 × M3 × 8 (FRM-07) · 2 × M2 × 12 + washers
 
 #### Do
 
 1. Motor face up, bracket top plate on its face (4 × M3 × 8); 20T pulley on the shaft, teeth level with the drum's teeth.
-2. Belt on the motor pulley and the drum's teeth; bracket on its template outline (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; screw the rails down through the slots.
+2. Belt on the motor pulley and the drum's teeth; bracket rails' slots over their 2 deck pilots (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; M2 × 12 + washer through each slot.
 
 #### Verify
 
@@ -75,16 +75,16 @@ M3 returns to the same spot every time (≤ 0.1°). · 0/4 steps done · ~1.8 h 
 
 ### M16.1 Flag and homing
 
-**Time** 30 min · **Needs** TBL-04 endstop · TBL-07b flag · CTL-06 leads (as M10.3)
+**Time** 30 min · **Needs** TBL-04 endstop · TBL-07b flag · CTL-06 leads (as M10.2)
 
 #### Do
 
-1. Flag on the drum's two flag holes (M3 × 8 self-tap), pointing at −180°; endstop on a printed riser beside the post, lead into the E4 Y-MIN socket.
+1. Flag on the drum's two flag holes (M2 × 8 self-tap), pointing at −180°; endstop on a printed riser beside the post (M2 into a spare deck pilot), lead into the SKR Pico Y-STOP socket.
 2. `installed_phase: 5`; `opengonio home` ten times.
 
 #### Verify
 
-- [ ] Home 10/10; `?` shows MPos Y = −180 after homing.
+- [ ] Home 10/10; after homing `opengonio status` shows MPos Y = 0 and true angle M3 = −180.
 
 #### Record
 
@@ -92,7 +92,7 @@ M3 returns to the same spot every time (≤ 0.1°). · 0/4 steps done · ~1.8 h 
 
 ### M16.2 Angle check
 
-**Time** 15 min · **Needs** paper 360° protractor (any free printable, TLS-08) taped on the drum top · a fixed pointer (tape on the post)
+**Time** 15 min · **Needs** paper 360° protractor (any free printable, printed on TLS-08) taped on the drum top · a fixed pointer (tape on the post)
 
 #### Do
 
@@ -144,4 +144,4 @@ JSON in phases/05-table/design.md → Results.
 
 Commit `make publish m="M16 table done"`.
 
-[Sources](../../REFERENCES.md): G33 · H11 · H16 · H17 · H26 · H37 · H41 · P40 · P41 · P42 · P43 · F12
+[Sources](../../REFERENCES.md): G33 · H11 · H16 · H17 · H26 · H37 · H41 · P41 · P42 · P43 · P58 · F12

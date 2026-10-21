@@ -22,7 +22,7 @@ import numpy as np
 
 from .brdf.models import ggx_brdf, lambert
 from .gantry.config import Machine
-from .gantry.fluidnc import AXIS_ORDER, RecordingTransport
+from .gantry.fluidnc import AXIS_ORDER, RecordingTransport, home_mpos
 from .gantry.kinematics import camera_dir, light_dir, sample_rotation
 
 MATERIALS = {   # name: (BRDF of unit vectors in the sample frame, camera gain)
@@ -37,25 +37,19 @@ LETTER = {"X": "M4", "Y": "M3", "Z": "M2", "A": "M1"}
 
 @dataclass
 class SimTransport(RecordingTransport):
-    """FluidNC stand-in that also tracks machine position and lamp outputs."""
-    homes: dict[str, float] = field(default_factory=dict)
+    """Controller stand-in: machine position (RecordingTransport) plus the lamp outputs."""
     outputs: dict[int, bool] = field(default_factory=dict)
 
     def write(self, data: bytes) -> None:
         txt = data.decode().strip()
-        if txt.startswith("$H") and len(txt) == 3:
-            self.mpos[txt[2]] = self.homes.get(txt[2], 0.0)
-        elif txt.startswith("G53 G1"):
-            for k, v in re.findall(r"([XYZA])(-?[\d.]+)", txt.split("F")[0]):
-                self.mpos[k] = float(v)
-        elif m := re.match(r"M6([23]) P(\d+)", txt):
+        if m := re.match(r"M6([23]) P(\d+)", txt):
             self.outputs[int(m.group(2))] = m.group(1) == "2"
         super().write(data)
 
 
 def sim_transport(cfg: Machine) -> SimTransport:
     t = SimTransport()
-    t.homes = {a.fluidnc_axis: a.home_deg for a in cfg.axes.values()}
+    t.homes = home_mpos(cfg)
     t.mpos = dict.fromkeys(AXIS_ORDER[:4], 0.0)
     return t
 
@@ -89,7 +83,10 @@ class SimCamera:
         self.gain = gain
 
     def true_pose(self) -> dict[str, float]:
-        p = {**self.cfg.default_pose(), **{LETTER[k]: v for k, v in self.t.mpos.items() if LETTER.get(k) in self.cfg.active_axes}}
+        zero = {k: v for k, v in home_mpos(self.cfg).items()}                  # machine position at home
+        home = {a.fluidnc_axis: a.home_deg for a in self.cfg.axes.values()}
+        p = {**self.cfg.default_pose(), **{LETTER[k]: v - zero.get(k, 0.0) + home.get(k, 0.0)
+                                           for k, v in self.t.mpos.items() if LETTER.get(k) in self.cfg.active_axes}}
         return {k: v + self.error_deg.get(k, 0.0) for k, v in p.items()}
 
     def signal(self) -> float:
@@ -104,8 +101,18 @@ class SimCamera:
             return 0.0
         return self.gain * self.f(wi, wo) * wi[2] * (1.0 - self.drift_pct_per_shot / 100.0 * self.shots)
 
-    def set_exposure_ms(self, ms: float) -> None:
+    def configure(self, s) -> dict:
+        """Same interface as UvcCamera.configure: the simulated camera applies exactly what is asked."""
+        self.exposure_ms = float(s.exposure_ms)
+        return self.readback()
+
+    def readback(self) -> dict:
+        return {"exposure_ms": self.exposure_ms, "gain": 0, "method": "simulated camera", "width": self.size[1],
+                "height": self.size[0], "discard_frames": 0, "device": f"sim:{self.material}"}
+
+    def set_exposure_ms(self, ms: float) -> dict:
         self.exposure_ms = ms
+        return self.readback()
 
     def grab(self) -> np.ndarray:
         lin = self.signal() * self.exposure_ms / 20.0
@@ -115,7 +122,7 @@ class SimCamera:
         return np.clip(np.round(img), 0, 255).astype(np.uint8)
 
     def spectral(self) -> list[int]:
-        """AS7341 stand-in: a flat-white lamp, 10 channels."""
+        """AS7341 stand-in: a flat-white lamp, 10 readings (F1-F8, clear, NIR)."""
         s = self.signal() + 2.0
         return [int(round(s * k)) for k in (0.3, 0.6, 0.8, 0.9, 1.0, 1.0, 0.95, 0.8, 3.0, 0.4)]
 
@@ -165,8 +172,9 @@ def demo(cfg: Machine, out: str | Path, m3_error: float = 0.37, gamma: float = 2
     steps["5 white"] = from_white(cal, run("white", "ptfe", at45, reference=False), cfg, today=today)
     matte = run("matte", "matte", inplane.grid(cfg, 20.0))
     rep = verify(matte, cfg, cal=cal)
-    rows = [r.split(",") for r in curve(matte, cfg, cal=cal).read_text().splitlines()[1:]]
-    f = [float(r[11]) for r in rows if r[11] and float(r[5]) <= 60]
+    import csv
+    rows = list(csv.DictReader(curve(matte, cfg, cal=cal).open(encoding="utf-8")))
+    f = [float(r["brdf_per_sr"]) for r in rows if r["brdf_per_sr"] and float(r["theta_i"]) <= 60]
     steps["6 matte brdf (expect 0.159)"] = round(sum(f) / len(f), 4)
     drift = verify(run("drift", "matte", inplane.grid(cfg, 20.0), drift=0.3), cfg, cal=cal)
     steps["7 drifting lamp"] = [drift["lamp_drift_pct"], drift["result"]]

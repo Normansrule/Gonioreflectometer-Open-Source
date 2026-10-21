@@ -1,11 +1,12 @@
 """opengonio command line.
 
+    opengonio init                           installed package: copy machine.yaml to ~/.config/opengonio/ to edit
     opengonio check-pose M4=40 M3=20         offline: BRDF angles + collision check
     opengonio plan inplane --step 10         offline: list in-plane poses
     opengonio --dry-run move M4=60 M3=30     print the G-code instead of sending it
     opengonio home | move ... | light on|off | sleep | wake | status
-    opengonio panel                          run the button panel (Pico hub) loop
-    opengonio send '$I' '?'                  raw FluidNC lines; prints the replies
+    opengonio panel                          run the button panel (ESP32-S3 hub) loop
+    opengonio send '$I' '?'                  raw controller lines (grblHAL / FluidNC); prints the replies
     opengonio station                        standalone: buttons + OLED run jobs, images to station.data_dir
     opengonio pull pi@opengonio.local        copy job folders from the station to ./data
     opengonio verify data/<job>              check a job folder (PASS / WARN / FAIL)
@@ -21,6 +22,7 @@
     opengonio calibrate show | mirror DIRS | dark DIR | white DIR    measured values -> config/calibration.yaml
     opengonio --sim mirror capture mirror    same commands on the simulated machine (no hardware)
     opengonio sim-demo --out data/sim        simulated stage 06-07 walkthrough; ends with "ALL PASS"
+    opengonio app --sim mirror               control app in the browser on a simulated machine (--window: desktop window)
 """
 from __future__ import annotations
 
@@ -47,13 +49,13 @@ def _transport(cfg, dry: bool, sim: bool = False):
         from .sim import sim_transport
         return sim_transport(cfg)
     if dry:
-        return RecordingTransport()
+        return RecordingTransport.for_machine(cfg)
     c = cfg.controller
     if c.get("transport", "serial") == "tcp":
         from .gantry.fluidnc import TcpTransport
         return TcpTransport(c.get("host", "fluidnc.local"), int(c.get("tcp_port", 23)))
-    from .gantry.fluidnc import SerialTransport
-    return SerialTransport(c.get("port", "auto"), int(c.get("baud", 115200)))
+    from .gantry.fluidnc import SerialTransport, dialect
+    return SerialTransport(c.get("port", "auto"), int(c.get("baud", 115200)), dialect(cfg)["usb_vid"])
 
 
 def _scan_offline(cfg, a, cal=None) -> int:
@@ -91,13 +93,33 @@ def _scan_offline(cfg, a, cal=None) -> int:
     return 0
 
 
+def _init(force: bool) -> int:
+    """Installed package: put an editable machine.yaml where load_config() finds it (never overwrites silently)."""
+    import shutil
+    from .gantry.config import PACKAGED_CONFIG, USER_CONFIG, default_config_path
+    if USER_CONFIG.exists() and not force:
+        print(f"{USER_CONFIG} exists (use --force to replace it; the old file is kept as .bak)")
+        return 1
+    USER_CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    if USER_CONFIG.exists():
+        shutil.copyfile(USER_CONFIG, USER_CONFIG.with_suffix(".yaml.bak"))
+    shutil.copyfile(PACKAGED_CONFIG, USER_CONFIG)
+    print(f"wrote {USER_CONFIG}\nin use now: {default_config_path()}\ncalibration: {DEFAULT_CAL}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
+    from .calibration import CalibrationError
     from .gantry.gantry import GantryError
+    from .runrecord import AcquisitionError, RunExistsError
     try:
         return _main(argv)
-    except GantryError as exc:                 # unsafe / out-of-range / not homed: refuse, don't crash
+    except (GantryError, RunExistsError, CalibrationError) as exc:   # unsafe / not homed / run exists: refuse
         print(f"refused: {exc}")
         return 3
+    except AcquisitionError as exc:            # run stopped part-way; its manifest records why
+        print(f"acquisition failed: {exc}")
+        return 4
 
 
 def _main(argv: list[str] | None = None) -> int:
@@ -110,6 +132,8 @@ def _main(argv: list[str] | None = None) -> int:
     ap.add_argument("--sim-drift", type=float, default=0.0, metavar="PCT", help="simulated lamp dimming per shot")
     ap.add_argument("--sim-gamma", type=float, default=1.0, metavar="G", help="simulated camera response (2.2 = sRGB-like)")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    it = sub.add_parser("init", help="copy the default machine.yaml to ~/.config/opengonio/ (installed package)")
+    it.add_argument("--force", action="store_true", help="replace an existing user machine.yaml (old one kept as .bak)")
     cp = sub.add_parser("check-pose"); cp.add_argument("pose", nargs="+")
     pl = sub.add_parser("plan"); pl.add_argument("kind", choices=["inplane", "mirror", "isotropic", "spin"])
     pl.add_argument("--step", type=float, default=10.0); pl.add_argument("--theta", type=float, default=30.0)
@@ -117,7 +141,7 @@ def _main(argv: list[str] | None = None) -> int:
     mv = sub.add_parser("move"); mv.add_argument("pose", nargs="+")
     li = sub.add_parser("light"); li.add_argument("state", choices=["on", "off"]); li.add_argument("--name", default="white")
     sub.add_parser("panel")
-    se = sub.add_parser("send", help="raw FluidNC lines"); se.add_argument("lines", nargs="+")
+    se = sub.add_parser("send", help="raw controller lines"); se.add_argument("lines", nargs="+")
     sub.add_parser("station", help="standalone mode (no laptop)")
     pu = sub.add_parser("pull", help="copy job folders from the station"); pu.add_argument("host"); pu.add_argument("--dest", default="data")
     ve = sub.add_parser("verify", help="check a job folder"); ve.add_argument("dirs", nargs="+")
@@ -131,7 +155,10 @@ def _main(argv: list[str] | None = None) -> int:
     ca.add_argument("--step", type=float, default=10.0); ca.add_argument("--out")
     ca.add_argument("--spectral", action="store_true", help="also read the AS7341 at every pose")
     ca.add_argument("--no-camera", action="store_true", help="spectral sensor only")
+    ca.add_argument("--overwrite", action="store_true", help="--out already holds a run: move it aside and start fresh")
     cu = sub.add_parser("curve", help="angles + brightness per pose -> curve.csv"); cu.add_argument("dirs", nargs="+")
+    cu.add_argument("--recalibrate", action="store_true",
+                    help="use the current calibration file instead of the run's own snapshot (writes curve_recal-<id>.csv)")
     rp = sub.add_parser("repeat", help="repeatability test with a laser, a mirror and a wall")
     rp.add_argument("axis", choices=["M4", "M3", "M2", "M1"]); rp.add_argument("--at", type=float, required=True)
     rp.add_argument("--away", type=float, default=30.0); rp.add_argument("--n", type=int, default=20)
@@ -139,8 +166,17 @@ def _main(argv: list[str] | None = None) -> int:
     cb = sub.add_parser("calibrate", help="measured values -> calibration.yaml")
     cb.add_argument("action", choices=["show", "mirror", "dark", "white", "linearity"]); cb.add_argument("dirs", nargs="*")
     cb.add_argument("--rho", type=float, default=0.99, help="PTFE reflectance (datasheet)")
+    cb.add_argument("--rho-source", default="assumed (datasheet nominal, not a certificate)",
+                    help="where --rho comes from (certificate number, datasheet); recorded with the white reference")
     fi = sub.add_parser("fit", help="fit a game-engine material to curve.csv"); fi.add_argument("dirs", nargs="+")
     sd = sub.add_parser("sim-demo", help="simulated calibration walkthrough"); sd.add_argument("--out", default="data/sim")
+    apx = sub.add_parser("app", help="control app: browser or desktop window (stage 14)")
+    apx.add_argument("--sim", dest="app_sim", metavar="MATERIAL", help="start on a simulated machine: " + ", ".join(
+        ("mirror", "ptfe", "matte", "paper", "plastic")))
+    apx.add_argument("--port", type=int, default=8747)
+    apx.add_argument("--data", default="data/app", help="folder for the app's runs")
+    apx.add_argument("--window", action="store_true", help='desktop window (pip install "opengonio[desktop]"), else the browser')
+    apx.add_argument("--no-browser", action="store_true", help="only serve; open the printed address yourself")
     sc = sub.add_parser("scan", help="3D photo scanner (phases 11-12)")
     sc.add_argument("action", choices=["plan", "export-colmap", "demo", "run", "calibrate", "sync-ids", "hull", "ps"])
     sc.add_argument("--voxel", type=float, default=1.0, help="hull: voxel size (mm)")
@@ -152,10 +188,16 @@ def _main(argv: list[str] | None = None) -> int:
     sc.add_argument("--background", action="store_true", help="capture the empty-platter pass")
     sc.add_argument("--out", default="scan_out")
     sc.add_argument("--exposure-ms", type=float, default=20.0)
+    sc.add_argument("--overwrite", action="store_true", help="--out already holds a scan: move it aside")
     a = ap.parse_args(argv)
+    if a.cmd == "init":
+        return _init(a.force)
     cfg = load_config(a.config) if a.config else load_config()
     cal = load_calibration(a.cal)
 
+    if a.cmd == "app":
+        from .app.server import main as app_main
+        return app_main(cfg, a.app_sim or a.sim, a.port, a.data, a.window, not a.no_browser, a.cal)
     if a.cmd == "sim-demo":
         from .sim import demo
         rep = demo(cfg.with_phase(max(cfg.installed_phase, 6)), a.out)
@@ -179,7 +221,7 @@ def _main(argv: list[str] | None = None) -> int:
             from .calibration import from_linearity
             print(json.dumps(from_linearity(cal, a.dirs[0])))
         else:
-            print(json.dumps(from_white(cal, a.dirs[0], cfg, a.rho)))
+            print(json.dumps(from_white(cal, a.dirs[0], cfg, a.rho, rho_source=a.rho_source)))
         print(f"saved {cal.save()}")
         return 0
 
@@ -225,7 +267,7 @@ def _main(argv: list[str] | None = None) -> int:
     if a.cmd == "curve":
         from .verify import curve
         for d in a.dirs:
-            print(curve(d, cfg, cal=cal))
+            print(curve(d, cfg, cal=cal, recalibrate=a.recalibrate))
         return 0
     if a.cmd == "pull":  # pragma: no cover - needs the station
         import shutil
@@ -238,20 +280,21 @@ def _main(argv: list[str] | None = None) -> int:
         from dataclasses import replace
         from .camera.uvc import CameraSettings, UvcCamera
         from .gantry.hub import Hub
+        from .imageio import save_image
         from .station import Station
-        import cv2
         st_cfg = cfg.station
         cfg = replace(cfg, controller={**cfg.controller, **st_cfg.get("controller", {})})
         g = Gantry(cfg, FluidNC(_transport(cfg, False)))
+        g.handshake()
         hub = Hub(st_cfg.get("hub_port", "/dev/serial0"), int(cfg.hub.get("baud", 115200)))
         cam = UvcCamera(int(cfg.camera.get("index", 0)), int(cfg.camera["width"]), int(cfg.camera["height"]))
-        cam.set(CameraSettings(float(st_cfg.get("exposure_ms", 20))))
+        cam.configure(CameraSettings(float(st_cfg.get("exposure_ms", 20))))
         g.offsets = cal.offsets
         sc_i = int(cfg.for_scan().camera["index"])
         scan_cam = None if sc_i == int(cfg.camera.get("index", 0)) else \
             UvcCamera(sc_i, int(cfg.camera["width"]), int(cfg.camera["height"]))
         st = Station(cfg, g, hub, cam, Path(st_cfg.get("data_dir", "~/opengonio-data")),
-                     save=lambda path, img: cv2.imwrite(str(path), img), cal=cal, scan_cam=scan_cam)
+                     save=save_image, cal=cal, scan_cam=scan_cam)
         print("station ready: NEXT chooses a job, START runs it")
         while True:
             ev = hub.poll()
@@ -298,25 +341,28 @@ def _main(argv: list[str] | None = None) -> int:
             spec = sim_cam.spectral if a.spectral else None
         else:  # pragma: no cover - needs hardware
             if not a.no_camera:
-                import cv2
                 from .camera.uvc import CameraSettings, UvcCamera
+                from .imageio import save_image
                 cam = UvcCamera(int(cfg.camera.get("index", 0)), int(cfg.camera["width"]), int(cfg.camera["height"]))
-                cam.set(CameraSettings(exposure))
-                save = lambda path, img: cv2.imwrite(str(path), img)  # noqa: E731
+                cam.configure(CameraSettings(exposure))           # read back: refuses if the camera ignores it
+                save = save_image
             if a.spectral:
                 from .gantry.hub import Hub
                 spec = Hub(cfg.hub.get("port", "auto"), int(cfg.hub.get("baud", 115200))).spectral
+        if not a.sim and not a.dry_run:  # pragma: no cover - needs hardware
+            g.handshake()
         g.home()
         if a.plan == "warmup":
             from .station import run_warmup
             print(json.dumps(run_warmup(g, cam, Path(a.out or "data/warmup"), a.minutes,
-                                        sleep=(lambda s: None) if a.sim else __import__("time").sleep), indent=1))
+                                        sleep=(lambda s: None) if a.sim else __import__("time").sleep,
+                                        overwrite=a.overwrite), indent=1))
             return 0
         print(run_plan(g, cam, plan, Path(a.out or f"data/{name}"), save, name, spectral=spec,
                        light=None if a.plan == "dark" else "white", cal=cal,
                        reference=a.plan in ("mirror", "inplane", "isotropic", "spin", "anisotropic"),
                        warmup_s=0.0 if a.sim else None, exposure_ms=exposure,
-                       exposures=a.exposures if a.plan == "linearity" else None))
+                       exposures=a.exposures if a.plan == "linearity" else None, overwrite=a.overwrite))
     elif a.cmd == "repeat":  # pragma: no cover - needs hardware and a person
         from .plans.repeatability import laser_angle_deg, laser_limit_mm, summarize
         limit = laser_limit_mm(cfg.repeatability_target_deg, a.wall_mm)
@@ -337,31 +383,43 @@ def _main(argv: list[str] | None = None) -> int:
         print(json.dumps(rep, indent=1))
         return 0 if rep["pass"] else 1
     elif a.cmd == "send":
+        from .gantry.gantry import GantryError, switches_blocked_output
+        bad = [ln for ln in a.lines if switches_blocked_output(cfg, ln)]
+        if bad:
+            raise GantryError(f"{bad[0]} switches a blocked light on (see phases/10-color/design.md)")
         for line in a.lines:
             if line == "?":
                 print(g.nc.status())
             else:
                 print("\n".join(g.nc.command(line)) or "ok")
     elif a.cmd == "status":
-        print(g.nc.status())
+        st = g.nc.status()
+        print(st)                                    # raw controller machine position (grblHAL: 0 at each switch)
+        print("true angles:", {k: round(v, 4) for k, v in g._true(st.mpos).items()})
     elif a.cmd == "panel":  # pragma: no cover - hardware loop
         from .gantry.hub import Hub
         from .gantry.panel import Panel
         hub = Hub(cfg.hub.get("port", "auto"), int(cfg.hub.get("baud", 115200)))
         panel = Panel(g, inplane.grid(cfg, 10.0))
-        print("panel ready: HOME START STOP LIGHT NEXT (PAUSE is on the E4)")
+        print("panel ready: HOME START STOP LIGHT NEXT PAUSE")
         hub.send("POWER?")
-        while True:
-            ev = hub.poll()
-            if ev:
-                panel.handle(ev.kind, ev.value)
-                print(panel.log[-1] if panel.log else ev)
-            panel.tick()
+        try:
+            while True:
+                ev = hub.poll()
+                if ev:
+                    panel.handle(ev.kind, ev.value)
+                    print(panel.log[-1] if panel.log else ev)
+                panel.tick()
+        finally:                                          # any error or Ctrl+C: lamp off before leaving
+            errs = g.all_lights_off()
+            if errs:
+                print("LAMP MAY STILL BE ON: " + "; ".join(errs))
     elif a.cmd == "scan":  # pragma: no cover - hardware
         from .camera.uvc import UvcCamera
         from .gantry.hub import Hub
         from .scan.run import run_scan
         c = cfg.for_scan().camera                 # the scan camera (second camera, or the moved one)
+        g.handshake()
         g.home()
         if a.action == "calibrate":
             from .scan.run import calibrate_scan
@@ -370,7 +428,7 @@ def _main(argv: list[str] | None = None) -> int:
             return 0
         run_scan(cfg, g, UvcCamera(int(c["index"]), int(c["width"]), int(c["height"])),
                  Hub(cfg.hub.get("port", "auto")), a.out, a.exposure_ms, background=a.background,
-                 ps="multispectral" in cfg.active_lights)   # photometric set only with the optional LED bank
+                 ps="multispectral" in cfg.active_lights and not cfg.lights["multispectral"].get("blocked"), overwrite=a.overwrite)   # photometric set only with the optional LED bank
     if isinstance(t, RecordingTransport) and not a.sim:
         print("\n".join(t.lines))
     return 0

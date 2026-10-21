@@ -21,7 +21,7 @@ def cfg():
 
 
 def gantry(cfg):
-    t = RecordingTransport()
+    t = RecordingTransport.for_machine(cfg)
     return Gantry(cfg, FluidNC(t, timeout_s=1)), t
 
 
@@ -115,11 +115,35 @@ def test_home_move_light_gcode(cfg):
     g, t = gantry(cfg)
     g.home()
     assert t.lines[:2] == ["$HX", "$HY"]
-    assert t.lines[2].startswith("G53 G1 X180.0000")
+    assert t.lines[2].startswith("G53 G1 X160.0000")  # grblHAL zeroes each axis at its switch: M4 180 = 160 from home (20)
     g.move(inplane.pose_for(30, 30))
-    assert t.lines[-1].startswith("G53 G1") and "X60.0000" in t.lines[-1] and "Y30.0000" in t.lines[-1]
+    assert t.lines[-2].startswith("G53 G1") and "X40.0000" in t.lines[-2] and "Y210.0000" in t.lines[-2]
+    assert t.lines[-1] == "G4 P0"                    # sync: the move has run before Idle is trusted
+    assert g.reported["M4"] == 60.0 and g.reported["M3"] == 30.0   # reported back as true angles
+    out = cfg.lights["white"]["output"]
     g.light("white", True); g.light("white", False)
-    assert t.lines[-2:] == ["M62 P0", "M63 P0"]
+    assert t.lines[-2:] == [f"M62 P{out}", f"M63 P{out}"]
+
+
+def test_fluidnc_dialect_still_supported(cfg):
+    from dataclasses import replace
+    fc = replace(cfg, controller={**cfg.controller, "firmware": "fluidnc"})
+    g, t = gantry(fc)
+    g.home()
+    g.move(inplane.pose_for(30, 30))
+    assert "X60.0000" in t.lines[-2] and "Y30.0000" in t.lines[-2]   # FluidNC homing.mpos_mm = home_deg
+    g.reinit_drivers(); g.home(); g.sleep(); g.wake()
+    assert "$MI" in t.lines and "$MD" in t.lines and t.lines[-1] == "$ME"
+
+
+def test_grblhal_reinit_sleep_wake(cfg):
+    g, t = gantry(cfg)
+    g.home(); g.reinit_drivers()
+    assert t.lines[-1] == "M122 I" and not g.homed            # Trinamic plugin re-init
+    g.home(); g.sleep()
+    assert t.lines[-1] == "$SLP" and not g.homed
+    g.wake()
+    assert t.lines[-1] == "'\\x18'" and not g.homed             # sleep ends with a reset: Alarm, re-home
 
 
 def test_move_rejections(cfg):
@@ -138,7 +162,7 @@ def test_move_rejections(cfg):
 def test_sleep_and_stop_clear_homing(cfg):
     g, t = gantry(cfg)
     g.home(); g.sleep()
-    assert "$MD" in t.lines and not g.homed
+    assert "$SLP" in t.lines and not g.homed
     g.home(); g.stop()
     assert "'!'" in t.lines and "'\\x18'" in t.lines and not g.homed
 
@@ -156,9 +180,9 @@ def test_panel_buttons(cfg):
     hub = FakeHub(["BTN HOME", "BTN LIGHT", "BTN NEXT", "POWER 0"])
     while (ev := hub.poll()):
         p.handle(ev.kind, ev.value)
-    assert "$HX" in t.lines and "M62 P0" in t.lines and p.index == 1 and not g.homed
+    assert "$HX" in t.lines and f"M62 P{cfg.lights['white']['output']}" in t.lines and p.index == 1 and not g.homed
     p.handle("POWER", "1")
-    assert t.lines[-1] == "$MI"
+    assert t.lines[-1] == "M122 I"
     hub.band(3); hub.band(None)
     assert hub.sent == ["BAND 3", "BAND OFF"]
 
@@ -173,6 +197,17 @@ def test_start_runs_one_pose_per_tick_and_stop_interrupts(cfg):
     p.handle("BTN", "STOP")
     p.tick()
     assert p.index == 2 and not p.running
+
+
+def test_pause_holds_plan_and_start_resumes(cfg):
+    g, _ = gantry(cfg)
+    g.home()
+    p = Panel(g, inplane.grid(cfg, 30))
+    p.handle("BTN", "START"); p.tick()
+    p.handle("BTN", "PAUSE"); p.tick()
+    assert p.index == 1 and not p.running and g.homed           # paused: still homed, nothing reset
+    p.handle("BTN", "START"); p.tick()
+    assert p.index == 2
 
 
 # ---- plans ----
@@ -205,7 +240,7 @@ def _station(tmp_path, cfg):
         def grab(self):
             return b"img"
     saved = []
-    g = Gantry(cfg, FluidNC(RecordingTransport()))
+    g = Gantry(cfg, FluidNC(RecordingTransport.for_machine(cfg)))
     hub = FakeHub()
     import itertools
     tick = itertools.count(0.0, 5.0)                     # 5 s per call: the 60 s lamp warm-up passes in 12 ticks
@@ -220,7 +255,7 @@ def test_station_runs_job_without_laptop(tmp_path, cfg):
     for _ in range(100):
         st.tick()
     m = json.loads((st.run_dir / "manifest.json").read_text())
-    assert m["finished"] and m["schema"] == 1 and len(m["shots"]) == len(st.plan) > 10
+    assert m["finished"] and m["status"] == "finished" and m["schema"] == 2 and len(m["shots"]) == len(st.plan) > 10
     assert len(saved) == len(st.plan) + 2                              # + ref_start, ref_end (lamp drift)
     assert any("warm-up" in x for x in hub.sent) and "done" in hub.sent[-1]
 
@@ -265,7 +300,7 @@ def test_run_plan_and_curve(tmp_path, cfg):
     from opengonio.plans import inplane
     from opengonio.station import run_plan
     from opengonio.verify import curve, verify
-    g = Gantry(cfg, FluidNC(RecordingTransport())); g.home()
+    g = Gantry(cfg, FluidNC(RecordingTransport.for_machine(cfg))); g.home()
 
     class Cam:
         def grab(self):

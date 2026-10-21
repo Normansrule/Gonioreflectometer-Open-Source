@@ -2,23 +2,26 @@
 
 <img src="../../docs/assets/steps/09.svg" width="100%" alt="Steps of stage 09">
 
-$11.99 · total so far $572.73 / $630
+$11.99 · total so far $566.77 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
 ## M27 · Spin wired and homed
 
-Sample spins on its own axis (direct drive). · 0/2 steps done · ~1.2 h hands-on · ~1 wk
+Sample spins on its own axis (direct drive). · 0/2 steps done · ~1.4 h hands-on · ~1 wk
 
 ### M27.1 Wire the spin motor
 
-**Time** 30 min · **Needs** CTL-11 cable · SPN-04 endstop · TBL-07b flag · CTL-06 leads · jumpers
+**Time** 40 min · **Needs** spare LAR-02 motor cable · 4 × WAGO 221-412 (PWR-20) · TLS-04 stripper · multimeter · SPN-04 endstop · TBL-07b flag · CTL-06 leads · jumpers
 
 #### Do
 
-1. Spin motor cable into the E4 E0 socket (route it along the yoke arm with slack for ±90° tilt and ±180° table).
-2. Flag on the platter rim (2 × M3 × 8), endstop on the cradle.
-3. Endstop lead to TH0 (2-pin: signal + ground, no supply): S and G from TH0 via a 2-pin XH lead; the module's V from Pico 3V3 OUT (pin 36) via a lead whose XH housing slides over Pico pins 36–37 with only pin 36 populated. Pico GND is already tied to the E4 (M09.2 ground jumper).
+1. The pancake (SPN-01) has bare leads. Find its coil pairs: touch two leads together and turn the shaft by hand; noticeably stiffer = one pair (or the meter: a pair reads a few ohms, two leads from different pairs read open). Tape-label them pair 1 and pair 2.
+2. Spare 5-pack cable: cut off the 6-pin (motor-end) plug, strip 11 mm of each of its 4 wires, twist the strands. At the 4-pin XH plug, note which wire colour sits in pins 1 + 4 (board labels 2B, 2A: one driver coil) and 2 + 3 (1B, 1A: the other), from the SKR Pico schematic.
+3. 4 × WAGO 221-412 (one wire each side): pair 1's two leads to the wires of plug pins 1 and 4; pair 2's two leads to the wires of pins 2 and 3. Tug-test each; tape the four connectors together. Check: meter at the plug, 1–4 and 2–3 read a few ohms, 1–2 open. Table: README → Wiring → 3.
+4. XH plug into the SKR Pico E socket (route the cable along the yoke arm with slack for ±90° tilt and ±180° table).
+5. Flag on the platter rim (2 × M2 × 8), endstop on the cradle.
+6. Endstop lead into E0-STOP (3-pin: signal, GND, 5 V, as M10.2): grblHAL uses it as the A limit.
 
 #### Verify
 
@@ -27,7 +30,9 @@ Sample spins on its own axis (direct drive). · 0/2 steps done · ~1.2 h hands-o
 
 #### If a check fails
 
-- No `Pn:A`: module V missing (3V3 lead) or the Pico not powered.
+- No `Pn:A`: lead order wrong at the module end (S, G, V), or the firmware was built with 3 axes (rebuild with 4).
+- Spin motor buzzes, no turn: a lead from each coil on one driver coil; redo the pair test (plug 1–4 and 2–3 must each read a few ohms).
+- Turns the wrong way: `$3` A bit (8), as in M08.3.
 
 #### Record
 

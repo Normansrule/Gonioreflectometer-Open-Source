@@ -1,0 +1,163 @@
+{
+ "schemaVersion": 2,
+ "generatedAt": "2026-10-20T00:00:00Z",
+ "title": "Design System: OpenGonio (Raking light)",
+ "extensions": {
+  "colorMeta": {
+   "velvet-ground": {
+    "role": "neutral",
+    "displayName": "Velvet ground",
+    "canonical": "#0c0b0a",
+    "tonalRamp": [
+     "#0c0b0a",
+     "#151310",
+     "#1e1b17",
+     "#2a2620",
+     "#8c857a",
+     "#b9b1a5",
+     "#efe9df",
+     "#f7f3ec"
+    ]
+   },
+   "tungsten": {
+    "role": "primary",
+    "displayName": "Tungsten 3000 K",
+    "canonical": "#ffc978",
+    "tonalRamp": [
+     "#3a2508",
+     "#5c3a0c",
+     "#7c4500",
+     "#b8741e",
+     "#ffb547",
+     "#ffc978",
+     "#ffdca8",
+     "#fff0d9"
+    ]
+   },
+   "scale-red": {
+    "role": "error",
+    "displayName": "Scale-bar red",
+    "canonical": "#e06a5a"
+   },
+   "scale-green": {
+    "role": "success",
+    "displayName": "Scale-bar green",
+    "canonical": "#7fb276"
+   },
+   "scale-blue": {
+    "role": "info",
+    "displayName": "Scale-bar blue (simulated, camera)",
+    "canonical": "#86a4e0"
+   }
+  },
+  "typographyMeta": {
+   "display": {
+    "displayName": "Display",
+    "purpose": "Page titles and big numbers; Gloock."
+   },
+   "headline": {
+    "displayName": "Headline",
+    "purpose": "Section headlines, two lines at most."
+   },
+   "body": {
+    "displayName": "Body",
+    "purpose": "Running text, controls, captions; Hanken Grotesk."
+   }
+  },
+  "shadows": [],
+  "motion": [
+   {
+    "name": "ease-out",
+    "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "purpose": "Entering, pressing, following."
+   },
+   {
+    "name": "ease-in-out",
+    "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+    "purpose": "Crossfades between pictures."
+   },
+   {
+    "name": "press",
+    "value": "140ms",
+    "purpose": "Button press, scale(0.97)."
+   },
+   {
+    "name": "ui",
+    "value": "200ms",
+    "purpose": "Colour and state changes."
+   },
+   {
+    "name": "exposure",
+    "value": "600ms",
+    "purpose": "Slow crossfade: light shifting."
+   },
+   {
+    "name": "lamp-spring",
+    "value": "stiffness 90, damping 19",
+    "purpose": "Hero lamp following the pointer."
+   }
+  ],
+  "breakpoints": [
+   {
+    "name": "phone",
+    "value": "760px"
+   },
+   {
+    "name": "tablet",
+    "value": "900px"
+   },
+   {
+    "name": "app-two-column",
+    "value": "1180px"
+   },
+   {
+    "name": "rail",
+    "value": "1280px"
+   }
+  ],
+  "components": [
+   {
+    "name": "button-primary",
+    "html": "<a class=\"btn btn-light\" href=\"#\">Get the build</a>",
+    "css": ".btn{display:inline-flex;align-items:center;min-height:44px;padding:0 24px;border:0;border-radius:2px;background:#1e1b17;color:#efe9df;font:500 14px 'Hanken Grotesk',sans-serif;transition:transform 140ms cubic-bezier(.23,1,.32,1)}.btn:active{transform:scale(.97)}.btn-light{background:#ffc978;color:#1b1306}"
+   },
+   {
+    "name": "status-patch",
+    "html": "<span><span class=\"patch sim\"></span> Simulated</span>",
+    "css": ".patch{display:inline-block;width:10px;height:10px;border-radius:1px;background:#7b7975}.patch.sim{background:#86a4e0}"
+   }
+  ],
+  "narrative": {
+   "northStar": "Raking light: a dark room with one warm lamp, moved low across the surface.",
+   "overview": "Conservators photograph a surface with a low, moving lamp so texture shows as light and shadow. OpenGonio does that with motors and a fixed camera, so the interface is a dark room with one lamp in it.",
+   "keyCharacteristics": [
+    "Velvet ground, bone ink",
+    "One tungsten accent: the lamp and the primary action",
+    "Scale-bar patches for status, always with a word",
+    "Gloock headlines, Hanken Grotesk text, tabular figures",
+    "Square corners, no gradients, no resting shadows"
+   ],
+   "rules": [
+    {
+     "section": "Colour",
+     "name": "One light",
+     "body": "Tungsten marks only the lamp and the single primary action on a screen."
+    },
+    {
+     "section": "Content",
+     "name": "Evidence",
+     "body": "Every number says whether it is simulated, modeled or measured."
+    }
+   ],
+   "dos": [
+    "Label every render and simulation",
+    "Keep the lamp the brightest thing on screen"
+   ],
+   "donts": [
+    "Stock photographs or invented results",
+    "A second accent colour",
+    "Decorative motion"
+   ]
+  }
+ }
+}

@@ -17,7 +17,7 @@ with zipfile.ZipFile(sys.argv[1], "w", zipfile.ZIP_DEFLATED) as z:
     for f in sorted(pathlib.Path("phases").glob("*/3d/*")):
         if f.suffix.lower() in (".step", ".stl", ".svg", ".md") and "vendor" not in f.parts:
             z.write(f)
-    z.write("phases/03-frame/placement-template.svg")
+    z.write("phases/03-frame/deck-map.svg")
     print(sys.argv[1], len(z.namelist()), "files")
 PY
 git tag -a "$TAG" -m "Stage $(basename "$DIR") done"

@@ -2,14 +2,16 @@
 
 HOME  -> home all installed axes        START -> run the loaded plan (one pose per tick)
 STOP  -> stop the plan + soft stop       LIGHT -> toggle the white light
-NEXT  -> one plan pose                   POWER 0 -> mark unhomed; POWER 1 -> re-init drivers ($MI)
-PAUSE is wired to the E4 feed-hold pin, so it works without the laptop.
+NEXT  -> one plan pose                   POWER 0 -> mark unhomed; POWER 1 -> re-init drivers (M122 I / $MI)
+PAUSE -> stop the plan after the pose in progress (START carries on from the next pose). It is a hub button: for an
+         immediate stop use the e-stop.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
 from .gantry import Gantry
+from .safety import on_power
 
 
 @dataclass
@@ -22,17 +24,8 @@ class Panel:
 
     def handle(self, kind: str, value: str) -> None:
         if kind == "POWER":
-            if value == "0":
-                self.running = False
-                self.g.homed.clear()
-                self.log.append("e-stop: motion power off, re-home needed")
-            else:
-                try:
-                    self.g.reinit_drivers()
-                    self.log.append("motion power back: drivers re-initialised, press HOME")
-                except Exception as exc:          # controller link may still be reconnecting
-                    self.g.homed.clear()
-                    self.log.append(f"motion power back; re-init failed ({exc}); reconnect, then HOME")
+            self.running = False
+            self.log.append(on_power(self.g, value))
             return
         if kind != "BTN":
             return
@@ -40,12 +33,20 @@ class Panel:
         if value == "HOME":
             self.g.home()
         elif value == "LIGHT":
-            self.g.toggle_light("white")
+            if self.running:                      # a measurement owns the lamp: no toggling mid-plan
+                self.log.append("LIGHT ignored while a plan is running")
+            else:
+                self.g.toggle_light("white")
         elif value == "STOP":
             self.running = False
+            errs = self.g.all_lights_off()
             self.g.stop()
+            if errs:
+                self.log.append("lamp may still be on: " + "; ".join(errs))
         elif value == "START":
             self.running = True
+        elif value == "PAUSE":
+            self.running = False                  # lamp and position kept: START resumes at self.index
         elif value == "NEXT":
             self.next_pose()
 

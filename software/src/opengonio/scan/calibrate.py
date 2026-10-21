@@ -60,7 +60,12 @@ class AxYbResult:
 
 def solve_ax_yb(A: list[np.ndarray], B: list[np.ndarray], X0: np.ndarray, Y0: np.ndarray | None = None,
                 iters: int = 50) -> AxYbResult:
-    """Minimise sum ||log(A_i^-1 X B_i Y)|| over X, Y (4x4 rigid transforms)."""
+    """Minimise sum ||log(A_i^-1 X B_i Y)|| over X, Y (4x4 rigid transforms).
+    Needs one B per A and at least 3 pairs; the result's residuals must be finite (ValueError otherwise)."""
+    if len(A) != len(B):
+        raise ValueError(f"{len(A)} camera poses but {len(B)} platter poses")
+    if len(A) < 3:
+        raise ValueError(f"need at least 3 board views to solve the camera pose, got {len(A)}")
     X, Y = X0.copy(), (np.eye(4) if Y0 is None else Y0.copy())
 
     def resid(X, Y):
@@ -90,8 +95,11 @@ def solve_ax_yb(A: list[np.ndarray], B: list[np.ndarray], X0: np.ndarray, Y0: np
         else:
             lam *= 10
     rr = r.reshape(-1, 6)
-    return AxYbResult(X, Y, float(np.degrees(np.sqrt((rr[:, :3] ** 2).mean()) / 100.0)),
-                      float(np.sqrt((rr[:, 3:] ** 2).mean())), it)
+    res = AxYbResult(X, Y, float(np.degrees(np.sqrt((rr[:, :3] ** 2).mean()) / 100.0)),
+                     float(np.sqrt((rr[:, 3:] ** 2).mean())), it)
+    if not (np.isfinite(res.rot_rms_deg) and np.isfinite(res.trans_rms_mm) and np.isfinite(X).all() and np.isfinite(Y).all()):
+        raise ValueError("camera pose solution is not finite: views too similar or bad detections")
+    return res
 
 
 @dataclass
@@ -111,6 +119,11 @@ class CameraCalibration:
         d = {"R_wc": self.R_wc.tolist(), "C": self.C.tolist(), "fx": self.fx, "fy": self.fy, "cx": self.cx,
              "cy": self.cy, "width": self.width, "height": self.height, "dist_k1_k2_p1_p2": list(self.dist)}
         Path(path).write_text(yaml.safe_dump(d), encoding="utf-8")
+
+    @property
+    def intrinsics(self):
+        from .geometry import Intrinsics
+        return Intrinsics(float(self.fx), float(self.fy), float(self.cx), float(self.cy), int(self.width), int(self.height))
 
     @classmethod
     def load(cls, path: str | Path) -> "CameraCalibration":
