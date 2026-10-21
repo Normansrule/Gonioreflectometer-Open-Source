@@ -52,6 +52,7 @@ cad:             ## dummy models of bought parts (cad/bought), whole-machine ass
 	$(PY) tools/cad/catalog.py
 	$(PY) tools/bom_readme.py
 	$(PY) tools/cad/interference.py
+	$(PY) tools/site_model.py           # the website's moving four-axis model (docs/og/model/rig.js)
 
 cad-check:       ## interference check of the assembly: shown pose + every axis across its travel (needs cadquery)
 	$(PY) tools/cad/interference.py

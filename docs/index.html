@@ -28,7 +28,7 @@
 </header>
 
 <nav class="rail" aria-label="Sections">
- <a href="#machine">The machine</a>
+ <a href="#machine">Four axes</a>
  <a href="#how">How it measures</a>
  <a href="#results">What you get</a>
  <a href="#evidence">Evidence</a>
@@ -40,7 +40,7 @@
 <section class="hero" aria-labelledby="h1">
  <div class="hero-copy">
   <h1 id="h1"><span class="sr-only">OpenGonio, </span>A printable gonioreflectometer</h1>
-  <p class="lead">A lamp swings around a flat sample while a fixed camera photographs it, to measure how the material reflects light at every angle.</p>
+  <p class="lead">A lamp circles a flat sample while a fixed camera watches, to measure how it reflects light at every angle.</p>
   <div class="acts">
    <a class="btn btn-light" href="https://github.com/Normansrule/Gonioreflectometer-Open-Source#build">Get the build</a>
    <a class="btn" href="lab.html">Open the lab</a>
@@ -64,24 +64,40 @@
    <span>Lamp <b id="rti">60°</b> from the normal<br>Viewed from <b>35°</b></span>
   </div>
   <div class="labels" id="labels" aria-hidden="true"><span>PTFE, the white reference</span><span>Mirror</span><span>Black ABS, printed</span></div>
-  <p class="render-note">A live rendering with the simulator's reflectance model, not a photograph. <span class="hint">Move the pointer or use the arrow keys to move the lamp.</span></p>
+  <p class="render-note" id="render-note">A live rendering with the simulator's reflectance model, not a photograph. <span class="hint">Move the pointer or use the arrow keys to move the lamp.</span></p>
   <p class="sr-only" id="lampread" aria-live="polite"></p>
  </div>
+ <a class="next" href="#machine"><span aria-hidden="true">↓</span> The machine, moving</a>
 </section>
 
-<section class="band wrap" id="machine" aria-labelledby="h-machine">
- <div class="machine reveal">
-  <h2 id="h-machine">One lamp, four motors, a fixed camera</h2>
+<section class="band rig-band" id="machine" aria-labelledby="h-machine">
+ <div class="wrap rig-head reveal">
+  <h2 id="h-machine">Four axes around one point</h2>
+  <p class="lead">Lamp, table, tilt and spin all move; the camera never does. Watch each axis, or drive it yourself.</p>
+ </div>
+ <figure class="rig" id="rig">
+  <div class="rig-stage" id="rig-stage">
+   <canvas id="rigc" role="img" aria-label="The OpenGonio CAD assembly moving through its four axes, lit by its own lamp."></canvas>
+   <img class="fallback" src="og/img/assembly.png" width="2033" height="1004" loading="lazy" decoding="async"
+        alt="The full OpenGonio assembly from the CAD model: a square printed deck, the light arm on its ring, the tilting sample table in the middle and the fixed camera on a rail to the right.">
+   <p class="rig-now"><b id="rig-axis">M4</b><span id="rig-what">The lamp swings around the ring</span></p>
+   <dl class="rig-angles" aria-hidden="true"><div><dt>θi</dt><dd id="rig-ti">–</dd></div><div><dt>θr</dt><dd id="rig-tr">–</dd></div></dl>
+   <p class="rig-loading" id="rig-loading">Loading the CAD model…</p>
+   <p class="sr-only" id="rig-live" aria-live="polite"></p>
+  </div>
+  <div class="wrap rig-controls" id="rig-controls">
+   <button class="btn" type="button" id="rig-play" aria-pressed="true">Pause</button>
+   <div class="rig-axes" id="rig-axes"></div>
+  </div>
+  <figcaption class="wrap">The CAD assembly, moved with the same rotations as the clash check in <code>tools/cad/poses.py</code> and lit only by its own lamp. Printed parts black, bought parts gold. A render, not a photograph. Drag to look around.</figcaption>
+ </figure>
+ <div class="wrap machine reveal">
+  <h3 class="sub-h">One lamp, four motors, a fixed camera</h3>
   <div class="copy">
    <p class="lead">A gonioreflectometer measures the bidirectional reflectance distribution function (BRDF): for light arriving from one direction, how much of it leaves toward every other direction.</p>
    <p class="measure">Lab instruments that do this cost as much as a car. OpenGonio follows the design of Ansari-Asl et al. (2024) and rebuilds it from 3D-printed black ABS (acrylonitrile butadiene styrene), M2 screws and off-the-shelf modules. One person with a printer and a screwdriver can build it: no soldering, drilling, sawing or crimping, and every part comes from Amazon, Digi-Key or Adafruit.</p>
    <p class="measure small" id="costline">Planned cost: $569.10, under a hard cap of $630.</p>
   </div>
-  <figure>
-   <img src="og/img/assembly.png" width="2033" height="1004" loading="lazy" decoding="async"
-        alt="The full OpenGonio assembly from the CAD model: a square printed deck, the light arm on its ring, the tilting sample table in the middle and the fixed camera on a rail to the right.">
-   <figcaption>The whole machine from the CAD model, rendered with one low lamp. A render, not a photograph.</figcaption>
-  </figure>
  </div>
 </section>
 
@@ -199,6 +215,7 @@
 <script src="site-data.js"></script>
 <script src="og/sim-examples.js"></script>
 <script src="og/specimen.js"></script>
+<script src="og/rigview.js"></script>
 <script src="og/site.js"></script>
 </body>
 </html>

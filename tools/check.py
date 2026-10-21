@@ -159,6 +159,19 @@ def check_site() -> list[str]:
             twin = app / "og" / rel
             if not twin.exists() or twin.read_bytes() != f.read_bytes():
                 errs.append(f"{twin.relative_to(ROOT)} differs from docs/og/{rel} (run `make build`)")
+    rig = ROOT / "docs" / "og" / "model" / "rig.js"                 # the moving model must use today's axes and travel
+    if rig.exists():
+        import json
+        sys.path.insert(0, str(ROOT / "tools" / "cad"))
+        import poses
+        from opengonio.gantry.config import load_config
+        head = rig.read_text(encoding="utf-8").split("window.RIG = ", 1)[1].split(";\n", 1)[0]
+        meta = json.loads(head)
+        want = {k: {"point": list(pt), "dir": list(d), "moves": sorted(m)} for k, (pt, d, _, m) in poses.AXES.items()}
+        if meta["axes"] != want or meta["shown"] != poses.SHOWN:
+            errs.append("docs/og/model/rig.js axes differ from tools/cad/poses.py (run tools/site_model.py)")
+        if meta["ranges"] != {k: [a.min_deg, a.max_deg] for k, a in load_config().axes.items()}:
+            errs.append("docs/og/model/rig.js axis travel differs from machine.yaml (run tools/site_model.py)")
     return errs
 
 

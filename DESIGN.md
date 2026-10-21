@@ -167,7 +167,8 @@ are separated by tone and space.
 
 | Component | Where | Notes |
 |---|---|---|
-| Specimen | landing hero (`og/specimen.js`) | WebGL: PTFE, mirror and printed ABS under a 3000 K point lamp; Lambert + GGX with Schlick Fresnel and height-correlated Smith, as in `opengonio.brdf.models.ggx_brdf`. Arrow keys move the lamp; a polite live region says where it is. Falls back to `og/img/specimen.png`. |
+| Specimen | landing hero, full bleed (`og/specimen.js`) | WebGL, behind the copy and shifted right of centre: PTFE, mirror and printed ABS under a 3000 K point lamp; Lambert + GGX with Schlick Fresnel and height-correlated Smith, as in `opengonio.brdf.models.ggx_brdf`. Arrow keys move the lamp; a polite live region says where it is. Falls back to `og/img/specimen.png`. |
+| Four-axis rig | landing, straight under the hero (`og/rigview.js`) | the CAD assembly (`og/model/rig.js`, written by `tools/site_model.py` during `make cad`) in WebGL, moved with the rotations of `tools/cad/poses.py` and lit only by the lamp on its arm. Plays M4, M3, M2, M1 in turn with the moving parts rimmed in tungsten; a slider per axis drives it by hand (pauses the play); drag to orbit; θi and θr from the software's kinematics. Loads when it nears the screen; falls back to `og/img/assembly.png`. |
 | Lamp gauge | hero, app | half circle: camera dot (blue) fixed at 35°, lamp dot (tungsten) at θi |
 | Midline rail | landing, ≥ 1280 px | fixed at the vertical centre, appears after the hero, marks the section in view |
 | Drag row | "How a measurement happens" | scroll-snap row, mouse drag with momentum, arrow buttons and arrow keys |

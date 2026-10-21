@@ -13,6 +13,7 @@
     let spec = null;
     try { spec = window.Specimen && Specimen.make(canvas, {}); } catch (e) { spec = null; }
     if (!spec) { stage.classList.add("nogl"); }
+    const wide = window.matchMedia("(min-width: 901px)"), shift = () => wide.matches ? 0.19 : 0;   // the copy sits on the left
     const th = OG.spring(34, 90, 19), ph = OG.spring(90, 90, 19);
     let lastInput = -1e9, running = false, visible = true, t0 = performance.now(), last = t0;
     const clampTh = v => Math.max(12, Math.min(87, v)), wrap = v => ((v % 360) + 360) % 360;
@@ -28,14 +29,16 @@
     let placed = "";
     function place() {                                  // keep each label under its strip as the canvas resizes
       const key = canvas.clientWidth + "x" + canvas.clientHeight; if (key === placed) return; placed = key;
-      labels.forEach((el, i) => { const q = spec.project(spots[i], -1.15); if (q) { el.style.left = q[0] + "px"; el.style.top = q[1] + "px"; } });
+      const W = canvas.clientWidth;                     // never closer than 16 px to the screen edge
+      labels.forEach((el, i) => { const q = spec.project(spots[i], -1.15), hw = el.offsetWidth / 2 + 16;
+        if (q) { el.style.left = Math.max(hw, Math.min(W - hw, q[0])) + "px"; el.style.top = q[1] + "px"; } });
     }
     function frame(now) {
       const dt = Math.min((now - last) / 1000, 1 / 30); last = now;
       const idle = !OG.reduced && now - lastInput > 4000;
       if (idle) { const s = (now - t0) / 1000; th.target = 52 - 18 * Math.cos(0.16 * s); ph.target = 90 + 80 * Math.sin(0.11 * s); }
       const a = th.step(dt), b = ph.step(dt);
-      if (spec) { spec.draw(th.x, ph.x); place(); }
+      if (spec) { spec.draw(th.x, ph.x, shift()); place(); }
       readout();
       running = visible && (a || b || idle);
       if (running) requestAnimationFrame(frame);
@@ -62,10 +65,94 @@
     });
     if (OG.reduced) { th.x = th.target = 35; ph.x = ph.target = 96; }   // a still, readable pose: the mirror just catching the lamp
     new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) kick(); }).observe(stage);
-    window.addEventListener("resize", () => { if (spec) { spec.draw(th.x, ph.x); place(); } });
-    window.addEventListener("og:theme", () => { if (spec) spec.draw(th.x, ph.x); });
+    window.addEventListener("resize", () => { if (spec) { spec.draw(th.x, ph.x, shift()); place(); } });
+    window.addEventListener("og:theme", () => { if (spec) spec.draw(th.x, ph.x, shift()); });
     OG.onReduce(() => { lastInput = performance.now(); kick(); });
     readout(); kick();
+    // for tools/readme_screens.py: put the lamp somewhere exact and draw one frame
+    window.__hero = { set(t, p) { lastInput = performance.now(); th.x = th.target = t; ph.x = ph.target = p; th.v = ph.v = 0;
+      if (spec) { spec.draw(t, p, shift()); place(); } readout(); } };
+  })();
+
+  /* ---------- the four-axis machine: CAD mesh, real kinematics, played in turn or driven by hand ---------- */
+  (function rig() {
+    const stage = $("rig-stage"), canvas = $("rigc"); if (!stage) return;
+    const NAMES = { M4: "Lamp arm", M3: "Table", M2: "Tilt", M1: "Spin" };
+    const SEQ = [
+      { k: "M4", what: "The lamp swings around the 12 inch ring", path: [100, 55, 170, 100] },
+      { k: "M3", what: "The table turns the sample toward the camera", path: [40, 15, 62, 40] },
+      { k: "M2", what: "The sample tilts out of the plane", path: [0, 35, -30, 0] },
+      { k: "M1", what: "The sample spins on its own axis", path: [0, 150, 0] },
+    ];
+    const pose = { M4: 100, M3: 40, M2: 0, M1: 0 };
+    const view = { yaw: -62, pitch: 26, zoom: 0.72 };
+    let R = null, rv = null, playing = !OG.reduced, active = "M4", seg = 0, t0 = 0, visible = false, raf = 0, last = 0, drag = null;
+    const ease = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    const SEG = 1.7, HOLD = 0.6;
+    function setActive(k, what) {
+      active = k; $("rig-axis").textContent = k; $("rig-what").textContent = what || SEQ.find(s => s.k === k).what;
+      document.querySelectorAll("[data-rig-axis]").forEach(b => b.setAttribute("aria-current", String(b.dataset.rigAxis === k)));
+    }
+    function sync() {
+      ["M4", "M3", "M2", "M1"].forEach(k => { const r = $("rig-r-" + k); if (r && document.activeElement !== r) r.value = pose[k];
+        const o = $("rig-o-" + k); if (o) o.textContent = Math.round(pose[k]) + "°"; });
+      const a = RigView.angles(pose); $("rig-ti").textContent = Math.round(a.ti) + "°"; $("rig-tr").textContent = Math.round(a.tr) + "°";
+    }
+    function draw() { if (rv) rv.draw(pose, view, { hi: R.axes[active].moves }); sync(); }
+    function step(now) {
+      const dt = Math.min((now - last) / 1000, 0.05); last = now;
+      if (playing) {
+        if (!OG.reduced && !drag) view.yaw += dt * 4;
+        const s = SEQ[seg], legs = s.path.length - 1, total = legs * SEG + HOLD, t = (now - t0) / 1000;
+        if (t >= total) { pose[s.k] = s.path[legs]; seg = (seg + 1) % SEQ.length; t0 = now; setActive(SEQ[seg].k); }
+        else { const i = Math.min(Math.floor(t / SEG), legs - 1), f = ease(Math.min((t - i * SEG) / SEG, 1));
+          pose[s.k] = s.path[i] + (s.path[i + 1] - s.path[i]) * f; }
+      }
+      draw();
+      raf = visible && (playing || drag) ? requestAnimationFrame(step) : 0;
+    }
+    function kick() { if (!raf && visible) { last = performance.now(); raf = requestAnimationFrame(step); } }
+    function setPlaying(p) {
+      playing = p; const b = $("rig-play"); b.textContent = p ? "Pause" : "Play"; b.setAttribute("aria-pressed", String(p));
+      if (p) { seg = SEQ.findIndex(s => s.k === active); SEQ.forEach(s => { pose[s.k] = s.path[0]; }); t0 = performance.now(); kick(); }
+    }
+    function controls() {
+      $("rig-axes").innerHTML = SEQ.map(s => { const [lo, hi] = R.ranges[s.k];
+        return `<div class="rig-axis"><button type="button" class="chip" data-rig-axis="${s.k}" aria-current="false" title="Play ${s.k}">` +
+          `<b>${s.k}</b> ${NAMES[s.k]}</button><input type="range" id="rig-r-${s.k}" min="${lo}" max="${hi}" step="1" value="${pose[s.k]}" ` +
+          `aria-label="${s.k} ${NAMES[s.k]}, degrees"><output id="rig-o-${s.k}"></output></div>`; }).join("");
+      SEQ.forEach(s => {
+        $("rig-r-" + s.k).addEventListener("input", e => { setPlaying(false); pose[s.k] = +e.target.value; setActive(s.k, `${NAMES[s.k]} at ${pose[s.k]}°`);
+          const a = RigView.angles(pose); $("rig-live").textContent = `${s.k} ${pose[s.k]} degrees: incidence ${Math.round(a.ti)}, reflection ${Math.round(a.tr)}`; draw(); });
+      });
+      document.querySelectorAll("[data-rig-axis]").forEach(b => b.addEventListener("click", () => {
+        const i = SEQ.findIndex(s => s.k === b.dataset.rigAxis); seg = i; SEQ.forEach(s => { pose[s.k] = s.path[0]; });
+        setActive(SEQ[i].k); playing = true; $("rig-play").textContent = "Pause"; $("rig-play").setAttribute("aria-pressed", "true");
+        t0 = performance.now(); kick(); }));
+      $("rig-play").addEventListener("click", () => setPlaying(!playing));
+      if (!playing) { $("rig-play").textContent = "Play"; $("rig-play").setAttribute("aria-pressed", "false"); }
+    }
+    stage.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, yaw: view.yaw, pitch: view.pitch }; stage.setPointerCapture(e.pointerId); kick(); });
+    stage.addEventListener("pointermove", e => { if (!drag) return; view.yaw = drag.yaw - (e.clientX - drag.x) * 0.3;
+      view.pitch = Math.max(4, Math.min(70, drag.pitch + (e.clientY - drag.y) * 0.25)); if (!playing) draw(); });
+    const up = () => { drag = null; }; stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
+    async function init() {
+      R = window.RIG;
+      try { rv = R && window.RigView ? await RigView.make(canvas, R) : null; } catch (e) { rv = null; }
+      $("rig-loading").hidden = true;
+      if (!rv) { stage.classList.add("nogl"); $("rig-controls").hidden = true; return; }
+      controls(); setActive("M4"); t0 = performance.now(); draw(); kick();
+    }
+    let asked = false;
+    new IntersectionObserver(es => { visible = es[0].isIntersecting;
+      if (visible && !asked) { asked = true; const sc = document.createElement("script"); sc.src = "og/model/rig.js"; sc.onload = init;
+        sc.onerror = () => { $("rig-loading").hidden = true; stage.classList.add("nogl"); $("rig-controls").hidden = true; }; document.body.appendChild(sc); }
+      if (visible) kick(); }, { rootMargin: "400px 0px" }).observe(stage);
+    window.addEventListener("og:theme", draw);
+    window.addEventListener("resize", () => { if (!raf) draw(); });
+    // for tools/readme_screens.py: an exact pose and highlighted axis, one frame
+    window.__rig = { ready: () => !!rv, seq: SEQ, set(p, k, yaw) { playing = false; Object.assign(pose, p); if (yaw != null) view.yaw = yaw;
+      setActive(k); draw(); } };
   })();
 
   /* ---------- rail: appears after the hero, marks the section in view ---------- */

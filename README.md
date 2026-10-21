@@ -1,4 +1,6 @@
-<img src="docs/assets/screens/site-hero-dark.jpg" width="100%" alt="The OpenGonio website: three samples (white PTFE, a mirror, printed black plastic) under one warm lamp, beside the title A printable gonioreflectometer">
+<img src="docs/assets/screens/hero.webp" width="100%" alt="The OpenGonio website opening: a warm lamp circles three samples (white PTFE, a mirror and printed black plastic); the mirror flashes at the mirror angle and the printed layer lines catch the grazing light">
+
+<img src="docs/assets/screens/rig.webp" width="100%" alt="The OpenGonio CAD assembly lit by its own lamp, moving through its four axes in turn: M4 swings the lamp arm, M3 turns the table, M2 tilts the sample, M1 spins it">
 
 # Gonioreflectometer-Open-Source
 
@@ -482,9 +484,9 @@ make ci                                   # the GitHub checks on a clean clone, 
 
 One look, two places: the website explains the instrument, the app drives it. Both are plain HTML, CSS and JavaScript with no build step, and share one set of design tokens (`docs/og/`).
 
-<img src="docs/assets/screens/site-lamp.gif" width="49%" alt="The hero samples under a lamp that follows the pointer: the white tile dims and brightens, the mirror flashes when the lamp reaches the mirror angle, and the printed layer lines light up under grazing light"> <img src="docs/assets/screens/app-dark.jpg" width="49%" alt="The control app on the simulated machine: axis sliders, the lamp switch with the colour LED bank shown as blocked, a top view of the pose, the camera frame, and a mirror sweep curve marked verify PASS">
+<img src="docs/assets/screens/app-dark.jpg" width="100%" alt="The control app on the simulated machine: axis sliders, the lamp switch with the colour LED bank shown as blocked, a top view of the pose, the camera frame, and a mirror sweep curve marked verify PASS">
 
-**Website** ([`docs/`](docs/index.html), published with GitHub Pages; also opens straight from disk). The first screen is a Web Graphics Library (WebGL) render of three samples (white PTFE, a mirror and printed black ABS) under one lamp that follows your pointer or the arrow keys, shaded with the same model the software fits. Below it: the machine, how a measurement happens, real outputs of the simulated machine, the evidence table, and the eighteen build stages. [`docs/lab.html`](docs/lab.html) keeps the interactive tools: the machine simulator, the BRDF explorer, the calibration lab and the 3D-scan planner.
+**Website** ([`docs/`](docs/index.html), published with GitHub Pages; also opens straight from disk). The first screen is a Web Graphics Library (WebGL) render of three samples (white PTFE, a mirror and printed black ABS) under one lamp that circles on its own and follows your pointer or the arrow keys, shaded with the same model the software fits. Right under it, the whole CAD assembly moves through its four axes in turn, lit by its own lamp and driven by the same rotations as the CAD clash check; sliders drive each axis by hand. Below that: the machine, how a measurement happens, real outputs of the simulated machine, the evidence table, and the eighteen build stages. [`docs/lab.html`](docs/lab.html) keeps the interactive tools: the machine simulator, the BRDF explorer, the calibration lab and the 3D-scan planner.
 
 **App** (`opengonio app`, stage 14). Connect, home, jog each axis (or drag the lamp in the top view), switch the lamp, grab a camera frame, run a mirror sweep, in-plane grid or isotropic set, and read `verify`'s verdict and the curve. STOP (or Esc) is always live; the colour LED bank stays blocked. On the simulated machine everything works; on a real machine it uses the same code as the command line and is **untested**, because no machine has been built yet.
 
@@ -501,6 +503,8 @@ The app listens on `127.0.0.1:8747` only and refuses requests from other web pag
 |---|---|
 | <img src="docs/assets/screens/site-results.jpg" alt="Website section What a run gives you: a simulated mirror sweep, a plastic fitted back to the numbers it was made with, an absolute matte BRDF and a fit-quality plot"> | <img src="docs/assets/screens/site-build.jpg" alt="Website section Built in eighteen stages: a simulator picture that changes with the stage you are reading"> |
 | <img src="docs/assets/screens/site-hero-light.jpg" alt="The website in its light theme"> | <img src="docs/assets/screens/app-connect.jpg" alt="The app before connecting: choose the simulated machine or the machine over USB, which is marked untested"> |
+| <img src="docs/assets/screens/lab.jpg" alt="The lab page: the machine simulator with its controls and angle readouts"> | <img src="docs/assets/screens/app-light.jpg" alt="The control app in its light theme"> |
+| <img src="docs/assets/screens/site-phone.jpg" width="60%" alt="The website on a phone"> | <img src="docs/assets/screens/app-phone.jpg" width="60%" alt="The control app on a phone"> |
 
 ## Project structure
 

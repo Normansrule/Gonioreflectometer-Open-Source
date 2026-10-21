@@ -11,7 +11,7 @@
 #extension GL_OES_standard_derivatives : enable
 #endif
 precision highp float;
-uniform vec2 uRes; uniform vec3 uLamp; uniform vec3 uCam; uniform vec3 uGround; uniform vec3 uLightCol;
+uniform vec2 uRes; uniform float uShift; uniform vec3 uLamp; uniform vec3 uCam; uniform vec3 uGround; uniform vec3 uLightCol;
 uniform float uFov; uniform float uExposure;
 const float PI = 3.14159265;
 float hash(float n){ return fract(sin(n) * 43758.5453); }
@@ -32,7 +32,7 @@ vec3 brdf(vec3 n, vec3 wi, vec3 wo, vec3 base, float rough, float metal){
   return diff + spec; }
 vec3 aces(vec3 x){ return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14), 0.0, 1.0); }
 void main(){
-  vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;
+  vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y; uv.x -= uShift;   // uShift: specimen centre moved right of the canvas centre
   vec3 fw = normalize(-uCam), rt = normalize(cross(fw, vec3(0.0, 0.0, 1.0))), up = cross(rt, fw);
   vec3 rd = normalize(fw + (uv.x*rt + uv.y*up) * tan(uFov*0.5)*2.0);
   vec3 col = uGround;
@@ -87,27 +87,27 @@ void main(){
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     const U = n => gl.getUniformLocation(prog, n);
-    const u = { res: U("uRes"), lamp: U("uLamp"), cam: U("uCam"), ground: U("uGround"), light: U("uLightCol"), fov: U("uFov"), exp: U("uExposure") };
+    const u = { shift: U("uShift"), res: U("uRes"), lamp: U("uLamp"), cam: U("uCam"), ground: U("uGround"), light: U("uLightCol"), fov: U("uFov"), exp: U("uExposure") };
     const CAM_DEG = 35;                                // the fixed camera: 35 degrees from the sample normal
     return {
       CAM_DEG,
-      draw(thetaDeg, phiDeg) {
+      draw(thetaDeg, phiDeg, sx = 0) {   // sx: centre the specimen this fraction of the width right of centre
         const dpr = Math.min(window.devicePixelRatio || 1, 1.75), w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
         if (!w || !h) return;
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
         gl.viewport(0, 0, w, h);
         const aspect = w / h, fov = 30 * Math.PI / 180;
-        const need = Math.max(1.98 / (Math.tan(fov / 2) * aspect), 1.45 / Math.tan(fov / 2));   // fit the three strips
+        const room = aspect * 2 * (sx > 0 ? Math.min(0.5 - sx, sx + 0.1) : 0.5), need = Math.max(1.85 / (Math.tan(fov / 2) * room), 1.3 / Math.tan(fov / 2));   // fit the three strips
         const c = CAM_DEG * Math.PI / 180, th = thetaDeg * Math.PI / 180, ph = phiDeg * Math.PI / 180, r = 3.2;
         const K = OG.tokens();
-        gl.uniform2f(u.res, w, h);
+        gl.uniform2f(u.res, w, h); gl.uniform1f(u.shift, sx * aspect);
         gl.uniform3f(u.cam, 0, -need * Math.sin(c), need * Math.cos(c));
         gl.uniform3f(u.lamp, r * Math.sin(th) * Math.cos(ph), r * Math.sin(th) * Math.sin(ph), r * Math.cos(th));
         gl.uniform3fv(u.ground, OG.rgb(K.ground));
         gl.uniform3f(u.light, 1.0, 0.74, 0.45);       // 3000 K, linear
         gl.uniform1f(u.fov, fov); gl.uniform1f(u.exp, 1.15);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
-        this.view = { cam: [0, -need * Math.sin(c), need * Math.cos(c)], fov, w: canvas.clientWidth, h: canvas.clientHeight };
+        this.view = { cam: [0, -need * Math.sin(c), need * Math.cos(c)], fov, w: canvas.clientWidth, h: canvas.clientHeight, sx };
       },
       /* world point on the sample plane -> CSS pixels in the canvas (for labels under each strip) */
       project(x, y) {
@@ -117,7 +117,7 @@ void main(){
         const d = [x - C[0], y - C[1], -C[2]], z = d[0] * fw[0] + d[1] * fw[1] + d[2] * fw[2];
         const k = 1 / (Math.tan(v.fov / 2) * 2 * z);
         const sx = (d[0] * rt[0] + d[1] * rt[1] + d[2] * rt[2]) * k, sy = (d[0] * up[0] + d[1] * up[1] + d[2] * up[2]) * k;
-        return [v.w / 2 + sx * v.h, v.h / 2 - sy * v.h];
+        return [v.w / 2 + v.sx * v.w + sx * v.h, v.h / 2 - sy * v.h];
       },
     };
   }
