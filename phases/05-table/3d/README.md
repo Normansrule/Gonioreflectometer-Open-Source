@@ -9,10 +9,12 @@ Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20
 | ID | Part | Edit (STEP) | Print (STL) |
 |---|---|---|---|
 | TBL-07a | Table drum: 100T teeth, 608 seats, OG-40 top | [TBL-07a_table_drum.step](TBL-07a_table_drum.step) | [TBL-07a_table_drum.stl](TBL-07a_table_drum.stl) |
-| TBL-07b | Home flag (print 3: table, tilt, spin) | [TBL-07b_home_flag.step](TBL-07b_home_flag.step) | [TBL-07b_home_flag.stl](TBL-07b_home_flag.stl) |
+| TBL-07b | Home flag (print 2: tilt, spin) | [TBL-07b_home_flag.step](TBL-07b_home_flag.step) | [TBL-07b_home_flag.stl](TBL-07b_home_flag.stl) |
 | TBL-07c | Table motor bracket (shaft up, slotted) | [TBL-07c_table_motor_bracket.step](TBL-07c_table_motor_bracket.step) | [TBL-07c_table_motor_bracket.stl](TBL-07c_table_motor_bracket.stl) |
 | TBL-07d | Table post: fixed M8 x 75 axle (hex-locked head) | [TBL-07d_table_post.step](TBL-07d_table_post.step) | [TBL-07d_table_post.stl](TBL-07d_table_post.stl) |
 | TBL-07f | Spacers + shims, table and tilt (one print) | [TBL-07f_spacers.step](TBL-07f_spacers.step) | [TBL-07f_spacers.stl](TBL-07f_spacers.stl) |
+| TBL-07g | Table endstop riser (3 deck pilots, +X) | [TBL-07g_endstop_riser.step](TBL-07g_endstop_riser.step) | [TBL-07g_endstop_riser.stl](TBL-07g_endstop_riser.stl) |
+| TBL-07h | Table home flag (fin at r 60) | [TBL-07h_table_flag.step](TBL-07h_table_flag.step) | [TBL-07h_table_flag.stl](TBL-07h_table_flag.stl) |
 
 Regenerate: `python tools/cad/parts.py` (parameters at the top of the file).
 

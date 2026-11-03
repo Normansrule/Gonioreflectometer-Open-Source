@@ -10,7 +10,7 @@ Black ABS, enclosed printer: nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20
 |---|---|---|---|
 | FRM-01a | Deck tile SW (x -300..-100, y -300..-100) | [FRM-01a_deck_tile_SW.step](FRM-01a_deck_tile_SW.step) | [FRM-01a_deck_tile_SW.stl](FRM-01a_deck_tile_SW.stl) |
 | FRM-01b | Deck tile S (x -100..100, y -300..-100) | [FRM-01b_deck_tile_S.step](FRM-01b_deck_tile_S.step) | [FRM-01b_deck_tile_S.stl](FRM-01b_deck_tile_S.stl) |
-| FRM-01c | Deck tile SE: power box (x 100..300, y -300..-100) | [FRM-01c_deck_tile_SE.step](FRM-01c_deck_tile_SE.step) | [FRM-01c_deck_tile_SE.stl](FRM-01c_deck_tile_SE.stl) |
+| FRM-01c | Deck tile SE: power plate (x 100..300, y -300..-100) | [FRM-01c_deck_tile_SE.step](FRM-01c_deck_tile_SE.step) | [FRM-01c_deck_tile_SE.stl](FRM-01c_deck_tile_SE.stl) |
 | FRM-01d | Deck tile W (x -300..-100, y -100..100) | [FRM-01d_deck_tile_W.step](FRM-01d_deck_tile_W.step) | [FRM-01d_deck_tile_W.stl](FRM-01d_deck_tile_W.stl) |
 | FRM-01e | Deck tile C: table post + motor (x -100..100, y -100..100) | [FRM-01e_deck_tile_C.step](FRM-01e_deck_tile_C.step) | [FRM-01e_deck_tile_C.stl](FRM-01e_deck_tile_C.stl) |
 | FRM-01f | Deck tile E: M4 motor + saddles (x 100..300, y -100..100) | [FRM-01f_deck_tile_E.step](FRM-01f_deck_tile_E.step) | [FRM-01f_deck_tile_E.stl](FRM-01f_deck_tile_E.stl) |

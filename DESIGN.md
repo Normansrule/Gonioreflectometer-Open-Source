@@ -158,7 +158,8 @@ are separated by tone and space.
 
 - The hero lamp follows the pointer on a critically damped spring (`OG.spring`) and drifts on a slow Lissajous path
   after four idle seconds; it renders only while it moves and is on screen.
-- Sections fade up 14 px as they arrive (desktop only).
+- On load the title rises line by line out of a mask while the lamp warms up over 1.8 s, like a tungsten filament.
+- Section headlines are uncovered left to right by a band of light (a clip-path wipe, 1.1 s) and sections fade up 14 px as they arrive (desktop only).
 - The app's pose drawing eases to each reported position on the same spring.
 - Hover effects only on devices that hover. With `prefers-reduced-motion: reduce`, the lamp is still (parked where the
   mirror just catches it), nothing slides, and the drag row does not coast.
@@ -168,7 +169,10 @@ are separated by tone and space.
 | Component | Where | Notes |
 |---|---|---|
 | Specimen | landing hero, full bleed (`og/specimen.js`) | WebGL, behind the copy and shifted right of centre: PTFE, mirror and printed ABS under a 3000 K point lamp; Lambert + GGX with Schlick Fresnel and height-correlated Smith, as in `opengonio.brdf.models.ggx_brdf`. Arrow keys move the lamp; a polite live region says where it is. Falls back to `og/img/specimen.png`. |
-| Four-axis rig | landing, straight under the hero (`og/rigview.js`) | the CAD assembly (`og/model/rig.js`, written by `tools/site_model.py` during `make cad`) in WebGL, moved with the rotations of `tools/cad/poses.py` and lit only by the lamp on its arm. Plays M4, M3, M2, M1 in turn with the moving parts rimmed in tungsten; a slider per axis drives it by hand (pauses the play); drag to orbit; θi and θr from the software's kinematics. Loads when it nears the screen; falls back to `og/img/assembly.png`. |
+| Story | landing, straight under the hero (`#machine`) | a pinned stage 6 screens tall that the scroll drives (Apple-style): the CAD parts fly in from an exploded view, lowest first; then M4, M3, M2, M1 play in turn; then the view swings round behind the fixed camera. Big crossfading captions, a chapter index on the right (click to jump), θi and θr live. The scroll value follows with a little inertia. Reduced motion: no pinning, one still picture and every chapter as text. |
+| Lamp cursor | hero, fine pointers | a tungsten ring on a stiff spring replaces the arrow over the specimen; the CTAs lean up to a few pixels toward the pointer |
+| Big numbers | after "Drive it" | four Gloock figures (axes, CAD parts, build steps, planned cost) that count up once on arrival; from `site-data.js` |
+| Four-axis rig | "Drive it yourself" (`og/rigview.js`) | the CAD assembly (`og/model/rig.js`, written by `tools/site_model.py` during `make cad`) in WebGL, moved with the rotations of `tools/cad/poses.py` and lit only by the lamp on its arm. Plays M4, M3, M2, M1 in turn with the moving parts rimmed in tungsten; a slider per axis drives it by hand (pauses the play); drag to orbit; θi and θr from the software's kinematics. Loads when it nears the screen; falls back to `og/img/assembly.png`. |
 | Lamp gauge | hero, app | half circle: camera dot (blue) fixed at 35°, lamp dot (tungsten) at θi |
 | Midline rail | landing, ≥ 1280 px | fixed at the vertical centre, appears after the hero, marks the section in view |
 | Drag row | "How a measurement happens" | scroll-snap row, mouse drag with momentum, arrow buttons and arrow keys |
@@ -177,6 +181,8 @@ are separated by tone and space.
 | Sticky stage picture | build stages | the simulator at each build stage, crossfading as the list scrolls |
 | Q and A | questions | large serif question, answer beside it |
 | Inverted footer | landing | ink ground, full-width wordmark |
+| Wiring guide | `docs/wiring.html` (`og/wiring-page.js`, `og/guide.css`) | every wire from `docs/wiring.yaml`, one per step: the section diagram in SVG, wires already made stay drawn, the current wire thick with a moving-dot arrow and pulsing tungsten rings on its two pins, the next wire dashed. Wire kinds told apart by colour and line pattern (ground = black core with a light edge). Section chips with progress (bone bar, scaleX); `#step-N` links; arrow keys. Wide screens show the whole section; phones scroll to the wire's start pin. |
+| Build book | `docs/build.html` (`og/build-page.js`, `og/guide.css`) | toy-brick instruction book from `docs/assembly.yaml` (`tools/build_book.py`): the CAD assembly (`og/model/rig.js`) in WebGL, parts already on in flat grey, this step's parts lit: tungsten = print it (the thing to do now, as the lamp marks it), bone = buy it. They slide in once per step along dashed ink arrows with a ground halo (900 ms each, 70 ms apart, exponential ease-out), then the page stops drawing; "Play again" repeats it. Parts box top left (a WebGL thumbnail per part, ×count, screws drawn to length), Gloock step number with "/total" bottom left, words from the stage checklist. Chips = parts of the machine (`section`). Drag to turn, double-click or "Reset view" to put it back; reduced motion: parts in place, arrows only. `?print`: one A4 landscape page per step, light theme (`exports/build-book.pdf`). |
 | Pose view | app | top view: ring, lamp, sample and normal, camera; dashed ghost = target; drag or arrow-key the lamp |
 | Switch | app lights | `role="switch"`; blocked lights disabled with the reason under "Blocked" |
 | STOP | app header | always enabled, red patch colour, Esc |

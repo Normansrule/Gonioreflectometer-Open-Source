@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenGonio build book</title>
+<meta name="description" content="Put the OpenGonio machine together one step at a time, like a toy-brick instruction book: every printed and bought part from the CAD model, in order, with the screws for each step. Generated from docs/assembly.yaml.">
+<meta name="theme-color" content="#0c0b0a">
+<link rel="icon" href="og/icon.svg" type="image/svg+xml">
+<link rel="preload" href="og/fonts/hanken-grotesk-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="og/og.css">
+<script src="og/og.js"></script>
+<link rel="stylesheet" href="og/guide.css">
+</head>
+<body class="book">
+<a class="skip btn btn-light" href="#main">Skip to the book</a>
+<header class="bar">
+ <a class="mark display" href="./">OpenGonio</a>
+ <nav aria-label="Pages">
+  <a href="./">Website</a><a href="lab.html">Lab</a><a href="wiring.html">Wiring guide</a><a href="build.html" aria-current="page">Build book</a>
+ </nav>
+ <button class="btn theme" type="button" data-theme-toggle><span data-theme-label>Light</span></button>
+</header>
+<main id="main">
+<section class="g-head" aria-labelledby="h1">
+ <h1 id="h1" class="display">The build book</h1>
+ <p class="g-lead">Every printed and bought part, in the order it goes on. Parts already on the machine are grey; each step's new
+  parts are in colour and slide into place along the arrows. Drag the picture to turn it; double-click to put it back.</p>
+ <p class="legend" aria-label="Colours"><span><i class="sw print" aria-hidden="true"></i>Print this (in black ABS)</span>
+  <span><i class="sw buy" aria-hidden="true"></i>Buy this</span><span><i class="sw done" aria-hidden="true"></i>Already on</span>
+  <span><a href="build.html?print" id="print-link">Whole book on one page, to print or save as PDF</a></span></p>
+</section>
+
+<nav class="sections" id="sections" aria-label="Parts of the machine"></nav>
+
+<section class="stage" aria-label="Current step">
+ <figure class="view" style="margin:0">
+  <canvas id="view" role="img" aria-label="3D view of this step"></canvas>
+  <svg id="arrows" class="arrows" aria-hidden="true"></svg>
+  <div class="callout" id="callout" aria-label="Parts for this step"></div>
+  <p class="big-n display num" aria-hidden="true"><span id="big-n"></span><small id="big-of"></small></p>
+  <div class="view-tools"><button class="btn" type="button" id="replay">Play again</button><button class="btn" type="button" id="reset" hidden>Reset view</button></div>
+  <p class="no-gl" id="no-gl" hidden>This browser can't draw the 3D model (WebGL is off). The parts and words below are the same.</p>
+ </figure>
+ <article class="card" aria-live="polite">
+  <div class="c-head">
+   <h2 id="s-title"></h2>
+   <p class="meta" id="k-sec"></p>
+   <div id="s-parts"></div>
+  </div>
+  <div class="c-body" id="s-body"></div>
+  <div class="c-nav">
+   <p class="progress num" id="k-step"></p>
+   <div class="nav">
+    <button class="btn" type="button" id="back">Back</button>
+    <button class="btn btn-light" type="button" id="next">Next</button>
+   </div>
+   <p class="hint">Keys: <span class="kbd">←</span> <span class="kbd">→</span>. Each step has its own link (the address bar).</p>
+  </div>
+ </article>
+</section>
+
+<div id="pages" class="pages" hidden></div>
+
+<p class="foot">The model is the CAD assembly (<code>tools/cad/assembly.py</code>); the words are the stage checklists
+ (<code>.github/phases.yml</code>); the order is <code>docs/assembly.yaml</code>. Wires, endstops, flags, the rim and tilt belts,
+ spacers and tape are not modelled: the checklist line says where they go, and every wire is in the <a href="wiring.html">wiring guide</a>.
+ Nothing here has been built or measured yet: this is the design.</p>
+</main>
+<script src="og/model/rig.js"></script>
+<script src="build-book.js"></script>
+<script src="og/build-page.js"></script>
+</body>
+</html>

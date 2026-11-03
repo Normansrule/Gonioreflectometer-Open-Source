@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/05.svg" width="100%" alt="Steps of stage 05">
 
-$23.56 · total so far $386.41 / $630
+$23.56 · total so far $312.50 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -16,7 +16,7 @@ Sample table turns on its fixed bolt axle without wobble. · 0/3 steps done · ~
 
 #### Do
 
-1. Print `TBL-07a_table_drum`, 3 × `TBL-07b_home_flag`, `TBL-07c_table_motor_bracket`, `TBL-07d_table_post`, `TBL-07f_spacers`.
+1. {'Print `TBL-07a_table_drum`, 2 × `TBL-07b_home_flag` (tilt and spin), `TBL-07c_table_motor_bracket`, `TBL-07d_table_post`, `TBL-07f_spacers`, `TBL-07g_endstop_riser` (foot on the bed), `TBL-07h_table_flag` (as exported': 'bridge on the bed, fin up).'}
 
 #### Verify
 
@@ -58,7 +58,8 @@ Tick the boxes; `make done id=M15.2`.
 #### Do
 
 1. Motor face up, bracket top plate on its face (4 × M3 × 8); 20T pulley on the shaft, teeth level with the drum's teeth.
-2. Belt on the motor pulley and the drum's teeth; bracket rails' slots over their 2 deck pilots (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; M2 × 12 + washer through each slot.
+2. E-stop pressed: its cable into the SKR Pico Y socket, run along the deck edge (never plug or unplug a motor with motor power on).
+3. Belt on the motor pulley and the drum's teeth; bracket rails' slots over their 2 deck pilots (inside the lazy Susan, at 180°); pull it outward until the belt deflects ~3 mm under a finger; M2 × 12 + washer through each slot.
 
 #### Verify
 
@@ -75,12 +76,14 @@ M3 returns to the same spot every time (≤ 0.1°). · 0/4 steps done · ~1.8 h 
 
 ### M16.1 Flag and homing
 
-**Time** 30 min · **Needs** TBL-04 endstop · TBL-07b flag · CTL-06 leads (as M10.2)
+**Time** 30 min · **Needs** TBL-04 endstop · TBL-07g riser, TBL-07h flag · 3 × M2 × 10 + washers, 2 × M2 × 6, 2 × M2 × 8 · CTL-06 leads (as M10.2)
 
 #### Do
 
-1. Flag on the drum's two flag holes (M2 × 8 self-tap), pointing at −180°; endstop on a printed riser beside the post (M2 into a spare deck pilot), lead into the SKR Pico Y-STOP socket.
-2. `installed_phase: 5`; `opengonio home` ten times.
+1. Riser on the three deck pilots at x = 40 (y = −40, 0, +40; +X side, inside the lazy Susan opening), 3 × M2 × 10 + washer, post outward. Endstop on its pad: slot over the pad's middle, header end outward, 2 × M2 × 6 self-tap.
+2. Flag on the drum top's two flag holes (the close pair outside the four yoke pilots), 2 × M2 × 8 self-tap, fin hanging down outside the drum. Turn the table by hand: at −180° (fin on +X) the fin passes through the slot without touching either side.
+3. E-stop pressed. Lead into the SKR Pico Y-STOP socket, along the riser and the deck.
+4. `installed_phase: 5`; `opengonio home` ten times.
 
 #### Verify
 
@@ -143,5 +146,7 @@ JSON in phases/05-table/design.md → Results.
 #### Record
 
 Commit `make publish m="M16 table done"`.
+
+> **Safety:** Before touching a motor plug or a screw terminal: press the e-stop and unplug the adapter.
 
 [Sources](../../REFERENCES.md): G33 · H11 · H16 · H17 · H26 · H37 · H41 · P41 · P42 · P43 · P58 · F12

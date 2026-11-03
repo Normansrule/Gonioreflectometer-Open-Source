@@ -61,7 +61,7 @@ def flow(x1, y1, x2, y2, color, label="", dur="1s"):
 
 def architecture() -> str:
     b = ""
-    b += box(30, 20, 250, 62, "Power", "24 V Li-ion pack · USB-C charge · E-STOP", ORANGE)
+    b += box(30, 20, 250, 62, "Power", "24 V wall adapter · E-STOP · limit switch", ORANGE)
     b += box(30, 110, 250, 70, "Laptop (mode 1)", "control · capture · processing", GREEN)
     b += box(30, 205, 250, 70, "Pi Zero 2 W (mode 2)", "no laptop: runs jobs, saves data", GREEN)
     b += box(30, 320, 250, 62, "USB camera (fixed)", "on the laptop or the Pi", BLUE)
@@ -203,19 +203,19 @@ def scanner() -> str:
 
 
 def power_flow() -> str:
-    steps = ["USB-C charger", "PD trigger 20 V", "CC/CV 24.0 V 1 A", "Battery 6S + BMS", "Fuse 3.15 A T", "E-STOP (NC)", "J3 over-travel", "SKR Pico"]
+    steps = ["Wall socket", "24 V 3 A adapter", "Screw-terminal jack", "E-STOP (NC)", "Limit switch (NC)", "MOT+ / MOT−", "SKR Pico"]
     w, gap, y = 128, 18, 50
     b = ""
     for i, s in enumerate(steps):
         x = 20 + i * (w + gap)
-        col = ORANGE if s.startswith("E-STOP") else (PURPLE if "SKR" in s else GREEN if s.startswith("Battery") else LINE)
+        col = ORANGE if s.startswith(("E-STOP", "Limit")) else (PURPLE if "SKR" in s else GREEN if "adapter" in s else LINE)
         b += f'<rect x="{x}" y="{y}" width="{w}" height="48" rx="8" fill="{PANEL}" stroke="{col}" stroke-width="2"/>'
         b += f'<text x="{x + w / 2}" y="{y + 29}" class="t" font-size="13" text-anchor="middle">{s}</text>'
         if i:
             b += f'<line x1="{x - gap}" y1="{y + 24}" x2="{x}" y2="{y + 24}" stroke="{YELLOW}" stroke-width="2"/>'
-    b += (f'<circle cy="{y + 24}" r="5" fill="{YELLOW}"><animate attributeName="cx" from="20" to="{20 + 8 * (w + gap) - gap}" '
+    b += (f'<circle cy="{y + 24}" r="5" fill="{YELLOW}"><animate attributeName="cx" from="20" to="{20 + len(steps) * (w + gap) - gap}" '
           f'dur="3s" repeatCount="indefinite"/></circle>')
-    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">A 24 V Li-ion pack with its own protection board runs the machine (~6 h per charge); USB-C charges it to 24.0 V, plugged in or not. No mains. E-STOP (also the off switch) or an over-travel switch cuts motor power; the laptop keeps running. Screw terminals and lever connectors only.</text>'
+    b += f'<text x="20" y="{y + 82}" class="m" font-size="12">A 24 V 3 A wall adapter runs the machine; only its 24 V comes inside. E-STOP (also the off switch) or the limit switch cuts motor power; the laptop keeps running. Screw terminals and lever connectors only.</text>'
     return svg(1200, 150, b)
 
 

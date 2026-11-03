@@ -59,8 +59,8 @@ def test_power_headroom():
     cfg = yaml.safe_load((power_budget.INPUT).read_text())
     res = power_budget.compute(cfg)
     ck = power_budget.checks(cfg, res)
-    assert all(ok for _, ok, _ in ck.values()), ck                     # pack current, 3 h session, charge covers typical, USB-C power, bus <= 24 V
-    assert cfg["supply"]["charger"]["volts"] <= cfg["supply"]["bus_max_volts"] == 24.0   # full pack never above the motor board's 24 V
+    assert all(ok for _, ok, _ in ck.values()), ck                     # adapter current with headroom, bus <= 24 V
+    assert cfg["supply"]["adapter"]["volts"] <= cfg["supply"]["bus_max_volts"] == 24.0   # adapter never above the motor board's 24 V
 
 
 def test_optics_basics():

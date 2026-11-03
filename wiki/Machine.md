@@ -11,7 +11,7 @@
 | M2   | sample tilt (yoke)          | ±90°    | 20T → 100T, 5:1                              | 0.0225°     | stage 08 |
 | M1   | sample spin (platter)       | ±180°   | direct drive (pancake motor), 1/64 microstep | 0.028°      | stage 09 |
 
-Measuring camera fixed on +X at 350 mm; scan camera fixed at 650 mm, 15° up, looking over it, so no camera ever moves or refocuses (one-camera option: move it, \$81 cheaper). Light 300 mm from the zero point. Optical homing on every axis, over-travel switches in the e-stop loop, 30 mm keep-out and 5° minimum light–camera angle (Ansari-Asl et al., 2024).
+Measuring camera fixed on +X at 350 mm; scan camera fixed at 650 mm, 15° up, looking over it, so no camera ever moves or refocuses (one-camera option: move it, \$81 cheaper). Light 300 mm from the zero point. Optical homing on every axis, one over-travel switch in the e-stop loop (light arm, at 17°; the other ends rely on soft limits and the e-stop), 30 mm keep-out and 5° minimum light–camera angle (Ansari-Asl et al., 2024).
 
 **Why the light is on a side ring.** Reflectance depends only on the light and camera directions *relative to the sample*, and the table (M3) and tilt (M2) already turn the sample to every direction an overhead light could reach. A horizontal ring keeps the arm’s weight on the bearing (the motor only moves it), stays low and stiff, and keeps cables out of the light path. A light on the camera axis (coaxial, via a beam splitter) sees only back-scatter, not the mirror peak, and loses ~75 % of the light in the splitter; it stays a possible later add-on for retroreflective materials.
 

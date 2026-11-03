@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -143,11 +144,22 @@ def check_wiring() -> list[str]:
     return wiring.check()
 
 
+def check_build_book() -> list[str]:
+    """docs/assembly.yaml: every CAD part in exactly one step, every checklist ref and line exists, build-book.js current."""
+    import build_book
+    data, errs = build_book.build()
+    out = ROOT / "docs" / "build-book.js"
+    if not errs and (not out.exists() or json.loads(out.read_text(encoding="utf-8").split("window.BOOK = ", 1)[1].rstrip(";\n")) != data):
+        errs.append("docs/build-book.js is out of date (run `make build`)")
+    return errs
+
+
 def check_site() -> list[str]:
     """Website and control app: every local src/href resolves, and the app's copy of docs/og matches the original."""
     errs = []
     app = ROOT / "software" / "src" / "opengonio" / "app" / "static"
-    for page in (ROOT / "docs" / "index.html", ROOT / "docs" / "lab.html", app / "index.html"):
+    for page in (ROOT / "docs" / "index.html", ROOT / "docs" / "lab.html", ROOT / "docs" / "wiring.html",
+                 ROOT / "docs" / "build.html", app / "index.html"):
         for ref in re.findall(r'(?:src|href)="([^"#?]+)', page.read_text(encoding="utf-8")):
             if re.match(r"^(https?:|mailto:|data:)", ref) or ref.startswith("/api/"):
                 continue
@@ -178,7 +190,8 @@ def check_site() -> list[str]:
 def main() -> int:
     groups = {"milestones": check_phases, "parts + budget": check_bom, "references + links": check_refs_and_links,
               "machine config + simulator": check_config, "math macros + PARTS.md": check_math_and_parts,
-              "wiring (docs/wiring.yaml vs firmware)": check_wiring, "website + app files": check_site}
+              "wiring (docs/wiring.yaml vs firmware)": check_wiring, "build book (docs/assembly.yaml)": check_build_book,
+              "website + app files": check_site}
     bad = 0
     for name, fn in groups.items():
         errs = fn()

@@ -53,6 +53,9 @@
 <circle cx="267.8" cy="497.4" r="4" fill="#555"/>
 <circle cx="295.8" cy="502.4" r="4" fill="#555"/>
 <circle cx="457.7" cy="408.9" r="4" fill="#555"/>
+<circle cx="350.0" cy="380.0" r="4" fill="#b80"/>
+<circle cx="350.0" cy="340.0" r="4" fill="#b80"/>
+<circle cx="350.0" cy="300.0" r="4" fill="#b80"/>
 <path d="M610.0 340.0h40" stroke="#06c" stroke-width="3" marker-end="url(#a)"/><text x="614.0" y="332.0" font-size="12" fill="#06c">+X camera</text>
 <text x="1020.0" y="25" text-anchor="middle" font-size="16">From below: how the tiles lie while you bolt them</text>
 <rect x="1120.0" y="440.0" width="200.0" height="200.0" fill="#f4f4f4" stroke="#000" stroke-width="1.5"/>
@@ -78,8 +81,9 @@
 <circle cx="195" cy="685.0" r="5" fill="#c60"/><text x="205" y="689.0" font-size="12">table motor bracket</text>
 <circle cx="370" cy="685.0" r="5" fill="#a0a"/><text x="380" y="689.0" font-size="12">M4 motor mount</text>
 <circle cx="545" cy="685.0" r="5" fill="#06c"/><text x="555" y="689.0" font-size="12">bar saddles</text>
-<circle cx="720" cy="685.0" r="5" fill="#080"/><text x="730" y="689.0" font-size="12">power box</text>
+<circle cx="720" cy="685.0" r="5" fill="#080"/><text x="730" y="689.0" font-size="12">power plate</text>
 <circle cx="895" cy="685.0" r="5" fill="#088"/><text x="905" y="689.0" font-size="12">controller tray</text>
 <circle cx="1070" cy="685.0" r="5" fill="#555"/><text x="1080" y="689.0" font-size="12">ring scale</text>
+<circle cx="1245" cy="685.0" r="5" fill="#b80"/><text x="1255" y="689.0" font-size="12">table endstop riser</text>
 <text x="10" y="715.0" font-size="12">Origin = deck centre under the zero point; 200 mm tiles; spare pilots on a 40 mm grid in every tile (not drawn) take endstops, switches and cable clips.</text>
 </svg>

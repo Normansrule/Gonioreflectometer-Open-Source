@@ -24,7 +24,7 @@ Pin by pin: [README → Wiring → 9](../../README.md#9--standalone-station-no-l
 | Pi pin 6 (GND) | ESP32-S3 J3-1 (GND) |
 | Pi pin 4 (5V) | ESP32-S3 J1-21 (5V): powers the hub without the laptop (never with its USB in the laptop at the same time) |
 | OLED SDA / SCL / VIN / GND | ESP32-S3 J3-4 (GPIO 1) / J3-5 (GPIO 2) / J1-2 (3V3) / J3-22 (GND); with the AS7341 fitted, chain the OLED from the sensor's second STEMMA QT socket |
-| Buck input | FUSED and GND lever connectors in the power box (5-way from here on; after the fuse, before the e-stop), so the Pi keeps running on e-stop (18–24 V in) |
+| Buck input | second wires under the jack's `+` / `−` screws on the power plate (before the e-stop), so the Pi keeps running on e-stop (24 V in) |
 | Buck 5.1 V out + / − | Pi pin 2 (5V) / pin 14 (GND), two cut female jumpers |
 | Camera(s) + SKR Pico USB-C | powered USB hub on the Pi's micro-USB data port (OTG adapter) |
 

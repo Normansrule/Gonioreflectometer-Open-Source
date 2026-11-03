@@ -78,7 +78,7 @@ ICONS = {   # 96 x 96 drawings
 }
 
 KIND = {  # part ID -> icon kind (printed parts use their STL thumbnail instead)
-    "PWR-21": "battery", "PWR-29": "psu", "PWR-27": "psu", "PWR-04": "fuse", "PWR-05": "fuse", "PWR-28": "estop", "PWR-10": "board",
+    "PWR-30": "psu", "PWR-28": "estop", "PWR-10": "board",
      "PWR-15": "wire", "PWR-20": "lever",
     "CTL-01": "board", "CTL-02": "board", "CTL-03": "cable", "CTL-04": "cable", "CTL-05": "keypad", "CTL-06": "cable",
     "CTL-07": "jumper", "CTL-08": "fan", "CTL-09": "laptop", "FRM-07": "hardware",

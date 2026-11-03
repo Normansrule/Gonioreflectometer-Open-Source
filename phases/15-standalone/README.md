@@ -73,10 +73,11 @@ Tick the boxes; `make done id=M41.1`.
 
 #### Do
 
-1. Set the buck to 5.1 V **before** connecting the Pi (meter on its output).
-2. A powered USB hub on the Pi's OTG port (STA-04) carries the camera(s) and the SKR Pico's USB-C cable.
-3. Buck input: a thin pair into the FUSED and GND lever connectors in the power box (after the fuse, before the e-stop; 5-way connectors if 3-way are full): pack BAT+ lever open first.
+1. Buck input: adapter unplugged first. A thin red / black pair under the jack's `+` / `−` screws beside the wires already there (before the e-stop, so the Pi stays on when the motors stop).
+2. Set the output **before anything is on it**: nothing on the buck output, adapter in, meter (DC volts) on the output terminals; turn the trim screw until it reads 5.1 V (it can start near 24 V: many turns). Unplug the adapter.
+3. A powered USB hub on the Pi's OTG port (STA-04) carries the camera(s) and the SKR Pico's USB-C cable.
 4. Wire buck output, UART and hub power per README → Wiring → 9: buck 5.1 V → Pi pin 2, buck − → Pi pin 14; Pi pin 8 (GPIO14 TX) → hub J3-16 (GPIO 48), Pi pin 10 (GPIO15 RX) ← hub J3-17 (GPIO 47), Pi pin 6 → hub J3-1 (GND), Pi pin 4 (5V) → hub J1-21 (5V); never with the hub's USB in the laptop at the same time.
+5. Adapter in: the Pi boots. Meter on the buck output terminals: 5.05–5.15 V (the Verify line).
 
 #### Verify
 

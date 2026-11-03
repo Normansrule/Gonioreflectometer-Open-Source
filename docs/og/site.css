@@ -67,7 +67,7 @@ code { font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 
 .gauge .ray { stroke: var(--light); stroke-width: 1.5; opacity: 0.7; }
 .hint { transition: opacity var(--t-exposure) ease; }
 .stage.touched .hint { opacity: 0; }
-.render-note { position: absolute; left: 42%; right: var(--margin); bottom: var(--s-5); font-size: 0.8125rem; color: var(--ink-2); pointer-events: none; text-align: center; }
+.render-note { position: absolute; left: 42%; right: var(--margin); bottom: var(--s-5); font-size: 0.8125rem; color: var(--ink-2); pointer-events: none; text-align: center; text-wrap: balance; }
 .next { position: absolute; left: var(--margin); bottom: var(--s-5); z-index: 2; font-size: var(--step-small); color: var(--ink-2); text-decoration: none;
         display: inline-flex; gap: var(--s-2); align-items: center; }
 .next span { display: inline-block; }
@@ -86,11 +86,94 @@ code { font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 
   .labels span { font-size: 0.8125rem; white-space: normal; width: 9em; }
 }
 
+/* ---------- load: the title rises line by line while the lamp warms up ---------- */
+.hero h1 .ln { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.hero h1 .ln > span { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .js .hero h1 .ln > span { animation: rise 1100ms var(--ease-out) both; }
+  .js .hero h1 .ln:nth-child(3) > span { animation-delay: 110ms; }
+  .js .hero .lead, .js .hero .acts, .js .hero .state { animation: settle 900ms var(--ease-out) both; animation-delay: 380ms; }
+  .js .hero .acts { animation-delay: 480ms; } .js .hero .state { animation-delay: 560ms; }
+}
+@keyframes rise { from { transform: translateY(105%); } }
+@keyframes settle { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---------- the lamp cursor (fine pointers, motion allowed) ---------- */
+.stage.has-cursor { cursor: none; }
+.lamp-cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 3; opacity: 0;
+               transition: opacity var(--t-ui) ease; }
+.lamp-cursor.on { opacity: 1; }
+.lamp-cursor::before { content: ""; position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%;
+                       border: 1.5px solid var(--light); }
+.lamp-cursor::after { content: ""; position: absolute; left: -2px; top: -2px; width: 4px; height: 4px; border-radius: 50%; background: var(--light); }
+.lamp-cursor span { position: absolute; left: 22px; top: -9px; font-size: 0.75rem; letter-spacing: 0.02em; color: var(--light-text); white-space: nowrap; }
+.stage.touched .lamp-cursor span { opacity: 0; transition: opacity var(--t-exposure) ease 1.2s; }
+.btn { will-change: translate; }
+
+/* ---------- big numbers ---------- */
+.numbers { padding-block: var(--s-9); }
+.num-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-6); }
+.big-num { font-family: var(--font-display); font-size: clamp(3.5rem, 1.5rem + 6vw, 8.5rem); line-height: 0.9; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.num-label { margin-top: var(--s-3); color: var(--ink-2); max-width: 22ch; }
+@media (max-width: 900px) { .num-row { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s-7); } }
+
+/* section headlines: a band of light sweeps across them as they arrive */
+@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+  .js .band h2.reveal, .js .band .reveal h2 { clip-path: inset(-0.2em 100% -0.3em -0.1em); transition: clip-path 800ms var(--ease-in-out); }
+  .js .band h2.reveal.lit, .js .band .reveal.lit h2 { clip-path: inset(-0.2em -0.2em -0.3em -0.1em); }
+}
+
 /* ---------- reveal: the light shifts onto each section ---------- */
 @media (prefers-reduced-motion: no-preference) and (min-width: 900px) {   /* phones: everything is already lit */
   .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out); }
   .js .reveal.lit { opacity: 1; transform: none; }
 }
+
+/* ---------- the story: a pinned stage that the scroll drives ---------- */
+.story { position: relative; height: 620svh; }
+.story h2.sr-only { font-size: var(--step-head); }
+.story-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.story-pin canvas, .story-pin img.fallback { position: absolute; inset: 0; width: 100%; height: 100%; }
+.story-pin img.fallback { display: none; object-fit: contain; }
+.story.nogl canvas, .story.nogl .story-angles, .story.nogl .story-index { display: none; }
+.story.nogl img.fallback { display: block; }
+.chapters { list-style: none; margin: 0; padding: 0; position: absolute; left: var(--margin); bottom: calc(var(--s-9) + var(--s-2)); width: min(38rem, 70vw); }
+@media (min-width: 1280px) { .chapters { left: calc(var(--margin) + 168px); } }
+.chapter { position: absolute; left: 0; bottom: 0; opacity: 0; transform: translateY(24px); clip-path: inset(0 0 100% 0);   /* clipped: off screen but still read aloud */
+           transition: opacity 500ms var(--ease-out), transform 700ms var(--ease-out), clip-path 0s linear 500ms; }
+.chapter.on { opacity: 1; transform: none; clip-path: inset(-20% -20% -20% -20%); transition-delay: 0s, 0s, 0s; }
+.ch-title { font-family: var(--font-display); font-size: clamp(2.25rem, 1.2rem + 3.6vw, 5rem); line-height: 1; letter-spacing: -0.02em; text-wrap: balance; }
+.ch-title b { font-weight: 400; color: var(--light-text); }
+.ch-sub { margin-top: var(--s-4); font-size: var(--step-lead); line-height: 1.4; color: var(--ink-2); max-width: 30ch; }
+.story-index { position: absolute; right: var(--margin); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: var(--s-1); }
+.story-index button { background: none; border: 0; padding: var(--s-2) 0; min-height: 36px; text-align: right; color: var(--ink-3); font-size: var(--step-small);
+                      cursor: pointer; display: flex; align-items: center; justify-content: flex-end; gap: var(--s-3); transition: color var(--t-ui) ease; }
+.story-index button::after { content: ""; width: 14px; height: 2px; background: currentColor; transform: scaleX(0.5); transform-origin: right;
+                             transition: transform var(--t-ui) var(--ease-out), background-color var(--t-ui) ease; }
+.story-index button[aria-current="true"] { color: var(--ink); }
+.story-index button[aria-current="true"]::after { background: var(--light); transform: scaleX(1.6); }
+@media (hover: hover) and (pointer: fine) { .story-index button:hover { color: var(--ink); } }
+.story .story-angles { top: calc(var(--s-9) + var(--s-2)); bottom: auto; }
+.story-note { position: absolute; right: var(--margin); bottom: var(--s-5); max-width: 36ch; text-align: right; font-size: 0.8125rem; color: var(--ink-2); }
+.story .rig-loading { pointer-events: none; }
+@media (max-width: 900px) {
+  .story { height: 560svh; }
+  .chapters { bottom: 92px; width: auto; right: var(--margin); }
+  .ch-sub { font-size: 1rem; }
+  .story-index { top: auto; bottom: auto; top: var(--s-5); transform: none; flex-direction: row; gap: var(--s-3); }
+  .story-index button::after { display: none; }
+  .story .story-angles { top: calc(var(--s-5) + 44px); bottom: auto; right: var(--margin); }
+  .story-note { left: var(--margin); right: var(--margin); text-align: left; bottom: var(--s-4); max-width: none; }
+}
+/* reduced motion: no pinning, no scrubbing; one still picture and every chapter as plain text */
+.story.still { height: auto; }
+.story.still .story-pin { position: relative; height: auto; overflow: visible; }
+.story.still .story-pin canvas, .story.still .story-pin img.fallback { position: relative; height: 62svh; }
+.story.still .story-note, .story.still .story-angles { display: none; }
+.story.still .chapters { position: static; width: auto; padding: var(--s-6) var(--margin) 0; display: grid; gap: var(--s-6); }
+.story.still .chapter { position: static; opacity: 1; transform: none; clip-path: none; }
+@media (min-width: 1280px) { .story.still .chapters { padding-left: calc(var(--margin) + 168px); } }
+.story.still .story-index { display: none; }
 
 /* ---------- the four-axis machine ---------- */
 .rig-band { padding-top: var(--s-9); }
@@ -225,7 +308,7 @@ figcaption { margin-top: var(--s-3); font-size: var(--step-small); color: var(--
 .foot { background: var(--ink); color: var(--ground); padding: var(--s-9) var(--margin) var(--s-6); }
 .foot a { color: inherit; }
 .foot .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--s-6); }
-.foot h3 { font-size: var(--step-small); font-weight: 600; margin-bottom: var(--s-3); }
+.foot h3 { font-size: var(--step-body); font-weight: 600; margin-bottom: var(--s-3); }
 .foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
 .foot .btn-light { color: var(--light-ink); }
 .foot .word { font-family: var(--font-display); font-size: calc((100vw - 2 * var(--margin)) / 5.62); line-height: 1; letter-spacing: -0.04em;

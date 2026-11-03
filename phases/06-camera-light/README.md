@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/brdf-lobe.svg" width="100%" alt="Camera and light">
 
-$111.91 · total so far $498.32 / $630
+$111.91 · total so far $424.41 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -128,7 +128,7 @@ Light switches from the laptop, stays cool and steady. · 0/3 steps done · ~1.6
 1. Print `LSR-05a_lamp_tube`, `LSR-05b_lamp_cap`. Strip one end of a 15 cm red and a 15 cm black 18 AWG lead (PWR-15) to the length in the holder's instruction sheet; push red into the holder's `+` poke-in, black into `−`.
 2. Holder face-down in the body's round seat, wire entries toward the lead groove (the side away from the clamp), leads along the groove. COB into the holder's square seat, light-emitting face down through the window. Thermal tape (LSR-04) on the COB's back; heatsink on top, fins out. Cap on with 4 × M2 × 12, leads through its slot; tighten evenly until the heatsink no longer turns.
 3. Lamp clamp onto the arm bar's outer pilot (M2 × 16), aperture facing the zero point.
-4. Driver (LSR-02) pins up in the short frame on the controller tray (double-sided tape). Female jumper ends onto its pins: +Vin ← SKR Pico HE `+` (terminal marked 12/24V; cut jumper, bare end under the screw); −Vin → SKR Pico HE `−` (terminal marked IO23; output port from M08.2, normally `M62 P4`).
+4. E-stop pressed, adapter unplugged (HE `+` carries motor-power voltage). Driver (LSR-02) pins up in the short frame on the controller tray (double-sided tape). Female jumper ends onto its pins: +Vin ← SKR Pico HE `+` (terminal marked 12/24V; cut jumper, bare end under the screw); −Vin → SKR Pico HE `−` (terminal marked IO23; output port from M08.2, normally `M62 P4`).
 5. Driver +Vo / −Vo pins → two chains of 5 male–female jumpers along the arm (slack for 20–324°); at the lamp, lever connectors join each chain's last end (cut off, stripped, folded double) to the lamp's red (+) / black (−) lead.
 
 #### Verify
@@ -155,7 +155,7 @@ Tick the boxes; `make done id=M18.1`.
 
 #### If a check fails
 
-- Lamp always on: driver −Vin on GND (or on HE `+`) instead of HE `−` (the terminal marked IO23).
+- Lamp always on: driver −Vin on GND instead of HE `−` (the terminal marked IO23). Never lights: −Vin on HE `+`, or +Vo / −Vo swapped.
 
 #### Record
 
@@ -256,6 +256,6 @@ Two real materials measured and pictured. · 0/2 steps done · ~40 min hands-on 
 
 `curve.csv` + `curve.svg` → `phases/06-camera-light/plastic_*`; commit.
 
-> **Safety:** Don't stare into the lamp.
+> **Safety:** Don't stare into the lamp. Before touching a motor plug or a screw terminal: press the e-stop and unplug the adapter.
 
 [Sources](../../REFERENCES.md): R1 · G12 · T32 · V1 · V2 · V3 · V4 · V5 · V7 · V8 · V9 · N3 · N11 · N24 · N25 · N45 · N46 · N47 · H13 · H14 · H15 · H49 · K1 · K2 · K3 · K4 · K5 · K6 · L4 · L5 · L6 · L7 · L21 · L22 · L23

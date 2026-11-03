@@ -14,7 +14,8 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "phases/03-frame/deck-map.svg"
 H, T = P.DECK_HALF, P.DECK_TILE
 COL = {"table post": "#c00", "table motor bracket": "#c60", "M4 motor mount": "#a0a", "bar saddles": "#06c",
-       "power box": "#080", "controller tray": "#088", "ring scale": "#555"}
+       "power plate": "#080", "controller tray": "#088", "ring scale": "#555",
+       "table endstop riser": "#b80"}
 
 
 def panel(ox: float, title: str, mirror: bool) -> list[str]:

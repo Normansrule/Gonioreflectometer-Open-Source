@@ -4,13 +4,16 @@
    SPDX-License-Identifier: GPL-3.0-or-later */
 (function () {
   const VERT = `
-attribute vec3 aPos; attribute vec3 aNrm; attribute float aGroup; attribute float aColor;
+attribute vec3 aPos; attribute vec3 aNrm; attribute float aGroup; attribute float aColor; attribute float aDelay;
+attribute vec3 aExp; attribute float aMag; uniform float uExplode; uniform float uSpread;
 uniform mat4 uVP; uniform mat4 uG[5]; uniform float uScale;
 varying vec3 vN; varying vec3 vW; varying float vC; varying float vG;
 mat4 pick(float g){ if (g < 0.5) return uG[0]; if (g < 1.5) return uG[1]; if (g < 2.5) return uG[2]; if (g < 3.5) return uG[3]; return uG[4]; }
 void main(){
   mat4 M = pick(aGroup);
-  vec4 w = M * vec4(aPos * uScale, 1.0);
+  // build-up: each part flies in along its own direction, lowest parts first (uExplode 1 = apart, 0 = built)
+  float d = aDelay / 255.0, k = smoothstep(0.0, 1.0, clamp((uExplode * 1.6) - (1.0 - d) * 0.6, 0.0, 1.0));
+  vec4 w = M * vec4(aPos * uScale + aExp * aMag * 4.0 * uSpread * k, 1.0);
   vW = w.xyz; vN = normalize(mat3(M) * aNrm); vC = aColor; vG = aGroup;
   gl_Position = uVP * w;
 }`;
@@ -85,6 +88,8 @@ void main(){ float r = length(vP); float a = exp(-r*r*5.0) * uA + smoothstep(0.1
     return { ti: deg(dot(n, l)), tr: deg(dot(n, cam)) };
   }
 
+  let cache = null;
+  function decoded(R) { return cache || (cache = inflate(R.data)); }   // one decode, any number of views
   async function inflate(b64) {
     const bin = Uint8Array.from(atob(b64), ch => ch.charCodeAt(0));
     const ds = new DecompressionStream("deflate");
@@ -94,8 +99,8 @@ void main(){ float r = length(vP); float a = exp(-r*r*5.0) * uA + smoothstep(0.1
   async function make(canvas, R) {
     const gl = canvas.getContext("webgl", { antialias: true, alpha: false, preserveDrawingBuffer: false });
     if (!gl || typeof DecompressionStream === "undefined" || !gl.getExtension("OES_element_index_uint")) return null;
-    const raw = await inflate(R.data);
-    const nv = R.vertices, vbytes = nv * 12;
+    const raw = await decoded(R);
+    const ST = R.stride || 12, nv = R.vertices, vbytes = nv * ST;
     const sh = (t, src) => { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
       if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
     const prog = (v, f) => { const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, v)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, f));
@@ -107,7 +112,8 @@ void main(){ float r = length(vP); float a = exp(-r*r*5.0) * uA + smoothstep(0.1
     const nIdx = (raw.byteLength - vbytes) / 4;
     const quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, quad); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
     const U = (p, n) => gl.getUniformLocation(p, n);
-    const loc = { pos: gl.getAttribLocation(P, "aPos"), nrm: gl.getAttribLocation(P, "aNrm"), grp: gl.getAttribLocation(P, "aGroup"), col: gl.getAttribLocation(P, "aColor") };
+    const loc = { del: gl.getAttribLocation(P, "aDelay"), exp: gl.getAttribLocation(P, "aExp"), mag: gl.getAttribLocation(P, "aMag"),
+      pos: gl.getAttribLocation(P, "aPos"), nrm: gl.getAttribLocation(P, "aNrm"), grp: gl.getAttribLocation(P, "aGroup"), col: gl.getAttribLocation(P, "aColor") };
     const pal = [];
     for (let i = 0; i < 4; i++) { const c = R.palette[i] || [0.5, 0.5, 0.5];
       pal.push(...(c[0] < 0.2 ? [0.075, 0.075, 0.08] : c));    // printed parts: matte black ABS, as built
@@ -116,6 +122,15 @@ void main(){ float r = length(vP); float a = exp(-r*r*5.0) * uA + smoothstep(0.1
     const [lo, hi] = R.bbox, centre = [(lo[0] + hi[0]) / 2 - 40, (lo[1] + hi[1]) / 2, 150];
     const radius = Math.hypot(hi[0] - lo[0], hi[1] - lo[1]) / 2;
     return {
+      /* an orbit (yaw, pitch, zoom) as an explicit camera, so camera moves can be blended */
+      orbit(view, aspect) {
+        const yaw = view.yaw * Math.PI / 180, pit = view.pitch * Math.PI / 180;
+        const dist = radius * view.zoom / Math.tan(0.31) / Math.min(1, aspect / 1.25);   // whole machine in frame at any aspect
+        const at = view.at || centre;
+        return { eye: [at[0] + dist * Math.cos(pit) * Math.cos(yaw), at[1] + dist * Math.cos(pit) * Math.sin(yaw), at[2] + dist * Math.sin(pit)],
+                 at, fov: view.fov || 0.62 };
+      },
+      aspect() { return (canvas.clientWidth || 1) / (canvas.clientHeight || 1); },
       draw(pose, view, opts) {
         const dpr = Math.min(window.devicePixelRatio || 1, 2), w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
         if (!w || !h) return;
@@ -123,17 +138,24 @@ void main(){ float r = length(vP); float a = exp(-r*r*5.0) * uA + smoothstep(0.1
         gl.viewport(0, 0, w, h);
         const K = OG.tokens(), bg = OG.rgb(K.ground);
         gl.clearColor(bg[0], bg[1], bg[2], 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        const yaw = view.yaw * Math.PI / 180, pit = view.pitch * Math.PI / 180, dist = radius * view.zoom / Math.tan(0.31) / Math.min(1, w / h / 1.25);   // whole machine in frame at any aspect
-        const eye = [centre[0] + dist * Math.cos(pit) * Math.cos(yaw), centre[1] + dist * Math.cos(pit) * Math.sin(yaw), centre[2] + dist * Math.sin(pit)];
-        const VP = mul(persp(0.62, w / h, 20, 6000), lookAt(eye, centre, [0, 0, 1]));
+        const cam = view.eye ? view : this.orbit(view, w / h);
+        const sx = opts.shift || 0, S = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, sx, 0, 0, 1];   // lens shift: frame the machine off centre
+        const eye = cam.eye, VP = mul(S, mul(persp(cam.fov || 0.62, w / h, 10, 6000), lookAt(eye, cam.at, [0, 0, 1])));
         const Ms = groupMatrices(R, pose);
         const lamp = apply(Ms[R.groups.indexOf("arm")], R.lamp);
         gl.useProgram(P);
         gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
-        gl.enableVertexAttribArray(loc.pos); gl.vertexAttribPointer(loc.pos, 3, gl.SHORT, false, 12, 0);
-        gl.enableVertexAttribArray(loc.nrm); gl.vertexAttribPointer(loc.nrm, 3, gl.BYTE, true, 12, 6);
-        gl.enableVertexAttribArray(loc.grp); gl.vertexAttribPointer(loc.grp, 1, gl.BYTE, false, 12, 9);
-        gl.enableVertexAttribArray(loc.col); gl.vertexAttribPointer(loc.col, 1, gl.UNSIGNED_BYTE, false, 12, 10);
+        gl.enableVertexAttribArray(loc.pos); gl.vertexAttribPointer(loc.pos, 3, gl.SHORT, false, ST, 0);
+        gl.enableVertexAttribArray(loc.nrm); gl.vertexAttribPointer(loc.nrm, 3, gl.BYTE, true, ST, 6);
+        gl.enableVertexAttribArray(loc.grp); gl.vertexAttribPointer(loc.grp, 1, gl.BYTE, false, ST, 9);
+        gl.enableVertexAttribArray(loc.col); gl.vertexAttribPointer(loc.col, 1, gl.UNSIGNED_BYTE, false, ST, 10);
+        if (ST >= 16) {
+          gl.enableVertexAttribArray(loc.del); gl.vertexAttribPointer(loc.del, 1, gl.UNSIGNED_BYTE, false, ST, 11);
+          gl.enableVertexAttribArray(loc.exp); gl.vertexAttribPointer(loc.exp, 3, gl.BYTE, true, ST, 12);
+          gl.enableVertexAttribArray(loc.mag); gl.vertexAttribPointer(loc.mag, 1, gl.UNSIGNED_BYTE, false, ST, 15);
+        }
+        gl.uniform1f(U(P, "uExplode"), ST >= 16 ? (opts.explode || 0) : 0);
+        gl.uniform1f(U(P, "uSpread"), opts.spread || 1);
         gl.uniformMatrix4fv(U(P, "uVP"), false, VP);
         gl.uniformMatrix4fv(U(P, "uG"), false, Ms.flat());
         gl.uniform1f(U(P, "uScale"), R.scale);
@@ -149,12 +171,12 @@ void main(){ float r = length(vP); float a = exp(-r*r*5.0) * uA + smoothstep(0.1
         // the lamp's glow, drawn over everything at the COB
         const clip = (() => { const v = VP, p = lamp; const x = v[0] * p[0] + v[4] * p[1] + v[8] * p[2] + v[12], y = v[1] * p[0] + v[5] * p[1] + v[9] * p[2] + v[13],
           ww = v[3] * p[0] + v[7] * p[1] + v[11] * p[2] + v[15]; return [x / ww, y / ww]; })();
-        gl.disableVertexAttribArray(loc.nrm); gl.disableVertexAttribArray(loc.grp); gl.disableVertexAttribArray(loc.col);
+        [loc.nrm, loc.grp, loc.col, loc.del, loc.exp, loc.mag].forEach(a => { if (a >= 0) gl.disableVertexAttribArray(a); });
         gl.useProgram(G); gl.disable(gl.DEPTH_TEST); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
         gl.bindBuffer(gl.ARRAY_BUFFER, quad); const gp = gl.getAttribLocation(G, "p");
         gl.enableVertexAttribArray(gp); gl.vertexAttribPointer(gp, 2, gl.FLOAT, false, 0, 0);
         const rpx = 34 * dpr; gl.uniform2f(U(G, "uC"), clip[0], clip[1]); gl.uniform2f(U(G, "uR"), rpx / w * 2, rpx / h * 2);
-        gl.uniform3f(U(G, "uCol"), 1.0, 0.82, 0.55); gl.uniform1f(U(G, "uA"), light ? 0.55 : 0.9);
+        gl.uniform3f(U(G, "uCol"), 1.0, 0.82, 0.55); gl.uniform1f(U(G, "uA"), (light ? 0.55 : 0.9) * (1 - (opts.explode || 0)));
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         gl.disable(gl.BLEND); gl.enable(gl.DEPTH_TEST);
         return { lamp, clip };

@@ -159,10 +159,31 @@ def keypad_1x4():
     return box(69, 20, 0.8).union(box(10, 85, 0.3, cy=False).translate((0, -95, 0))).union(box(12.7, 5, 2.5).translate((0, -97, 0)))
 
 
+WAGO_221 = {2: (13.1, 18.7, 8.3), 3: (18.7, 18.6, 8.3), 5: (30.0, 18.8, 8.6)}   # 221-412 / 413 / 415: W x D x H [P63]
+
+
 def wago(n):
-    """WAGO 221-41n lever connector: 18.6 deep x 8.4 high (levers included); 221-412 is 13.2 wide (WAGO data sheet [P47])."""
-    w = 5.5 * n + 2.2
-    return box(18.6, w, 6.4).union(box(14, w - 1.0, 2.0).translate((0, 0, 6.4)))
+    """WAGO 221-41n lever connector, levers closed: x = depth (wires go in at -x), y = width, z = height (levers on top)."""
+    w, d, h = WAGO_221[n]
+    body = box(d, w, h - 2.0)
+    for k in range(n):                                                         # one lever per wire, 1 mm apart
+        body = body.union(box(d - 4.6, w / n - 1.0, 2.0).translate((2.3, -w / 2 + (k + 0.5) * w / n, h - 2.0)))
+    return body
+
+
+def wago_inline():
+    """WAGO 221-2401 inline connector: 35.5 mm long [P63], one wire in each end; section ESTIMATE 10 x 9 mm."""
+    return box(35.5, 10, 7).union(box(14, 8, 2).translate((-9, 0, 7))).union(box(14, 8, 2).translate((9, 0, 7)))
+
+
+def wago_assortment():
+    """PWR-20 as bought [P62]: 3 each of 221-412, 221-413, 221-415 and 221-2401, laid out in rows."""
+    out = None
+    for row, make in enumerate((lambda: wago(2), lambda: wago(3), lambda: wago(5), wago_inline)):
+        for k in range(3):
+            p = make().translate((k * 40.0, row * 36.0, 0))
+            out = p if out is None else out.union(p)
+    return out
 
 
 def ptfe():
@@ -202,12 +223,14 @@ def skr_pico():
 
 
 def esp32s3_devkitc():
-    """ESP32-S3-DevKitC-1 envelope, drawn as it sits in the tray: upside down (module can down, header pins up).
-    Outline ESTIMATE 69 x 26 mm (clones vary): 2 x 22 pins, can 18 x 25.5 x 3.2 at the -X end, USB-C at +X."""
-    b = pcb(69, 26).translate((0, 0, 3.2))
-    b = b.union(box(25.5, 18, 3.2).translate((-69 / 2 + 13, 0, 0)))                    # module can (rests on the pedestal)
+    """ESP32-S3-DevKitC-1, drawn as it sits in the tray: upside down (module can down, header pins up).
+    Espressif board 62.74 x 25.4 mm [P65] (clones run to ~69 x 26): 2 x 22 pins 22.86 mm apart, can 18 x 25.5 x 3.2
+    at the -X end, USB-C at +X."""
+    L, Wd = 62.74, 25.4
+    b = pcb(L, Wd).translate((0, 0, 3.2))
+    b = b.union(box(25.5, 18, 3.2).translate((-L / 2 + 13, 0, 0)))                     # module can (rests on the pedestal)
     for y in (-11.43, 11.43):
-        b = b.union(box(56, 2.5, 2.5).translate((2, y, 4.8))).union(box(56, 0.64, 8.5).translate((2, y, 7.3)))   # headers + pins
+        b = b.union(box(55.9, 2.5, 2.5).translate((2, y, 4.8))).union(box(55.9, 0.64, 8.5).translate((2, y, 7.3)))   # 22 pins x 2.54
     return b
 
 
@@ -217,44 +240,24 @@ def e4_board():
     return b.union(box(80, 50, 20).translate((0, 0, 1.6)))
 
 
-def me8108():
-    """ME-8108 roller limit switch: body 42 x 28 x 18 (screw terminals at the bottom), lever arm + 18 mm roller on top."""
-    b = box(42, 28, 18)
-    return b.union(box(6, 4, 30).translate((10, 0, 18))).union(cyl(18, 6).rotate((0, 0, 0), (1, 0, 0), 90).translate((10, 3, 48)))
+def estop_station():
+    """BAOMAIN e-stop station [P60]: 2.8 x 2.8 x 3.4 in overall (71 x 71 x 86 mm, listing copy [P64]); box height and
+    head size ESTIMATE (62 mm box, 30 mm collar, 40 mm mushroom)."""
+    head = W("XY").circle(20).extrude(14).faces(">Z").fillet(6).translate((0, 0, 72)).union(cyl(30, 10).translate((0, 0, 62)))
+    return box(71, 71, 62).union(head)
 
 
-def battery_pack():
-    """Xeanerol 6S Li-ion pack with BMS [P49]: 78 x 50 x 72 mm upright (listing), leads out of the +X face near the top."""
-    return box(78, 50, 72).union(cyl(8, 12).rotate((0, 0, 0), (0, 1, 0), 90).translate((39, 12, 60)))
+def dc_jack_screw():
+    """Female 5.5 x 2.1 mm DC jack to screw terminals (comes with PWR-30 [P59]): ESTIMATE 32 x 14 x 13 mm, socket toward +X."""
+    j = box(32, 14, 13)
+    return j.union(cyl(8, 4).rotate((0, 0, 0), (0, 1, 0), 90).translate((16, 0, 6.5)))
 
 
-def drok_cc_cv():
-    """DROK 35 W buck-boost CC/CV module in its case [P57]: 72 x 59 x 32 mm (maker page "Size: 72*59*32mm"), drawn with
-    the long side along Y as it sits in the box; LCD window on top. Terminals are inside that envelope."""
-    return box(59, 72, 31).union(box(30, 22, 1).translate((0, 8, 31)))
-
-
-def fuse_holder():
-    """uxcell inline screw-type 5 x 20 mm holder, 16 AWG (PWR-04): no size published - ESTIMATE body Ø12 x 50 mm
-    (measure on arrival; the box cradle takes up to Ø14). 15 mm of each lead shown."""
-    return cyl(12, 50).rotate((0, 0, 0), (0, 1, 0), 90).translate((-25, 0, 0)).union(
-        cyl(2.6, 80).rotate((0, 0, 0), (0, 1, 0), 90).translate((-40, 0, 0))).translate((0, 0, 6))
-
-
-def fuse_5x20():
-    """5 x 20 mm glass fuse (IEC 60127 size)."""
-    return cyl(5, 20).rotate((0, 0, 0), (0, 1, 0), 90).translate((-10, 0, 2.5))
-
-
-def pd_trigger():
-    """USB-C PD trigger board [P55]: footprint estimate 60 x 30 mm, display and terminal block 18 mm tall."""
-    return pcb(60, 30).union(box(20, 12, 10).translate((-12, 0, 1.6))).union(box(12, 26, 12).translate((22, 0, 1.6)))
-
-
-def estop_cheap():
-    """22 mm e-stop, 1 NO + 1 NC [P56]: 40 mm head above the panel (z = 0), body ~50 mm behind it (60 x 70 mm max)."""
-    head = W("XY").circle(20).extrude(10).faces(">Z").fillet(6).translate((0, 0, 10)).union(cyl(30, 10))
-    return head.union(cyl(22, 10).translate((0, 0, -10))).union(box(32, 42, 40).translate((0, 0, -50)))
+def limit_switch_sealed():
+    """Joinfworld sealed roller-lever microswitch [P61]: ESTIMATE body 20 x 6.4 x 10 mm, lever + roller to 22 mm, 3 wires out."""
+    b = box(20, 6.4, 10).union(box(18, 4, 0.8).translate((-1, 0, 10)).rotate((0, 0, 10), (0, 1, 10), -12))
+    b = b.union(cyl(5, 4).rotate((0, 0, 0), (1, 0, 0), 90).translate((8, 2, 14)))
+    return b.union(cyl(4, 40).rotate((0, 0, 0), (0, 1, 0), -90).translate((-10, 0, 5)))
 
 
 def fan40():
@@ -270,18 +273,14 @@ def star_led():
 
 
 B_PARTS = {   # id: (file stem, builder, source of the dimensions)
-    "PWR-21": ("battery_6s_24v_5ah", battery_pack, "Xeanerol 6S 5 Ah pack, Amazon listing read 2026-10-12 [P49]: 78 x 50 x 72 mm (not re-checked)"),
-    "PWR-27": ("usb_c_pd_trigger", pd_trigger, "PD trigger board [P55]: ESTIMATE 60 x 30 mm (no size published), measure on arrival"),
-    "PWR-29": ("drok_cc_cv_35w", drok_cc_cv, "DROK 35 W CC/CV module, maker page [P57]: 72 x 59 x 32 mm"),
-    "PWR-04": ("fuse_holder_inline_5x20", fuse_holder, "uxcell 16 AWG inline holder: ESTIMATE body Ø12 x 50 mm (no size published)"),
-    "PWR-05": ("fuse_5x20", fuse_5x20, "5 x 20 mm fuse (IEC 60127 size)"),
-    "PWR-28": ("estop_22mm_1no1nc", estop_cheap, "LAY37-11ZS e-stop listing [P56]: 40 mm head, 22 mm hole, 60 x 70 mm max"),
+    "PWR-30": ("dc_jack_screw_terminal", dc_jack_screw, "Screw-terminal DC jack with the ALITOVE adapter [P59]: ESTIMATE 32 x 14 x 13 mm (none published)"),
+    "PWR-28": ("estop_station_1no1nc", estop_station, "BAOMAIN e-stop station [P60]: 71 x 71 x 86 mm overall (listing copy [P64]); box/head split ESTIMATE"),
     "PWR-10": ("pc817_opto_module_24v", lambda: pcb(66, 16.5).union(box(10, 16.5, 10.4).translate((-28, 0, 1.6))).union(box(10, 16.5, 10.4).translate((28, 0, 1.6))),
                "NOYITO PC817 1-channel module: 66 x 16.5 x 12 mm (maker manual); screw terminals both ends"),
     "PWR-15": ("wire_18awg_pair", lambda: box(4, 2, 1000), "18 AWG silicone pair, 1 m"),
-    "PWR-20": ("lever_connector_221_412", lambda: wago(2), "WAGO 221-412 data sheet: 18.6 x 13.2 x 8.4 mm"),
+    "PWR-20": ("wago_221_assortment_12", wago_assortment, "WAGO 221 12-piece [P62]: 221-412 13.1 x 18.7 x 8.3, 221-413 18.7 x 18.6 x 8.3, 221-415 30 x 18.8 x 8.6 mm, 221-2401 35.5 mm long [P63]"),
     "CTL-01": ("btt_skr_pico_envelope", skr_pico, "BTT SKR Pico V1.0 maker STEP [C12]: 85 x 56 mm, holes 58 x 49"),
-    "CTL-02": ("esp32s3_devkitc1", esp32s3_devkitc, "ESP32-S3-DevKitC-1: ESTIMATE 69 x 26 mm (clones vary; measure)"),
+    "CTL-02": ("esp32s3_devkitc1", esp32s3_devkitc, "ESP32-S3-DevKitC-1: 62.74 x 25.4 mm (Espressif board [P65]; clones to ~69 x 26: measure)"),
     "CTL-03": ("usb_cable_e4", lambda: cable(1000, 3.5, (12, 7, 20), (9, 5, 15)), "USB cable envelope"),
     "CTL-05": ("membrane_keypad_1x4", keypad_1x4, "Adafruit 1332: 69 x 20 x 0.8 mm, 85 mm tail [C9]"),
     "CTL-06": ("jst_xh_lead_3pin", lambda: box(7.5, 5.75, 9.8).union(cyl(1.3, 500).translate((0, 0, 9.8))).union(box(7.5, 5.75, 9.8).translate((0, 0, 509.8))),
@@ -299,7 +298,7 @@ B_PARTS = {   # id: (file stem, builder, source of the dimensions)
     "LAR-03": ("gt2_belt_open_1m", lambda: box(6, 1.4, 1000), "GT2 6 mm open belt, 1 m"),
     "LAR-04": ("gt2_pulley_20t_5mm", gt2_20t, "GT2 20T 5 mm bore, 16 mm flanges [P42]"),
     "LAR-05": ("tcst2103_endstop_module", tcst2103_module, "TCST2103 module: 33 x 11 mm PCB, 3.1 mm slot [P43]"),
-    "LAR-06": ("me8108_limit_switch", me8108, "ME-8108 listing photo (envelope); measure on arrival"),
+    "LAR-06": ("limit_switch_sealed_prewired", limit_switch_sealed, "Joinfworld sealed roller-lever switch [P61]: ESTIMATE 20 x 6.4 x 10 mm body (none published)"),
     "TBL-02": ("gt2_belt_232_loop", lambda: belt_loop(6.37, 31.83, 49.4), "GT2 232 mm loop on 20T + 100T at 49.4 mm"),
     "TBL-05": ("bolt_m8x75_nut", lambda: bolt(8, 75, 13, 5.3, True, (13, 6.5)), "DIN 931 M8 x 75 + DIN 934 nut"),
     "CAM-01": ("arducam_b0433_imx477_usb", camera_b0433, "Arducam B0433 datasheet drawing: 38 x 38, holes 34 mm [K3]"),
@@ -331,7 +330,7 @@ B_PARTS = {   # id: (file stem, builder, source of the dimensions)
     "SCN-02": ("charuco_mat_print", lambda: box(279.4, 215.9, 0.2), "Letter print"),
     "STA-01": ("pi_zero_2wh", pi_zero_2wh, "Raspberry Pi Zero 2 W drawing [H51]: 65 x 30, holes 58 x 23"),
     "STA-02": ("microsd_card", lambda: box(15, 11, 1), "microSD"),
-    "STA-03": ("buck_lm2596_display", buck_lm2596_display, "DROK LM2596 with display (envelope ~66 x 36 x 20)"),
+    "STA-03": ("buck_lm2596_display", buck_lm2596_display, "LM2596 adjustable buck (envelope ~66 x 36 x 20, the size with a display)"),
     "STA-04": ("otg_adapter", lambda: box(20, 14, 8).union(box(7, 2.5, 6).translate((0, 0, -6))), "Micro-USB OTG adapter"),
     "STA-05": ("ssd1306_oled_096in", oled_ssd1306, "0.96 in SSD1306 I2C module: 27.3 x 27.8 mm"),
     "STA-06": ("jumper_wire_ff", jumper_wire, "Dupont jumper 2.54 mm"),

@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/08.svg" width="100%" alt="Steps of stage 08">
 
-$16.68 · total so far $554.78 / $630
+$16.68 · total so far $480.87 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -51,12 +51,13 @@ Tick the boxes; `make done id=M25.2`.
 
 ### M25.3 Tilt drive and flag
 
-**Time** 45 min · **Needs** TLT-01 motor · TLT-02 280 mm belt · TLT-03 pulley · TLT-04 endstop · TBL-07b flag · 4 × M3 × 8 (FRM-07)
+**Time** 45 min · **Needs** TLT-01 motor · TLT-02 280 mm belt · TLT-03 pulley · TLT-04 endstop · TBL-07b flag · 4 × M3 × 16 (FRM-07; through the 12 mm arm into the motor)
 
 #### Do
 
-1. Motor on the inner face of the pulley-side arm above the axis, shaft out through the arm slot (4 × M3 × 8 in the slots); 20T pulley outside, level with the 100T; belt on; slide the motor up to tension (~3 mm deflection); tighten.
-2. Flag on a cradle end block at −90°; endstop on the arm; lead into the SKR Pico Z-STOP socket (CTL-06, as M10.2).
+1. E-stop pressed: motor cable into the SKR Pico Z1 socket first, along the yoke arm with slack for the table's ±180°.
+2. Motor on the inner face of the pulley-side arm above the axis, shaft out through the arm slot (4 × M3 × 16 in the slots; the arm is 12 mm thick); 20T pulley outside, level with the 100T; belt on; slide the motor up to tension (~3 mm deflection); tighten.
+3. Flag on a cradle end block at −90°; endstop on the arm; lead into the SKR Pico Z-STOP socket (CTL-06, as M10.2).
 
 #### Verify
 
@@ -163,5 +164,7 @@ Tick the boxes; `make done id=M26.2`.
 #### Record
 
 Both fits in phases/08-tilt/design.md → Results; commit.
+
+> **Safety:** Before touching a motor plug or a screw terminal: press the e-stop and unplug the adapter.
 
 [Sources](../../REFERENCES.md): G3 · G8 · G23 · G25 · G30 · T2 · T3 · T4 · T5 · T10 · T12 · T13 · T14 · T16 · T17 · T21 · T25 · T26 · V9 · N1 · N5 · N7 · N8 · H3 · H20 · H21 · H48 · P41 · P42 · P43 · P58 · F12

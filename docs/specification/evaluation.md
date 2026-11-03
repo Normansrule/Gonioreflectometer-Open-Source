@@ -53,8 +53,8 @@ signal over the valid region, BRDF in 1/sr against a reflectance standard, the r
 | 3D visual hull | SIMULATED | `scan demo`; real scan of the reference cube (M33) |
 | Photometric stereo normals | SIMULATED | far-field light model: direction error up to atan(r/d), not corrected; needs the blocked LED bank |
 | Standalone station runs unattended | NOT CHARACTERIZED | station tests are simulated; M42 is the first real run |
-| Run time ≈ 6 h per charge, 18–24 V pack charged to 24.0 V over USB-C | MODELED | `tools/power_budget.py` from listing values; stage 01 tests T3, T4, T13, T15 |
-| Electrical safety | NOT CHARACTERIZED | no certification; power from a ready-made Li-ion pack with its own protection board, a 3.15 A fuse and a CC/CV charging module set to 24.0 V / 1.0 A (no mains in the machine); e-stop, wiring and charge temperature checked by the stage 01/02 steps only |
+| Power: 24 V 3 A wall adapter, 1.3 A peak draw (132 % headroom) | MODELED | `tools/power_budget.py` from listing values; stage 01 tests T3, T4, T9, T12 |
+| Electrical safety | NOT CHARACTERIZED | no certification; power from a ready-made 24 V wall adapter (mains stays inside its own case, outside the machine; its short-circuit protection is the listing's claim); e-stop, limit switch, wiring and terminal temperature checked by the stage 01/02/04 steps only |
 
 ## Uncertainty budget (BRDF, white light)
 

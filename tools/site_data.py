@@ -4,7 +4,7 @@
     python tools/site_data.py
 
 Stages and hours: .github/phases.yml · costs and cap: phases/*/bom.csv (tools/bom_check.py) · evidence: the README
-Status table. The page reads window.SITE; nothing on it is typed in twice.
+Status table · CAD part count: docs/og/model/rig.js. The page reads window.SITE; nothing on it is typed in twice.
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 from __future__ import annotations
@@ -50,7 +50,14 @@ def data() -> dict:
     totals = bom_check.totals(bom_check.load())
     return {"stages": out, "plan_usd": round(sum(v["buy"] for v in totals.values()), 2), "cap_usd": bom_check.HARD_CAP,
             "steps": sum(s["steps"] for s in out), "hours": round(sum(s["hours"] for s in out), 1),
-            "evidence": evidence()}
+            "parts": cad_parts(), "evidence": evidence()}
+
+
+def cad_parts() -> int:
+    """Parts in the CAD assembly, from the website model's own header (docs/og/model/rig.js, written by `make cad`)."""
+    f = ROOT / "docs" / "og" / "model" / "rig.js"
+    m = re.search(r'"parts":(\d+)', f.read_text(encoding="utf-8")[:4000]) if f.exists() else None
+    return int(m[1]) if m else 0
 
 
 def main() -> int:

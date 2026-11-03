@@ -1,0 +1,174 @@
+# Build book: the order the printed and bought parts go together (docs/build.html, tools/build_book.py).
+# Each step adds parts from the CAD assembly (tools/cad/assembly.py; names as in docs/og/model/rig.js, `*` = any).
+# Every modelled part is in exactly one step (`make build` fails otherwise).
+# The words come from .github/phases.yml: `ref` = the checklist step, `lines` = which of its lines (0 = first).
+# `section` = starts a new chip in the book's index (a part of the machine); later steps stay in it until the next one.
+# `from` = where the new parts come in from: down (from above), out (away from their centre), +x, -x, +y, -y.
+# `stack: true` = the parts go in one inside the other: each starts further out, in the order listed (print shows them apart).
+# `view` = camera [yaw, pitch] in degrees (yaw 0 looks from +X, the camera side). Leave it out for the default.
+# SPDX-License-Identifier: CC-BY-SA-4.0
+
+steps:
+  - title: Bolt the deck together
+    section: Deck and frame
+    ref: M11.3
+    lines: [0, 1, 2]
+    add: ["FRM-01*"]
+    from: out
+    view: [-120, 55]
+
+  - title: Outrigger saddles
+    ref: M12.1
+    lines: [1]
+    add: ["FRM-09d_*"]
+    view: [-35, 30]
+
+  - title: Outrigger and end foot
+    ref: M12.1
+    lines: [2]
+    add: [FRM-02a_outrigger_1, FRM-02b_outrigger_2, FRM-09i_1, FRM-09f_end_foot]
+    view: [-35, 30]
+
+  - title: Camera pillar and scan post
+    ref: M12.1
+    lines: [3]
+    add: [FRM-09h_camera_pillar, FRM-09e_post_socket, FRM-02c_scan_post_1, FRM-09i_2, FRM-02d_scan_post_2]
+    view: [-35, 22]
+
+  - title: Power plate
+    section: Power plate
+    ref: M12.2
+    lines: [0]
+    add: [PWR-18_power_plate]
+    view: [-55, 45]
+
+  - title: Jack and e-stop box
+    ref: M05.1
+    lines: [0, 1]
+    add: [PWR-30_dc_jack, PWR-28_estop]
+    view: [-55, 40]
+    note: Done on the bench in stage 01, before the plate goes on the deck; shown here in place. Wiring is in the wiring guide.
+
+  - title: Controller tray
+    section: Controller tray
+    ref: M12.2
+    lines: [1]
+    add: [CTL-10b_controller_tray]
+    view: [150, 45]
+
+  - title: Boards on the tray
+    ref: M10.1
+    lines: [1, 2, 3, 4]
+    add: [CTL-01_btt_skr_pico, CTL-02_esp32s3_hub, PWR-10_opto_module, "PWR-20_*"]
+    view: [150, 50]
+    note: Done in stage 02, before the tray goes on the deck; shown here in place.
+
+  - title: Lazy Susan and ring scale
+    section: Light arm
+    ref: M13.3
+    lines: [0]
+    add: [LAR-01_lazy_susan, "FRM-09c_*"]
+    view: [-60, 50]
+
+  - title: Rim and arm segment
+    ref: M13.3
+    lines: [1, 2]
+    add: ["LAR-08a_*", LAR-08c_arm_segment]
+    view: [-60, 45]
+
+  - title: Ring motor
+    ref: M13.4
+    lines: [0, 1, 2]
+    add: [LAR-08b_ring_motor_mount, LAR-02_motor_M4, LAR-04_pulley_M4]
+    from: +x
+    view: [-30, 35]
+
+  - title: Arm
+    ref: M13.5
+    lines: [0, 1]
+    add: [LAR-08f_upright_bar, LAR-08e_cross_clamp, LAR-08g_arm_bar]
+    view: [-40, 25]
+
+  - title: Table post and axle bolt
+    section: Table
+    ref: M15.2
+    lines: [0]
+    add: [TBL-07d_table_post, TBL-05_axle_bolt]
+    view: [-45, 35]
+
+  - title: Drum on its bearings
+    ref: M15.2
+    lines: [1, 2]
+    add: [FRM-08_608, FRM-08_608_2, TBL-07a_table_drum]
+    stack: true
+    view: [-45, 30]
+
+  - title: Table motor and belt
+    ref: M15.3
+    lines: [0, 1, 2]
+    add: [TBL-07c_table_motor_bracket, TBL-01_motor_M3, TBL-03_pulley_M3, TBL-02_belt_232]
+    from: -x
+    view: [-150, 35]
+
+  - title: Table home switch
+    ref: M16.1
+    lines: [0, 1]
+    add: [TBL-07g_endstop_riser, TBL-04_endstop, TBL-07h_table_flag]
+    view: [-20, 35]
+
+  - title: Measuring camera
+    section: Camera and lamp
+    ref: M17.2
+    lines: [1, 2]
+    add: [CAM-03b_camera_plate, CAM-01_camera, CAM-02_lens]
+    from: +x
+    view: [-30, 20]
+
+  - title: Lamp
+    ref: M18.1
+    lines: [1, 2]
+    add: [LSR-05a_lamp, LSR-06_holder, LSR-01_cob, LSR-03_heatsink, LSR-05b_lamp_cap]
+    from: +y
+    stack: true
+    view: [-60, 20]
+
+  - title: LED driver
+    ref: M18.1
+    lines: [3]
+    add: [LSR-02_led_driver]
+    view: [150, 50]
+
+  - title: Tilt yoke
+    section: Tilt and spin
+    ref: M25.2
+    lines: [1]
+    add: [TLT-07a_tilt_yoke]
+    view: [-45, 25]
+
+  - title: Cradle, spin motor and platter
+    ref: M25.2
+    lines: [0]
+    add: [TLT-07c_tilt_cradle, SPN-01_motor_M1, SPN-07a_spin_platter]
+    view: [-45, 25]
+    note: Put the motor and platter on the cradle first, then lower the cradle between the yoke arms.
+
+  - title: Stub axles and bearings
+    ref: M25.2
+    lines: [2]
+    add: [TLT-07b_pulley_100T, TLT-05_stub_bolt, TLT-05_stub_bolt_2, "FRM-08_608_[34]"]
+    from: out
+    view: [-60, 20]
+
+  - title: Tilt motor
+    ref: M25.3
+    lines: [0, 1]
+    add: [TLT-01_motor_M2]
+    view: [-60, 25]
+
+  - title: Scan camera
+    section: Scan camera
+    ref: M31.2
+    lines: [1]
+    add: [SCN-03d_scan_camera_plate, CAM-04_camera_scan, CAM-05_lens_scan]
+    from: +x
+    view: [-30, 15]

@@ -6,7 +6,7 @@
 - The cradle floor holds the pancake spin motor (stage 09); home flag (TBL-07b) on a cradle end block at −90°, endstop on the arm, lead to SKR Pico Z-STOP.
 - Checked in CAD: no part of the cradle, platter or spin motor touches the yoke over M2 = −90…90°, and nothing turning with the table touches the table motor, the lazy Susan or the M4 motor over M3 = 0…360°.
 
-Fasteners: M8 × 35 × 2 + nuts, M2 × 12 × 4 (OG-40, self-tap), M2 × 8 × 2 (flag), M2 × 6 + nut (platter hub), M3 × 8 × 8 (tilt and spin motor faces, FRM-07).
+Fasteners: M8 × 35 × 2 + nuts, M2 × 12 × 4 (OG-40, self-tap), M2 × 8 × 2 (flag), M2 × 6 + nut (platter hub), M3 × 16 × 4 (tilt motor, through the 12 mm arm) and M3 × 8 × 4 (spin motor face, cradle floor), FRM-07.
 
 ## 3D parts
 

@@ -4,7 +4,7 @@
 
 <img src="../../docs/assets/axes.svg" width="100%" alt="Frame">
 
-$22.45 · total so far $288.31 / $630
+$22.45 · total so far $211.51 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -105,15 +105,15 @@ Outrigger, camera pillar, scan post and boxes screwed into the deck's pilots. ·
 
 Tick the boxes; `make done id=M12.1`.
 
-### M12.2 Mount the boxes
+### M12.2 Mount the plate and tray
 
-**Time** 15 min · **Needs** power box · controller tray · 8 × M2 × 12 (FRM-06)
+**Time** 15 min · **Needs** power plate (with jack and e-stop box) · controller tray · 8 × M2 × 12 (FRM-06)
 
 #### Do
 
-1. Power box: 4 × M2 × 12 from inside, through its floor bosses into the SE tile's pilots (centre 220, −220), e-stop toward you.
+1. Power plate: 4 × M2 × 12 through its counterbored holes into the SE tile's pilots (centre 220, −220), jack socket toward the +X edge. Lift the e-stop box off its tape to reach the two holes under it, then press it back.
 2. Controller tray: 4 × M2 × 12 through its corner bosses into the NW tile's pilots (centre −200, 220).
-3. Black wire along the deck edge to SKR Pico POWER `−`. Red wire for now straight to POWER `+` (it gets the over-travel switch in M14.1).
+3. Red and black runs along the deck edge to MOT+ / MOT− on the tray; take the red run up the +X side, past the ring at about 17° (the limit switch is spliced into it there in M14.1), and leave 10 cm of slack there.
 
 #### Verify
 

@@ -4,20 +4,19 @@
 
 Enclosed printer, nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm layers, 4 walls, 25 % gyroid, brim on tall or long parts, door shut until cool; XY shrink compensation from the tolerance coupon (M03.3). Print in the orientation of the STL (flat face down). Filament is an estimate (±25 %): the slicer has the real number.
 
-**Core machine: ≈ 2848 g of ABS** (71 % of the 4 kg FIL-01 supply; ±25 %, plus any reprints) · optional add-ons (stages 10, 15, CAL-06c, ENC-04a): ≈ 106 g · minimum build volume 220 × 220 × 200 mm (largest part: FRM-09h, 184 mm tall).
+**Core machine: ≈ 2664 g of ABS** (67 % of the 4 kg FIL-01 supply; ±25 %, plus any reprints) · optional add-ons (stages 10, 15, CAL-06c, ENC-04a): ≈ 106 g · minimum build volume 220 × 220 × 200 mm (largest part: FRM-09h, 184 mm tall).
 
 | Stage | ID | Part | Print | Size x × y × z (mm) | ≈ g each | ≈ g total | Fits |
 |---|---|---|---:|---|---:|---:|---|
 | 00-plan | PLAN-01 | [Fit test: M2 self-tap holes + 608 pockets](../phases/00-plan/3d/PLAN-01_tolerance_coupon.stl) | 1 | 100 × 60 × 8 | 26 | 26 | yes |
-| 01-power | PWR-18a | [Power box](../phases/01-power/3d/PWR-18a_power_box.stl) | 1 | 160 × 130 × 80 | 191 | 191 | yes |
-| 01-power | PWR-18b | [Power box lid (e-stop)](../phases/01-power/3d/PWR-18b_power_lid.stl) | 1 | 160 × 130 × 5 | 58 | 58 | yes |
+| 01-power | PWR-18 | [Power plate (jack + e-stop box)](../phases/01-power/3d/PWR-18_power_plate.stl) | 1 | 130 × 110 × 12 | 46 | 46 | yes |
 | 02-controller | CTL-10a | [Keypad panel + OLED window](../phases/02-controller/3d/CTL-10a_button_panel.stl) | 1 | 160 × 60 × 3 | 26 | 26 | yes |
-| 02-controller | CTL-10b | [Controller tray (E4 + Pico + opto + LED driver)](../phases/02-controller/3d/CTL-10b_controller_tray.stl) | 1 | 200 × 130 × 15 | 77 | 77 | yes |
+| 02-controller | CTL-10b | [Controller tray (SKR Pico + ESP32-S3 + opto + LED driver)](../phases/02-controller/3d/CTL-10b_controller_tray.stl) | 1 | 200 × 130 × 15 | 79 | 79 | yes |
 | 03-frame | FRM-01a | [Deck tile SW (x -300..-100, y -300..-100)](../phases/03-frame/3d/FRM-01a_deck_tile_SW.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
 | 03-frame | FRM-01b | [Deck tile S (x -100..100, y -300..-100)](../phases/03-frame/3d/FRM-01b_deck_tile_S.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
-| 03-frame | FRM-01c | [Deck tile SE: power box (x 100..300, y -300..-100)](../phases/03-frame/3d/FRM-01c_deck_tile_SE.stl) | 1 | 200 × 200 × 24 | 159 | 159 | yes |
+| 03-frame | FRM-01c | [Deck tile SE: power plate (x 100..300, y -300..-100)](../phases/03-frame/3d/FRM-01c_deck_tile_SE.stl) | 1 | 200 × 200 × 24 | 159 | 159 | yes |
 | 03-frame | FRM-01d | [Deck tile W (x -300..-100, y -100..100)](../phases/03-frame/3d/FRM-01d_deck_tile_W.stl) | 1 | 200 × 200 × 24 | 159 | 159 | yes |
-| 03-frame | FRM-01e | [Deck tile C: table post + motor (x -100..100, y -100..100)](../phases/03-frame/3d/FRM-01e_deck_tile_C.stl) | 1 | 200 × 200 × 24 | 160 | 160 | yes |
+| 03-frame | FRM-01e | [Deck tile C: table post + motor (x -100..100, y -100..100)](../phases/03-frame/3d/FRM-01e_deck_tile_C.stl) | 1 | 200 × 200 × 24 | 161 | 161 | yes |
 | 03-frame | FRM-01f | [Deck tile E: M4 motor + saddles (x 100..300, y -100..100)](../phases/03-frame/3d/FRM-01f_deck_tile_E.stl) | 1 | 200 × 200 × 24 | 164 | 164 | yes |
 | 03-frame | FRM-01g | [Deck tile NW: controller tray (x -300..-100, y 100..300)](../phases/03-frame/3d/FRM-01g_deck_tile_NW.stl) | 1 | 200 × 200 × 24 | 160 | 160 | yes |
 | 03-frame | FRM-01h | [Deck tile N (x -100..100, y 100..300)](../phases/03-frame/3d/FRM-01h_deck_tile_N.stl) | 1 | 200 × 200 × 24 | 158 | 158 | yes |
@@ -39,10 +38,12 @@ Enclosed printer, nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm 
 | 04-light-arm | LAR-08f | [Light-arm upright bar, 200 mm](../phases/04-light-arm/3d/LAR-08f_upright_bar.stl) | 1 | 200 × 20 × 20 | 36 | 36 | yes |
 | 04-light-arm | LAR-08g | [Horizontal light-arm bar, 200 mm](../phases/04-light-arm/3d/LAR-08g_arm_bar.stl) | 1 | 200 × 20 × 20 | 36 | 36 | yes |
 | 05-table | TBL-07a | [Table drum: 100T teeth, 608 seats, OG-40 top](../phases/05-table/3d/TBL-07a_table_drum.stl) | 1 | 68 × 68 × 27 | 37 | 37 | yes |
-| 05-table | TBL-07b | [Home flag (print 3: table, tilt, spin)](../phases/05-table/3d/TBL-07b_home_flag.stl) | 3 | 16 × 34 × 10 | 1 | 3 | yes |
+| 05-table | TBL-07b | [Home flag (print 2: tilt, spin)](../phases/05-table/3d/TBL-07b_home_flag.stl) | 2 | 16 × 34 × 10 | 1 | 2 | yes |
 | 05-table | TBL-07c | [Table motor bracket (shaft up, slotted)](../phases/05-table/3d/TBL-07c_table_motor_bracket.stl) | 1 | 46 × 79 × 53 | 30 | 30 | yes |
 | 05-table | TBL-07d | [Table post: fixed M8 x 75 axle (hex-locked head)](../phases/05-table/3d/TBL-07d_table_post.stl) | 1 | 54 × 54 × 52 | 21 | 21 | yes |
 | 05-table | TBL-07f | [Spacers + shims, table and tilt (one print)](../phases/05-table/3d/TBL-07f_spacers.stl) | 1 | 60 × 28 × 9 | 2 | 2 | yes |
+| 05-table | TBL-07g | [Table endstop riser (3 deck pilots, +X)](../phases/05-table/3d/TBL-07g_endstop_riser.stl) | 1 | 42 × 92 × 56 | 14 | 14 | yes |
+| 05-table | TBL-07h | [Table home flag (fin at r 60)](../phases/05-table/3d/TBL-07h_table_flag.stl) | 1 | 36 × 20 × 23 | 2 | 2 | yes |
 | 06-camera-light | CAM-03a | [f/8 aperture stop](../phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl) | 1 | 14 × 14 × 1 | 0 | 0 | yes |
 | 06-camera-light | CAM-03b | [Camera plate + post clamp](../phases/06-camera-light/3d/CAM-03b_camera_plate.stl) | 1 | 50 × 50 × 34 | 18 | 18 | yes |
 | 06-camera-light | LSR-05a | [Lamp body + tube, bar clamp, polarizer slot](../phases/06-camera-light/3d/LSR-05a_lamp_tube.stl) | 1 | 53 × 72 × 74 | 36 | 36 | yes |
@@ -64,4 +65,4 @@ Enclosed printer, nozzle 245–255 °C, bed 100–105 °C, fan ≤ 20 %, 0.2 mm 
 | 11-scan-capture | SCN-03d | [Scan camera plate, looks 15 deg down](../phases/11-scan-capture/3d/SCN-03d_scan_camera_plate_15.stl) | 1 | 50 × 52 × 44 | 20 | 20 | yes |
 | 15-standalone | STA-07a (optional) | [Pi Zero 2 W mount](../phases/15-standalone/3d/STA-07a_pi_zero_mount.stl) | 1 | 75 × 40 × 11 | 9 | 9 | yes |
 
-Total all parts: ≈ 2954 g. Regenerate: `make parts` (or `python tools/cad/printability.py`).
+Total all parts: ≈ 2770 g. Regenerate: `make parts` (or `python tools/cad/printability.py`).

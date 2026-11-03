@@ -82,18 +82,17 @@ def build() -> cq.Assembly:
     for k in range(4):
         add("FRM-09c", rot_z(P.protractor_segment(), 20 + 80 * k), PRINT)
     # ---- power and controller
-    add("PWR-18a_power_box", orient(P.power_box(), t=(220, -220, 0)), PRINT)
-    add("PWR-18b_power_lid", orient(P.power_lid(), t=(220, -220, P.BOX_H)), PRINT)
-    add("PWR-28_estop", orient(B.estop_cheap(), t=(220 + P.ESTOP_AT[0], -220 + P.ESTOP_AT[1], P.BOX_H + 3.2)), BUY)
-    add("PWR-21_battery", orient(B.battery_pack(), t=(220 + P.PACK_AT[0], -220 + P.PACK_AT[1], P.PAD_Z)), BUY)
-    add("PWR-29_drok_cc_cv", orient(B.drok_cc_cv(), t=(220 + P.DROK_AT[0], -220 + P.DROK_AT[1], P.PAD_Z)), BUY)
-    add("PWR-27_pd_trigger", orient(B.pd_trigger(), t=(220 + P.TRIG_AT[0], -220 + P.TRIG_AT[1], P.PAD_Z)), BUY)
-    add("PWR-04_fuse_holder", orient(B.fuse_holder(), t=(220 + P.FUSE_AT[0], -220 + P.FUSE_AT[1], 2.4 + 1.5)), BUY)
+    px, py = P.POWER_XY
+    add("PWR-18_power_plate", orient(P.power_plate(), t=(px, py, 0)), PRINT)
+    add("PWR-28_estop", orient(B.estop_station(), t=(px + P.ESTOP_BOX_AT[0], py + P.ESTOP_BOX_AT[1], P.PLATE[2])), BUY)
+    add("PWR-30_dc_jack", orient(B.dc_jack_screw(), t=(px + P.JACK_AT[0], py + P.JACK_AT[1], P.PLATE[2])), BUY)
     tx, ty = P.TRAY_XY
     add("CTL-10b_controller_tray", orient(P.controller_tray(), t=(tx, ty, 0)), PRINT)
     add("CTL-01_btt_skr_pico", orient(B.skr_pico(), y_to=(0, -1, 0), t=(tx + P.SKR_AT[0], ty + P.SKR_AT[1], 3 + P.SKR_STANDOFF)), BUY)   # turned 180 deg
     add("CTL-02_esp32s3_hub", orient(B.esp32s3_devkitc(), t=(tx + P.ESP_AT[0], ty + P.ESP_AT[1], 3 + P.ESP_PED + 1.0)), BUY)   # pins up, 1 mm foam tape
     add("PWR-10_opto_module", orient(B.B_PARTS["PWR-10"][1](), t=(tx + 47, ty + 40, 3)), BUY)
+    for (x, y), name in zip(P.WAGO_POCKETS, ("MOT_plus", "MOT_minus", "keypad_GND")):          # 221-413s, entries facing -Y
+        add(f"PWR-20_{name}", orient(B.wago(3), z_to=(0, 0, 1), y_to=(-1, 0, 0), t=(tx + x, ty + y, 3)), BUY)
     add("LSR-02_led_driver", orient(B.ldd_module(), z_to=(0, 0, -1), t=(tx + 40, ty + 5, 3 + 12.2)), BUY)   # pins up
     # ---- light arm (M4 = 90 deg: arm on +Y)
     add("LAR-01_lazy_susan", orient(B.lazy_susan()), BUY)
@@ -129,6 +128,9 @@ def build() -> cq.Assembly:
     add("TBL-01_motor_M3", orient(B.nema17(38, 24), t=(-P.TABLE_BELT_C, 0, 48)), BUY)
     add("TBL-03_pulley_M3", orient(B.gt2_20t(), t=(-P.TABLE_BELT_C, 0, 53.7)), BUY)
     add("TBL-02_belt_232", orient(B.belt_loop(6.37, 31.83, P.TABLE_BELT_C), t=(-P.TABLE_BELT_C, 0, Z["drum"] + 1.2)), BUY)
+    add("TBL-07g_endstop_riser", orient(P.endstop_riser()), PRINT)                       # table home (M3 = -180): +X
+    add("TBL-04_endstop", orient(B.tcst2103_module(), t=(P.TFLAG["fin_r"], 0, P.ENDSTOP_Z)), BUY)
+    add("TBL-07h_table_flag", orient(P.table_flag(), z_to=(0, 0, -1), y_to=(0, 1, 0), t=(0, 0, Z["hub_top"] + P.TFLAG["tab_t"])), PRINT, g="table")
     # ---- tilt (yoke arms along Y) + spin, M2 = 90 deg: platter face up
     yz = Z["hub_top"]
     add("TLT-07a_tilt_yoke", rot_z(P.tilt_yoke(), 90, (0, 0, yz)), PRINT, g="table")

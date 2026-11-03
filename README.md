@@ -1,6 +1,6 @@
 <img src="docs/assets/screens/hero.webp" width="100%" alt="The OpenGonio website opening: a warm lamp circles three samples (white PTFE, a mirror and printed black plastic); the mirror flashes at the mirror angle and the printed layer lines catch the grazing light">
 
-<img src="docs/assets/screens/rig.webp" width="100%" alt="The OpenGonio CAD assembly lit by its own lamp, moving through its four axes in turn: M4 swings the lamp arm, M3 turns the table, M2 tilts the sample, M1 spins it">
+<img src="docs/assets/screens/rig.webp" width="100%" alt="Scrolling the website builds the machine: the CAD assembly's parts fly in from an exploded view, then M4 swings the lamp arm, M3 turns the table, M2 tilts the sample and M1 spins it, lit only by the machine's own lamp">
 
 # Gonioreflectometer-Open-Source
 
@@ -24,7 +24,7 @@ Measures how materials reflect light — the bidirectional reflectance distribut
 <!-- budget:start -->
 | Plan (every core part bought) | Still to buy | Have / ordered | Paid so far | Decided | Tools to buy (kept, separate) |
 |---:|---:|---:|---:|---:|---:|
-| $569.10 | $524.12 | $44.98 | $0.00 | 4/107 parts | $469.76 |
+| $495.19 | $450.21 | $44.98 | $0.00 | 4/103 parts | $469.76 |
 
 Optional spectral sensor +\$19.90 · Optional standalone kit +\$71.68 · Optional no-switching camera kit +\$90.10 · Optional colour kit (bands + polarizers) +\$103.95
 <!-- budget:end -->
@@ -40,7 +40,7 @@ Optional spectral sensor +\$19.90 · Optional standalone kit +\$71.68 · Optiona
 | Motors | NEMA 17 17HS4401 5-pack for M4 arm, M3 table, M2 tilt (+2 spare) · 17HS08-1004S pancake for M1 spin (both bought) | — |
 | Camera | Arducam 12 MP IMX477 USB camera, 16 mm M12 lens at f/8 | USB |
 | Light | Citizen COB, CRI 97, 350 mA constant-current driver switched by the SKR Pico | — |
-| Power | 24 V 6S Li-ion pack with protection board, charged over USB-C (20 V PD → 24.0 V, 1 A), 3.15 A fuse, latching e-stop | — |
+| Power | 24 V 3 A wall adapter with a screw-terminal jack, latching e-stop in its own box, pre-wired limit switch (over-travel) | — |
 | Prints | black ABS (cuts stray reflections), enclosed printer, M2 self-tapping screws | — |
 
 **Contents:** [Status](#status) · [Electronics](#electronics) · [Mechanical](#mechanical) · [Printed parts](#printed-parts) · [Tools](#tools) · [Wiring](#wiring) · [Build](#build) · [Software](#software) · [Website and app](#website-and-app) · [Project structure](#project-structure) · [Design](#design) · [Licence](#licence)
@@ -59,8 +59,8 @@ Optional spectral sensor +\$19.90 · Optional standalone kit +\$71.68 · Optiona
 | Colour LED bank (stage 10) | **blocked**: driver circuit unsafe as designed, do not power |
 | 3D scan: visual hull | simulated |
 | 3D scan: photometric stereo | simulated; needs the blocked LED bank |
-| 24 V Li-ion pack charged over USB-C, ≈ 6 h per charge | modeled from listing values |
-| Electrical safety | not certified (no mains in the machine: Li-ion pack with protection board, fuse, e-stop) |
+| 24 V wall adapter, 3 A: 1.3 A peak draw | modeled from listing values |
+| Electrical safety | not certified (only 24 V inside the machine: wall adapter with short-circuit protection per its listing, e-stop, limit switch) |
 
 Try it without hardware: `make setup && source .venv/bin/activate && make sim` ends with `ALL PASS`. Installed from a wheel instead of the repository: `opengonio init` puts an editable `machine.yaml` in `~/.config/opengonio/`.
 
@@ -71,15 +71,11 @@ Click a picture for the 3D view. **STEP** / **STL**: true-size model to download
 <!-- bom-electronics:start -->
 | | Part | Qty | Price | Buy | 3D model |
 |:-:|---|:-:|--:|---|---|
-| <a href="cad/bought/PWR-21_battery_6s_24v_5ah.stl"><img src="docs/assets/parts/PWR-21_battery_6s_24v_5ah.png" width="48" height="48" alt="PWR-21"></a> | **PWR-21** 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS) | 1 | \$41.99 | [Amazon](https://www.amazon.com/dp/B0FHPST5TP) | [STEP](cad/bought/PWR-21_battery_6s_24v_5ah.step?raw=true) · [STL](cad/bought/PWR-21_battery_6s_24v_5ah.stl?raw=true) |
-| <a href="cad/bought/PWR-27_usb_c_pd_trigger.stl"><img src="docs/assets/parts/PWR-27_usb_c_pd_trigger.png" width="48" height="48" alt="PWR-27"></a> | **PWR-27** USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals | 1 | \$9.99 | [Amazon](https://www.amazon.com/dp/B0HHNFY7HT) | [STEP](cad/bought/PWR-27_usb_c_pd_trigger.step?raw=true) · [STL](cad/bought/PWR-27_usb_c_pd_trigger.stl?raw=true) |
-| <a href="cad/bought/PWR-29_drok_cc_cv_35w.stl"><img src="docs/assets/parts/PWR-29_drok_cc_cv_35w.png" width="48" height="48" alt="PWR-29"></a> | **PWR-29** DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W) | 1 | \$16.99 | [Amazon](https://www.amazon.com/dp/B07VNDGFT6) | [STEP](cad/bought/PWR-29_drok_cc_cv_35w.step?raw=true) · [STL](cad/bought/PWR-29_drok_cc_cv_35w.stl?raw=true) |
-| <a href="cad/bought/PWR-04_fuse_holder_inline_5x20.stl"><img src="docs/assets/parts/PWR-04_fuse_holder_inline_5x20.png" width="48" height="48" alt="PWR-04"></a> | **PWR-04** Inline 5 x 20 mm fuse holder, 16 AWG (2-pack) | 1 | \$6.19 | [Amazon](https://www.amazon.com/dp/B07SM5YJ97) | [STEP](cad/bought/PWR-04_fuse_holder_inline_5x20.step?raw=true) · [STL](cad/bought/PWR-04_fuse_holder_inline_5x20.stl?raw=true) |
-| <a href="cad/bought/PWR-05_fuse_5x20.stl"><img src="docs/assets/parts/PWR-05_fuse_5x20.png" width="48" height="48" alt="PWR-05"></a> | **PWR-05** Fuse 3.15 A time-lag 5 x 20 mm | 1 | \$10.99 | [Amazon](https://www.amazon.com/dp/B00Y3OJUFK) | [STEP](cad/bought/PWR-05_fuse_5x20.step?raw=true) · [STL](cad/bought/PWR-05_fuse_5x20.stl?raw=true) |
-| <a href="cad/bought/PWR-28_estop_22mm_1no1nc.stl"><img src="docs/assets/parts/PWR-28_estop_22mm_1no1nc.png" width="48" height="48" alt="PWR-28"></a> | **PWR-28** Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack) | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B09JP4JKY6) | [STEP](cad/bought/PWR-28_estop_22mm_1no1nc.step?raw=true) · [STL](cad/bought/PWR-28_estop_22mm_1no1nc.stl?raw=true) |
+| <a href="cad/bought/PWR-30_dc_jack_screw_terminal.stl"><img src="docs/assets/parts/PWR-30_dc_jack_screw_terminal.png" width="48" height="48" alt="PWR-30"></a> | **PWR-30** 24 V 3 A wall adapter with screw-terminal DC jack | 1 | \$17.85 | [Amazon](https://www.amazon.com/dp/B078RY7BPL) | [STEP](cad/bought/PWR-30_dc_jack_screw_terminal.step?raw=true) · [STL](cad/bought/PWR-30_dc_jack_screw_terminal.stl?raw=true) |
+| <a href="cad/bought/PWR-28_estop_station_1no1nc.stl"><img src="docs/assets/parts/PWR-28_estop_station_1no1nc.png" width="48" height="48" alt="PWR-28"></a> | **PWR-28** Emergency stop in its own box, latching, 1 NO + 1 NC, screw terminals | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B00NTT91Y0) | [STEP](cad/bought/PWR-28_estop_station_1no1nc.step?raw=true) · [STL](cad/bought/PWR-28_estop_station_1no1nc.stl?raw=true) |
 | <a href="cad/bought/PWR-10_pc817_opto_module_24v.stl"><img src="docs/assets/parts/PWR-10_pc817_opto_module_24v.png" width="48" height="48" alt="PWR-10"></a> | **PWR-10** Optocoupler module PC817, 24 V input, screw terminals (2-pack) | 1 | \$6.99 | [Amazon](https://www.amazon.com/dp/B0B5382ZT7) | [STEP](cad/bought/PWR-10_pc817_opto_module_24v.step?raw=true) · [STL](cad/bought/PWR-10_pc817_opto_module_24v.stl?raw=true) |
-| <a href="cad/bought/PWR-15_wire_18awg_pair.stl"><img src="docs/assets/parts/PWR-15_wire_18awg_pair.png" width="48" height="48" alt="PWR-15"></a> | **PWR-15** 18 AWG silicone wire red/black, 1 m pair | 1 | \$7.98 | [Amazon](https://www.amazon.com/dp/B01708AYYQ) | [STEP](cad/bought/PWR-15_wire_18awg_pair.step?raw=true) · [STL](cad/bought/PWR-15_wire_18awg_pair.stl?raw=true) |
-| <a href="cad/bought/PWR-20_lever_connector_221_412.stl"><img src="docs/assets/parts/PWR-20_lever_connector_221_412.png" width="48" height="48" alt="PWR-20"></a> | **PWR-20** Lever wire connectors, WAGO 221 assortment (28) | 1 | \$20.95 | [Amazon](https://www.amazon.com/dp/B0CJ5QF3VX) | [STEP](cad/bought/PWR-20_lever_connector_221_412.step?raw=true) · [STL](cad/bought/PWR-20_lever_connector_221_412.stl?raw=true) · [maker](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) |
+| <a href="cad/bought/PWR-15_wire_18awg_pair.stl"><img src="docs/assets/parts/PWR-15_wire_18awg_pair.png" width="48" height="48" alt="PWR-15"></a> | **PWR-15** 18 AWG silicone wire red/black, 1.5 m (5 ft) each colour | 1 | \$7.98 | [Amazon](https://www.amazon.com/dp/B01708AYYQ) | [STEP](cad/bought/PWR-15_wire_18awg_pair.step?raw=true) · [STL](cad/bought/PWR-15_wire_18awg_pair.stl?raw=true) |
+| <a href="cad/bought/PWR-20_wago_221_assortment_12.stl"><img src="docs/assets/parts/PWR-20_wago_221_assortment_12.png" width="48" height="48" alt="PWR-20"></a> | **PWR-20** Lever wire connectors, WAGO 221 assortment (12) | 1 | \$12.45 | [Amazon](https://www.amazon.com/dp/B0CJ5QF4Z2) | [STEP](cad/bought/PWR-20_wago_221_assortment_12.step?raw=true) · [STL](cad/bought/PWR-20_wago_221_assortment_12.stl?raw=true) · [maker](https://www.wago.com/ch-de/installationsklemmen/compact-verbindungsklemme/p/221-412) |
 | <a href="cad/bought/CTL-01_btt_skr_pico_envelope.stl"><img src="docs/assets/parts/CTL-01_btt_skr_pico_envelope.png" width="48" height="48" alt="CTL-01"></a> | **CTL-01** BIGTREETECH SKR Pico V1.0 (RP2040, 4 × TMC2209 UART, USB-C) | 1 | \$35.99 | [Amazon](https://www.amazon.com/dp/B09MYKL9MP) | [STEP](cad/bought/CTL-01_btt_skr_pico_envelope.step?raw=true) · [STL](cad/bought/CTL-01_btt_skr_pico_envelope.stl?raw=true) · [maker](https://github.com/bigtreetech/SKR-Pico/blob/master/3D/BTT%20SKR%20Pico%20V1.0.step) |
 | <a href="cad/bought/CTL-03_usb_cable_e4.stl"><img src="docs/assets/parts/CTL-03_usb_cable_e4.png" width="48" height="48" alt="CTL-03"></a> | **CTL-03** USB-A to USB-C data cables, 3 ft (2-pack) | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B07DD5YHMH) | [STEP](cad/bought/CTL-03_usb_cable_e4.step?raw=true) · [STL](cad/bought/CTL-03_usb_cable_e4.stl?raw=true) |
 | <a href="cad/bought/CTL-05_membrane_keypad_1x4.stl"><img src="docs/assets/parts/CTL-05_membrane_keypad_1x4.png" width="48" height="48" alt="CTL-05"></a> | **CTL-05** Membrane keypad 1 x 4 | 1 | \$7.89 | [Amazon](https://www.amazon.com/dp/B076WS74VN) | [STEP](cad/bought/CTL-05_membrane_keypad_1x4.step?raw=true) · [STL](cad/bought/CTL-05_membrane_keypad_1x4.stl?raw=true) |
@@ -87,13 +83,13 @@ Click a picture for the 3D view. **STEP** / **STL**: true-size model to download
 | <a href="cad/bought/CTL-07_jumper_wire_mf.stl"><img src="docs/assets/parts/CTL-07_jumper_wire_mf.png" width="48" height="48" alt="CTL-07"></a> | **CTL-07** Jumper wires male-female 20 cm (120) | 1 | \$6.98 | [Amazon](https://www.amazon.com/dp/B0BHNM91FX) | [STEP](cad/bought/CTL-07_jumper_wire_mf.step?raw=true) · [STL](cad/bought/CTL-07_jumper_wire_mf.stl?raw=true) |
 | <a href="cad/bought/LAR-02_nema17_17hs4401.stl"><img src="docs/assets/parts/LAR-02_nema17_17hs4401.png" width="48" height="48" alt="LAR-02"></a> | **LAR-02** NEMA 17 stepper 42 Ncm 1.5 A, 38 mm (5-pack: M4, M3, M2 + 2 spare) | 1 | \$32.99 | [Amazon](https://www.amazon.com/dp/B088B756MY) | [STEP](cad/bought/LAR-02_nema17_17hs4401.step?raw=true) · [STL](cad/bought/LAR-02_nema17_17hs4401.stl?raw=true) |
 | <a href="cad/bought/LAR-05_tcst2103_endstop_module.stl"><img src="docs/assets/parts/LAR-05_tcst2103_endstop_module.png" width="48" height="48" alt="LAR-05"></a> | **LAR-05** Optical endstop module, slot type (6-pack) | 1 | \$8.99 | [Amazon](https://www.amazon.com/dp/B0719K9Z9R) | [STEP](cad/bought/LAR-05_tcst2103_endstop_module.step?raw=true) · [STL](cad/bought/LAR-05_tcst2103_endstop_module.stl?raw=true) · [maker](https://www.vishay.com/en/product/81147/) |
-| <a href="cad/bought/LAR-06_me8108_limit_switch.stl"><img src="docs/assets/parts/LAR-06_me8108_limit_switch.png" width="48" height="48" alt="LAR-06"></a> | **LAR-06** Roller-lever limit switch, screw terminals (2) | 1 | \$6.99 | [Amazon](https://www.amazon.com/dp/B09TDBH593) | [STEP](cad/bought/LAR-06_me8108_limit_switch.step?raw=true) · [STL](cad/bought/LAR-06_me8108_limit_switch.stl?raw=true) |
+| <a href="cad/bought/LAR-06_limit_switch_sealed_prewired.stl"><img src="docs/assets/parts/LAR-06_limit_switch_sealed_prewired.png" width="48" height="48" alt="LAR-06"></a> | **LAR-06** Roller-lever limit switch, sealed, 3 wires attached (2-pack) | 1 | \$9.88 | [Amazon](https://www.amazon.com/dp/B09VGL29HS) | [STEP](cad/bought/LAR-06_limit_switch_sealed_prewired.step?raw=true) · [STL](cad/bought/LAR-06_limit_switch_sealed_prewired.stl?raw=true) |
 | <a href="cad/bought/CAM-01_arducam_b0433_imx477_usb.stl"><img src="docs/assets/parts/CAM-01_arducam_b0433_imx477_usb.png" width="48" height="48" alt="CAM-01"></a> | **CAM-01** USB camera 12 MP IMX477, M12 mount (UVC) | 1 | \$59.99 | [Amazon](https://www.amazon.com/dp/B0C1G73QZD) | [STEP](cad/bought/CAM-01_arducam_b0433_imx477_usb.step?raw=true) · [STL](cad/bought/CAM-01_arducam_b0433_imx477_usb.stl?raw=true) |
 | <a href="cad/bought/LSR-06_te_lumawise_z35_2213678_5.stl"><img src="docs/assets/parts/LSR-06_te_lumawise_z35_2213678_5.png" width="48" height="48" alt="LSR-06"></a> | **LSR-06** Solderless COB holder 13.5 mm (TE LUMAWISE Z35) | 1 | \$3.50 | [Digi-Key](https://www.digikey.com/en/products/detail/te-connectivity-amp-connectors/2213678-5/6174915) | [STEP](cad/bought/LSR-06_te_lumawise_z35_2213678_5.step?raw=true) · [STL](cad/bought/LSR-06_te_lumawise_z35_2213678_5.stl?raw=true) · [maker](https://www.te.com/) |
 | <a href="cad/bought/LSR-01_citizen_clu7a3_cob.stl"><img src="docs/assets/parts/LSR-01_citizen_clu7a3_cob.png" width="48" height="48" alt="LSR-01"></a> | **LSR-01** COB LED CRI 97, 12 V, 13.5 mm (Citizen CLU7A3) | 1 | \$5.91 | [Digi-Key](https://www.digikey.com/en/products/detail/citizen/CLU7A3-0403E1-303H7X5/17053751) | [STEP](cad/bought/LSR-01_citizen_clu7a3_cob.step?raw=true) · [STL](cad/bought/LSR-01_citizen_clu7a3_cob.stl?raw=true) |
 | <a href="cad/bought/LSR-02_meanwell_nldd_350h.stl"><img src="docs/assets/parts/LSR-02_meanwell_nldd_350h.png" width="48" height="48" alt="LSR-02"></a> | **LSR-02** Constant-current driver 350 mA | 1 | \$5.41 | [Digi-Key](https://www.digikey.com/en/products/detail/mean-well-usa-inc/NLDD-350H/13913618) | [STEP](cad/bought/LSR-02_meanwell_nldd_350h.step?raw=true) · [STL](cad/bought/LSR-02_meanwell_nldd_350h.stl?raw=true) · [maker](https://www.meanwellusa.com/) |
 | <a href="cad/bought/SPN-01_nema17_17hs08_1004s_pancake.stl"><img src="docs/assets/parts/SPN-01_nema17_17hs08_1004s_pancake.png" width="48" height="48" alt="SPN-01"></a> | **SPN-01** NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) | 1 | \$11.99 | [Amazon](https://www.amazon.com/dp/B00PNEQ79Q) | [STEP](cad/bought/SPN-01_nema17_17hs08_1004s_pancake.step?raw=true) · [STL](cad/bought/SPN-01_nema17_17hs08_1004s_pancake.stl?raw=true) · [maker](https://files.omc-stepperonline.com/17HS08-1004S.STEP) |
-| | **Total** | | **\$337.67** | | |
+| | **Total** | | **\$263.76** | | |
 <!-- bom-electronics:end -->
 
 ## Mechanical
@@ -130,8 +126,7 @@ Black ABS (acrylonitrile butadiene styrene) on an enclosed printer, ≈ 2.7 kg, 
 | | Part | Stage | Download |
 |:-:|---|---|---|
 | <a href="phases/00-plan/3d/PLAN-01_tolerance_coupon.stl"><img src="docs/assets/parts/PLAN-01_tolerance_coupon.png" width="48" height="48" alt="PLAN-01"></a> | **PLAN-01** tolerance coupon | [00 Plan](phases/00-plan/) | [STL](phases/00-plan/3d/PLAN-01_tolerance_coupon.stl?raw=true) · [STEP](phases/00-plan/3d/PLAN-01_tolerance_coupon.step?raw=true) |
-| <a href="phases/01-power/3d/PWR-18a_power_box.stl"><img src="docs/assets/parts/PWR-18a_power_box.png" width="48" height="48" alt="PWR-18a"></a> | **PWR-18a** power box | [01 Power box](phases/01-power/) | [STL](phases/01-power/3d/PWR-18a_power_box.stl?raw=true) · [STEP](phases/01-power/3d/PWR-18a_power_box.step?raw=true) |
-| <a href="phases/01-power/3d/PWR-18b_power_lid.stl"><img src="docs/assets/parts/PWR-18b_power_lid.png" width="48" height="48" alt="PWR-18b"></a> | **PWR-18b** power lid | [01 Power box](phases/01-power/) | [STL](phases/01-power/3d/PWR-18b_power_lid.stl?raw=true) · [STEP](phases/01-power/3d/PWR-18b_power_lid.step?raw=true) |
+| <a href="phases/01-power/3d/PWR-18_power_plate.stl"><img src="docs/assets/parts/PWR-18_power_plate.png" width="48" height="48" alt="PWR-18"></a> | **PWR-18** power plate | [01 Power](phases/01-power/) | [STL](phases/01-power/3d/PWR-18_power_plate.stl?raw=true) · [STEP](phases/01-power/3d/PWR-18_power_plate.step?raw=true) |
 | <a href="phases/02-controller/3d/CTL-10a_button_panel.stl"><img src="docs/assets/parts/CTL-10a_button_panel.png" width="48" height="48" alt="CTL-10a"></a> | **CTL-10a** button panel | [02 Controller and buttons](phases/02-controller/) | [STL](phases/02-controller/3d/CTL-10a_button_panel.stl?raw=true) · [STEP](phases/02-controller/3d/CTL-10a_button_panel.step?raw=true) |
 | <a href="phases/02-controller/3d/CTL-10b_controller_tray.stl"><img src="docs/assets/parts/CTL-10b_controller_tray.png" width="48" height="48" alt="CTL-10b"></a> | **CTL-10b** controller tray | [02 Controller and buttons](phases/02-controller/) | [STL](phases/02-controller/3d/CTL-10b_controller_tray.stl?raw=true) · [STEP](phases/02-controller/3d/CTL-10b_controller_tray.step?raw=true) |
 | <a href="phases/03-frame/3d/FRM-01a_deck_tile_SW.stl"><img src="docs/assets/parts/FRM-01a_deck_tile_SW.png" width="48" height="48" alt="FRM-01a"></a> | **FRM-01a** deck tile SW | [03 Frame](phases/03-frame/) | [STL](phases/03-frame/3d/FRM-01a_deck_tile_SW.stl?raw=true) · [STEP](phases/03-frame/3d/FRM-01a_deck_tile_SW.step?raw=true) |
@@ -164,6 +159,8 @@ Black ABS (acrylonitrile butadiene styrene) on an enclosed printer, ≈ 2.7 kg, 
 | <a href="phases/05-table/3d/TBL-07c_table_motor_bracket.stl"><img src="docs/assets/parts/TBL-07c_table_motor_bracket.png" width="48" height="48" alt="TBL-07c"></a> | **TBL-07c** table motor bracket | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07c_table_motor_bracket.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07c_table_motor_bracket.step?raw=true) |
 | <a href="phases/05-table/3d/TBL-07d_table_post.stl"><img src="docs/assets/parts/TBL-07d_table_post.png" width="48" height="48" alt="TBL-07d"></a> | **TBL-07d** table post | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07d_table_post.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07d_table_post.step?raw=true) |
 | <a href="phases/05-table/3d/TBL-07f_spacers.stl"><img src="docs/assets/parts/TBL-07f_spacers.png" width="48" height="48" alt="TBL-07f"></a> | **TBL-07f** spacers | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07f_spacers.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07f_spacers.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07g_endstop_riser.stl"><img src="docs/assets/parts/TBL-07g_endstop_riser.png" width="48" height="48" alt="TBL-07g"></a> | **TBL-07g** endstop riser | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07g_endstop_riser.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07g_endstop_riser.step?raw=true) |
+| <a href="phases/05-table/3d/TBL-07h_table_flag.stl"><img src="docs/assets/parts/TBL-07h_table_flag.png" width="48" height="48" alt="TBL-07h"></a> | **TBL-07h** table flag | [05 Table (M3)](phases/05-table/) | [STL](phases/05-table/3d/TBL-07h_table_flag.stl?raw=true) · [STEP](phases/05-table/3d/TBL-07h_table_flag.step?raw=true) |
 | <a href="phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl"><img src="docs/assets/parts/CAM-03a_aperture_stop_f8.png" width="48" height="48" alt="CAM-03a"></a> | **CAM-03a** aperture stop f8 | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.stl?raw=true) · [STEP](phases/06-camera-light/3d/CAM-03a_aperture_stop_f8.step?raw=true) |
 | <a href="phases/06-camera-light/3d/CAM-03b_camera_plate.stl"><img src="docs/assets/parts/CAM-03b_camera_plate.png" width="48" height="48" alt="CAM-03b"></a> | **CAM-03b** camera plate | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/CAM-03b_camera_plate.stl?raw=true) · [STEP](phases/06-camera-light/3d/CAM-03b_camera_plate.step?raw=true) |
 | <a href="phases/06-camera-light/3d/LSR-05a_lamp_tube.stl"><img src="docs/assets/parts/LSR-05a_lamp_tube.png" width="48" height="48" alt="LSR-05a"></a> | **LSR-05a** lamp tube | [06 Camera and light](phases/06-camera-light/) | [STL](phases/06-camera-light/3d/LSR-05a_lamp_tube.stl?raw=true) · [STEP](phases/06-camera-light/3d/LSR-05a_lamp_tube.step?raw=true) |
@@ -211,42 +208,41 @@ Black ABS (acrylonitrile butadiene styrene) on an enclosed printer, ≈ 2.7 kg, 
 <!-- wiring:start -->
 <img src="docs/assets/wiring.svg" width="100%" alt="Wiring overview">
 
-Every connection, pin by pin. No solder, no crimps: screw terminals, lever connectors (WAGO 221), plug-in leads and jumper wires. Source: [`docs/wiring.yaml`](docs/wiring.yaml) (`make build` writes this section; `make check` compares it with the firmware). **Press the e-stop and unplug the USB-C charger before touching any terminal.**
+Every connection, pin by pin. No solder, no crimps: screw terminals, lever connectors (WAGO 221), plug-in leads and jumper wires. Source: [`docs/wiring.yaml`](docs/wiring.yaml) (`make build` writes this section; `make check` compares it with the firmware). **Press the e-stop and unplug the wall adapter before touching any terminal.** Step by step with pictures: [wiring guide](docs/wiring.html).
 
-**Jump to:** [Power box: battery, charger, fuse, e-stop](#1--power-box-battery-charger-fuse-e-stop) · [Motor power: e-stop → over-travel switch → SKR Pico](#2--motor-power-e-stop--over-travel-switch--skr-pico) · [SKR Pico: motors](#3--skr-pico-motors) · [SKR Pico: endstops (home switches)](#4--skr-pico-endstops-home-switches) · [Lamp (white COB)](#5--lamp-white-cob) · [Hub: keypads and motor-power sense](#6--hub-keypads-and-motor-power-sense) · [USB data](#7--usb-data) · [Optional add-ons](#8--optional-add-ons) · [Standalone station (no laptop, optional)](#9--standalone-station-no-laptop-optional) · [Not wired: colour LED bank](#10--not-wired-colour-led-bank) · [SKR Pico port map](#skr-pico-port-map) · [ESP32-S3 header map](#esp32-s3-header-map)
+**Jump to:** [Power: wall adapter, jack, e-stop](#1--power-wall-adapter-jack-e-stop) · [Motor power: e-stop → limit switch → SKR Pico](#2--motor-power-e-stop--limit-switch--skr-pico) · [SKR Pico: motors](#3--skr-pico-motors) · [SKR Pico: endstops (home switches)](#4--skr-pico-endstops-home-switches) · [Lamp (white COB)](#5--lamp-white-cob) · [Hub: keypads and motor-power sense](#6--hub-keypads-and-motor-power-sense) · [USB data](#7--usb-data) · [Optional add-ons](#8--optional-add-ons) · [Standalone station (no laptop, optional)](#9--standalone-station-no-laptop-optional) · [Not wired: colour LED bank](#10--not-wired-colour-led-bank) · [SKR Pico port map](#skr-pico-port-map) · [ESP32-S3 header map](#esp32-s3-header-map)
 
-### 1 · Power box: battery, charger, fuse, e-stop
+### 1 · Power: wall adapter, jack, e-stop
 
-*Stage 01.* 18 AWG (PWR-15) red for `+`, black for `−`. Strip 11 mm for lever connectors, 8 mm for screw terminals; twist the strands; tug-test every wire. Pack leads go in **last** (M06). Trigger DIP switch on 20 V.
+*Stage 01.* The adapter stays outside the machine and goes into the wall **last** (M06; before that only for the jack check in M04.2). 18 AWG (PWR-15) red for `+`, black for `−`. Strip 8 mm for screw terminals, 11 mm for lever connectors; twist the strands; tug-test every wire. On the BAOMAIN e-stop the NC contact is terminals 1 and 2 (NO = 3 and 4): check with the meter, 1–2 beep with the button released and open when it is pressed. Either gap under a terminal screw is the same terminal.
 
-<img src="docs/assets/wiring/wiring-01.svg" width="100%" alt="1 · Power box: battery, charger, fuse, e-stop: pin-by-pin diagram">
-
-| # | From | To | Wire | Notes |
-|---:|---|---|---|---|
-| 1 | **USB-C charger ≥ 30 W (the laptop's)** · USB-C | **USB-C PD trigger (PWR-27)** · USB-C in | USB-C cable (the charger's own) | through the +X wall opening; charger ≥ 30 W with a 20 V profile |
-| 2 | **USB-C PD trigger (PWR-27)** · OUT + | **CC/CV charger (PWR-29)** · IN + | 18 AWG red, short | screw terminals |
-| 3 | **USB-C PD trigger (PWR-27)** · OUT − | **CC/CV charger (PWR-29)** · IN − | 18 AWG black, short | screw terminals |
-| 4 | **Battery pack (PWR-21)** · red lead | **Lever connector BAT+ (2-way)** · 1 | pack lead | insert last (M06) |
-| 5 | **Fuse holder (PWR-04)** · lead A | **Lever connector BAT+ (2-way)** · 2 | holder lead | 3.15 A T fuse inside (PWR-05) |
-| 6 | **Fuse holder (PWR-04)** · lead B | **Lever connector FUSED (3-way)** · 1 | holder lead |  |
-| 7 | **CC/CV charger (PWR-29)** · OUT + | **Lever connector FUSED (3-way)** · 2 | 18 AWG red, short | charges the pack through the fuse |
-| 8 | **Lever connector FUSED (3-way)** · 3 | **E-stop (PWR-28)** · NC 1 | 18 AWG red | the NC contact block, not NO |
-| 9 | **Battery pack (PWR-21)** · black lead | **Lever connector GND (3-way)** · 1 | pack lead | insert last (M06) |
-| 10 | **CC/CV charger (PWR-29)** · OUT − | **Lever connector GND (3-way)** · 2 | 18 AWG black, short |  |
-| 11 | **Lever connector GND (3-way)** · 3 | **Lever connector MOT− (3-way, on the tray)** · 1 | 18 AWG black (the whole run to the tray) | out through the +Y slot; until M10.3 straight into SKR Pico POWER GND |
-| 12 | **Lever connector MOT− (3-way, on the tray)** · 2 | **SKR Pico (CTL-01)** · POWER GND | 10 cm 18 AWG black offcut | from M10.3 |
-
-### 2 · Motor power: e-stop → over-travel switch → SKR Pico
-
-*Stage 01–04.* One red wire. Until M14.1 it runs straight from the e-stop to the SKR Pico; M14.1 cuts it at the over-travel switch. Press the e-stop before touching any terminal.
-
-<img src="docs/assets/wiring/wiring-02.svg" width="100%" alt="2 · Motor power: e-stop → over-travel switch → SKR Pico: pin-by-pin diagram">
+<img src="docs/assets/wiring/wiring-01.svg" width="100%" alt="1 · Power: wall adapter, jack, e-stop: pin-by-pin diagram">
 
 | # | From | To | Wire | Notes |
 |---:|---|---|---|---|
-| 1 | **E-stop (PWR-28)** · NC 2 | **Over-travel switch (LAR-06)** · COM | 18 AWG red | out through the +Y (J3) slot |
-| 2 | **Over-travel switch (LAR-06)** · NC | **Lever connector MOT+ (3-way, on the tray)** · 1 | 18 AWG red | NO terminal stays empty; until M10.3 straight into SKR Pico POWER 12/24V |
-| 3 | **Lever connector MOT+ (3-way, on the tray)** · 2 | **SKR Pico (CTL-01)** · POWER 12/24V | 10 cm 18 AWG red offcut | from M10.3 |
+| 1 | **24 V wall adapter (PWR-30)** · round 24 V plug | **Screw-terminal jack (with PWR-30)** · socket | the adapter's own cable | push fully in; the wall plug stays out (except the jack check in M04.2) until M06 |
+| 2 | **Screw-terminal jack (with PWR-30)** · + | **E-stop box (PWR-28)** · NC 1 | 18 AWG red | NC contact, not NO |
+| 3 | **Screw-terminal jack (with PWR-30)** · − | **Lever connector MOT− (3-way, on the tray)** · 1 | 18 AWG black (the whole run to the tray) | ground never goes through the e-stop |
+| 4 | **Lever connector MOT− (3-way, on the tray)** · 3 | **SKR Pico (CTL-01)** · POWER GND | 10 cm 18 AWG black offcut | from M08.3 |
+
+**Check:** Adapter unplugged, e-stop released: continuity jack + to e-stop NC 2 (beep); press the e-stop: open. · Jack + to jack −: OL (no short).
+
+### 2 · Motor power: e-stop → limit switch → SKR Pico
+
+*Stage 01–04.* One + line. Until M14.1 a red wire runs from e-stop NC 2 straight to MOT+; M14.1 cuts that run beside the limit switch and splices the switch in with two 221-2401s, so its own leads only need to reach the run (their length is not on the listing). The switch has its own wires: find them with the meter first (COM–NC beeps with the lever untouched and opens when the lever is pressed; on the units bought black = COM, grey = NC, blue = NO). Press the e-stop before touching any terminal.
+
+<img src="docs/assets/wiring/wiring-02.svg" width="100%" alt="2 · Motor power: e-stop → limit switch → SKR Pico: pin-by-pin diagram">
+
+| # | From | To | Wire | Notes |
+|---:|---|---|---|---|
+| 1 | **E-stop box (PWR-28)** · NC 2 | **Splice A, e-stop side (WAGO 221-2401)** · red in | 18 AWG red (the red run, e-stop part) | stage 04 (M14.1) cuts the run beside the switch; before that it runs on to MOT+ 1 |
+| 2 | **Limit switch, over-travel (LAR-06)** · black (COM) | **Splice A, e-stop side (WAGO 221-2401)** · black | the switch's own wire | 11 mm stripped |
+| 3 | **Limit switch, over-travel (LAR-06)** · grey (NC) | **Splice B, tray side (WAGO 221-2401)** · grey | the switch's own wire | connected to COM while the lever is untouched |
+| 4 | **Splice B, tray side (WAGO 221-2401)** · red out | **Lever connector MOT+ (3-way, on the tray)** · 1 | 18 AWG red (the red run, tray part) |  |
+| 5 | **Limit switch, over-travel (LAR-06)** · blue (NO) | **Blue-wire cap (WAGO 221-2401)** · blue | the switch's own wire | unused: alone in a 221-2401 so the bare end is covered |
+| 6 | **Lever connector MOT+ (3-way, on the tray)** · 3 | **SKR Pico (CTL-01)** · POWER 12/24V | 10 cm 18 AWG red offcut | from M08.3 |
+
+**Check:** Adapter unplugged: continuity e-stop NC 2 to MOT+ (beep); press the limit switch lever: open. · Live (M06, M14.1): adapter in, e-stop released, DC volts MOT+ to MOT− ≈ +24 V; e-stop pressed or lever pressed: 0 V.
 
 ### 3 · SKR Pico: motors
 
@@ -259,10 +255,10 @@ Every connection, pin by pin. No solder, no crimps: screw terminals, lever conne
 | 1 | **M4 motor, light arm (LAR-02)** · 6-pin socket | **SKR Pico (CTL-01)** · X pins 1–4 (2B 1B 1A 2A) | 5-pack cable (1 m) | grblHAL X · stage 04 |
 | 2 | **M3 motor, table (TBL-01)** · 6-pin socket | **SKR Pico (CTL-01)** · Y pins 1–4 (2B 1B 1A 2A) | 5-pack cable (1 m) | grblHAL Y · stage 05 |
 | 3 | **M2 motor, tilt (TLT-01)** · 6-pin socket | **SKR Pico (CTL-01)** · Z1 pins 1–4 (2B 1B 1A 2A) | 5-pack cable (1 m) | grblHAL Z · stage 08 (Z2 is the same driver: leave empty) |
-| 4 | **M1 pancake, spin (SPN-01)** · coil pair 1 (2 bare leads) | **Lever connector (WAGO 221-412)** · pair 1 (2 × 221-412) | motor leads, 11 mm stripped, folded double | pancake has bare leads: find the pairs first (M27.1) |
-| 5 | **Lever connector (WAGO 221-412)** · pair 1 (2 × 221-412) | **SKR Pico (CTL-01)** · E pin 1 (2B) + E pin 4 (2A) | spare 5-pack cable (6-pin plug cut off): the wires in plug pins 1 and 4 | driver coil 2B / 2A |
-| 6 | **M1 pancake, spin (SPN-01)** · coil pair 2 (2 bare leads) | **Lever connector (WAGO 221-412)** · pair 2 (2 × 221-412) | motor leads, 11 mm stripped, folded double |  |
-| 7 | **Lever connector (WAGO 221-412)** · pair 2 (2 × 221-412) | **SKR Pico (CTL-01)** · E pins 2–3 (1B 1A) | same cable: the wires in plug pins 2 and 3 | driver coil 1B / 1A · grblHAL A · stage 09 |
+| 4 | **M1 pancake, spin (SPN-01)** · coil pair 1 (2 bare leads) | **Lever connectors (WAGO 221-412 / 415)** · pair 1 (2 × 221-412) | motor leads, 11 mm stripped, folded double | pancake has bare leads: find the pairs first (M27.1) |
+| 5 | **Lever connectors (WAGO 221-412 / 415)** · pair 1 (2 × 221-412) | **SKR Pico (CTL-01)** · E pin 1 (2B) + E pin 4 (2A) | spare 5-pack cable (6-pin plug cut off): the wires in plug pins 1 and 4 | driver coil 2B / 2A |
+| 6 | **M1 pancake, spin (SPN-01)** · coil pair 2 (2 bare leads) | **Lever connectors (WAGO 221-412 / 415)** · pair 2 (221-412 + 221-415) | motor leads, 11 mm stripped, folded double |  |
+| 7 | **Lever connectors (WAGO 221-412 / 415)** · pair 2 (221-412 + 221-415) | **SKR Pico (CTL-01)** · E pins 2–3 (1B 1A) | same cable: the wires in plug pins 2 and 3 | driver coil 1B / 1A · grblHAL A · stage 09 |
 
 ### 4 · SKR Pico: endstops (home switches)
 
@@ -309,8 +305,8 @@ Every connection, pin by pin. No solder, no crimps: screw terminals, lever conne
 | 8 | **Keypad B (CTL-05)** · key 1 | **ESP32-S3 hub (CTL-02)** · J1-8 (GPIO15) | M-F jumper | NEXT |
 | 9 | **Keypad B (CTL-05)** · key 2 | **ESP32-S3 hub (CTL-02)** · J1-9 (GPIO16) | M-F jumper | PAUSE (stops after the current pose) |
 | 10 | **Keypad B (CTL-05)** · key 3, key 4 | — | not connected | spare keys |
-| 11 | **Lever connector MOT+ (3-way, on the tray)** · 3 | **Opto module (PWR-10)** · IN+ | cut M-F jumper, stripped end folded double | 24 V module; its resistor is on board |
-| 12 | **Lever connector MOT− (3-way, on the tray)** · 3 | **Opto module (PWR-10)** · IN− | cut M-F jumper, stripped end folded double | a thin jumper beside 18 AWG under one screw does not clamp |
+| 11 | **Lever connector MOT+ (3-way, on the tray)** · 2 | **Opto module (PWR-10)** · IN+ | short 18 AWG red | 24 V module; its resistor is on board |
+| 12 | **Lever connector MOT− (3-way, on the tray)** · 2 | **Opto module (PWR-10)** · IN− | short 18 AWG black | 8 mm under the module screw, 11 mm in the lever connector |
 | 13 | **Opto module (PWR-10)** · VCC | **ESP32-S3 hub (CTL-02)** · J1-1 (3V3) | M-F jumper | 3V3 (not 5 V: the GPIO is 3.3 V) |
 | 14 | **Opto module (PWR-10)** · GND | **ESP32-S3 hub (CTL-02)** · J3-21 (GND) | M-F jumper | GND |
 | 15 | **Opto module (PWR-10)** · OUT | **ESP32-S3 hub (CTL-02)** · J1-10 (GPIO17) | M-F jumper | motion-power sense: low = motor power on |
@@ -359,8 +355,8 @@ Every connection, pin by pin. No solder, no crimps: screw terminals, lever conne
 | 2 | **Pi Zero 2 W (STA-01)** · pin 10 (GPIO15 RXD) | **ESP32-S3 hub (CTL-02)** · J3-17 (GPIO47) | F-F jumper | Pi GPIO15 RX ← hub GPIO47 TX |
 | 3 | **Pi Zero 2 W (STA-01)** · pin 6 (GND) | **ESP32-S3 hub (CTL-02)** · J3-1 (GND) | F-F jumper | GND (UART and hub-power return) |
 | 4 | **Pi Zero 2 W (STA-01)** · pin 4 (5V) | **ESP32-S3 hub (CTL-02)** · J1-21 (5V) | F-F jumper | Pi 5V powers the hub (5V pin) |
-| 5 | **Lever connector FUSED (3-way)** · 4 (5-way) | **5 V buck (STA-03, optional)** · IN+ | thin red pair | after the fuse, before the e-stop: swap FUSED and GND for 5-way connectors |
-| 6 | **Lever connector GND (3-way)** · 4 (5-way) | **5 V buck (STA-03, optional)** · IN− | thin black pair |  |
+| 5 | **Screw-terminal jack (with PWR-30)** · + | **5 V buck (STA-03, optional)** · IN+ | thin red, second wire under the jack screw | before the e-stop: the Pi stays on when the motors stop |
+| 6 | **Screw-terminal jack (with PWR-30)** · − | **5 V buck (STA-03, optional)** · IN− | thin black, second wire under the jack screw |  |
 | 7 | **5 V buck (STA-03, optional)** · OUT+ | **Pi Zero 2 W (STA-01)** · pin 2 (5V) | cut F jumper | 5.1 V |
 | 8 | **5 V buck (STA-03, optional)** · OUT− | **Pi Zero 2 W (STA-01)** · pin 14 (GND) | cut F jumper | GND |
 | 9 | **SKR Pico (CTL-01)** · USB-C (+ camera USB) | **Powered USB hub ([TBD], optional)** · ports | same cables as with the laptop | hub on the Pi's micro-USB data port through the OTG adapter (STA-04); hub supply [TBD] |
@@ -393,7 +389,7 @@ Ports as named on the board; pins in the maker pin diagram's order [C12]. `·` =
 | Y | motor socket, XH 4-pin | M3 motor, table |
 | Z1 | motor socket, XH 4-pin | M2 motor, tilt |
 | Z2 | second socket on the Z driver | · |
-| E | motor socket, XH 4-pin | Lever connector |
+| E | motor socket, XH 4-pin | Lever connectors |
 | X-STOP | IO4 · GND · 5V | M4 endstop |
 | Y-STOP | IO3 · GND · 5V | M3 endstop |
 | Z-STOP | IO25 · GND · 5V | M2 endstop |
@@ -441,19 +437,21 @@ Pin numbers as in Espressif's user guide (J1 on one long edge, J3 on the other).
 ## Build
 
 <!-- next:start -->
-**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 138 steps done
+**Next step: [M01.1 Get the papers](phases/00-plan/README.md#m011-get-the-papers)** · 20 min · 0 of 136 steps done
 <!-- next:end -->
 
 Each step: **Time · Needs → Do → Verify → If it fails → Record**. `make next` prints the next step; `make done id=M05.1` ticks it and closes its issue.
+
+**Pictures:** [build book](docs/build.html) (every printed and bought part in the order it goes on, in 3D, one step per page; [PDF](exports/build-book.pdf) to print) · [wiring guide](docs/wiring.html) (every wire, one at a time).
 
 <!-- phases:start -->
 | # | Stage | Milestones | Hours | Done | Cost |
 |---:|---|---|---:|---:|---:|
 | 00 | [Plan](phases/00-plan/) | M01 Read and decide, M02 Software runs on the laptop, M03 CAD and printer ready | 6.7 h | 0/12 | $64 |
-| 01 | [Power box](phases/01-power/) | M04 Order power parts, M05 Wire the power box, M06 First power-on | 3.7 h | 0/10 | $131 |
+| 01 | [Power](phases/01-power/) | M04 Order and check power parts, M05 Wire the power, M06 First power-on | 2.5 h | 0/8 | $54 |
 | 02 | [Controller and buttons](phases/02-controller/) | M07 Order controller parts, M08 One motor turns from the laptop, M09 Keypads work with the laptop, M10 Controller box closed | 4.5 h | 0/12 | $71 |
 | 03 | [Frame](phases/03-frame/) | M11 Print and join the deck, M12 Assemble the frame | 2.8 h | 0/5 | $22 |
-| 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | 5.4 h | 0/9 | $75 |
+| 04 | [Light arm (M4)](phases/04-light-arm/) | M13 Ring drive built, M14 Light arm homes and repeats | 5.4 h | 0/9 | $77 |
 | 05 | [Table (M3)](phases/05-table/) | M15 Table axis built, M16 Table homes and repeats | 3.2 h | 0/7 | $24 |
 | 06 | [Camera and light](phases/06-camera-light/) | M17 Camera sees the zero point, M18 Lamp on and safe, M19 Mirror test, M20 First reflectance curves | 5.8 h | 0/11 | $112 |
 | 07 | [Calibrate → game material](phases/07-calibrate/) | M21 Dark box, M22 Camera response and angle calibration, M23 Brightness calibration, M24 First game material | 4.8 h | 0/11 | $40 |
@@ -486,7 +484,7 @@ One look, two places: the website explains the instrument, the app drives it. Bo
 
 <img src="docs/assets/screens/app-dark.jpg" width="100%" alt="The control app on the simulated machine: axis sliders, the lamp switch with the colour LED bank shown as blocked, a top view of the pose, the camera frame, and a mirror sweep curve marked verify PASS">
 
-**Website** ([`docs/`](docs/index.html), published with GitHub Pages; also opens straight from disk). The first screen is a Web Graphics Library (WebGL) render of three samples (white PTFE, a mirror and printed black ABS) under one lamp that circles on its own and follows your pointer or the arrow keys, shaded with the same model the software fits. Right under it, the whole CAD assembly moves through its four axes in turn, lit by its own lamp and driven by the same rotations as the CAD clash check; sliders drive each axis by hand. Below that: the machine, how a measurement happens, real outputs of the simulated machine, the evidence table, and the eighteen build stages. [`docs/lab.html`](docs/lab.html) keeps the interactive tools: the machine simulator, the BRDF explorer, the calibration lab and the 3D-scan planner.
+**Website** ([`docs/`](docs/index.html), published with GitHub Pages; also opens straight from disk). The first screen is a Web Graphics Library (WebGL) render of three samples (white PTFE, a mirror and printed black ABS) under one lamp that circles on its own and follows your pointer or the arrow keys, shaded with the same model the software fits. Scrolling on pins the whole CAD assembly in place and builds it: its parts fly in from an exploded view, then each axis plays in turn and the view swings round behind the fixed camera, with the captions changing as you go (the motion uses the same rotations as the CAD clash check). After that you can drive each axis with a slider, and the big numbers count up. Below that: the machine, how a measurement happens, real outputs of the simulated machine, the evidence table, and the eighteen build stages. [`docs/lab.html`](docs/lab.html) keeps the interactive tools: the machine simulator, the BRDF explorer, the calibration lab and the 3D-scan planner. Two step-by-step guides: [`docs/wiring.html`](docs/wiring.html) (one wire per step) and [`docs/build.html`](docs/build.html) (the build book: the CAD parts one step at a time).
 
 **App** (`opengonio app`, stage 14). Connect, home, jog each axis (or drag the lamp in the top view), switch the lamp, grab a camera frame, run a mirror sweep, in-plane grid or isotropic set, and read `verify`'s verdict and the curve. STOP (or Esc) is always live; the colour LED bank stays blocked. On the simulated machine everything works; on a real machine it uses the same code as the command line and is **untested**, because no machine has been built yet.
 
@@ -503,6 +501,7 @@ The app listens on `127.0.0.1:8747` only and refuses requests from other web pag
 |---|---|
 | <img src="docs/assets/screens/site-results.jpg" alt="Website section What a run gives you: a simulated mirror sweep, a plastic fitted back to the numbers it was made with, an absolute matte BRDF and a fit-quality plot"> | <img src="docs/assets/screens/site-build.jpg" alt="Website section Built in eighteen stages: a simulator picture that changes with the stage you are reading"> |
 | <img src="docs/assets/screens/site-hero-light.jpg" alt="The website in its light theme"> | <img src="docs/assets/screens/app-connect.jpg" alt="The app before connecting: choose the simulated machine or the machine over USB, which is marked untested"> |
+| <img src="docs/assets/screens/build-book.jpg" alt="The build book, step 11: the ring motor mount, motor and pulley in colour sliding onto the grey deck along dashed arrows, with the parts box and screws drawn to length"> | <img src="docs/assets/screens/wiring-guide.jpg" alt="The wiring guide: the motor-power section with the current wire thick, its two pins ringed, and the next wire dashed"> |
 | <img src="docs/assets/screens/lab.jpg" alt="The lab page: the machine simulator with its controls and angle readouts"> | <img src="docs/assets/screens/app-light.jpg" alt="The control app in its light theme"> |
 | <img src="docs/assets/screens/site-phone.jpg" width="60%" alt="The website on a phone"> | <img src="docs/assets/screens/app-phone.jpg" width="60%" alt="The control app on a phone"> |
 

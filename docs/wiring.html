@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenGonio wiring guide</title>
+<meta name="description" content="Every wire in the OpenGonio machine, one at a time: from the 24 V wall adapter through the e-stop and limit switch to the motor board, the motors, the switches, the lamp and the hub. Generated from docs/wiring.yaml.">
+<meta name="theme-color" content="#0c0b0a">
+<link rel="icon" href="og/icon.svg" type="image/svg+xml">
+<link rel="preload" href="og/fonts/hanken-grotesk-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="og/og.css">
+<script src="og/og.js"></script>
+<link rel="stylesheet" href="og/guide.css">
+</head>
+<body>
+<a class="skip btn btn-light" href="#main">Skip to the guide</a>
+<header class="bar">
+ <a class="mark display" href="./">OpenGonio</a>
+ <nav aria-label="Pages">
+  <a href="./">Website</a><a href="lab.html">Lab</a><a href="wiring.html" aria-current="page">Wiring guide</a><a href="build.html">Build book</a>
+ </nav>
+ <button class="btn theme" type="button" data-theme-toggle><span data-theme-label>Light</span></button>
+</header>
+<main id="main">
+<section class="g-head" aria-labelledby="h1">
+ <h1 id="h1" class="display">Wiring, one wire at a time</h1>
+ <p class="g-lead">Every connection in the machine, in the order you make it. The pulsing tungsten rings mark the two ends of the wire to make
+  now; the moving dots run from where it starts to where it lands; a dashed outline shows the wire after it. Wires you have already made stay drawn.</p>
+ <p class="g-safety"><span class="patch red" aria-hidden="true"></span><span><b>Press the e-stop and unplug the wall adapter before touching any terminal.</b>
+  Strip 8 mm for screw terminals and 11 mm for lever connectors, twist the strands, tug-test every wire.</span></p>
+ <div class="legend" id="legend" aria-label="Wire kinds"></div>
+</section>
+
+<nav class="sections" id="sections" aria-label="Sections"></nav>
+
+<section class="stage" aria-label="Current step">
+ <figure class="sheet" style="margin:0">
+  <div class="sheet-scroll" id="scroll" tabindex="0" aria-label="Wiring diagram; scrolls sideways"><svg id="sheet" role="img" aria-labelledby="sheet-title"><title id="sheet-title">Wiring diagram</title></svg></div>
+  <p class="sheet-note">Diagram generated from <code>docs/wiring.yaml</code>, the same source as README → Wiring. On a phone, swipe sideways: it scrolls to the current wire.</p>
+ </figure>
+ <article class="card" aria-live="polite">
+  <div class="c-head">
+   <h2 id="s-title"></h2>
+   <p class="meta" id="k-sec"></p>
+  </div>
+  <div class="c-body" id="s-body"></div>
+  <div class="c-nav">
+   <p class="progress num" id="k-step"></p>
+   <div class="nav">
+    <button class="btn" type="button" id="back">Back</button>
+    <button class="btn btn-light" type="button" id="next">Next</button>
+   </div>
+   <p class="hint">Keys: <span class="kbd">←</span> <span class="kbd">→</span>. Each step has its own link (the address bar).</p>
+  </div>
+ </article>
+</section>
+
+<p class="foot">Nothing here has been built or measured yet: this is the design. Part numbers in brackets are the parts list IDs
+ (README → Electronics). Printed parts and how they go together: the <a href="build.html">build book</a>.</p>
+</main>
+<script src="wiring-guide.js"></script>
+<script src="og/wiring-page.js"></script>
+</body>
+</html>

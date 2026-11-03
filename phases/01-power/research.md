@@ -4,19 +4,22 @@
 
 | Need | Met by | Check |
 |---|---|---|
-| Rechargeable over USB-C, cheap | 6S pack with BMS [P49] + PD trigger [P55] + CC/CV module [P57], ~$69 | T3, T13 |
-| Lithium made safe without soldering | ready-made pack with BMS (over-charge/-discharge/-current, short); CC/CV limits charge to 24.0 V, 1.0 A; 3.15 A fuse on the pack lead; screw terminals + lever connectors | T1, T3, T13 |
-| Bus inside the motor board's 12–24 V | pack 18–24.0 V (charged to 4.0 V per cell) | `tools/power_budget.py --check` (bus) |
-| ≥ 25 % current headroom | 10 A pack / 1.7 A peak at 18 V | `power_budget.py` (battery) |
-| A working session on the pack | ~6 h typical (≥ 3 h required); unlimited with the USB-C charger plugged in | T15 |
-| E-stop, no solder | latching e-stop NC on the pack line, screw terminals + lever connectors | T1, T5 |
+| Fewest parts, plug or screw only | 24 V 3 A wall adapter with a screw-terminal jack [P59], e-stop in its own box [P60], WAGO lever connectors [P62] | T1, T3 |
+| Bus inside the motor board's 12–24 V | regulated 24 V adapter | `tools/power_budget.py --check` (bus) |
+| ≥ 25 % current headroom | 3 A adapter / peak draw | `power_budget.py` (adapter) |
+| Short-circuit protection without a fuse | adapter's own short-circuit and overload protection (listing) | T1 before power; T5 |
+| E-stop, no solder | latching e-stop NC on the + line, screw terminals + lever connectors | T1, T5 |
+| Over-travel cut | pre-wired sealed roller switch [P61] in the + line after the e-stop (stage 04) | M14.1 |
 | Motion-power sense | PC817 opto module (24 V version) | T7 |
 
 ## Options considered
 
 | Option | Why not (now) |
 |---|---|
-| 24 V adapter only (MEAN WELL GST60A24, $35) | not rechargeable; was the first design |
+| 6S Li-ion pack + USB-C PD trigger + CC/CV module + fuse (~$90, the 12–19 Oct design) | dropped on 19 Oct 2026: plug-in only, fewer parts |
+| MEAN WELL GST60A24 adapter ($35) | UL-listed, but no screw-terminal jack included (needs a separate jack) and twice the price |
+| Bare 22 mm e-stop in a printed lid | needs a printed box and a panel hole; the e-stop station comes in its own box |
+| ME-8108 roller limit switch with screw terminals | DC rating 0.25 A in its listing; the pre-wired sealed switch lists 6 A at 12 V DC and needs no terminals |
 | USB-C power bank 65 W + trigger (~$66) | replaced on request: a plain lithium pack instead of a power bank |
 | Pack + 80 W converter for a regulated 24 V (~$143) | the converter isn't needed once the pack is charged to 24.0 V |
 | Parts with maker 3D models (MEAN WELL, Phoenix Contact) | ~$50 more; the cheap modules are measured on arrival instead |

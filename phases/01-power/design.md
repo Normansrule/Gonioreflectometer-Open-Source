@@ -1,86 +1,73 @@
 # 01 · Design
 
-## Battery, charged over USB-C
+## Plug-in power: wall adapter, e-stop, limit switch
 
 <img src="../../docs/assets/power-flow.svg" width="100%" alt="Power path">
 
-The machine runs from a **ready-made 24 V lithium-ion pack** (6 cells in series, 5 Ah) with its own protection board
-(battery management system, BMS: over-charge, over-discharge, over-current, short circuit). The bus is the pack voltage,
-18–24 V; the SKR Pico motor board takes 12–24 V. Charging is laptop-style: a USB-C charger plugs into a trigger board in the box wall that
-asks it for 20 V (USB Power Delivery, PD); a constant-voltage / constant-current (CC/CV) module turns that into
-**24.0 V, 1.0 A** for the pack. It can stay plugged in while measuring. No mains in the machine, no solder, no crimps.
+The machine runs from a **24 V 3 A wall adapter** (PWR-30, 72 W). The adapter stays outside the machine; its round
+plug goes into a **screw-terminal jack** that sits in a frame on the printed power plate. From there one `+` line runs
+through the **e-stop** (PWR-28, its own box, NC contact) and the **limit switch** (LAR-06, stage 04) to the MOT+ lever
+connector on the controller tray, which feeds the SKR Pico and the opto module. Ground goes straight from the jack to
+MOT−. No battery, no charging, no fuse, no solder, no crimps: every join is a screw terminal, a lever connector or a
+plug. Changed from the battery design on 19 Oct 2026 (the battery was dropped).
 
 | Part | Job | Rating |
 |---|---|---|
-| PWR-21 Xeanerol 6S 5 Ah pack [P49] | battery, BMS inside, bare red/black leads | 10 A out, 2 A charge max; ~76 Wh usable to 3.0 V per cell |
-| PWR-27 USB-C PD trigger [P55] | USB-C input in the +X wall; DIP switch on 20 V; display shows what it got | falls back to 5 V if 20 V isn't offered: then nothing charges (M04.2) |
-| PWR-29 DROK CC/CV module [P57] | the charger: 20 V in → 24.00 V, 1.000 A limit; LCD shows pack voltage and charge current | 35 W; output anti-backflow (the pack can't feed back into it) |
-| PWR-04 + PWR-05 fuse | 3.15 A time-lag in an inline holder on the pack `+` lead: a short anywhere after it blows the fuse before the 18 AWG wire heats | peak draw 1.7 A at 18 V |
-| PWR-28 e-stop [P56] | cuts the pack to the SKR Pico: motors, lamp; also the off switch | NC contact, 10 A |
-| PWR-10 opto module | SKR Pico POWER → ESP32-S3 GPIO 17: motion-power sense | 24 V module |
+| PWR-30 ALITOVE adapter + jack [P59] | 24 V for the motors, lamp and board; the jack turns its round plug into `+` / `−` screws | 24 V, 3 A; short-circuit, overload and over-temperature protection (listing) |
+| PWR-28 BAOMAIN e-stop box [P60] | cuts 24 V to the SKR Pico: motors, lamp; also the off switch | NC contact, 10 A (AC rating) |
+| LAR-06 limit switch [P61] | over-travel: cuts 24 V if the light arm runs past its range (stage 04) | 6 A at 12 V DC (no 24 V DC rating listed) |
+| PWR-20 WAGO 221-413 × 2 | MOT+ and MOT−: split the line to the board and the opto module | 20 A |
+| PWR-10 opto module | MOT+ / MOT− → ESP32-S3 GPIO 17: motion-power sense | 24 V module |
 
-**Why 24.0 V and not 25.2 V:** a 6S pack is full at 25.2 V (4.2 V per cell), above the motor board's 24 V rating. Charging to
-4.0 V per cell keeps the bus at ≤ 24.0 V and is gentler on the cells, for ~15 % less capacity. The pack ships with a
-25.2 V wall charger: **don't use it** for this machine.
+**Why no fuse:** the adapter limits its own output (short-circuit and overload protection, listing), so a short after it
+shuts the adapter down. The 18 AWG wire carries ≥ 5 A, above the adapter's 3 A.
 
-**Trade-offs:** no low-voltage alarm. The BMS is the last cut-off, at a voltage the listing doesn't give: recharge after
-each session, or keep the USB-C charger plugged in (24 W charge covers the 13 W typical draw). Charging runs with the
-e-stop pressed too. Charge on a hard surface and don't leave it charging unattended until M06's temperature check has
-passed. Run time and charge time: [power_budget.md](power_budget.md) (~6 h typical; ~4 h empty to full).
+**Trade-offs:** the adapter's listing gives FCC / CE / RoHS marks, not a UL listing; a UL-listed 24 V adapter without the
+jack can replace it (the jack is then a separate part). The limit switch is rated 6 A at 12 V DC; at 24 V it breaks
+about 1.3 A (peak draw, `power_budget.md`): it opens only in a fault, and the e-stop stays the switch you use.
 
 ## Netlist and build (no solder)
 
-Pin by pin, with every terminal: [README → Wiring](../../README.md#wiring) (groups 1–2, 6).
+Pin by pin, with every terminal: [README → Wiring](../../README.md#wiring) (groups 1–2, 6) and the step-by-step
+[wiring guide](../../docs/wiring.html).
 
 | Net | Members | Joined by |
 |---|---|---|
-| USB-C | USB-C charger (≥ 30 W, 20 V PD; the laptop's) → trigger board input through the +X wall | plug |
-| V20 | trigger `+` / `−` → DROK IN `+` / `−` | screw terminals |
-| BAT+ | pack red lead → fuse holder lead A (2-way lever connector) | lever connector |
-| FUSED | fuse holder lead B + DROK OUT `+` + red wire to e-stop NC 1 (+ optional Pi buck `+`, stage 15) | 3-way (5-way with the Pi) lever connector |
-| MOTION (red wire) | e-stop NC 2 → out of the +Y slot → over-travel switch COM–NC (stage 04) → MOT+ lever connector on the tray → 10 cm lead → SKR Pico POWER `+` (+ opto sense lead) | screw terminals, 3-way lever connector |
-| GND (black) | pack black lead + DROK OUT `−` + black wire (+ optional Pi buck `−`) → MOT− lever connector on the tray → 10 cm lead → SKR Pico POWER `−` (+ opto sense lead) | 3-way (5-way) lever connector; 3-way on the tray |
-| OPTO_IN | MOT+ / MOT− lever connectors → opto module (PWR-10) input `+` / `−` (series resistor on the module) | cut jumpers folded double; module screw terminals |
+| 24 V in | adapter round plug → jack socket | plug |
+| + (before the e-stop) | jack `+` → e-stop NC terminal 1 (+ optional Pi buck `+`, stage 15) | screw terminals |
+| MOTION + | e-stop NC terminal 2 → red run → 221-2401 → limit switch COM (black) – NC (grey) → 221-2401 → red run → MOT+ lever connector on the tray → 10 cm lead → SKR Pico POWER `+`; MOT+ → opto IN+ | screw terminals, the switch's own wires, 3-way lever connector |
+| GND | jack `−` → MOT− lever connector on the tray → 10 cm lead → SKR Pico POWER `−`; MOT− → opto IN− (+ optional Pi buck `−`) | screw terminal, 3-way lever connector |
 | OPTO_OUT | module VCC ← ESP32-S3 3V3, GND ← ESP32-S3 GND, OUT → GPIO 17 | male–female jumpers |
 
-ESP32-S3 GPIO 17 reads low when MOTION is on (`SENSE_ACTIVE_LOW` in the hub firmware flips it for modules that drive OUT high).
-The optional standalone Pi (STA-03 buck) takes its input after the fuse, before the e-stop.
+ESP32-S3 GPIO 17 reads low when MOTION is on (`SENSE_ACTIVE_LOW` in the hub firmware flips it for modules that drive
+OUT high). Until M14.1 a red wire takes the limit switch's place (e-stop NC 2 → MOT+ slot 1).
 
 ### Build
 
-1. Set the DROK first, on the bench, pack **not** connected: USB-C charger → trigger (20 V) → DROK IN; turn the CV pot
-   to 24.00 V on the LCD, short OUT `+`/`−` with a spare wire through the multimeter on 10 A and turn the CC pot to
-   1.00 A (M04). Then unplug the USB-C charger.
-2. Self-tap 4 × M2 × 10 into the box posts once. E-stop in the lid hole.
-3. Pack upright in its floor frame, leads toward +X. The lid ribs stop it lifting.
-4. DROK and trigger board in their frames on double-sided tape (TLS-09); trigger USB-C into the +X opening.
-5. Fuse (3.15 A T) into the holder; holder in its cradle. Wire per the netlist, pack leads **last**. Strip 8 mm for
-   screws, 11 mm for lever connectors; twist strands; tug-test every wire.
-6. Lid M2 × 10, snug (it's plastic); box to deck: 4 × M2 × 12 through the floor bosses into the SE tile's pilots.
+1. Print the power plate (PWR-18) (M04.3); it goes on the SE deck tile in M12.2, once the deck exists (4 × M2 × 12).
+2. Jack into its frame, round socket toward the deck edge (+X); e-stop box into its rim on double-sided tape (TLS-09).
+3. Wire per the netlist with the adapter **unplugged**: strip 8 mm for screws, 11 mm for lever connectors; twist
+   strands; tug-test every wire. On the BAOMAIN e-stop NC = terminals 1 and 2 (check with the meter).
+4. Checks with power off (T1), then the adapter into the wall (M06).
 
 ## 3D parts
 
 | Part | Source |
 |---|---|
-| Box 160 × 130 × 80, lid (PWR-18) | `tools/cad/parts.py`: walls 2.4 mm, floor frames on pads for the pack (`PACK`), the DROK (`DROK`) and the trigger board (`TRIG`), fuse-holder cradle, USB-C opening (+X), lid ribs over the pack, Ø22.3 e-stop hole, motor-power and J3 slots (+Y), vents (±X), M2 self-tap posts, 6 mm floor bosses (M2 into the deck pilots) |
+| Power plate 130 × 110 × 4 (PWR-18) | `tools/cad/parts.py` `power_plate()`: jack frame (`JACK`, `JACK_AT`), 2 mm rim for the e-stop box (`ESTOP_BOX`, `ESTOP_BOX_AT`), 4 counterbored M2 holes on the OG-40 pattern into the SE tile's pilots |
 | Bought parts | models drawn in this repo (`tools/cad/bought.py` → `cad/bought/`) at the sizes below: simplified outer shapes, not maker models (none are published), except WAGO, whose own STEP is linked in the BOM |
 
 ### Model sizes and where they come from
 
-Checked 2026-10-14. The size column is the generated file's bounding box (`cad/bought/*.step`).
-
 | Part | Model size (mm) | Source | Status |
 |---|---|---|---|
-| PWR-21 pack | 78 × 50 × 72 (+12 lead stub) | Amazon listing [P49], read 2026-10-12 | listing value; Amazon could not be re-read on 2026-10-14: **measure on arrival** |
-| PWR-29 DROK CC/CV | 72 × 59 × 32 | DROK product page: "Size: 72\*59\*32mm" [P57] | maker value |
-| PWR-27 PD trigger | 60 × 30 × 13.6 | none published | **estimate: measure on arrival** |
-| PWR-04 fuse holder | body Ø11 × 47.5, leads Ø2.6 (16 AWG) | Littelfuse drawing for 01500274Z [P6] | maker value |
-| PWR-05 fuse | Ø5 × 20 | IEC 60127 size | standard |
-| PWR-28 e-stop | Ø40 head, 70 overall, 22 mm hole | LAY37-11ZS listing: 40 mm head, "60 × 70 mm (max D × H)" [P56] | listing value |
+| PWR-30 screw-terminal jack | 32 × 14 × 13 | none published | **estimate: measure on arrival** |
+| PWR-28 e-stop box | 70 × 70 × 60 + Ø40 head | none published | **estimate: measure on arrival** |
+| LAR-06 limit switch | body 20 × 6.4 × 10 | none published | **estimate: measure on arrival** |
 | PWR-10 opto module | 66 × 16.5 × 12 | NOYITO manual: "66mm x 16.5mm x 12mm" | maker value |
 | PWR-20 WAGO 221-412 | 18.6 × 13.2 × 8.4 | WAGO data sheet [P47] | maker value (maker STEP also available) |
 
-If a part measures more than 1 mm off, change its constant in `tools/cad/parts.py` (`PACK`, `DROK`, `TRIG`) and the model in
+If a part measures more than 1 mm off, change its constant in `tools/cad/parts.py` (`JACK`, `ESTOP_BOX`) and the model in
 `tools/cad/bought.py`, then `make parts cad` (the clash check must stay at 0).
 
 ## Results

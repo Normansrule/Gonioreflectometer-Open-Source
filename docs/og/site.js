@@ -13,6 +13,7 @@
     let spec = null;
     try { spec = window.Specimen && Specimen.make(canvas, {}); } catch (e) { spec = null; }
     if (!spec) { stage.classList.add("nogl"); }
+    const born = performance.now();
     const wide = window.matchMedia("(min-width: 901px)"), shift = () => wide.matches ? 0.19 : 0;   // the copy sits on the left
     const th = OG.spring(34, 90, 19), ph = OG.spring(90, 90, 19);
     let lastInput = -1e9, running = false, visible = true, t0 = performance.now(), last = t0;
@@ -38,9 +39,10 @@
       const idle = !OG.reduced && now - lastInput > 4000;
       if (idle) { const s = (now - t0) / 1000; th.target = 52 - 18 * Math.cos(0.16 * s); ph.target = 90 + 80 * Math.sin(0.11 * s); }
       const a = th.step(dt), b = ph.step(dt);
-      if (spec) { spec.draw(th.x, ph.x, shift()); place(); }
+      const warm = OG.reduced ? 1 : Math.min(1, (now - born) / 1800), gain = warm * warm * (3 - 2 * warm);   // the lamp comes up like a tungsten filament
+      if (spec) { spec.draw(th.x, ph.x, shift(), gain); place(); }
       readout();
-      running = visible && (a || b || idle);
+      running = visible && (a || b || idle || warm < 1);
       if (running) requestAnimationFrame(frame);
     }
     function kick() { if (!running && visible) { running = true; last = performance.now(); requestAnimationFrame(frame); } }
@@ -72,6 +74,80 @@
     // for tools/readme_screens.py: put the lamp somewhere exact and draw one frame
     window.__hero = { set(t, p) { lastInput = performance.now(); th.x = th.target = t; ph.x = ph.target = p; th.v = ph.v = 0;
       if (spec) { spec.draw(t, p, shift()); place(); } readout(); } };
+  })();
+
+  /* the CAD mesh (og/model/rig.js, about 1 MB) loads once, when the first view of it nears the screen */
+  let rigLoad = null;
+  function loadRig() {
+    return rigLoad || (rigLoad = new Promise((ok, fail) => {
+      if (window.RIG) return ok();
+      const sc = document.createElement("script"); sc.src = "og/model/rig.js"; sc.onload = () => ok(); sc.onerror = fail; document.body.appendChild(sc);
+    }));
+  }
+
+  /* ---------- the story: scroll builds the machine, then plays each axis, then looks through the camera ---------- */
+  (function story() {
+    const sec = $("machine"), canvas = $("storyc"); if (!sec || !canvas) return;
+    const still = OG.reduced;
+    if (still) sec.classList.add("still");
+    let sizedW = 0;                                   // fix the height in px once: phone URL bars must not shift the story
+    function size() { if (still || innerWidth === sizedW) return; sizedW = innerWidth;
+      sec.style.height = Math.round(innerHeight * (innerWidth > 900 ? 6.2 : 5.6)) + "px"; }
+    size(); addEventListener("resize", size);
+    const B = [0, 0.2, 0.36, 0.52, 0.68, 0.84, 1];                       // chapter starts, as a fraction of the scroll
+    const AX = [null, ["M4", [100, 55, 170, 100]], ["M3", [40, 15, 62, 40]], ["M2", [0, 35, -30, 0]], ["M1", [0, 150, 0]], null];
+    const base = { M4: 100, M3: 40, M2: 0, M1: 0 };
+    const chapters = [...sec.querySelectorAll(".chapter")], dots = [...sec.querySelectorAll("[data-ch]")];
+    const sm = x => x * x * (3 - 2 * x), clamp = x => Math.max(0, Math.min(1, x)), lerp = (a, b, t) => a + (b - a) * t;
+    const along = (path, u) => { const n = path.length - 1, f = clamp(u) * n, i = Math.min(Math.floor(f), n - 1); return lerp(path[i], path[i + 1], sm(f - i)); };
+    let R = null, rv = null, target = 0, p = 0, raf = 0, visible = false, last = 0, shown = -1;
+    function progress() { const r = sec.getBoundingClientRect(), span = r.height - innerHeight; return span > 0 ? clamp(-r.top / span) : 0; }
+    function frame(q) {
+      let ch = B.findIndex((b, i) => q >= b && q < B[i + 1]); if (ch < 0) ch = B.length - 2;
+      const u = (q - B[ch]) / (B[ch + 1] - B[ch]);
+      const pose = { ...base }; let hi = [];
+      if (AX[ch]) { pose[AX[ch][0]] = along(AX[ch][1], u); hi = R.axes[AX[ch][0]].moves; }
+      const explode = still ? 0 : 1 - sm(clamp(q / 0.17));
+      const yaw = ch === 0 ? lerp(-18, -62, sm(clamp(u))) : lerp(-62, -150, clamp((q - B[1]) / (B[5] - B[1])));
+      const zf = innerWidth > 900 ? 1 : 0.72;            // phones: closer, the machine fills the narrow frame
+      const orb = rv.orbit({ yaw, pitch: ch === 0 ? lerp(58, 26, sm(u)) : 26, zoom: (ch === 0 ? lerp(1.45, 0.98, sm(u)) : 0.98) * zf }, rv.aspect());
+      let cam = orb;
+      if (ch === 5) {                                   // into the measuring camera: what it sees, from where it stands
+        const t = sm(clamp(u * 1.2)), far = rv.aspect() < 1 ? 1.5 : 1, lens = { eye: [1250 * far, -330 * far, 470 * far], at: [120, 0, 150], fov: 0.52 };   // over the camera's shoulder
+        const end = rv.orbit({ yaw: -150, pitch: 26, zoom: 0.98 * zf }, rv.aspect());
+        cam = { eye: end.eye.map((e, i) => lerp(e, lens.eye[i], t)), at: end.at.map((a, i) => lerp(a, lens.at[i], t)), fov: lerp(end.fov, lens.fov, t) };
+      }
+      const wide = innerWidth > 900, shift = wide ? (ch === 5 ? 0.3 : 0.3) : 0;
+      rv.draw(pose, cam, { hi, explode, shift, spread: wide ? 1 : 0.45 });
+      if (ch !== shown) { shown = ch; chapters.forEach((c, i) => c.classList.toggle("on", i === ch));
+        dots.forEach((d, i) => d.setAttribute("aria-current", String(i === ch))); }
+      const a = RigView.angles(pose); $("st-ti").textContent = Math.round(a.ti) + "°"; $("st-tr").textContent = Math.round(a.tr) + "°";
+      sec.style.setProperty("--chapter-u", u.toFixed(3));
+    }
+    function loop(now) {
+      const dt = Math.min((now - last) / 1000, 0.05); last = now;
+      p = still ? target : p + (target - p) * Math.min(1, dt * 7);     // a little inertia, like a heavy dial
+      if (rv) frame(p);
+      raf = visible && Math.abs(target - p) > 1e-4 ? requestAnimationFrame(loop) : 0;
+    }
+    function kick() { target = still ? 0.19 : progress(); if (!raf && visible) { last = performance.now(); raf = requestAnimationFrame(loop); } }
+    addEventListener("scroll", kick, { passive: true });
+    addEventListener("resize", () => { if (rv) frame(p); });
+    window.addEventListener("og:theme", () => { if (rv) frame(p); });
+    dots.forEach(d => d.addEventListener("click", () => {
+      const i = +d.dataset.ch, r = sec.getBoundingClientRect(), span = r.height - innerHeight;
+      scrollTo({ top: scrollY + r.top + span * (B[i] + 0.02), behavior: OG.reduced ? "auto" : "smooth" }); }));
+    new IntersectionObserver(es => { visible = es[0].isIntersecting;
+      if (visible && !R) loadRig().then(async () => {
+        R = window.RIG;
+        try { rv = await RigView.make(canvas, R); } catch (e) { rv = null; }
+        $("st-loading").hidden = true;
+        if (!rv) { sec.classList.add("nogl"); return; }
+        p = target = still ? 0.19 : progress(); frame(p);   // reduced motion: one still picture, the machine built
+        $("st-parts").textContent = R.parts;
+      }, () => { $("st-loading").hidden = true; sec.classList.add("nogl"); });
+      if (visible) kick(); }, { rootMargin: "600px 0px" }).observe(sec);
+    window.__story = { at(q) { p = target = q; if (rv) frame(q); }, ready: () => !!rv };
   })();
 
   /* ---------- the four-axis machine: CAD mesh, real kinematics, played in turn or driven by hand ---------- */
@@ -137,7 +213,7 @@
       view.pitch = Math.max(4, Math.min(70, drag.pitch + (e.clientY - drag.y) * 0.25)); if (!playing) draw(); });
     const up = () => { drag = null; }; stage.addEventListener("pointerup", up); stage.addEventListener("pointercancel", up);
     async function init() {
-      R = window.RIG;
+      R = window.RIG;   // loaded by loadRig()
       try { rv = R && window.RigView ? await RigView.make(canvas, R) : null; } catch (e) { rv = null; }
       $("rig-loading").hidden = true;
       if (!rv) { stage.classList.add("nogl"); $("rig-controls").hidden = true; return; }
@@ -145,14 +221,54 @@
     }
     let asked = false;
     new IntersectionObserver(es => { visible = es[0].isIntersecting;
-      if (visible && !asked) { asked = true; const sc = document.createElement("script"); sc.src = "og/model/rig.js"; sc.onload = init;
-        sc.onerror = () => { $("rig-loading").hidden = true; stage.classList.add("nogl"); $("rig-controls").hidden = true; }; document.body.appendChild(sc); }
+      if (visible && !asked) { asked = true;
+        loadRig().then(init, () => { $("rig-loading").hidden = true; stage.classList.add("nogl"); $("rig-controls").hidden = true; }); }
       if (visible) kick(); }, { rootMargin: "400px 0px" }).observe(stage);
     window.addEventListener("og:theme", draw);
     window.addEventListener("resize", () => { if (!raf) draw(); });
     // for tools/readme_screens.py: an exact pose and highlighted axis, one frame
     window.__rig = { ready: () => !!rv, seq: SEQ, set(p, k, yaw) { playing = false; Object.assign(pose, p); if (yaw != null) view.yaw = yaw;
       setActive(k); draw(); } };
+  })();
+
+  /* ---------- the cursor is the lamp's handle; buttons lean toward the pointer ---------- */
+  (function pointerCraft() {
+    const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!fine || OG.reduced) return;
+    const stage = $("stage"), ring = document.createElement("div");
+    ring.className = "lamp-cursor"; ring.setAttribute("aria-hidden", "true"); ring.innerHTML = "<span>Lamp</span>";
+    stage.appendChild(ring); stage.classList.add("has-cursor");
+    const x = OG.spring(0, 380, 34), y = OG.spring(0, 380, 34); let raf = 0, on = false;
+    const tick = () => { const a = x.step(1 / 60), b = y.step(1 / 60);
+      ring.style.transform = `translate(${x.x}px, ${y.x}px)`; raf = (a || b) ? requestAnimationFrame(tick) : 0; };
+    stage.addEventListener("pointermove", e => { const r = stage.getBoundingClientRect();
+      x.target = e.clientX - r.left; y.target = e.clientY - r.top;
+      if (!on) { on = true; x.x = x.target; y.x = y.target; ring.classList.add("on"); }
+      if (!raf) raf = requestAnimationFrame(tick); });
+    stage.addEventListener("pointerleave", () => { on = false; ring.classList.remove("on"); });
+    document.querySelectorAll(".hero .acts .btn").forEach(btn => {               // magnetic, on a stiff spring, small reach
+      const dx = OG.spring(0, 260, 22), dy = OG.spring(0, 260, 22); let r2 = 0;
+      const t2 = () => { const a = dx.step(1 / 60), b = dy.step(1 / 60); btn.style.translate = `${dx.x.toFixed(2)}px ${dy.x.toFixed(2)}px`;
+        r2 = (a || b) ? requestAnimationFrame(t2) : 0; };
+      btn.addEventListener("pointermove", e => { const r = btn.getBoundingClientRect();
+        dx.target = (e.clientX - r.left - r.width / 2) * 0.22; dy.target = (e.clientY - r.top - r.height / 2) * 0.3; if (!r2) r2 = requestAnimationFrame(t2); });
+      btn.addEventListener("pointerleave", () => { dx.target = dy.target = 0; if (!r2) r2 = requestAnimationFrame(t2); });
+    });
+  })();
+
+  /* ---------- numbers that count up once, when they arrive ---------- */
+  (function counts() {
+    const els = [...document.querySelectorAll("[data-count]")];
+    const fmt = (el, v) => { const d = +(el.dataset.dec || 0); el.textContent = (el.dataset.pre || "") + v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); };
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; io.unobserve(e.target);
+      const el = e.target, to = +el.dataset.count;
+      if (OG.reduced) return fmt(el, to);
+      const t0 = performance.now(), dur = 1400;
+      const run = now => { const k = Math.min(1, (now - t0) / dur), ease = 1 - Math.pow(1 - k, 4); fmt(el, to * ease); if (k < 1) requestAnimationFrame(run); };
+      requestAnimationFrame(run);
+    }), { threshold: 0.6 });
+    els.forEach(el => { fmt(el, OG.reduced ? +el.dataset.count : 0); io.observe(el); });
   })();
 
   /* ---------- rail: appears after the hero, marks the section in view ---------- */
@@ -209,6 +325,9 @@
   })();
 
   /* ---------- numbers from the repo ---------- */
+  if (SITE.steps) { $("n-steps").dataset.count = SITE.steps; $("n-hours").dataset.count = Math.round(SITE.hours);
+    $("n-cost").dataset.count = Math.round(SITE.plan_usd); }
+  if (SITE.parts) { $("n-parts").dataset.count = SITE.parts; $("n-parts").textContent = SITE.parts; }
   if (SITE.plan_usd) $("costline").textContent = `Planned cost: ${usd(SITE.plan_usd)} of parts, under a hard cap of ${usd(SITE.cap_usd)}.`;
   if (SITE.steps) $("build-lead").textContent = `${SITE.steps} steps, about ${Math.round(SITE.hours)} hours of work and ${usd(SITE.plan_usd)} of parts. ` +
     "Each stage ends with something that works, and each step is a checklist: what you need, what to do, how to check it, and what to do if the check fails.";

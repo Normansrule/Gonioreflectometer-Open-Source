@@ -39,16 +39,14 @@ parts:
   SKR: "SKR Pico (CTL-01)"
   HUB: "ESP32-S3 hub (CTL-02)"
   PI: "Pi Zero 2 W (STA-01)"
-  PACK: "Battery pack (PWR-21)"
-  TRIG: "USB-C PD trigger (PWR-27)"
-  DROK: "CC/CV charger (PWR-29)"
-  FUSE: "Fuse holder (PWR-04)"
-  ESTOP: "E-stop (PWR-28)"
-  OT: "Over-travel switch (LAR-06)"
+  ADAPTER: "24 V wall adapter (PWR-30)"
+  JACK: "Screw-terminal jack (with PWR-30)"
+  ESTOP: "E-stop box (PWR-28)"
+  OT: "Limit switch, over-travel (LAR-06)"
+  CAP: "Blue-wire cap (WAGO 221-2401)"
+  OTA: "Splice A, e-stop side (WAGO 221-2401)"
+  OTB: "Splice B, tray side (WAGO 221-2401)"
   OPTO: "Opto module (PWR-10)"
-  BAT+: "Lever connector BAT+ (2-way)"
-  FUSED: "Lever connector FUSED (3-way)"
-  GND: "Lever connector GND (3-way)"
   MOT+: "Lever connector MOT+ (3-way, on the tray)"
   MOT-: "Lever connector MOT− (3-way, on the tray)"
   LAMPDRV: "Lamp driver NLDD-350H (LSR-02)"
@@ -64,47 +62,52 @@ parts:
   KPA: "Keypad A (CTL-05)"
   KPB: "Keypad B (CTL-05)"
   LAPTOP: "Laptop"
-  CHARGER: "USB-C charger ≥ 30 W (the laptop's)"
   CAM: "Camera (CAM-01)"
   FAN: "40 mm fan (CTL-08, optional)"
   SPEC: "AS7341 sensor (SPC-01, optional)"
   OLED: "OLED (STA-05, optional)"
   BUCK: "5 V buck (STA-03, optional)"
   USBHUB: "Powered USB hub ([TBD], optional)"
-  SPLICE: "Lever connector (WAGO 221-412)"
+  SPLICE: "Lever connectors (WAGO 221-412 / 415)"
   HGND: "Lever connector keypad GND (3-way)"
   LASER: "Alignment laser (LAR-09, tool)"
   BANK: "Colour LED bank (MSK-01…03)"
 
 groups:
-  - title: "1 · Power box: battery, charger, fuse, e-stop"
+  - title: "1 · Power: wall adapter, jack, e-stop"
     stage: "01"
     intro: >-
-      18 AWG (PWR-15) red for `+`, black for `−`. Strip 11 mm for lever connectors, 8 mm for screw terminals; twist the
-      strands; tug-test every wire. Pack leads go in **last** (M06). Trigger DIP switch on 20 V.
+      The adapter stays outside the machine and goes into the wall **last** (M06; before that only for the jack check in M04.2). 18 AWG (PWR-15) red for `+`, black for
+      `−`. Strip 8 mm for screw terminals, 11 mm for lever connectors; twist the strands; tug-test every wire. On the
+      BAOMAIN e-stop the NC contact is terminals 1 and 2 (NO = 3 and 4): check with the meter, 1–2 beep with the button
+      released and open when it is pressed. Either gap under a terminal screw is the same terminal.
+    checks:
+      - "Adapter unplugged, e-stop released: continuity jack + to e-stop NC 2 (beep); press the e-stop: open."
+      - "Jack + to jack −: OL (no short)."
     rows:
-      - ["CHARGER:USB-C", "TRIG:USB-C in", "USB-C cable (the charger's own)", "through the +X wall opening; charger ≥ 30 W with a 20 V profile"]
-      - ["TRIG:OUT +", "DROK:IN +", "18 AWG red, short", "screw terminals"]
-      - ["TRIG:OUT −", "DROK:IN −", "18 AWG black, short", "screw terminals"]
-      - ["PACK:red lead", "BAT+:1", "pack lead", "insert last (M06)"]
-      - ["FUSE:lead A", "BAT+:2", "holder lead", "3.15 A T fuse inside (PWR-05)"]
-      - ["FUSE:lead B", "FUSED:1", "holder lead", ""]
-      - ["DROK:OUT +", "FUSED:2", "18 AWG red, short", "charges the pack through the fuse"]
-      - ["FUSED:3", "ESTOP:NC 1", "18 AWG red", "the NC contact block, not NO"]
-      - ["PACK:black lead", "GND:1", "pack lead", "insert last (M06)"]
-      - ["DROK:OUT −", "GND:2", "18 AWG black, short", ""]
-      - ["GND:3", "MOT-:1", "18 AWG black (the whole run to the tray)", "out through the +Y slot; until M10.3 straight into SKR Pico POWER GND"]
-      - ["MOT-:2", "SKR:POWER.GND", "10 cm 18 AWG black offcut", "from M10.3"]
+      - ["ADAPTER:round 24 V plug", "JACK:socket", "the adapter's own cable", "push fully in; the wall plug stays out (except the jack check in M04.2) until M06"]
+      - ["JACK:+", "ESTOP:NC 1", "18 AWG red", "NC contact, not NO"]
+      - ["JACK:−", "MOT-:1", "18 AWG black (the whole run to the tray)", "ground never goes through the e-stop"]
+      - ["MOT-:3", "SKR:POWER.GND", "10 cm 18 AWG black offcut", "from M08.3"]
 
-  - title: "2 · Motor power: e-stop → over-travel switch → SKR Pico"
+  - title: "2 · Motor power: e-stop → limit switch → SKR Pico"
     stage: "01–04"
     intro: >-
-      One red wire. Until M14.1 it runs straight from the e-stop to the SKR Pico; M14.1 cuts it at the over-travel switch.
-      Press the e-stop before touching any terminal.
+      One + line. Until M14.1 a red wire runs from e-stop NC 2 straight to MOT+; M14.1 cuts that run beside the limit
+      switch and splices the switch in with two 221-2401s, so its own leads only need to reach the run (their length is
+      not on the listing). The switch has its own wires: find them with the meter first (COM–NC beeps with the lever untouched and
+      opens when the lever is pressed; on the units bought black = COM, grey = NC, blue = NO). Press the e-stop before
+      touching any terminal.
+    checks:
+      - "Adapter unplugged: continuity e-stop NC 2 to MOT+ (beep); press the limit switch lever: open."
+      - "Live (M06, M14.1): adapter in, e-stop released, DC volts MOT+ to MOT− ≈ +24 V; e-stop pressed or lever pressed: 0 V."
     rows:
-      - ["ESTOP:NC 2", "OT:COM", "18 AWG red", "out through the +Y (J3) slot"]
-      - ["OT:NC", "MOT+:1", "18 AWG red", "NO terminal stays empty; until M10.3 straight into SKR Pico POWER 12/24V"]
-      - ["MOT+:2", "SKR:POWER.12/24V", "10 cm 18 AWG red offcut", "from M10.3"]
+      - ["ESTOP:NC 2", "OTA:red in", "18 AWG red (the red run, e-stop part)", "stage 04 (M14.1) cuts the run beside the switch; before that it runs on to MOT+ 1"]
+      - ["OT:black (COM)", "OTA:black", "the switch's own wire", "11 mm stripped"]
+      - ["OT:grey (NC)", "OTB:grey", "the switch's own wire", "connected to COM while the lever is untouched"]
+      - ["OTB:red out", "MOT+:1", "18 AWG red (the red run, tray part)", ""]
+      - ["OT:blue (NO)", "CAP:blue", "the switch's own wire", "unused: alone in a 221-2401 so the bare end is covered"]
+      - ["MOT+:3", "SKR:POWER.12/24V", "10 cm 18 AWG red offcut", "from M08.3"]
 
   - title: "3 · SKR Pico: motors"
     stage: "02–09"
@@ -120,8 +123,8 @@ groups:
       - ["M2:6-pin socket", "SKR:Z1.1-4", "5-pack cable (1 m)", "grblHAL Z · stage 08 (Z2 is the same driver: leave empty)"]
       - ["M1:coil pair 1 (2 bare leads)", "SPLICE:pair 1 (2 × 221-412)", "motor leads, 11 mm stripped, folded double", "pancake has bare leads: find the pairs first (M27.1)"]
       - ["SPLICE:pair 1 (2 × 221-412)", "SKR:E.1 + E.4", "spare 5-pack cable (6-pin plug cut off): the wires in plug pins 1 and 4", "driver coil 2B / 2A"]
-      - ["M1:coil pair 2 (2 bare leads)", "SPLICE:pair 2 (2 × 221-412)", "motor leads, 11 mm stripped, folded double", ""]
-      - ["SPLICE:pair 2 (2 × 221-412)", "SKR:E.2-3", "same cable: the wires in plug pins 2 and 3", "driver coil 1B / 1A · grblHAL A · stage 09"]
+      - ["M1:coil pair 2 (2 bare leads)", "SPLICE:pair 2 (221-412 + 221-415)", "motor leads, 11 mm stripped, folded double", ""]
+      - ["SPLICE:pair 2 (221-412 + 221-415)", "SKR:E.2-3", "same cable: the wires in plug pins 2 and 3", "driver coil 1B / 1A · grblHAL A · stage 09"]
 
   - title: "4 · SKR Pico: endstops (home switches)"
     stage: "02–09"
@@ -168,8 +171,8 @@ groups:
       - ["KPB:key 1", "HUB:J1-8", "M-F jumper", "NEXT"]
       - ["KPB:key 2", "HUB:J1-9", "M-F jumper", "PAUSE (stops after the current pose)"]
       - ["KPB:key 3, key 4", "-", "not connected", "spare keys"]
-      - ["MOT+:3", "OPTO:IN+", "cut M-F jumper, stripped end folded double", "24 V module; its resistor is on board"]
-      - ["MOT-:3", "OPTO:IN−", "cut M-F jumper, stripped end folded double", "a thin jumper beside 18 AWG under one screw does not clamp"]
+      - ["MOT+:2", "OPTO:IN+", "short 18 AWG red", "24 V module; its resistor is on board"]
+      - ["MOT-:2", "OPTO:IN−", "short 18 AWG black", "8 mm under the module screw, 11 mm in the lever connector"]
       - ["OPTO:VCC", "HUB:J1-1", "M-F jumper", "3V3 (not 5 V: the GPIO is 3.3 V)"]
       - ["OPTO:GND", "HUB:J3-21", "M-F jumper", "GND"]
       - ["OPTO:OUT", "HUB:J1-10", "M-F jumper", "motion-power sense: low = motor power on"]
@@ -216,8 +219,8 @@ groups:
       - ["PI:10", "HUB:J3-17", "F-F jumper", "Pi GPIO15 RX ← hub GPIO47 TX"]
       - ["PI:6", "HUB:J3-1", "F-F jumper", "GND (UART and hub-power return)"]
       - ["PI:4", "HUB:J1-21", "F-F jumper", "Pi 5V powers the hub (5V pin)"]
-      - ["FUSED:4 (5-way)", "BUCK:IN+", "thin red pair", "after the fuse, before the e-stop: swap FUSED and GND for 5-way connectors"]
-      - ["GND:4 (5-way)", "BUCK:IN−", "thin black pair", ""]
+      - ["JACK:+", "BUCK:IN+", "thin red, second wire under the jack screw", "before the e-stop: the Pi stays on when the motors stop"]
+      - ["JACK:−", "BUCK:IN−", "thin black, second wire under the jack screw", ""]
       - ["BUCK:OUT+", "PI:2", "cut F jumper", "5.1 V"]
       - ["BUCK:OUT−", "PI:14", "cut F jumper", "GND"]
       - ["SKR:USB-C (+ camera USB)", "USBHUB:ports", "same cables as with the laptop", "hub on the Pi's micro-USB data port through the OTG adapter (STA-04); hub supply [TBD]"]

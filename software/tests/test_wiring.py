@@ -49,7 +49,7 @@ def test_alternatives_may_share_pins_but_others_may_not():
 
 
 def test_readme_anchor_matches_github():
-    assert wiring.anchor("1 · Power box: battery, charger, fuse, e-stop") == "1--power-box-battery-charger-fuse-e-stop"
+    assert wiring.anchor("1 · Power: wall adapter, jack, e-stop") == "1--power-wall-adapter-jack-e-stop"
 
 
 def test_every_section_has_an_animated_pin_diagram():

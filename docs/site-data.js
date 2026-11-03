@@ -18,16 +18,16 @@ window.SITE = {
   {
    "id": "01",
    "folder": "01-power",
-   "title": "Power box",
-   "goal": "Everything for the battery box on the bench; the charging module set before the pack is connected.",
+   "title": "Power",
+   "goal": "Wall adapter, e-stop box, wire and lever connectors on the bench, each checked; the power plate printed.",
    "milestones": [
-    "Order power parts",
-    "Wire the power box",
+    "Order and check power parts",
+    "Wire the power",
     "First power-on"
    ],
-   "steps": 10,
-   "hours": 3.7,
-   "cost": 131.06
+   "steps": 8,
+   "hours": 2.5,
+   "cost": 54.26
   },
   {
    "id": "02",
@@ -68,7 +68,7 @@ window.SITE = {
    ],
    "steps": 9,
    "hours": 5.4,
-   "cost": 74.54
+   "cost": 77.43
   },
   {
    "id": "05",
@@ -248,10 +248,11 @@ window.SITE = {
    "cost": 0.0
   }
  ],
- "plan_usd": 569.1,
+ "plan_usd": 495.19,
  "cap_usd": 630.0,
- "steps": 138,
- "hours": 95.2,
+ "steps": 136,
+ "hours": 94.0,
+ "parts": 83,
  "evidence": [
   {
    "claim": "In-plane and out-of-plane BRDF, white light, flat samples ≤ 50 mm",
@@ -286,12 +287,12 @@ window.SITE = {
    "evidence": "simulated; needs the blocked LED bank"
   },
   {
-   "claim": "24 V Li-ion pack charged over USB-C, ≈ 6 h per charge",
+   "claim": "24 V wall adapter, 3 A: 1.3 A peak draw",
    "evidence": "modeled from listing values"
   },
   {
    "claim": "Electrical safety",
-   "evidence": "not certified (no mains in the machine: Li-ion pack with protection board, fuse, e-stop)"
+   "evidence": "not certified (only 24 V inside the machine: wall adapter with short-circuit protection per its listing, e-stop, limit switch)"
   }
  ]
 };

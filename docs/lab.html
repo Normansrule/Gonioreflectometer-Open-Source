@@ -299,7 +299,7 @@ const PARTS = {   // what you click -> where its files are (relative to docs/)
   cam: {n: "Fixed camera, 16 mm lens, f/8 stop", st: "06-camera-light", bom: "CAM-01…03"},
   lamp: {n: "White lamp (COB + driver)", st: "06-camera-light", bom: "LSR-01…05"},
   leds: {n: "8-band LED bank on a 40° mast", st: "10-color", bom: "MSK-01…06"},
-  pwr: {n: "Power box (24 V Li-ion pack, USB-C charging, fuse, e-stop)", st: "01-power", bom: "PWR-04…29"},
+  pwr: {n: "Power plate (24 V wall adapter jack, e-stop box)", st: "01-power", bom: "PWR-10…30"},
   ctl: {n: "Controller: SKR Pico (USB-C) + ESP32-S3 + buttons", st: "02-controller", bom: "CTL-01…11"},
   pi: {n: "Pi Zero 2 W station (optional)", st: "15-standalone", bom: "STA-01…07"},
   base: {n: "Printed deck + camera rail", st: "03-frame", bom: "FRM-01…09"},
@@ -312,7 +312,7 @@ function draw() {
   const p = pose(), st = state(p), scan = mode === "scan", B = +$("build").value;
   g2.clearRect(0, 0, cv.width, cv.height);
   const ring = []; for (let k = 0; k <= 72; k++) { const a = k * 5; ring.push([150 * c(a), 150 * s(a), -144]); }
-  if (B < 3) { $("partinfo").textContent = "Stages 01–02 are bench builds: power box and controller."; }
+  if (B < 3) { $("partinfo").textContent = "Stages 01–02 are bench builds: power plate and controller."; }
   const xEnd = M.twoCams && (scan || B >= 11) ? M.Dscan * Math.cos(M.scanElev * Math.PI / 180) + 70 : M.Dc + 70;
   poly([[-220, -220, -150], [xEnd, -220, -150], [xEnd, 220, -150], [-220, 220, -150]], B >= 3 ? K.g2 : K.ground, K.rule);
   box3([-170, -170, -130], [70, 50, 40], K.g3, K.ink);

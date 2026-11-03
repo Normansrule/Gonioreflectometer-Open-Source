@@ -91,7 +91,7 @@ void main(){
     const CAM_DEG = 35;                                // the fixed camera: 35 degrees from the sample normal
     return {
       CAM_DEG,
-      draw(thetaDeg, phiDeg, sx = 0) {   // sx: centre the specimen this fraction of the width right of centre
+      draw(thetaDeg, phiDeg, sx = 0, gain = 1) {   // gain: the lamp warming up on load (0..1)   // sx: centre the specimen this fraction of the width right of centre
         const dpr = Math.min(window.devicePixelRatio || 1, 1.75), w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
         if (!w || !h) return;
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
@@ -105,7 +105,7 @@ void main(){
         gl.uniform3f(u.lamp, r * Math.sin(th) * Math.cos(ph), r * Math.sin(th) * Math.sin(ph), r * Math.cos(th));
         gl.uniform3fv(u.ground, OG.rgb(K.ground));
         gl.uniform3f(u.light, 1.0, 0.74, 0.45);       // 3000 K, linear
-        gl.uniform1f(u.fov, fov); gl.uniform1f(u.exp, 1.15);
+        gl.uniform1f(u.fov, fov); gl.uniform1f(u.exp, 1.15 * gain);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         this.view = { cam: [0, -need * Math.sin(c), need * Math.cos(c)], fov, w: canvas.clientWidth, h: canvas.clientHeight, sx };
       },

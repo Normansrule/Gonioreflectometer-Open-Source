@@ -11,6 +11,7 @@ Generated copies; the sources stay the truth. Rebuilt by `make export` (and on G
 | [bom/opengonio-bom.xlsx](bom/opengonio-bom.xlsx) | Excel, Google Sheets, LibreOffice Calc: pictures, buy and STEP/STL links, live totals vs. the cap | `PARTS.md` (decisions), `phases/*/bom.csv` |
 | [bom/opengonio-bom.csv](bom/opengonio-bom.csv) | any spreadsheet or script | same |
 | [wiki/opengonio-wiki.pdf](wiki/opengonio-wiki.pdf) · [.docx](wiki/opengonio-wiki.docx) | PDF reader; Word, Google Docs | `wiki/src/*.md` |
+| [build-book.pdf](build-book.pdf) | any PDF reader or printer: the build book, one step per A4 landscape page | `docs/assembly.yaml` (order), `.github/phases.yml` (words), `tools/cad/*.py` (model) |
 | [cad/opengonio_assembly.glb](cad/opengonio_assembly.glb) | Blender (*File → Import → glTF*), Windows 3D Viewer, three.js, online glTF viewers; parts named by BOM ID, metres | `tools/cad/*.py` |
 
 CAD masters: STEP (Onshape, FreeCAD, Fusion 360, SolidWorks; PrusaSlicer, OrcaSlicer and Bambu Studio also import STEP) in `cad/` and `phases/*/3d/`; STL for every slicer.

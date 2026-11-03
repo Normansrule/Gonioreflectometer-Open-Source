@@ -13,7 +13,7 @@ No WiFi on the SKR Pico: the laptop (or the Pi station, stage 15) connects over 
 
 ## Wiring and pins
 
-Pin-by-pin tables for every connection (power box to laptop): [README → Wiring](../../README.md#wiring), generated from [`docs/wiring.yaml`](../../docs/wiring.yaml). Summary:
+Pin-by-pin tables for every connection (power to laptop): [README → Wiring](../../README.md#wiring), generated from [`docs/wiring.yaml`](../../docs/wiring.yaml). Summary:
 
 SKR Pico pins from the maker pin diagram and grblHAL board map [C12][R85]:
 
@@ -48,10 +48,10 @@ ESP32-S3 hub pins (GPIO numbers; all clear of the strapping, USB, flash/PSRAM an
 |---|---|
 | Red / black motor-power leads | MOT+ / MOT− 3-way lever connectors on the tray → 10 cm 18 AWG leads → SKR Pico POWER + / − (screw terminal) |
 | Motors M4 M3 M2 | SKR Pico X, Y, Z1 (the 5-pack's 1 m cables; CTL-11 only if they don't latch) |
-| M1 pancake (bare leads) | SKR Pico E, through a spare 5-pack cable spliced with 4 × WAGO 221-412 (coil pair 1 → plug pins 1–2, pair 2 → pins 3–4; M27.1) |
+| M1 pancake (bare leads) | SKR Pico E, through a spare 5-pack cable spliced with 3 × WAGO 221-412 + 1 × 221-415 (coil pair 1 → plug pins 1 + 4, pair 2 → pins 2 + 3; M27.1) |
 | Endstop modules M4 M3 M2 M1 | X-STOP, Y-STOP, Z-STOP, E0-STOP (3-pin: signal, GND, 5 V) |
 | White COB driver +Vin / −Vin (female jumpers on its pins) | SKR Pico HE `12/24V` / HE `IO23` (cut jumpers under the screws) |
-| Opto module input + / − | MOT+ / MOT− lever connectors (cut jumpers, folded double) |
+| Opto module input + / − | MOT+ / MOT− lever connectors, slot 2 (short 18 AWG red / black offcuts) |
 | Opto module OUT / GND / VCC | ESP32-S3 J1-10 (GPIO 17) / J3-21 (GND) / J1-1 (3V3) (male–female jumpers) |
 | Keypad A keys 1–4 | ESP32-S3 J1-4…J1-7 (GPIO 4–7) |
 | Keypad B keys 1, 2 | ESP32-S3 J1-8, J1-9 (GPIO 15, 16: NEXT, PAUSE) |
@@ -87,7 +87,7 @@ bash scripts/controller.sh settings          # sends firmware/grblhal/settings.t
 bash scripts/controller.sh pins              # output port numbers for machine.yaml lights
 ```
 
-**3. Motors** (pack on, e-stop released):
+**3. Motors** (24 V adapter in, e-stop released):
 
 ```bash
 bash scripts/controller.sh test              # info, home, M4=60, M4=90 M3=45, motors off ($SLP)

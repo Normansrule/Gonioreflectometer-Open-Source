@@ -334,6 +334,17 @@ def rel(p: Path) -> str:
     return p.relative_to(ROOT).as_posix()
 
 
+def build_book() -> list[str]:
+    """exports/build-book.pdf: the build book (docs/build.html), one step per page. Needs playwright + Chromium."""
+    try:
+        import playwright  # noqa: F401
+        r = subprocess.run([sys.executable, str(ROOT / "tools" / "build_book.py"), "--pdf"], cwd=ROOT, capture_output=True,
+                           text=True, timeout=600)
+    except (ImportError, subprocess.TimeoutExpired):
+        return ["(build book PDF skipped: pip install playwright; playwright install chromium)"]
+    return ["build-book.pdf"] if r.returncode == 0 else ["(build book PDF failed: " + (r.stderr.strip().splitlines() or ["?"])[-1] + ")"]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cad", action="store_true")
@@ -348,7 +359,7 @@ def main() -> int:
         sheets = ["(bom skipped: pip install openpyxl, or make setup)"]
     if not PIL_OK:
         sheets.append("(no pictures in the workbook: pip install pillow)")
-    done = [paper_docx(), overleaf_zip(), *references(), *sheets, *wiki_book()] + (cad() if a.cad else [])
+    done = [paper_docx(), overleaf_zip(), *references(), *sheets, *wiki_book(), *build_book()] + (cad() if a.cad else [])
     print("exports: " + " · ".join(done))
     return 0
 

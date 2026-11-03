@@ -54,17 +54,11 @@ def tolerance_coupon():
 
 
 # ---------------- 01 power ----------------
-BOX_H = 80.0                      # pack 72 mm upright + pads; e-stop body ~50 mm behind the lid
-BOX_L, BOX_W = 160.0, 130.0
-PACK = (78.0, 50.0, 72.0)          # PWR-21 6S pack 78 x 50 x 72 mm (listing [P49]; measure on arrival, change here), upright
-PACK_AT = (-36.0, -25.0)           # pack centre: against the -X wall (vents), clear of the corner posts
-PAD_Z = 6.0                        # modules stand on pads, clear of the deck-screw bosses
-DROK = (59.0, 72.0, 32.0)          # PWR-29 DROK with case, 72 x 59 x 32 mm (maker page [P57]), long side along Y
-DROK_AT = (39.0, -19.0)
-TRIG = (60.0, 30.0)                # PWR-27 trigger board footprint (estimate: measure on arrival), USB-C at its +X end
-TRIG_AT = (47.0, 38.0)             # USB-C end 0.6 mm inside the +X wall: the charger plugs in through the wall
-FUSE_AT = (-32.0, 30.0)            # PWR-04 inline fuse holder in a floor cradle behind the pack: cup takes bodies up to Ø14 mm
-ESTOP_AT = (47.0, 40.0)            # e-stop hole in the lid, above the trigger board (body ends 9 mm above it)
+PLATE = (130.0, 110.0, 4.0)        # power plate L x W x thickness, on the SE deck tile (POWER_XY)
+JACK = (32.0, 14.0, 13.0)          # PWR-30 screw-terminal DC jack (ESTIMATE: measure on arrival, change here)
+JACK_AT = (40.0, 15.0)             # jack centre: round plug in from +X (the deck edge), screw terminals toward -X
+ESTOP_BOX = (71.0, 71.0)           # PWR-28 e-stop station: 2.8 x 2.8 x 3.4 in overall (listing copy [P64]); measure, change here
+ESTOP_BOX_AT = (-25.0, 0.0)        # station centre; sits in a 2 mm rim on double-sided tape
 DIN_W = 6.2                        # Phoenix UT / PLC module width on a rail (kept for later add-ons)
 
 
@@ -79,56 +73,21 @@ def din_stub(n: int = 1, wall_h: float = 14.0) -> cq.Workplane:
     return hat
 
 
-def power_box():
-    """Battery pack, USB-C charging (PD trigger + CC/CV module), fuse and e-stop in one box. The pack stands upright in
-    a floor pocket (lid ribs stop it lifting); the trigger board's USB-C faces an opening in the +X wall, so the pack
-    charges with the lid closed. Modules sit in locating frames on double-sided tape; the fuse holder in a cradle."""
-    L, W, H, t = BOX_L, BOX_W, BOX_H, 2.4                      # 6 perimeters of 0.4 mm: stiff enough in ABS
-    b = cq.Workplane("XY").box(L, W, H, centered=(True, True, False)).faces(">Z").shell(-t)
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            post = cq.Workplane("XY").circle(4.5).extrude(H - 3).translate((sx * (L / 2 - t - 4), sy * (W / 2 - t - 4), 0))
-            post = post.cut(cq.Workplane("XY").circle(M2_TAP / 2).extrude(10).translate((sx * (L / 2 - t - 4), sy * (W / 2 - t - 4), H - 11)))
-            b = b.union(post)
-
-    def pocket(size, at, wall_h):
-        w, d = size[0] + 2 * CLEAR + 1.0, size[1] + 2 * CLEAR + 1.0
-        o = cq.Workplane("XY").rect(w + 4, d + 4).extrude(wall_h).cut(cq.Workplane("XY").rect(w, d).extrude(wall_h))
-        out = o.translate((at[0], at[1], t))
-        for sx in (-1, 1):                                                                               # corner pads
-            for sy in (-1, 1):
-                out = out.union(cq.Workplane("XY").rect(10, min(10, size[1] - 4)).extrude(PAD_Z - t)
-                                .translate((at[0] + sx * (size[0] / 2 - 7), at[1] + sy * (size[1] / 2 - 6), t)))
-        return out
-    b = b.union(pocket(PACK, PACK_AT, 14.0)).union(pocket(DROK, DROK_AT, 8.0)).union(pocket(TRIG, TRIG_AT, 8.0))
-    for dx in (-15.0, 15.0):                                                                             # fuse holder cradle
-        c = cq.Workplane("XY").box(6, 18, 9, centered=(True, True, False)).translate((FUSE_AT[0] + dx, FUSE_AT[1], t))
-        c = c.cut(cq.Workplane("YZ").circle(7.2).extrude(6).translate((FUSE_AT[0] + dx - 3, FUSE_AT[1], t + 7 + 1.5)))
-        b = b.union(c)
-    b = b.cut(cq.Workplane("YZ").rect(14, 10).extrude(20).translate((L / 2 - 3, TRIG_AT[1], PAD_Z + 3.2)))    # USB-C in
-    b = b.cut(cq.Workplane("XZ").rect(14, 8).extrude(20).translate((-10, W / 2 + 10, 40)))             # motor power pair (+Y)
-    b = b.cut(cq.Workplane("XZ").rect(10, 6).extrude(20).translate((5, W / 2 + 10, 40)))               # J3 over-travel loop
-    for k in range(4):                                                                                   # vents (-X)
-        b = b.cut(cq.Workplane("YZ").rect(3, 20).extrude(20).translate((-L / 2 - 10, -30 + 12 * k, 50)))
-    for k in range(4):                                                                                   # vents (+X, above the modules)
-        b = b.cut(cq.Workplane("YZ").rect(3, 20).extrude(20).translate((L / 2 - 10, -30 + 9 * k, 55)))
+def power_plate():
+    """Holds the screw-terminal jack (PWR-30) in a frame and the e-stop box (PWR-28) in a low rim; the wall adapter stays
+    outside the machine. Four M2 x 12 through counterbored holes into the SE tile's pilots (same pattern as before)."""
+    L, W, t = PLATE
     h = OG40 / 2
-    for x, y in ((h, h), (-h, h), (h, -h), (-h, -h)):                                                   # 6 mm bosses: M2 x 12 from inside
-        b = b.union(cq.Workplane("XY").circle(5).extrude(6).translate((x, y, 0)))                       # into the deck pilots (PLACE)
-        b = b.cut(cq.Workplane("XY").circle(M2 / 2).extrude(6).translate((x, y, 0)))
-    return b
-
-
-def power_lid():
-    """Lid: e-stop hole, two ribs that stop the pack lifting."""
-    L, W, t = BOX_L, BOX_W, 3.2
-    lid = cq.Workplane("XY").box(L, W, t, centered=(True, True, False))
-    lid = lid.cut(cq.Workplane("XY").circle(22.3 / 2).extrude(t).translate((*ESTOP_AT, 0)))                 # e-stop
-    gap = BOX_H - (PAD_Z + PACK[2]) - 0.6                                                                 # rib stops 0.6 mm above the pack
-    for dx in (-25.0, 25.0):
-        lid = lid.union(cq.Workplane("XY").rect(4, PACK[1] - 10).extrude(-gap).translate((PACK_AT[0] + dx, PACK_AT[1], 0)))
-    pts = [(sx * (L / 2 - 2.4 - 4), sy * (W / 2 - 2.4 - 4)) for sx in (-1, 1) for sy in (-1, 1)]
-    return lid.faces(">Z").workplane().pushPoints(pts).cboreHole(M2, M2_HEAD, 1.8)
+    p = (cq.Workplane("XY").box(L, W, t, centered=(True, True, False)).faces(">Z").workplane()
+         .pushPoints([(h, h), (-h, h), (h, -h), (-h, -h)]).cboreHole(M2, M2_HEAD, 1.8))
+    ex, ey = ESTOP_BOX[0] + 2 * CLEAR + 1.0, ESTOP_BOX[1] + 2 * CLEAR + 1.0
+    rim = cq.Workplane("XY").rect(ex + 4, ey + 4).extrude(2.0).cut(cq.Workplane("XY").rect(ex, ey).extrude(2.0))
+    p = p.union(rim.translate((ESTOP_BOX_AT[0], ESTOP_BOX_AT[1], t)))
+    jx, jy = JACK[0] + 2 * CLEAR, JACK[1] + 2 * CLEAR + 0.6
+    for sy in (-1, 1):                                                                                   # jack frame: two side walls,
+        p = p.union(cq.Workplane("XY").box(jx - 6, 3.0, 8.0, centered=(True, True, False))                 # ends open for the plug and
+                    .translate((JACK_AT[0], JACK_AT[1] + sy * (jy / 2 + 1.5), t)))                         # the screw terminals
+    return p
 
 
 # ---------------- 02 controller ----------------
@@ -146,7 +105,7 @@ def button_panel():
 SKR_AT = (-50.0, 0.0)             # CTL-01 BTT SKR Pico centre, turned 180 deg so its USB-C faces the -X tray edge
 SKR_HOLES = [(-19.0, sy * 24.5) for sy in (-1, 1)] + [(39.0, sy * 24.5) for sy in (-1, 1)]   # 58 x 49 (maker STEP, turned)
 SKR_STANDOFF = 6.0                # board 6 mm above the tray floor: clear of its underside parts
-ESP = (69.0, 26.0)                # CTL-02 ESP32-S3-DevKitC-1 outline (ESTIMATE for clones: measure, change here)
+ESP = (62.74, 25.4)               # CTL-02 ESP32-S3-DevKitC-1, Espressif board [P65]; clones run to ~69 x 26: measure, change here
 ESP_AT = (55.0, -40.0)            # USB end toward +X (tray edge); module end toward -X
 ESP_PED = 6.0                     # pedestal under the module can: board upside down, header pins UP for the jumpers
 OPTO_MOD = (66.0, 16.5)           # PWR-10 PC817 24 V module, 66 x 16.5 x 12 mm (listing); screw terminals both ends
@@ -176,6 +135,7 @@ def controller_tray():
     t = t.union(_pocket(*ESP, 1.6, 12, ESP_AT))                                                       # locating frame
     t = t.union(cq.Workplane("XY").rect(22, ESP[1] - 6).extrude(ESP_PED).translate((ex - ESP[0] / 2 + 13, ey, 3)))   # pedestal
     t = t.cut(cq.Workplane("XY").rect(4, 16).extrude(12).translate((ex + ESP[0] / 2 + 1.5, ey, 3)))  # USB-C opening
+    t = t.union(_wago_pockets())                                                                     # MOT+, MOT-, keypad GND, spare
     for x, y in TRAY_HOLES:                                                                         # 6 mm corner bosses
         t = t.union(cq.Workplane("XY").circle(5).extrude(6).translate((x, y, 0)))
         t = t.cut(cq.Workplane("XY").circle(M2 / 2).extrude(6).translate((x, y, 0)))
@@ -183,6 +143,22 @@ def controller_tray():
 
 
 TRAY_HOLES = [(sx * 92, sy * 57) for sx in (-1, 1) for sy in (-1, 1)]
+# PWR-20 WAGO lever connectors (sizes from distributor data [P63]): width x depth x height, wires go in along the depth.
+WAGO_221 = {2: (13.1, 18.7, 8.3), 3: (18.7, 18.6, 8.3), 5: (30.0, 18.8, 8.6)}
+# Four pockets along the tray's south edge, under the SKR Pico's edge, openings facing -Y (the deck runs come in there):
+# MOT+, MOT- and keypad GND (221-413 each) and one spare. 3 walls, 5 mm high: levers stay free, entries stay open.
+WAGO_CELL, WAGO_WALL, WAGO_POCKETS = (18.9, 18.8), 1.2, [(-74.0 + 20.1 * k, -47.0) for k in range(4)]
+
+
+def _wago_pockets() -> cq.Workplane:
+    cw, cd = WAGO_CELL
+    w = WAGO_WALL
+    out = None
+    for x, y in WAGO_POCKETS:
+        c = cq.Workplane("XY").box(cw + 2 * w, cd + w, 5, centered=(True, False, False)).translate((x, y - cd / 2, 3))
+        c = c.cut(cq.Workplane("XY").box(cw, cd, 5, centered=(True, False, False)).translate((x, y - cd / 2, 3)))
+        out = c if out is None else out.union(c)
+    return out
 
 
 # ---------------- 03 frame: printed deck, printed bars, M2 throughout ----------------
@@ -536,7 +512,7 @@ def table_drum():
     d = d.cut(cq.Workplane("XY").circle(7.0).extrude(h))                                    # inner races / spacer clear
     d = d.cut(cq.Workplane("XY").circle(10).extrude(h - (TABLE_Z["nut"] - z0)).translate((0, 0, TABLE_Z["nut"] - z0)))   # nut + spanner
     d = d.faces(">Z").workplane().rect(OG40, OG40, forConstruction=True).vertices().hole(M2_TAP, 12)   # M2 x 12 self-tap from the yoke
-    return d.cut(cq.Workplane("XY").pushPoints([(30, -4.5), (30, 4.5)]).circle(M2_TAP / 2).extrude(8).translate((0, 0, h - 8)))
+    return d.cut(cq.Workplane("XY").pushPoints([(-TFLAG["tab_r"], -4.5), (-TFLAG["tab_r"], 4.5)]).circle(M2_TAP / 2).extrude(8).translate((0, 0, h - 8)))
 
 
 def table_motor_bracket():
@@ -554,6 +530,46 @@ def table_motor_bracket():
     top = top.cut(cq.Workplane("XY").circle(NEMA17_BOSS / 2 + 0.3).extrude(5).translate((0, 0, MOTOR_BODY)))
     top = top.cut(cq.Workplane("XY").rect(NEMA17_HOLES, NEMA17_HOLES, forConstruction=True).vertices().circle(M3 / 2).extrude(5).translate((0, 0, MOTOR_BODY)))
     return rails.union(top)
+
+
+# Table home: the flag (TBL-07h) sits on the drum's top at local -x, so at home (M3 = -180) its fin is at world +X,
+# in the slot of a TCST2103 endstop (TBL-04) on a riser (TBL-07g) screwed to three deck pilots inside the lazy Susan.
+# Fin at r 60: clear of the table motor's pulley (r <= 57.4) and the motor bracket (z <= 53.5) when it swings past 180.
+# Endstop PCB at z 56, so its plugged lead stays below the yoke base that sweeps r <= 72 from the drum top (z 80.7) up.
+TFLAG = {"tab_r": 30.0, "fin_r": 60.0, "fin_len": 20.0, "fin_t": 1.5, "fin_bottom": 62.0, "tab_t": 4.0}
+ENDSTOP_Z = 56.0                                                        # TBL-04 PCB underside above the deck
+ENDSTOP_FEET = [(40.0, -40.0), (40.0, 0.0), (40.0, 40.0)]               # spare-grid pilots of the C tile
+
+
+def table_flag():
+    """Home flag for the table, in print pose (the face that sits on the drum is up at z 4; fin standing up from the
+    bed): a tab on the drum's two flag holes, a bridge out past the drum, a fin at r 60 that hangs down when fitted and
+    passes edge-first through the TCST2103's 3.1 mm slot (1.5 mm thick: 0.8 mm each side). x = radius from the axis."""
+    t, r0, rf = TFLAG["tab_t"], TFLAG["tab_r"], TFLAG["fin_r"]
+    tab = cq.Workplane("XY").box(10, 16, t, centered=(True, True, False)).translate((r0, 0, 0))
+    tab = tab.cut(cq.Workplane("XY").pushPoints([(r0, -4.5), (r0, 4.5)]).circle(M2 / 2).extrude(t))
+    bridge = cq.Workplane("XY").box(rf + 1.5 - (r0 + 5), 10, t, centered=(False, True, False)).translate((r0 + 5, 0, 0))
+    fin_h = TABLE_Z["hub_top"] - TFLAG["fin_bottom"]
+    fin = cq.Workplane("XY").box(TFLAG["fin_t"], TFLAG["fin_len"], fin_h + t, centered=(True, True, False)).translate((rf, 0, 0))
+    return tab.union(bridge).union(fin)
+
+
+def endstop_riser():
+    """Stands the table endstop (TBL-04) at r 60 on +X, PCB long axis radial, slot at the fin's radius. A T foot on three
+    deck pilots (3 x M2 x 10), a post outside the lazy Susan's drum clearance, a pad with two M2 self-tap pilots and
+    2 mm bosses (the module's solder side clears the pad). World coordinates: deck top = z 0."""
+    rf, z = TFLAG["fin_r"], ENDSTOP_Z
+    foot = cq.Workplane("XY").box(12, 92, 5, centered=(True, True, False)).translate((40, 0, 0))
+    foot = foot.union(cq.Workplane("XY").box(38, 20, 5, centered=(False, True, False)).translate((34, 0, 0)))
+    foot = foot.cut(cq.Workplane("XY").pushPoints(ENDSTOP_FEET).circle(M2 / 2).extrude(5))
+    post = cq.Workplane("XY").box(12, 20, z - 2 - 6 - 5, centered=(False, True, False)).translate((rf, 0, 5))
+    pad = cq.Workplane("XY").box(33, 11, 6, centered=(True, True, False)).translate((rf, 0, z - 2 - 6))
+    holes = [(rf - 12.5, 0), (rf + 12.5, 0)]
+    pad = pad.union(cq.Workplane("XY").pushPoints(holes).circle(3).extrude(2).translate((0, 0, z - 2)))
+    zp = z - 2 - 6                                                                    # 45 deg web under the inner pad: prints with no support
+    web = cq.Workplane("XZ").polyline([(rf, zp - (rf - (rf - 16.5))), (rf, zp), (rf - 16.5, zp)]).close().extrude(5.5, both=True)
+    r = foot.union(post).union(pad).union(web)
+    return r.cut(cq.Workplane("XY").pushPoints(holes).circle(M2_TAP / 2).extrude(8).translate((0, 0, z - 8)))
 
 
 YOKE_INNER = 116.0
@@ -843,9 +859,10 @@ PLACE = {   # part: deck pilot positions (x, y), mm from the zero point; deck_ti
     "table motor bracket": [(-TABLE_BELT_C, s * 34.3) for s in (-1, 1)],
     "M4 motor mount": [(RING_MOTOR_R + (RING_BASE[0] + RING_BASE[1]) / 2, s * 38) for s in (-1, 1)],
     "bar saddles": [(x + dx, dy) for x in SADDLES_X for dx, dy in SADDLE_HOLES],
-    "power box": [(POWER_XY[0] + dx, POWER_XY[1] + dy) for dx in (-20, 20) for dy in (-20, 20)],
+    "power plate": [(POWER_XY[0] + dx, POWER_XY[1] + dy) for dx in (-20, 20) for dy in (-20, 20)],
     "controller tray": [(TRAY_XY[0] + x, TRAY_XY[1] + y) for x, y in TRAY_HOLES],
     "ring scale": [_polar(RING_SCREW_R, 20 + 80 * k + a) for k in range(4) for a in RING_SCREW_A],
+    "table endstop riser": ENDSTOP_FEET,
 }
 _DECK_EDGES = [-DECK_HALF + DECK_TILE * k for k in range(DECK_N + 1)]
 
@@ -863,13 +880,12 @@ _check_place()
 # ---------------- registry ----------------
 PARTS = {   # id: (stage folder, file stem, function, what)
     "PLAN-01": ("00-plan", "tolerance_coupon", tolerance_coupon, "Fit test: M2 self-tap holes + 608 pockets"),
-    "PWR-18a": ("01-power", "power_box", power_box, "Power box"),
-    "PWR-18b": ("01-power", "power_lid", power_lid, "Power box lid (e-stop)"),
+    "PWR-18": ("01-power", "power_plate", power_plate, "Power plate (jack + e-stop box)"),
     "CTL-10a": ("02-controller", "button_panel", button_panel, "Keypad panel + OLED window"),
     "CTL-10b": ("02-controller", "controller_tray", controller_tray, "Controller tray (SKR Pico + ESP32-S3 + opto + LED driver)"),
     "FRM-01a": ("03-frame", "deck_tile_SW", lambda: deck_tile_k(0), "Deck tile SW (x -300..-100, y -300..-100)"),
     "FRM-01b": ("03-frame", "deck_tile_S", lambda: deck_tile_k(1), "Deck tile S (x -100..100, y -300..-100)"),
-    "FRM-01c": ("03-frame", "deck_tile_SE", lambda: deck_tile_k(2), "Deck tile SE: power box (x 100..300, y -300..-100)"),
+    "FRM-01c": ("03-frame", "deck_tile_SE", lambda: deck_tile_k(2), "Deck tile SE: power plate (x 100..300, y -300..-100)"),
     "FRM-01d": ("03-frame", "deck_tile_W", lambda: deck_tile_k(3), "Deck tile W (x -300..-100, y -100..100)"),
     "FRM-01e": ("03-frame", "deck_tile_C", lambda: deck_tile_k(4), "Deck tile C: table post + motor (x -100..100, y -100..100)"),
     "FRM-01f": ("03-frame", "deck_tile_E", lambda: deck_tile_k(5), "Deck tile E: M4 motor + saddles (x 100..300, y -100..100)"),
@@ -893,10 +909,12 @@ PARTS = {   # id: (stage folder, file stem, function, what)
     "LAR-08f": ("04-light-arm", "upright_bar", upright_bar, "Light-arm upright bar, 200 mm"),
     "LAR-08g": ("04-light-arm", "arm_bar", arm_bar, "Horizontal light-arm bar, 200 mm"),
     "TBL-07a": ("05-table", "table_drum", table_drum, "Table drum: 100T teeth, 608 seats, OG-40 top"),
-    "TBL-07b": ("05-table", "home_flag", home_flag, "Home flag (print 3: table, tilt, spin)"),
+    "TBL-07b": ("05-table", "home_flag", home_flag, "Home flag (print 2: tilt, spin)"),
     "TBL-07c": ("05-table", "table_motor_bracket", table_motor_bracket, "Table motor bracket (shaft up, slotted)"),
     "TBL-07d": ("05-table", "table_post", table_post, "Table post: fixed M8 x 75 axle (hex-locked head)"),
     "TBL-07f": ("05-table", "spacers", spacers, "Spacers + shims, table and tilt (one print)"),
+    "TBL-07g": ("05-table", "endstop_riser", endstop_riser, "Table endstop riser (3 deck pilots, +X)"),
+    "TBL-07h": ("05-table", "table_flag", table_flag, "Table home flag (fin at r 60)"),
     "CAM-03a": ("06-camera-light", "aperture_stop_f8", aperture_stop, "f/8 aperture stop"),
     "CAM-03b": ("06-camera-light", "camera_plate", camera_plate, "Camera plate + post clamp"),
     "LSR-05a": ("06-camera-light", "lamp_tube", lamp_tube, "Lamp body + tube, bar clamp, polarizer slot"),

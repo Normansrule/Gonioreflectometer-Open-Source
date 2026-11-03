@@ -76,6 +76,6 @@ Background papers and sources, by topic. Format: APA reference — *what this pr
 
 - IEC. (n.d.). *Photobiological safety of lamps and lamp systems*. https://doi.org/10.3403/30149289 — *COB and LED-bank eye-safety risk groups (phases 04, 10)* `[N47]`
 - *ISO, "safety of machinery*. (n.d.-a). https://doi.org/10.3403/30265059 — *E-stop category and reset behaviour (phases 01, 02)* `[N48]`
-- *IEC, "safety of machinery*. (n.d.). https://doi.org/10.3403/30238348 — *Power box wiring, colours, stop circuit (phase 01)* `[N49]`
+- *IEC, "safety of machinery*. (n.d.). https://doi.org/10.3403/30238348 — *Power wiring, colours, stop circuit (phase 01)* `[N49]`
 - *ISO, "safety of machinery*. (n.d.-b). https://doi.org/10.3403/30201665 — *Pinch-point/hazard risk assessment (phases 00, 16)* `[N50]`
 - *IEC, "audio/video, information and communication technology equipment*. (n.d.). https://doi.org/10.3403/30347376U — *Bought-in PSU safety listing (phase 01)* `[N51]`

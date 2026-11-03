@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/04.svg" width="100%" alt="Steps of stage 04">
 
-$74.54 · total so far $362.85 / $630
+$77.43 · total so far $288.94 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/)
 
@@ -76,8 +76,9 @@ Tooth count in design.md.
 
 #### Do
 
-1. Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt (its flanges pass above and below the band).
-2. Mount at 0° (+X), base outside the lazy Susan, its two slots over the two deck pilots; slide it in until the pulley meshes the rim belt fully, then M2 × 12 + washer through each slot.
+1. E-stop pressed. This is the bench motor from M08.3: unplug it from the SKR Pico X socket only now, mount it, then plug it back into X with its cable along the deck edge.
+2. Motor on the mount plate (shaft down through the slot, 4 × M3 × 8); 20T pulley on the shaft, grub on the D flat, teeth level with the rim belt (its flanges pass above and below the band).
+3. Mount at 0° (+X), base outside the lazy Susan, its two slots over the two deck pilots; slide it in until the pulley meshes the rim belt fully, then M2 × 12 + washer through each slot.
 
 #### Verify
 
@@ -115,21 +116,25 @@ M4 returns to the same spot every time (≤ 0.1°). · 0/4 steps done · ~2.2 h 
 
 ### M14.1 Home switch
 
-**Time** 45 min · **Needs** LAR-05 TCST2103 · LAR-06 roller switch · flag on the arm
+**Time** 45 min · **Needs** LAR-05 TCST2103 · LAR-06 limit switch (3 wires attached) · 3 × 221-2401 (PWR-20; two splices + the blue cap) · flag on the arm
 
 #### Do
 
-1. Mount the TCST2103 so the arm flag cuts it at 20°: M2 × 8 + washer through one module hole into the nearest spare deck pilot (40 mm grid), double-sided tape under it (lead as in M10.3).
-2. Roller over-travel switch (LAR-06) on the deck 3° beyond (M2 into spare pilots, or double-sided tape). Press the e-stop; cut the red wire where it passes the switch, strip both ends, one under COM, one under NC.
+1. Mount the TCST2103 so the arm flag cuts it at 20°: M2 × 8 + washer through one module hole into the nearest spare deck pilot (40 mm grid), double-sided tape under it (lead as in M10.2).
+2. Limit switch (LAR-06) on the deck at 17° (3° past home, outside the 20–324° travel), lever toward the arm (double-sided tape). Find its wires with the meter: COM–NC beeps with the lever untouched and opens when pressed (black = COM, grey = NC, blue = NO on the units bought).
+3. Press the e-stop, unplug the adapter. Splice the switch into the red run (e-stop NC 2 → MOT+ slot 1), so the length of its own leads doesn't matter: lay the run past the switch and cut it where both the black and the grey lead reach it with slack. Strip 11 mm on both cut ends and on the black and grey leads.
+4. One 221-2401: red from the e-stop + black (COM). A second: grey (NC) + red on to the tray. Blue (NO) alone in the third. Tug each; tape the connectors to the deck beside the switch.
+5. Check before power (adapter unplugged, e-stop released): continuity e-stop NC 2 → MOT+ beeps; press the lever: it opens (proves the switch is in the + line). Ω MOT+ to MOT−: > 10 kΩ or OL (T1).
+6. Adapter in, release the e-stop.
 
 #### Verify
 
 - [ ] `opengonio send '?'` shows `Pn:X` with the flag in the slot.
-- [ ] Pressing the roller switch drops SKR Pico POWER to 0 V (and the hub prints `POWER 0`).
+- [ ] Pressing the lever drops SKR Pico POWER to 0 V and the hub prints `POWER 0`; releasing it brings both back (T6).
 
 #### Record
 
-Tick the boxes; `make done id=M14.1`.
+T6 in `phases/01-power/test.csv`; `make done id=M14.1`.
 
 ### M14.2 Config and homing
 
@@ -146,7 +151,7 @@ Tick the boxes; `make done id=M14.1`.
 
 - [ ] Tests pass.
 - [ ] After power-up `?` shows `<Alarm` (must_home: nothing moves until homed); after homing `<Idle`.
-- [ ] Home finishes 10/10; arm stops on the flag, never on the roller switch.
+- [ ] Home finishes 10/10; arm stops on the flag, never on the limit switch.
 
 #### If a check fails
 
@@ -199,4 +204,6 @@ Three readings in design.md.
 
 Both JSON summaries in phases/04-light-arm/design.md → Results; commit.
 
-[Sources](../../REFERENCES.md): R1 · G10 · N15 · N47 · H2 · H11 · H16 · H17 · H18 · H26 · P42 · P43 · P44 · P58 · M1 · M2 · M10
+> **Safety:** Before touching a motor plug or a screw terminal: press the e-stop and unplug the adapter.
+
+[Sources](../../REFERENCES.md): R1 · G10 · N15 · N47 · H2 · H11 · H16 · H17 · H18 · H26 · P42 · P43 · P44 · P58 · P61 · M1 · M2

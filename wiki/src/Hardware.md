@@ -1,10 +1,10 @@
 # Hardware
 
-Every electrical connection, pin by pin (power box, SKR Pico, ESP32-S3 header, lamp, USB): [README → Wiring]({{REPO}}/README.md#wiring).
+Every electrical connection, pin by pin (power, SKR Pico, ESP32-S3 header, lamp, USB; step by step in the [wiring guide]({{REPO}}/docs/wiring.html)): [README → Wiring]({{REPO}}/README.md#wiring).
 
 | Subsystem | Parts | Stage |
 |---|---|---|
-| Power | 24 V Li-ion pack with protection board (~6 h per charge), charged over USB-C (PD trigger + CC/CV module), 3.15 A fuse, latching e-stop, lever connectors | [01]({{REPO}}/phases/01-power) |
+| Power | 24 V 3 A wall adapter with a screw-terminal jack, latching e-stop in its own box, pre-wired limit switch, lever connectors | [01]({{REPO}}/phases/01-power) |
 | Controller | BTT SKR Pico (grblHAL, USB-C) + ESP32-S3 hub, keypads | [02]({{REPO}}/phases/02-controller) |
 | Frame | printed 600 × 600 mm deck (9 tiles), printed 20 × 20 bars, M2 screws | [03]({{REPO}}/phases/03-frame) |
 | Light arm (M4) | 12 in lazy Susan, GT2 belt rim, 24:1 | [04]({{REPO}}/phases/04-light-arm) |
@@ -16,7 +16,7 @@ Every electrical connection, pin by pin (power box, SKR Pico, ESP32-S3 header, l
 - **One screw size:** M2 everywhere; M3 only into the motors, M8 bolts as axles.
 - **Printed parts:** black ABS (acrylonitrile butadiene styrene) on an enclosed printer; ≈ 2.7 kg, half of it the deck.
 - **Circuit board (future):** a carrier board that replaces the modules and jumpers: [pcb/]({{REPO}}/pcb/README.md).
-- **Optical homing** on every axis; over-travel switches in the e-stop loop.
+- **Optical homing** on every axis; one over-travel switch in the e-stop loop (light arm, at 17°; the other ends rely on soft limits and the e-stop).
 - **Cost:** see the [bill of materials]({{REPO}}/README.md#electronics) (pictures, buy links, STEP/STL downloads).
 
 Open-hardware practice [@H28; @H31]: [Appendix E](Appendix-E-Hardware.md).

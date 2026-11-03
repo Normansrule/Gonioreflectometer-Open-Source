@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Wiring tables and diagram from docs/wiring.yaml (the source of truth for every connection).
 
-    python tools/wiring.py            # README "Wiring" block, docs/assets/wiring.svg, docs/assets/wiring/wiring-NN.svg
+    python tools/wiring.py            # README "Wiring" block, docs/assets/wiring.svg, docs/assets/wiring/wiring-NN.svg,
+                                      # docs/wiring-guide.js (the step-by-step guide page docs/wiring.html)
     python tools/wiring.py --check    # pins vs firmware/hub/main.py, SKR Pico map, machine.yaml; header pins used twice
 
 Pin maps: SKR Pico V1.0 maker pin diagram [C12]; ESP32-S3-DevKitC-1 v1.1 user guide, headers J1/J3 [R86];
@@ -152,7 +153,8 @@ def readme_block(w: dict) -> str:
            "Every connection, pin by pin. No solder, no crimps: screw terminals, lever connectors (WAGO 221), "
            "plug-in leads and jumper wires. Source: [`docs/wiring.yaml`](docs/wiring.yaml) "
            "(`make build` writes this section; `make check` compares it with the firmware). "
-           "**Press the e-stop and unplug the USB-C charger before touching any terminal.**", ""]
+           "**Press the e-stop and unplug the wall adapter before touching any terminal.** "
+           "Step by step with pictures: [wiring guide](docs/wiring.html).", ""]
     toc = " · ".join(f"[{g['title'].split(' · ', 1)[1]}](#{anchor(g['title'])})" for g in w["groups"])
     out += [f"**Jump to:** {toc} · [SKR Pico port map](#skr-pico-port-map) · [ESP32-S3 header map](#esp32-s3-header-map)", ""]
     for g in w["groups"]:
@@ -169,6 +171,9 @@ def readme_block(w: dict) -> str:
             frm, to, wire, note = (r + ["", ""])[:4]
             out.append(f"| {i} | {annotate(frm, w['parts'])} | {annotate(to, w['parts'])} | {wire} | {note} |")
         out.append("")
+        if g.get("checks"):
+            out.append("**Check:** " + " · ".join(g["checks"]))
+            out.append("")
     out += ["### SKR Pico port map", "",
             "Ports as named on the board; pins in the maker pin diagram's order [C12]. `·` = free.", "", skr_table(w), ""]
     out += ["### ESP32-S3 header map", "",
@@ -220,9 +225,9 @@ def svg() -> str:
     b += (f'<text x="24" y="54" fill="{MUTED}" font-size="12">Red: 18–24 V motor power · grey: ground · blue: motor '
           f'cables · green: home switches · purple: 3.3 V logic · yellow: USB. Pin-by-pin tables below.</text>')
     # power chain (left)
-    b += _box(24, 84, 230, 76, "Power box (01)", ["6S pack + BMS · fuse 3.15 A T", "USB-C → PD 20 V → CC/CV 24 V"], GREEN)
-    b += _box(24, 186, 230, 48, "E-stop (NC contact)", [], ORANGE)
-    b += _box(24, 260, 230, 48, "Over-travel switch", [], ORANGE)
+    b += _box(24, 84, 230, 76, "Power (01)", ["24 V 3 A wall adapter", "screw-terminal jack on the power plate"], GREEN)
+    b += _box(24, 186, 230, 48, "E-stop box (NC contact)", [], ORANGE)
+    b += _box(24, 260, 230, 48, "Limit switch (over-travel)", [], ORANGE)
     b += _wire([(139, 160), (139, 186)], RED)
     b += _wire([(139, 234), (139, 260)], RED)
     # motors (top) + SKR Pico (centre)
@@ -266,7 +271,10 @@ def svg() -> str:
 
 # ---- one animated pin-by-pin diagram per group ------------------------------------------------------------------
 GROUP_DIR = ROOT / "docs" / "assets" / "wiring"
-GREY, ORANGE2 = "#8b949e", "#ffa657"
+GUIDE = ROOT / "docs" / "wiring-guide.js"
+KIND_KEY = {"18–24 V": "power", "ground / − side": "ground", "limit-switch wire (+24 V line)": "switch", "3.3 / 5 V": "logic",
+            "signal": "signal", "motor": "motor", "home switch": "home", "USB": "usb", "reserved": "reserved"}
+GREY, ORANGE2, SWITCH = "#8b949e", "#ffa657", "#ff9e9e"
 
 
 def esc(t: str) -> str:
@@ -286,6 +294,8 @@ def wire_colour(r: list, blocked: bool, parts: dict | None = None) -> tuple[str,
     pins = " ".join(pin_text(e, parts or {}) if e != "-" else "" for e in (frm, to))
     if blocked:
         return GREY, "reserved"
+    if {"OT", "OTA", "OTB"} & {frm.split(":")[0], to.split(":")[0]}:
+        return SWITCH, "limit-switch wire (+24 V line)"
     if "usb" in wire or "USB" in pins:
         return YELLOW, "USB"
     if frm.split(":")[0] in ("M1", "M2", "M3", "M4", "SPLICE") or "5-pack" in wire or "same cable" in wire:
@@ -295,7 +305,7 @@ def wire_colour(r: list, blocked: bool, parts: dict | None = None) -> tuple[str,
     ends = {frm.split(":")[0], to.split(":")[0]}
     if any(k in pins for k in ("GND", "−", "common", "black")) or "black" in wire or ends & {"MOT-", "GND", "HGND"}:
         return GREY, "ground / − side"
-    if ends & {"MOT+", "FUSED", "BAT+"} or any(k in pins for k in (
+    if ends & {"MOT+", "JACK", "ADAPTER"} or any(k in pins for k in (
             "12/24V", "+Vin", "+Vo", "OUT +", "IN +", "IN+", "lead A", "lead B", "NC", "COM")):
         return RED, "18–24 V"
     if any(k in pins for k in ("3V3", "5V", "VCC", "VIN")):
@@ -305,7 +315,8 @@ def wire_colour(r: list, blocked: bool, parts: dict | None = None) -> tuple[str,
     return PURPLE, "signal"
 
 
-def group_svg(g: dict, parts: dict) -> tuple[str, int]:
+def layout(g: dict, parts: dict) -> dict:
+    """Boxes, pins and wire paths of one group: shared by the README diagrams and the step-by-step guide page."""
     rows, blocked = g["rows"], bool(g.get("blocked"))
     node = lambda e: e.partition(":")[0]                      # noqa: E731
     order: list[str] = []
@@ -376,32 +387,13 @@ def group_svg(g: dict, parts: dict) -> tuple[str, int]:
     total_h = int(bottom + (len(skips["bottom"]) * LANE + 16 if skips["bottom"] else 0) + 50)
     out_k: dict[int, int] = {}
     in_k: dict[int, int] = {}
-
-    b = [f'<text x="28" y="34" fill="{TXT}" font-size="18" font-weight="600">{esc(g["title"])}</text>',
-         f'<text x="28" y="56" fill="{MUTED}" font-size="12">Stage {esc(g["stage"])} · each line is one wire, from the '
-         f'left pin to the right pin; the number matches the table row below.</text>']
-    if blocked:
-        b.append(f'<text x="{total_w - 28}" y="34" fill="{RED}" font-size="15" font-weight="700" text-anchor="end">'
-                 f'BLOCKED: do not wire or power</text>')
-    # boxes and pins
-    for n in order:
-        x0, y0, w, h = pos[n]
-        b.append(f'<rect x="{x0:.0f}" y="{y0:.0f}" width="{w:.0f}" height="{h:.0f}" rx="9" fill="{PANEL}" stroke="{LINE}" stroke-width="1.5"/>')
-        b.append(f'<text x="{x0 + 12:.0f}" y="{y0 + 20:.0f}" fill="{TXT}" font-size="13" font-weight="600">{esc(parts.get(n, n))}</text>')
-        for i, p in enumerate(pins[n]):
-            py = y0 + HEAD + ROW * i + ROW / 2 + 2
-            b.append(f'<rect x="{x0 + 6:.0f}" y="{py - 9:.0f}" width="{w - 12:.0f}" height="18" rx="4" fill="{BG}"/>')
-            b.append(f'<text x="{x0 + 14:.0f}" y="{py + 4:.0f}" fill="{TXT}" font-size="11.5">{esc(p)}</text>')
-    # wires
-    kinds = {}
+    wires = []
     for i, r in enumerate(rows, 1):
         colr, kind = wire_colour(r, blocked, parts)
-        kinds[kind] = colr
         x1, y1 = pin_xy(r[0], "out")
+        w = {"n": i, "row": r, "colour": colr, "kind": kind, "a": (x1, y1), "pin_a": (node(r[0]), pin_text(r[0], parts))}
         if r[1] == "-":
-            b.append(f'<text x="{x1 - 12:.0f}" y="{y1 + 4:.0f}" fill="{MUTED}" font-size="11" text-anchor="end">'
-                     f'not connected ({i})</text>')
-            b.append(f'<circle cx="{x1:.0f}" cy="{y1:.0f}" r="4" fill="{BG}" stroke="{GREY}" stroke-width="1.5"/>')
+            wires.append(w)
             continue
         x2, y2 = pin_xy(r[1], "in")
         if i in route:
@@ -418,6 +410,42 @@ def group_svg(g: dict, parts: dict) -> tuple[str, int]:
             t = (0.5, 0.32, 0.68)[i % 3]                      # stagger the row badges so neighbours don't overlap
             mx = (1 - t) ** 3 * x1 + 3 * (1 - t) ** 2 * t * (x1 + dx) + 3 * (1 - t) * t ** 2 * (x2 - dx) + t ** 3 * x2
             my = (1 - t) ** 3 * y1 + 3 * (1 - t) ** 2 * t * y1 + 3 * (1 - t) * t ** 2 * y2 + t ** 3 * y2
+        w.update(d=d, b=(x2, y2), badge=(mx, my), pin_b=(node(r[1]), pin_text(r[1], parts)))
+        wires.append(w)
+    return {"order": order, "pos": pos, "pins": pins, "wires": wires, "w": total_w, "h": total_h,
+            "blocked": blocked, "ROW": ROW, "HEAD": HEAD}
+
+
+def group_svg(g: dict, parts: dict) -> tuple[str, int]:
+    L = layout(g, parts)
+    blocked, total_w, total_h = L["blocked"], L["w"], L["h"]
+    b = [f'<text x="28" y="34" fill="{TXT}" font-size="18" font-weight="600">{esc(g["title"])}</text>',
+         f'<text x="28" y="56" fill="{MUTED}" font-size="12">Stage {esc(g["stage"])} · each line is one wire, from the '
+         f'left pin to the right pin; the number matches the table row below.</text>']
+    if blocked:
+        b.append(f'<text x="{total_w - 28}" y="34" fill="{RED}" font-size="15" font-weight="700" text-anchor="end">'
+                 f'BLOCKED: do not wire or power</text>')
+    # boxes and pins
+    for n in L["order"]:
+        x0, y0, w, h = L["pos"][n]
+        b.append(f'<rect x="{x0:.0f}" y="{y0:.0f}" width="{w:.0f}" height="{h:.0f}" rx="9" fill="{PANEL}" stroke="{LINE}" stroke-width="1.5"/>')
+        b.append(f'<text x="{x0 + 12:.0f}" y="{y0 + 20:.0f}" fill="{TXT}" font-size="13" font-weight="600">{esc(parts.get(n, n))}</text>')
+        for i, p in enumerate(L["pins"][n]):
+            py = y0 + L["HEAD"] + L["ROW"] * i + L["ROW"] / 2 + 2
+            b.append(f'<rect x="{x0 + 6:.0f}" y="{py - 9:.0f}" width="{w - 12:.0f}" height="18" rx="4" fill="{BG}"/>')
+            b.append(f'<text x="{x0 + 14:.0f}" y="{py + 4:.0f}" fill="{TXT}" font-size="11.5">{esc(p)}</text>')
+    # wires
+    kinds = {}
+    for wr in L["wires"]:
+        i, colr, kind = wr["n"], wr["colour"], wr["kind"]
+        kinds[kind] = colr
+        x1, y1 = wr["a"]
+        if "d" not in wr:
+            b.append(f'<text x="{x1 - 12:.0f}" y="{y1 + 4:.0f}" fill="{MUTED}" font-size="11" text-anchor="end">'
+                     f'not connected ({i})</text>')
+            b.append(f'<circle cx="{x1:.0f}" cy="{y1:.0f}" r="4" fill="{BG}" stroke="{GREY}" stroke-width="1.5"/>')
+            continue
+        d, (x2, y2), (mx, my) = wr["d"], wr["b"], wr["badge"]
         if blocked:
             b.append(f'<path d="{d}" fill="none" stroke="{colr}" stroke-width="2" stroke-dasharray="4 6" opacity="0.7"/>')
         else:
@@ -454,6 +482,53 @@ def write_group_svgs(w: dict) -> dict[int, int]:
         if int(f.stem.split("-")[1]) > len(w["groups"]):
             f.unlink()
     return widths
+
+
+# ---- step-by-step guide data (docs/wiring.html reads it) ---------------------------------------------------------
+def md_html(s: str) -> str:
+    """The little markdown wiring.yaml uses (**bold**, `code`) -> HTML, escaped."""
+    s = esc(" ".join(str(s).split()))
+    s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
+    return re.sub(r"`(.+?)`", r"<code>\1</code>", s)
+
+
+def guide_data(w: dict) -> dict:
+    groups = []
+    for g in w["groups"]:
+        L = layout(g, w["parts"])
+        boxes = [{"id": n, "name": w["parts"].get(n, n), "x": round(L["pos"][n][0]), "y": round(L["pos"][n][1]),
+                  "w": round(L["pos"][n][2]), "h": round(L["pos"][n][3]), "pins": L["pins"][n]} for n in L["order"]]
+        wires = []
+        for wr in L["wires"]:
+            frm, to, wire, note = (wr["row"] + ["", ""])[:4]
+            item = {"n": wr["n"], "kind": KIND_KEY.get(wr["kind"], "signal"), "label": wr["kind"],
+                    "from": {"part": w["parts"].get(wr["pin_a"][0], wr["pin_a"][0]), "pin": wr["pin_a"][1]},
+                    "wire": md_html(wire), "note": md_html(note), "a": [round(v) for v in wr["a"]]}
+            if "d" in wr:
+                item.update(to={"part": w["parts"].get(wr["pin_b"][0], wr["pin_b"][0]), "pin": wr["pin_b"][1]},
+                            d=wr["d"], b=[round(v) for v in wr["b"]], badge=[round(v) for v in wr["badge"]])
+            wires.append(item)
+        xs = [b["x"] for b in boxes] + [b["x"] + b["w"] for b in boxes]
+        ys = [b["y"] for b in boxes] + [b["y"] + b["h"] for b in boxes]
+        for wr in L["wires"]:
+            xs.append(wr["a"][0]); ys.append(wr["a"][1])
+            for cmd, args in re.findall(r"([MHVC])([^MHVC]*)", wr.get("d", "")):
+                nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", args)]
+                (xs if cmd == "H" else ys if cmd == "V" else xs).extend(nums if cmd in "HV" else nums[0::2])
+                if cmd in "MC":
+                    ys.extend(nums[1::2])
+        pad = 24
+        view = [round(min(xs) - pad - 70), round(min(ys) - pad), round(max(xs) - min(xs) + 2 * pad + 70), round(max(ys) - min(ys) + 2 * pad)]
+        groups.append({"title": g["title"], "stage": str(g["stage"]), "intro": md_html(g.get("intro", "")),
+                       "checks": [md_html(c) for c in g.get("checks", [])], "blocked": L["blocked"], "view": view,
+                       "w": L["w"], "h": L["h"], "head": L["HEAD"], "row": L["ROW"], "boxes": boxes, "wires": wires})
+    return {"note": "Generated by tools/wiring.py from docs/wiring.yaml (`make build`): do not edit by hand.", "groups": groups}
+
+
+def write_guide(w: dict) -> None:
+    import json
+    GUIDE.write_text("// Written by tools/wiring.py from docs/wiring.yaml (`make build`): do not edit by hand.\nwindow.WIRING = "
+                     + json.dumps(guide_data(w), ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
 
 
 # ---- checks ---------------------------------------------------------------------------------------------------
@@ -573,6 +648,7 @@ def main(argv=None) -> int:
     write_readme(readme_block(w))
     SVG.write_text(svg(), encoding="utf-8")
     write_group_svgs(w)
+    write_guide(w)
     n = sum(len(g["rows"]) for g in w["groups"])
     print(f"README.md wiring: {n} connections in {len(w['groups'])} groups; docs/assets/wiring.svg")
     return 0

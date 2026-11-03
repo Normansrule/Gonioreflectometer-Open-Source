@@ -1,0 +1,213 @@
+/* The two build guides (docs/wiring.html, docs/build.html): one step per page, the lamp marks what to do next.
+   Tokens from og.css; DESIGN.md explains them. SPDX-License-Identifier: CC-BY-SA-4.0 */
+
+:root {
+  /* wire kinds: colour + line pattern, so no kind is told apart by colour alone */
+  --w-power: #e06a5a; --w-ground: #0b0a09; --w-ground-edge: #b9b1a5; --w-switch: #f0a596; --w-logic: #d9935b;
+  --w-signal: #86a4e0; --w-motor: #a891dc; --w-home: #7fb276; --w-usb: #b9b1a5; --w-reserved: #5f5a52;
+  --paper: var(--ground-2);
+}
+:root[data-theme="light"] {
+  --w-power: #b23a2b; --w-ground: #141311; --w-ground-edge: #8f8a82; --w-switch: #c9604f; --w-logic: #a85a17;
+  --w-signal: #2f5aa8; --w-motor: #6b4fb8; --w-home: #3e6f36; --w-usb: #625e57; --w-reserved: #a9a59d;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --w-power: #b23a2b; --w-ground: #141311; --w-ground-edge: #8f8a82; --w-switch: #c9604f; --w-logic: #a85a17;
+    --w-signal: #2f5aa8; --w-motor: #6b4fb8; --w-home: #3e6f36; --w-usb: #625e57; --w-reserved: #a9a59d;
+  }
+}
+
+.bar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: var(--s-5);
+  padding: var(--s-3) var(--margin);
+  background: var(--ground);
+}
+.bar .mark { font-size: 1.5rem; text-decoration: none; white-space: nowrap; }
+.bar nav { display: flex; gap: var(--s-5); overflow-x: auto; margin-right: auto; scrollbar-width: none; }
+.bar nav::-webkit-scrollbar { display: none; }
+.bar nav a { color: var(--ink-2); font-size: var(--step-small); text-decoration: none; white-space: nowrap; padding: var(--s-2) 0; }
+.bar nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--light-mark); text-decoration-thickness: 2px; }
+@media (hover: hover) and (pointer: fine) { .bar nav a:hover { color: var(--ink); } }
+.bar .theme { min-height: 36px; padding: 0 var(--s-4); flex: none; }
+@media (max-width: 720px) {
+  .bar { flex-wrap: wrap; row-gap: 0; }
+  .bar nav { order: 3; width: 100%; margin: 0; }
+  .bar .theme { margin-left: auto; }
+}
+
+main { max-width: 1320px; margin: 0 auto; padding: 0 var(--margin) var(--s-8); }
+.g-head { padding: var(--s-6) 0 var(--s-4); display: grid; gap: var(--s-3); }
+.g-head h1 { font-size: var(--step-head); }
+.g-lead { color: var(--ink-2); max-width: 60ch; }
+.g-safety { display: flex; gap: var(--s-3); align-items: baseline; color: var(--ink); max-width: 68ch; }
+.patch { flex: none; width: 10px; height: 10px; display: inline-block; transform: translateY(1px); }
+.patch.red { background: var(--patch-red); }
+.patch.light { background: var(--light-mark); }
+
+.legend { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); font-size: var(--step-small); color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: var(--s-2); }
+.legend svg { width: 30px; height: 10px; }
+
+/* section chips */
+.sections { display: flex; gap: var(--s-2); overflow-x: auto; padding: var(--s-2) 5px var(--s-4); margin-inline: -5px; scroll-padding-inline: 5px; scrollbar-width: thin; }
+.sections button {
+  flex: none; display: grid; gap: 2px; text-align: left; min-width: 150px; max-width: 220px;
+  padding: var(--s-3) var(--s-4); border: 0; border-radius: var(--radius); background: var(--ground-2);
+  color: var(--ink-2); cursor: pointer; font-size: var(--step-small); line-height: 1.3;
+  transition: background-color var(--t-ui) ease, color var(--t-ui) ease;
+}
+.sections button b { color: var(--ink); font-weight: 500; }
+.sections button .meter { height: 3px; background: var(--ground-4); margin-top: var(--s-2); }
+.sections button .meter i { display: block; height: 100%; background: var(--ink-2); transform: scaleX(0); transform-origin: left; transition: transform var(--t-exposure) var(--ease-out); }
+.sections button[aria-current="true"] { background: var(--ground-3); color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .sections button:hover { background: var(--ground-3); } }
+
+/* the stage: the diagram full width, the step card under it */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+.sheet { background: var(--paper); border-radius: var(--radius); overflow: hidden; }
+.sheet-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.sheet svg { width: 100%; height: auto; display: block; max-height: 62vh; }
+.sheet-note { margin: 0; padding: var(--s-2) var(--s-4); font-size: var(--step-small); color: var(--ink-2); max-width: 72ch; }
+
+.card { background: var(--ground-2); border-radius: var(--radius); padding: var(--s-5);
+        display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); grid-template-areas: "head body" "nav body"; gap: var(--s-4) var(--s-6); align-items: start; }
+.card .c-head { grid-area: head; display: grid; gap: var(--s-3); }
+.card .c-body { grid-area: body; display: grid; gap: var(--s-3); max-width: 66ch; }
+.card .c-nav { grid-area: nav; display: grid; gap: var(--s-2); align-self: end; }
+@media (max-width: 860px) { .card { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "body" "nav"; } }
+.meta, .progress { font-size: var(--step-small); color: var(--ink-2); }
+.card h2 { font-family: var(--font-display); font-size: clamp(1.45rem, 1.15rem + 0.9vw, 1.95rem); line-height: 1.1; letter-spacing: -0.01em; }
+.ends { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--s-2) var(--s-4); margin: 0; }
+.ends dt { font-size: var(--step-small); color: var(--ink-2); padding-top: 2px; }
+.ends dd { margin: 0; }
+.ends dd b { font-weight: 500; }
+.ends .kind { display: inline-flex; align-items: center; gap: var(--s-2); }
+.ends .kind svg, .legend svg { width: 30px; height: 10px; flex: none; }
+.note { color: var(--ink-2); font-size: var(--step-small); max-width: 62ch; }
+.intro-text { color: var(--ink-2); font-size: var(--step-small); max-width: 62ch; }
+.checks { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s-2); }
+.warn { background: color-mix(in srgb, var(--patch-red) 16%, transparent); color: var(--ink); padding: var(--s-3) var(--s-4); border-radius: var(--radius); }
+.nav { display: flex; gap: var(--s-3); align-items: center; }
+.nav .btn { flex: 1; }
+.nav .btn-light { flex: 2; }
+.hint { font-size: var(--step-small); color: var(--ink-2); }
+code { font-size: 0.9em; background: var(--ground-3); padding: 0 4px; border-radius: var(--radius); }
+.kbd { font-size: 0.85em; border: 1px solid var(--rule); padding: 0 5px; border-radius: var(--radius); }
+
+/* svg pieces */
+.box-r { fill: var(--ground); stroke: var(--rule); stroke-width: 1.2; }
+.box-t { fill: var(--ink); font: 600 13px var(--font-text); }
+.pin-r { fill: var(--ground-3); }
+.pin-t { fill: var(--ink-2); font: 400 11.5px var(--font-text); }
+.pin-on .pin-r { fill: var(--light-glow); stroke: var(--light-mark); stroke-width: 1.5; }
+.pin-on .pin-t { fill: var(--ink); font-weight: 600; }
+.title-t { fill: var(--ink); font: 400 20px var(--font-display); }
+.sub-t { fill: var(--ink-3); font: 400 12px var(--font-text); }
+.wire { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.k-power { stroke: var(--w-power); }
+.k-ground { stroke: var(--w-ground); }
+.k-ground-edge { stroke: var(--w-ground-edge); }
+.k-switch { stroke: var(--w-switch); stroke-dasharray: 10 5; }
+.k-logic { stroke: var(--w-logic); stroke-dasharray: 2 4; }
+.k-signal { stroke: var(--w-signal); }
+.k-motor { stroke: var(--w-motor); stroke-dasharray: 14 4 3 4; }
+.k-home { stroke: var(--w-home); stroke-dasharray: 6 4; }
+.k-usb { stroke: var(--w-usb); stroke-dasharray: 1 5; }
+.k-reserved { stroke: var(--w-reserved); stroke-dasharray: 3 6; }
+.ghost { fill: none; stroke: var(--light-mark); stroke-width: 2; stroke-dasharray: 6 7; opacity: 0.75; }
+.flow { fill: none; stroke: var(--light); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1 11; }
+.ring { fill: none; stroke: var(--light-mark); stroke-width: 2.5; transform-box: fill-box; transform-origin: center; }
+.ring-next { fill: none; stroke: var(--light-mark); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.badge-c { fill: var(--ground); stroke-width: 1.5; }
+.badge-t { fill: var(--ink-2); font: 500 10px var(--font-text); }
+.nc-t { fill: var(--ink-2); font: 400 11px var(--font-text); }
+@media (prefers-reduced-motion: no-preference) {
+  .flow { animation: flow 0.9s linear infinite; }
+  .ring { animation: pulse 1.4s ease-in-out infinite; }
+}
+@keyframes flow { to { stroke-dashoffset: -12; } }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.35); opacity: 0.45; } }
+
+.foot { margin-top: var(--s-7); color: var(--ink-2); font-size: var(--step-small); max-width: 68ch; }
+
+/* ---------- build book (docs/build.html) ---------- */
+.book { --new-print: var(--light); --new-buy: var(--patch-white); --done: #5b564e; }   /* tungsten = print this, bone = buy this */
+:root[data-theme="light"] .book { --done: #a7a49d; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .book { --done: #a7a49d; } }
+.sw { width: 14px; height: 14px; display: inline-block; border-radius: var(--radius); flex: none; }
+.sw.print { background: var(--new-print); } .sw.buy { background: var(--new-buy); } .sw.done { background: var(--done); }
+
+.view { position: relative; background: var(--paper); border-radius: var(--radius); overflow: hidden; }
+.view canvas { width: 100%; height: min(64vh, 640px); min-height: 340px; touch-action: pan-y; cursor: grab; }
+.view canvas:active { cursor: grabbing; }
+.arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.arrows path { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 6; stroke-linecap: round; }
+.arrows path.halo { stroke: var(--ground); stroke-width: 5; stroke-dasharray: none; opacity: 0.85; }
+.arrows .head { fill: var(--ink); stroke: none; }
+.arrows polygon.halo { fill: none; stroke: var(--ground); stroke-width: 4; stroke-linejoin: round; opacity: 0.85; }
+.big-n { position: absolute; left: var(--s-5); bottom: var(--s-3); margin: 0; font-size: clamp(4rem, 2rem + 6vw, 6rem);
+         line-height: 1; color: var(--ink); pointer-events: none; }
+.big-n small { font-size: 0.3em; color: var(--ink-2); margin-left: 0.15em; letter-spacing: 0; }
+.view-tools { position: absolute; right: var(--s-4); bottom: var(--s-4); display: flex; gap: var(--s-2); }
+.view-tools .btn { min-height: 40px; padding: 0 var(--s-4); background: color-mix(in srgb, var(--ground-3) 88%, transparent); }
+.no-gl { color: var(--ink-2); font-size: var(--step-small); max-width: 60ch; }
+/* no WebGL: the step number, the parts box (words only) and a note, in the flow */
+.view.nogl { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "n parts" "n note";
+             align-items: end; gap: var(--s-3) var(--s-6); padding: var(--s-5); }
+.view.nogl .big-n { position: static; grid-area: n; align-self: center; }
+.view.nogl .callout { position: static; grid-area: parts; max-width: none; border: 0; background: none; padding: 0; align-items: end; }
+.view.nogl .no-gl { grid-area: note; }
+.view.nogl .callout canvas, .view.nogl .view-tools, .view.nogl .arrows { display: none; }
+
+/* the parts box, top left like the brick books */
+.callout { position: absolute; left: var(--s-4); top: var(--s-4); max-width: min(46%, 560px);
+           display: flex; flex-wrap: wrap; gap: var(--s-2); padding: var(--s-3);
+           background: color-mix(in srgb, var(--ground) 82%, transparent); border: 1px solid var(--rule); border-radius: var(--radius); }
+.callout .it { display: grid; justify-items: center; gap: 2px; width: 84px; font-size: 12px; line-height: 1.2; color: var(--ink-2); text-align: center; }
+.callout .it canvas { width: 72px; height: 72px; min-height: 0; background: var(--ground-3); border-radius: var(--radius); cursor: default; }
+.callout .it img { width: 72px; height: 72px; border-radius: var(--radius); }
+.callout .it b { color: var(--ink); font-weight: 600; font-size: 14px; }
+.callout .it.buy canvas { box-shadow: inset 0 -3px 0 var(--new-buy); }
+.callout .it.print canvas { box-shadow: inset 0 -3px 0 var(--new-print); }
+.callout .screw { display: grid; justify-items: center; align-content: end; gap: 2px; min-width: 64px; font-size: 12px; color: var(--ink-2); }
+.callout .screw svg { height: 72px; width: 40px; }
+.callout .screw b { color: var(--ink); font-weight: 600; font-size: 14px; }
+.screw-s { fill: var(--ink-2); } .screw-h { fill: var(--ink); }
+@media (max-width: 720px) {
+  .callout { position: static; max-width: none; border: 0; border-top: 1px solid var(--rule); border-radius: 0; background: transparent; }
+  .big-n { top: var(--s-3); bottom: auto; font-size: 3.5rem; }
+  .view canvas { height: 52vh; }
+}
+
+.c-head .parts-list { margin-top: var(--s-3); }
+.parts-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-2); }
+.parts-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-3); align-items: baseline; }
+.parts-list .q { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; min-width: 2.2em; }
+.parts-list .id { color: var(--ink-2); font-size: var(--step-small); }
+.steps-text { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s-2); }
+.ref { font-size: var(--step-small); color: var(--ink-2); }
+
+/* print / PDF: one step per landscape page */
+.pages { display: grid; gap: var(--s-6); }
+.page { display: grid; grid-template-columns: 1.35fr 1fr; gap: var(--s-5); align-items: start; background: var(--ground-2);
+        padding: var(--s-5); border-radius: var(--radius); }
+.page .pic { position: relative; }
+.page .pic img { width: 100%; background: var(--paper); border-radius: var(--radius); }
+.page .pic .big-n { left: var(--s-4); top: var(--s-2); bottom: auto; font-size: 5rem; }
+.page .parts-list { font-size: 13px; gap: 2px; }
+.page .steps-text { font-size: 14px; }
+.page .callout { position: static; max-width: none; margin-top: var(--s-3); }
+.page h2 { font-family: var(--font-display); font-size: 1.8rem; line-height: 1.1; }
+.page .txt { display: grid; gap: var(--s-3); font-size: 15px; }
+.book.printing .bar, .book.printing .sections, .book.printing .stage, .book.printing .g-head .legend a { display: none; }
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  .book .bar, .book .sections, .book .stage, .book .skip, .book .foot { display: none !important; }
+  .book .g-head, .print-hint { display: none; }
+  .book main { max-width: none; padding: 0; }
+  .page { break-after: page; break-inside: avoid; background: none; padding: 0; }
+  .page:last-child { break-after: auto; }
+  .page .pic img { max-height: 150mm; object-fit: contain; }
+}

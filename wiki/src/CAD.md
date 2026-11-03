@@ -13,6 +13,8 @@
 | `cad/vendor/` (not committed) | real vendor models: `bash scripts/get_cad.sh` |
 | [`cad/PRINT.md`]({{REPO}}/cad/PRINT.md) | print list: how many of each, size vs build volume, ≈ grams of ABS (core ≈ 2.7 kg, deck tiles ≈ 1.4 kg) |
 
+**Putting it together:** the [build book]({{REPO}}/docs/build.html) shows every modelled part in order, one step per page ([PDF]({{REPO}}/exports/build-book.pdf)); the order is `docs/assembly.yaml`, the words come from the stage checklists.
+
 `make cad` regenerates dummies + assembly and runs `make cad-check` (no collisions across every axis' travel, clear sight lines from both cameras and the lamp to the sample); `make cad-zip` packs every STEP into `dist/opengonio-cad.zip` (one Onshape import).
 
 

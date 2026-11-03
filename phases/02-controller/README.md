@@ -2,7 +2,7 @@
 
 <img src="../../docs/assets/steps/02.svg" width="100%" alt="Steps of stage 02">
 
-$70.84 · total so far $265.86 / $630
+$70.84 · total so far $189.06 / $630
 
 [Design](design.md) · [Parts list](bom.csv) · [3D files](3d/) · [Tests](test.csv)
 
@@ -66,7 +66,7 @@ Laptop → USB-C → SKR Pico (grblHAL) → motor works on the bench. · 0/3 ste
 
 #### Do
 
-1. Plug the SKR Pico into the laptop by USB-C (no motor power needed: its schematic feeds USB 5 V into the logic supply through a diode; if no LED lights, connect the pack and release the e-stop).
+1. Plug the SKR Pico into the laptop by USB-C (no motor power needed: its schematic feeds USB 5 V into the logic supply through a diode; if no LED lights, check the USB-C cable carries data; the board gets motor power only in M08.3).
 2. PowerShell (admin): `usbipd list` (the board shows as 2e8a:…); `usbipd bind --busid <busid>`; `usbipd attach --wsl --busid <busid>`.
 3. Ubuntu: `sudo usermod -aG dialout $USER && newgrp dialout`; `ls /dev/ttyACM*`.
 
@@ -110,11 +110,11 @@ C1 in `phases/02-controller/test.csv`.
 
 ### M08.3 Bench motor
 
-**Time** 20 min · **Needs** LAR-02 motor · power box · tape flag on the shaft
+**Time** 20 min · **Needs** LAR-02 motor · power wired (M05) · 2 × 10 cm PWR-15 offcuts (red, black) · tape flag on the shaft
 
 #### Do
 
-1. E-stop pressed. Red out → SKR Pico POWER `+`, black out → POWER `−` (screw terminal). Motor → the X socket. Release the e-stop.
+1. E-stop pressed, adapter unplugged. 10 cm red offcut from MOT+ slot 3 → SKR Pico POWER `+`, 10 cm black from MOT− slot 3 → POWER `−` (screw terminal). Motor → the X socket. Adapter in, release the e-stop.
 2. `opengonio send 'M122 I'` (drivers configured now that motor power is on).
 3. `opengonio send '$20=0' '$X' 'G91' 'G1 X10 F600' 'G1 X-10 F600' 'G90'` (soft limits off and `$X` unlock: unhomed bench test only).
 4. `opengonio send '$X' 'G91' 'G1 X360 F300' 'G90'`; press the e-stop halfway.
@@ -218,10 +218,11 @@ Boards on the tray; homing, e-stop sense and heat tested. · 0/4 steps done · ~
 
 #### Do
 
-1. Print `CTL-10a_button_panel.stl`, `CTL-10b_controller_tray.stl`.
+1. Measure the ESP32-S3 board first: the tray's frame fits Espressif's 62.7 × 25.4 mm board. A clone that is longer (up to ~69 × 26): set `ESP` in `tools/cad/parts.py`, `make parts`. Then print `CTL-10a_button_panel.stl`, `CTL-10b_controller_tray.stl`.
 2. Drive M2 × 8 into the 4 SKR Pico standoffs once; mount the board (holes 58 × 49 mm), USB-C toward the tray edge, a washer under each head.
 3. ESP32-S3 (flashed in M09.1): a square of foam tape on the pedestal, then the board upside down (module can on the tape, header pins up), USB end at the opening.
 4. Opto module (PWR-10) into the long frame, double-sided tape under it, terminals up. The short frame is for the LED driver (M18.1). Keypads: peel and stick into the panel recesses, tails through the slots.
+5. Lever connectors: MOT+ and MOT− (from M05.2) and a third 221-413 for the keypad GND (M09) slide into the pockets along the tray's south edge, wire openings out, levers up. The fourth pocket is spare.
 
 #### Verify
 
@@ -263,27 +264,27 @@ C2, C3 in `test.csv`.
 
 ### M10.3 E-stop sense with the opto module
 
-**Time** 30 min · **Needs** PWR-10 opto module (24 V version) · 2 × WAGO 221-413 (PWR-20) · 2 × 10 cm PWR-15 offcuts (red, black) · 2 cut jumpers · M-F jumpers
+**Time** 30 min · **Needs** PWR-10 opto module (24 V version) · 2 × short PWR-15 offcuts (red, black) · M-F jumpers
 
 #### Do
 
-1. E-stop pressed. Take the red and black motor-power wires out of the SKR Pico POWER screws; each into a 3-way lever connector (MOT+, MOT−) with a 10 cm 18 AWG offcut back to its POWER screw. Third slot: a cut jumper (stripped, folded double) to the opto module's input `+` (MOT+) / `−` (MOT−). A thin jumper under a screw beside an 18 AWG wire does not clamp.
+1. E-stop pressed, adapter unplugged. Short red offcut from MOT+ slot 2 → the opto module's IN+ screw; short black from MOT− slot 2 → IN−. 8 mm under the module screws, 11 mm in the lever connectors.
 2. Output side: module VCC ← ESP32-S3 J1-1 (3V3), GND ← J3-21 (GND), OUT → J1-10 (GPIO 17) (female jumper ends on the hub pins; bare ends under the module screws, or female ends on its pins).
-3. Motor holding (`opengonio home`, then wait): measure SKR Pico POWER (T4). Press the e-stop: watch the hub output and the panel; release; `opengonio home`.
+3. Motor holding (`opengonio home`, then wait): measure SKR Pico POWER (T4), and DC volts from jack `+` to SKR Pico POWER `+` (T12, the drop along the wires and switches). Press the e-stop: watch the hub output and the panel; release; `opengonio home`.
 
 #### Verify
 
-- [ ] T4 ≥ 17.5 V.
-- [ ] Module input LED on with the pack on; hub prints `POWER 0` on e-stop, `POWER 1` after release, 20 times out of 20 (T7); moves refused until HOME (C7).
+- [ ] T4 ≥ 22.5 V; T12 ≤ 0.3 V.
+- [ ] Module input LED on with motor power on; hub prints `POWER 0` on e-stop, `POWER 1` after release, 20 times out of 20 (T7); moves refused until HOME (C7).
 
 #### If a check fails
 
 - Reads the wrong way round (`POWER 1` with the e-stop pressed): your module drives OUT high when powered; set `SENSE_ACTIVE_LOW = False` in `firmware/hub/main.py`, `bash scripts/hub.sh`.
-- Never changes: input `+` / `−` swapped, or OUT not on GPIO 17; the module's input LED must light with the pack on (dimmer on a low pack is normal).
+- Never changes: input `+` / `−` swapped, or OUT not on GPIO 17; the module's input LED must light with motor power on.
 
 #### Record
 
-T4, T7 in `phases/01-power/test.csv`; C7 in `phases/02-controller/test.csv`.
+T4, T7, T12 in `phases/01-power/test.csv`; C7 in `phases/02-controller/test.csv`.
 
 ### M10.4 Heat
 

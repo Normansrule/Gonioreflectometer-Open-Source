@@ -25,6 +25,7 @@ build:           ## regenerate checklists, README tables, figures, budgets, 3D i
 	$(PY) tools/optics.py > /dev/null
 	$(PY) tools/make_assets.py > /dev/null
 	$(PY) tools/wiring.py
+	$(PY) tools/build_book.py
 	$(PY) tools/cad/index.py
 	$(PY) tools/cad/catalog.py
 	$(PY) tools/bom_readme.py
@@ -76,7 +77,7 @@ paper:           ## paper/build/opengonio.pdf (LaTeX + biber; skipped if latexmk
 	  && echo "paper/build/opengonio.pdf" || (tail -30 build.log; exit 1); \
 	else echo "paper: skipped (sudo apt install latexmk biber texlive-publishers texlive-bibtex-extra texlive-latex-extra)"; fi
 
-export:          ## exports/: Word + Overleaf paper, Zotero refs, Excel BOM, wiki PDF/Word (needs pandoc; see exports/README.md)
+export:          ## exports/: Word + Overleaf paper, Zotero refs, Excel BOM, wiki PDF/Word, build book PDF (needs pandoc; see exports/README.md)
 	$(PY) tools/exports.py
 
 ci:              ## replay the GitHub checks (clean clone, fresh venv) before pushing; tests HEAD

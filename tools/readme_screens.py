@@ -62,30 +62,27 @@ def animations(p, base: str) -> None:
         pg.evaluate(f"__hero.set({50 - 16 * math.cos(t):.3f}, {90 + 80 * math.sin(t):.3f})"); pg.wait_for_timeout(40)
         frames.append(Image.open(io.BytesIO(pg.screenshot())).convert("RGB").resize((960, 600), Image.LANCZOS))
     webp(frames, "hero.webp", 110)
-    pg.evaluate("document.getElementById('rig-stage').scrollIntoView({block: 'center'}); document.querySelector('.rail').style.display = 'none'")
-    for _ in range(100):
-        if pg.evaluate("window.__rig && __rig.ready()"):
+    # the story section: scroll position -> build-up, each axis, the camera; pinned, so one viewport shows it all.
+    # Motion allowed here (with reduced motion the story is a still list), and the page draws nothing else meanwhile.
+    pg.close()
+    pg = p.new_page(viewport={"width": 1440, "height": 900}, color_scheme="dark", device_scale_factor=1)
+    pg.set_default_timeout(120000)
+    pg.goto(f"{base}/index.html", wait_until="networkidle"); pg.wait_for_timeout(800)
+    pg.evaluate("document.querySelector('.rail').style.display = 'none'; const s = document.getElementById('machine');"
+                "scrollTo(0, s.getBoundingClientRect().top + scrollY + 10)")
+    for _ in range(150):
+        if pg.evaluate("window.__story && __story.ready()"):
             break
         pg.wait_for_timeout(100)
-    box = pg.evaluate("(() => { const r = document.getElementById('rig-stage').getBoundingClientRect(); return [r.x, r.y, r.width, r.height]; })()")
-    seq = pg.evaluate("__rig.seq.map(s => [s.k, s.path])")
-    base_pose = {k: path[0] for k, path in seq}
-    frames, yaw = [], -62.0
-    for k, path in seq:
-        legs = len(path) - 1
-        n = 8 * legs
-        for j in range(n + 4):                                    # each leg eased, then a short hold
-            f = min(j / n, 1.0) * legs
-            i = min(int(f), legs - 1)
-            x = f - i
-            e = 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
-            pose = {**base_pose, k: path[i] + (path[i + 1] - path[i]) * e}
-            yaw += 0.6
-            pg.evaluate(f"__rig.set({__import__('json').dumps(pose)}, '{k}', {yaw})"); pg.wait_for_timeout(30)
-            shot = pg.screenshot(clip={"x": box[0], "y": box[1], "width": box[2], "height": box[3]})
-            im = Image.open(io.BytesIO(shot)).convert("RGB")
-            frames.append(im.resize((960, round(im.height * 960 / im.width)), Image.LANCZOS))
-    webp(frames, "rig.webp", 90)
+    frames = []
+    n = 120
+    for i in range(n):
+        q = i / (n - 1) * 0.985
+        pg.evaluate(f"__story.at({q:.4f})"); pg.wait_for_timeout(70)
+        im = Image.open(io.BytesIO(pg.screenshot())).convert("RGB")
+        frames.append(im.resize((960, 600), Image.LANCZOS))
+    frames += [frames[-1]] * 10                                   # rest on the last chapter before looping
+    webp(frames, "rig.webp", 70)
     pg.close()
 
 
@@ -109,6 +106,12 @@ def site(p, base: str) -> None:
     pg.evaluate("document.querySelector('#machine').scrollIntoView()"); pg.wait_for_timeout(1400)
     jpg(pg.screenshot(), "lab.jpg")
     pg.close()
+    for page, frag, name in (("build.html", "#step-11", "build-book.jpg"), ("wiring.html", "#step-6", "wiring-guide.jpg")):
+        pg = p.new_page(viewport={"width": 1440, "height": 900}, color_scheme="dark")      # the two guides, part landed
+        pg.goto(f"{base}/{page}{frag}", wait_until="networkidle"); pg.wait_for_timeout(2500)
+        pg.evaluate("document.querySelector('.stage').scrollIntoView({block: 'start'}); scrollBy(0, -170)"); pg.wait_for_timeout(600)
+        jpg(pg.screenshot(), name)
+        pg.close()
 
 
 def app(p) -> None:

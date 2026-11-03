@@ -13,15 +13,15 @@ Your decisions on every part I suggested. **Edit this file** (on GitHub: open it
 <!-- parts-summary -->
 | Status | Parts | Core USD | Optional USD | Tools USD |
 |---|---:|---:|---:|---:|
-| suggested | 84 | $524.12 | $425.58 | $469.76 |
+| suggested | 80 | $450.21 | $425.58 | $469.76 |
 | agreed | 0 | $0.00 | $0.00 | $0.00 |
 | ordered | 4 | $44.98 | $0.00 | $0.00 |
 | have | 0 | $0.00 | $0.00 | $0.00 |
 | swap | 0 | $0.00 | $0.00 | $0.00 |
 | skip | 0 | $0.00 | $0.00 | $0.00 |
-| **Still to buy** | 60 | **$524.12** | **$0.00** | **$469.76** |
+| **Still to buy** | 56 | **$450.21** | **$0.00** | **$469.76** |
 | Paid so far | | $0.00 | | |
-| Plan: every core part bought (cap $630) | | $569.10 | | |
+| Plan: every core part bought (cap $630) | | $495.19 | | |
 
 Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optional parts you `agreed` to. Tools are bought once and kept: they have their own total and are not in the machine cap.
 
@@ -90,38 +90,18 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 
-## 01 · Power box
+## 01 · Power
 
-0/10 decided · still to buy $131.06 · [bom.csv](phases/01-power/bom.csv) · [checklist](phases/01-power/README.md)
+0/6 decided · still to buy $54.26 · [bom.csv](phases/01-power/bom.csv) · [checklist](phases/01-power/README.md)
 
-- [ ] **PWR-21** 24 V Li-ion battery pack 5 Ah with built-in protection board (BMS) — 1 × $41.99 = $41.99 · [buy at amazon.com](https://www.amazon.com/dp/B0FHPST5TP) · status: suggested
-  - <img src="docs/assets/parts/icon-battery.svg" width="64" height="64" alt="PWR-21"> **Qty 1** · **Must meet:** Assembled 6S Li-ion pack (18–25.2 V), ≥ 5 Ah, built-in protection board (BMS: over-charge, over-discharge, over-current, short circuit) rated ≥ 5 A continuous, bare red/black leads; no cell assembly
-  - *why:* The battery: runs the machine; charged over USB-C (PWR-27 + PWR-29) · Label: input 25.2 V 2 A max, output 22–25 V 10 A max; 21700 cells; 78 × 50 × 72 mm (listing, measure on arrival). Charged to 24.0 V by PWR-29. The included 25.2 V wall charger is not used: it fills to 25.2 V, above the motor board's 24 V rating. Charge on a hard surface; M06 checks pack temperature.
+- [ ] **PWR-30** 24 V 3 A wall adapter with screw-terminal DC jack — 1 × $17.85 = $17.85 · [buy at amazon.com](https://www.amazon.com/dp/B078RY7BPL) · status: suggested
+  - <img src="docs/assets/parts/icon-psu.svg" width="64" height="64" alt="PWR-30"> **Qty 1** · **Must meet:** Regulated 24 V DC, ≥ 3 A (72 W), 5.5 × 2.1 mm plug, short-circuit and overload protection, with a female 5.5 × 2.1 mm jack to screw terminals (+ / − marked): no solder
+  - *why:* Power for the whole machine: plugs into the wall; its round plug goes into the screw-terminal jack · Listing (read 2026-10-23): FCC / CE / RoHS (not a UL listing); short-circuit, overload and over-temperature protection; AC cable ~120 cm, DC cable ~110 cm. The adapter stays outside the machine; only the jack sits on the power plate. Replaces the battery, USB-C charging, fuse and their box.
   - note:
   - paid:
-- [ ] **PWR-27** USB-C PD trigger board, 20 V by DIP switch, voltage display, screw terminals — 1 × $9.99 = $9.99 · [buy at amazon.com](https://www.amazon.com/dp/B0HHNFY7HT) · status: suggested
-  - <img src="docs/assets/parts/icon-psu.svg" width="64" height="64" alt="PWR-27"> **Qty 1** · **Must meet:** USB-C Power Delivery (PD) trigger (sink) board, 20 V selectable without soldering (DIP switch or button), screw-terminal output, ≥ 2 A
-  - *why:* USB-C input: asks the USB-C charger for 20 V and feeds the charging module · Plug a USB-C charger ≥ 30 W (the laptop's, or any USB-C PD charger with a 20 V profile) into it. Falls back to 5 V if the charger can't give 20 V: the charging module then does nothing (input below 5.5 V).
-  - note:
-  - paid:
-- [ ] **PWR-29** DROK buck-boost module 35 W, constant voltage + constant current, LCD (V in, V out, A, W) — 1 × $16.99 = $16.99 · [buy at amazon.com](https://www.amazon.com/dp/B07VNDGFT6) · status: suggested
-  - <img src="docs/assets/parts/icon-psu.svg" width="64" height="64" alt="PWR-29"> **Qty 1** · **Must meet:** Step-up/step-down DC-DC with constant-voltage and constant-current (current-limit) settings, input covering 20 V, output to ≥ 25 V, ≥ 30 W, output anti-backflow (no reverse current into it), screw terminals
-  - *why:* Charges the pack from USB-C: 20 V in → 24.0 V, 1.0 A limited; its LCD shows pack voltage and charge current · Set once with the pack disconnected: output 24.00 V (4.0 V per cell: keeps the motor board at its 24 V rating and is gentler on the cells), current limit 1.000 A (24 W, about 27 W from the USB-C charger). Listing: reverse-input and output anti-backflow protection, over-current, over-temperature. Size 72 × 59 × 32 mm with case (maker page).
-  - note:
-  - paid:
-- [ ] **PWR-04** Inline 5 x 20 mm fuse holder, 16 AWG (2-pack) — 1 × $6.19 = $6.19 · [buy at amazon.com](https://www.amazon.com/dp/B07SM5YJ97) · status: suggested
-  - <img src="docs/assets/parts/icon-fuse.svg" width="64" height="64" alt="PWR-04"> **Qty 1** · **Must meet:** Inline holder for 5 × 20 mm fuses, ≥ 5 A, with wire leads (16 AWG); leads go into lever connectors (no solder)
-  - *why:* Battery fuse (pack + lead) · Second holder spare. The box cradle takes bodies up to Ø14 mm.
-  - note:
-  - paid:
-- [ ] **PWR-05** Fuse 3.15 A time-lag 5 x 20 mm — 1 × $10.99 = $10.99 · [buy at amazon.com](https://www.amazon.com/dp/B00Y3OJUFK) · status: suggested
-  - <img src="docs/assets/parts/icon-fuse.svg" width="64" height="64" alt="PWR-05"> **Qty 1** · **Must meet:** 5 × 20 mm glass fuse, 3.15 A, time-lag (T / slow-blow), 250 V
-  - *why:* Battery over-current protection (short anywhere after the pack) · Check the marking says T (time-lag / slow-blow), not F. 1 fitted + 4 spare.
-  - note:
-  - paid:
-- [ ] **PWR-28** Emergency stop 22 mm latching, 1 NO + 1 NC, screw terminals (2-pack) — 1 × $8.99 = $8.99 · [buy at amazon.com](https://www.amazon.com/dp/B09JP4JKY6) · status: suggested
-  - <img src="docs/assets/parts/icon-estop.svg" width="64" height="64" alt="PWR-28"> **Qty 1** · **Must meet:** 22 mm panel emergency stop, latching (twist to release), ≥ 1 normally-closed contact rated ≥ 24 V DC / 3 A, screw terminals (no solder)
-  - *why:* Cuts the battery to the motion board; also the off switch · Contacts rated 660 V / 10 A (AC). Wire the NC contact (normally closed). Second switch spare.
+- [ ] **PWR-28** Emergency stop in its own box, latching, 1 NO + 1 NC, screw terminals — 1 × $8.99 = $8.99 · [buy at amazon.com](https://www.amazon.com/dp/B00NTT91Y0) · status: suggested
+  - <img src="docs/assets/parts/icon-estop.svg" width="64" height="64" alt="PWR-28"> **Qty 1** · **Must meet:** Latching mushroom e-stop (push to stop, twist to release) already mounted in its own box: no panel hole; ≥ 1 normally-closed contact rated ≥ 3 A (DC rating where the listing gives one); screw terminals (no solder)
+  - *why:* Cuts 24 V to the motor board (motors, lamp); also the off switch · Contacts rated 660 V / 10 A (AC). Wire the NC contact: terminals 1 and 2 on this switch, NO = 3 and 4 (confirm with the meter: 1–2 beep released, open pressed). Sits on the power plate on double-sided tape.
   - note:
   - paid:
 - [ ] **PWR-10** Optocoupler module PC817, 24 V input, screw terminals (2-pack) — 1 × $6.99 = $6.99 · [buy at amazon.com](https://www.amazon.com/dp/B0B5382ZT7) · status: suggested
@@ -129,19 +109,19 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* Isolated motion-power sense to the ESP32-S3 hub (resistor on the board) · 66 x 16.5 x 12 mm; sits in a locating frame on the controller tray (double-sided tape). Second module spare.
   - note:
   - paid:
-- [ ] **PWR-15** 18 AWG silicone wire red/black, 1 m pair — 1 × $7.98 = $7.98 · [buy at amazon.com](https://www.amazon.com/dp/B01708AYYQ) · status: suggested
+- [ ] **PWR-15** 18 AWG silicone wire red/black, 1.5 m (5 ft) each colour — 1 × $7.98 = $7.98 · [buy at amazon.com](https://www.amazon.com/dp/B01708AYYQ) · status: suggested
   - <img src="docs/assets/parts/icon-wire.svg" width="64" height="64" alt="PWR-15"> **Qty 1** · **Must meet:** 18 AWG stranded silicone wire, red + black (≥ 5 A)
   - *why:* Power wiring
   - note:
   - paid:
-- [ ] **PWR-20** Lever wire connectors, WAGO 221 assortment (28) — 1 × $20.95 = $20.95 · [buy at amazon.com](https://www.amazon.com/dp/B0CJ5QF3VX) · status: suggested
-  - <img src="docs/assets/parts/icon-lever.svg" width="64" height="64" alt="PWR-20"> **Qty 1** · **Must meet:** Lever splicing connectors for 24–12 AWG stranded and solid wire (fine-stranded down to 0.14 mm²), 2/3/5-way, ≥ 20 A (WAGO 221-412/413/415): ≥ 6 × 2-way, 5 × 3-way, 2 × 5-way
-  - *why:* Every bare-wire join: no solder, no crimp, no heat-shrink · Uses (README → Wiring): BAT+ 221-2401; FUSED, GND, MOT+, MOT− and keypad GND 221-413 (FUSED and GND become 221-415 in stage 15); lamp leads 2 × 221-412; M1 pancake splice 4 × 221-412 (motor leads ~26 AWG: only the 221-41x take fine-stranded 0.14 mm²). The 12-pc set has 3 × 221-412: too few for the splice.
+- [ ] **PWR-20** Lever wire connectors, WAGO 221 assortment (12) — 1 × $12.45 = $12.45 · [buy at amazon.com](https://www.amazon.com/dp/B0CJ5QF4Z2) · status: suggested
+  - <img src="docs/assets/parts/icon-lever.svg" width="64" height="64" alt="PWR-20"> **Qty 1** · **Must meet:** Lever splicing connectors for 24–12 AWG stranded and solid wire (fine-stranded down to 0.14 mm²), 2/3/5-way, ≥ 20 A (WAGO 221-412/413/415): ≥ 3 × 3-way, 3 × 2-way, 3 × 5-way
+  - *why:* Every bare-wire join: no solder, no crimp, no heat-shrink · Uses (README → Wiring): MOT+, MOT− and keypad GND 221-413; M1 pancake splice 3 × 221-412 + 1 × 221-415 (motor leads ~26 AWG: only the 221-41x take fine-stranded 0.14 mm²); lamp leads 2 × 221-415; all three 221-2401 at the limit switch (two splices into the red run + the unused wire's cap). The three 221-413s sit in pockets on the controller tray (CTL-10b).
   - note:
   - paid:
-- [ ] **PWR-18** Power box + lid — print · print · status: suggested
-  - <img src="docs/assets/parts/PWR-18a_power_box.png" width="64" height="64" alt="PWR-18"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/PWR-18a_power_box.step](phases/01-power/3d/PWR-18a_power_box.step)
-  - *why:* Houses battery, charging module, USB-C input, fuse and e-stop; OG-40 mount · Box + lid ABS weight: see cad/PRINT.md. The USB-C trigger faces a wall opening: plug in the charger with the lid closed.
+- [ ] **PWR-18** Power plate — print · print · status: suggested
+  - <img src="docs/assets/parts/PWR-18_power_plate.png" width="64" height="64" alt="PWR-18"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/PWR-18_power_plate.step](phases/01-power/3d/PWR-18_power_plate.step)
+  - *why:* Holds the screw-terminal jack and the e-stop box on the deck; OG-40 mount · Plate ABS weight: see cad/PRINT.md. The jack sits in a frame with its screw terminals toward the controller tray; the e-stop box sits in a 2 mm rim on double-sided tape (TLS-09).
   - note:
 
 ## 02 · Controller and buttons
@@ -175,7 +155,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - paid:
 - [ ] **CTL-08** Fan 40 mm 24 V — 1 × $7.99 = $7.99 · optional · [buy at amazon.com](https://www.amazon.com/dp/B09F9JT3BY) · status: suggested
   - <img src="docs/assets/parts/icon-fan.svg" width="64" height="64" alt="CTL-08"> **Qty 1** · **Must meet:** 40 mm fan, 24 V DC, 2-wire
-  - *why:* Advised by BTT above 0.8 A per motor; fit it if T6 driver temperature fails · SKR Pico has FAN1–3 outputs (12/24 V, switched); this one runs from the motor supply.
+  - *why:* Advised by BTT above 0.8 A per motor; fit it if C8 driver temperature fails · SKR Pico has FAN1–3 outputs (12/24 V, switched); this one runs from the motor supply.
   - note:
   - paid:
 - [ ] **CTL-11** Stepper cables 1 m, PH2.0 6-pin to XH2.54 4-pin (4-pack) — 1 × $6.00 = $6.00 · optional · [buy at amazon.com](https://www.amazon.com/dp/B099214RPZ) · status: suggested
@@ -206,8 +186,8 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **FRM-07** Socket screw kit M2/M3/M4 with nuts (820 pcs): M3 for the motors — 1 × $9.88 = $9.88 · [buy at amazon.com](https://www.amazon.com/dp/B0D636MJ1N) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FRM-07"> **Qty 1** · **Must meet:** M3-0.5 × 8 mm socket-head cap screws (≥ 16) with washers; hex key 2.5 mm
-  - *why:* M3 x 8 into the four NEMA 17 faces (the motors' own thread); spare M2 · Only M3 left in the machine: motors are threaded M3. Covers TBL-06, TLT-06, SPN-06.
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="FRM-07"> **Qty 1** · **Must meet:** M3-0.5 × 8 mm (≥ 12) and × 16 mm (≥ 4) socket-head cap screws with washers; hex key 2.5 mm
+  - *why:* M3 x 8 into three NEMA 17 faces, M3 x 16 through the tilt-yoke arm into the fourth (the motors' own thread); spare M2 · Only M3 left in the machine: motors are threaded M3. Covers TBL-06, TLT-06, SPN-06.
   - note:
   - paid:
 - [ ] **FRM-08** 608-2RS bearings (10) — 1 × $4.99 = $4.99 · [buy at amazon.com](https://www.amazon.com/dp/B0CX8CDL7D) · status: suggested
@@ -230,7 +210,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 ## 04 · Light arm (M4)
 
-1/8 decided · still to buy $41.55 · [bom.csv](phases/04-light-arm/bom.csv) · [checklist](phases/04-light-arm/README.md)
+1/8 decided · still to buy $44.44 · [bom.csv](phases/04-light-arm/bom.csv) · [checklist](phases/04-light-arm/README.md)
 
 - [ ] **LAR-01** 12 in lazy Susan bearing — 1 × $13.99 = $13.99 · [buy at amazon.com](https://www.amazon.com/dp/B0CQXFVDN7) · status: suggested
   - <img src="docs/assets/parts/icon-turntable.svg" width="64" height="64" alt="LAR-01"> **Qty 1** · **Must meet:** 12 in (≈ 305 mm) lazy-Susan ball bearing, flat, ≥ 50 kg rating, no wobble you can feel
@@ -257,14 +237,14 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - *why:* M4 home · Covers LAR-05, TBL-04, TLT-04, SPN-04. Check the slot is ≥ 3 mm (the flag is 1.5 mm).
   - note:
   - paid:
-- [ ] **LAR-06** Roller-lever limit switch, screw terminals (2) — 1 × $6.99 = $6.99 · [buy at amazon.com](https://www.amazon.com/dp/B09TDBH593) · status: suggested
-  - <img src="docs/assets/parts/icon-switch.svg" width="64" height="64" alt="LAR-06"> **Qty 1** · **Must meet:** Roller-lever limit switch with screw terminals (ME-8108 style), normally-closed contact ≥ 3 A at 24 V DC
-  - *why:* Over-travel switches in the e-stop loop [R1]
+- [ ] **LAR-06** Roller-lever limit switch, sealed, 3 wires attached (2-pack) — 1 × $9.88 = $9.88 · [buy at amazon.com](https://www.amazon.com/dp/B09VGL29HS) · status: suggested
+  - <img src="docs/assets/parts/icon-switch.svg" width="64" height="64" alt="LAR-06"> **Qty 1** · **Must meet:** Momentary roller-lever microswitch with COM / NC / NO wires already attached (no solder, no crimp), NC contact rated ≥ 3 A DC
+  - *why:* Over-travel switch in the motor-power line: cuts 24 V if the light arm runs past its range [R1] · Listing: 6 A at 12 V DC or 5 A at 250 V AC (no 24 V DC rating given). Wire colours on the units bought: black = COM, grey = NC, blue = NO (check yours with the meter: COM–NC beeps at rest, opens when the lever is pressed). Second switch spare.
   - note:
   - paid:
 - [ ] **LAR-09** Laser module class 2 (650 nm, < 1 mW); mirror = one CAL-02 tile — 1 × $15.99 = $15.99 · tool · [buy at amazon.com](https://www.amazon.com/dp/B00ZR80S9S) · status: suggested
   - <img src="docs/assets/parts/icon-laser.svg" width="64" height="64" alt="LAR-09"> **Qty 1** · **Must meet:** Red laser pointer, class 2 (< 1 mW), plus a ~25 mm flat mirror
-  - *why:* Repeatability test: mirror on the moving part, spot on a wall 2 m away (0.1 deg = 7 mm) · Bare module, 2.6–6 V: run it from a spare 5 V and GND pin pair (an SKR Pico STOP port or the ESP32-S3 5V pin) with two jumper wires. Mirror: one CAL-02 tile.
+  - *why:* Repeatability test: mirror on the moving part, spot on a wall 2 m away (0.1 deg = 7 mm) · Bare module, 2.6–6 V: run it from a spare 5 V and GND pin pair (SKR Pico RGB port: 5V pin 3, GND pin 1; README → Wiring → 8) with two jumper wires. Mirror: one CAL-02 tile.
   - note:
   - paid:
 - [ ] **LAR-08** Belt rim segments, arm segment, M4 motor mount, cross clamp, upright + arm bars — print · print · status: suggested
@@ -308,7 +288,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - paid:
 - [ ] **TBL-07** Printed table parts — print · print · status: suggested
   - <img src="docs/assets/parts/TBL-07a_table_drum.png" width="64" height="64" alt="TBL-07"> **Qty 1** · **Must meet:** ABS, 0.2 mm layers, 4 walls, 25–30 % infill, enclosed printer; settings and checks in this stage's checklist · files: [3d/TBL-07a_table_drum.step](phases/05-table/3d/TBL-07a_table_drum.step)
-  - *why:* Post, drum (100T teeth + 608 seats + OG-40 top), motor bracket, flags, spacers
+  - *why:* Post, drum (100T teeth + 608 seats + OG-40 top), motor bracket, flags, spacers, endstop riser
   - note:
 
 ## 06 · Camera and light
@@ -452,7 +432,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - note:
   - paid:
 - [ ] **TLT-06** Axis fasteners (M3 motor face + M2 set) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0D636MJ1N) · status: suggested
-  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="TLT-06"> **Qty 1** · **Must meet:** 4 × M3 × 8 for the NEMA 17 face; M2 socket screws 6–16 mm with nuts and washers
+  - <img src="docs/assets/parts/icon-hardware.svg" width="64" height="64" alt="TLT-06"> **Qty 1** · **Must meet:** 4 × M3 × 16 for the NEMA 17 face (through the 12 mm yoke arm); M2 socket screws 6–16 mm with nuts and washers
   - *why:* Motor face (M3), brackets, flags, clamps (M2) · From the FRM-06 and FRM-07 kits.
   - note:
   - paid:
@@ -467,7 +447,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
 
 - [x] **SPN-01** NEMA 17 pancake stepper 16 Ncm 1 A (direct drive) — 1 × $11.99 = $11.99 · [buy at amazon.com](https://www.amazon.com/dp/B00PNEQ79Q) · status: ordered
   - <img src="docs/assets/parts/icon-motor.svg" width="64" height="64" alt="SPN-01"> **Qty 1** · **Must meet:** NEMA 17 pancake, body ≤ 25 mm, 1.8°/step, ≥ 13 N·cm, ≤ 1.0 A, 5 mm D-shaft ≥ 16 mm (driver at 1/64 microstep)
-  - *why:* M1 spin: the platter sits on its shaft · Bought. Fixed bare leads, no connector (listing photo): spliced to a spare LAR-02 cable (6-pin plug cut off) with 4 × WAGO 221-412 (fine-stranded 0.14–4 mm²), XH 4-pin end into the SKR Pico E socket. Wiring: README → Wiring, M27.1.
+  - *why:* M1 spin: the platter sits on its shaft · Bought. Fixed bare leads, no connector (listing photo): spliced to a spare LAR-02 cable (6-pin plug cut off) with 3 × WAGO 221-412 + 1 × 221-415 (fine-stranded 0.14–4 mm²), XH 4-pin end into the SKR Pico E socket. Wiring: README → Wiring, M27.1. Same frame and shaft, also fits: STEPPERONLINE 17HE08-1004S (B0B93PNYCP); check its shaft length ≥ 16 mm and D flat.
   - note:
   - paid:
 - [ ] **SPN-04** Optical endstop module, slot type (from the LAR-05 6-pack) — $0 (in another row) · [buy at amazon.com](https://www.amazon.com/dp/B0719K9Z9R) · status: suggested
@@ -578,7 +558,7 @@ Still to buy = core parts not `ordered` / `have` / `swap` / `skip`, plus optiona
   - paid:
 - [ ] **STA-03** Buck converter 24 V to 5 V 3 A — 1 × $7.99 = $7.99 · optional · [buy at amazon.com](https://www.amazon.com/dp/B0DBVYP91F) · status: suggested
   - <img src="docs/assets/parts/icon-driver.svg" width="64" height="64" alt="STA-03"> **Qty 1** · **Must meet:** Buck converter 18–24 V in → 5.1 V out, ≥ 3 A, screw terminals on input and output
-  - *why:* Powers the Pi from the pack (after the fuse, before the e-stop: the Pi stays up when the e-stop is pressed) · The Pi draws ~2–3 W from the pack even with the e-stop pressed: take the buck's `+` out of the lever connector for storage. Set it to 5.1 V with the trimmer before connecting the Pi; check for screw terminals.
+  - *why:* Powers the Pi from the pack (after the fuse, before the e-stop: the Pi stays up when the e-stop is pressed) · Wired under the jack's +/− screws, before the e-stop: the Pi draws ~2–3 W whenever the adapter is plugged in. Set it to 5.1 V with the trimmer before connecting the Pi; check for screw terminals.
   - note:
   - paid:
 - [ ] **STA-04** Micro-USB OTG adapter — 1 × $2.50 = $2.50 · optional · [buy at adafruit.com](https://www.adafruit.com/product/1099) · status: suggested

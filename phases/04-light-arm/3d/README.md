@@ -28,6 +28,6 @@ Every bought part has a model in the repo (dummy in `cad/bought/` or open model 
 | LAR-03 | GT2 6 mm open belt (5 m) | [`LAR-03_gt2_belt_open_1m.step`](../../../cad/bought/LAR-03_gt2_belt_open_1m.step) | None published - use the dummy (belt) |
 | LAR-04 | GT2 20T pulley 5 mm bore (5-pack) | [`LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step`](../../../cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step)<br>[`LAR-04_gt2_pulley_20t_5mm.step`](../../../cad/bought/LAR-04_gt2_pulley_20t_5mm.step) | cad/open/LAR-04_adafruit_1253_gt2_20t_pulley_8mm_bore.step (set bore to 5 mm) |
 | LAR-05 | Optical endstop module, slot type (6-pack) | [`LAR-05_tcst2103_endstop_module.step`](../../../cad/bought/LAR-05_tcst2103_endstop_module.step) | [link](https://www.vishay.com/en/product/81147/) (TCST2103 sensor only: ECAD models, free login) |
-| LAR-06 | Roller-lever limit switch, screw terminals (2) | [`LAR-06_me8108_limit_switch.step`](../../../cad/bought/LAR-06_me8108_limit_switch.step) | None published - use the dummy |
+| LAR-06 | Roller-lever limit switch, sealed, 3 wires attached (2-pack) | [`LAR-06_limit_switch_sealed_prewired.step`](../../../cad/bought/LAR-06_limit_switch_sealed_prewired.step) | None published - repo model at an ESTIMATED 20 x 10 x 6.4 mm body + 20 mm lever (measure on arrival) |
 
 Design notes: [../design.md](../design.md).

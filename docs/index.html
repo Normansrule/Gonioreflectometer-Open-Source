@@ -22,13 +22,16 @@
 <header class="top">
  <a class="mark" href="./" aria-label="OpenGonio home">OpenGonio</a>
  <a href="lab.html">Lab</a>
+ <a class="hide-s" href="wiring.html">Wiring</a>
+ <a class="hide-s" href="build.html">Build book</a>
  <a class="hide-s" href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/blob/main/paper/build/opengonio.pdf">Paper</a>
  <a class="hide-s" href="https://github.com/Normansrule/Gonioreflectometer-Open-Source">GitHub</a>
  <button class="btn theme" type="button" data-theme-toggle><span data-theme-label>Light</span></button>
 </header>
 
 <nav class="rail" aria-label="Sections">
- <a href="#machine">Four axes</a>
+ <a href="#machine">The machine</a>
+ <a href="#drive">Drive it</a>
  <a href="#how">How it measures</a>
  <a href="#results">What you get</a>
  <a href="#evidence">Evidence</a>
@@ -39,7 +42,7 @@
 <main id="main">
 <section class="hero" aria-labelledby="h1">
  <div class="hero-copy">
-  <h1 id="h1"><span class="sr-only">OpenGonio, </span>A printable gonioreflectometer</h1>
+  <h1 id="h1"><span class="sr-only">OpenGonio, </span><span class="ln"><span>A printable</span></span> <span class="ln"><span>gonioreflectometer</span></span></h1>
   <p class="lead">A lamp circles a flat sample while a fixed camera watches, to measure how it reflects light at every angle.</p>
   <div class="acts">
    <a class="btn btn-light" href="https://github.com/Normansrule/Gonioreflectometer-Open-Source#build">Get the build</a>
@@ -67,13 +70,37 @@
   <p class="render-note" id="render-note">A live rendering with the simulator's reflectance model, not a photograph. <span class="hint">Move the pointer or use the arrow keys to move the lamp.</span></p>
   <p class="sr-only" id="lampread" aria-live="polite"></p>
  </div>
- <a class="next" href="#machine"><span aria-hidden="true">↓</span> The machine, moving</a>
+ <a class="next" href="#machine"><span aria-hidden="true">↓</span> Scroll to build the machine</a>
 </section>
 
-<section class="band rig-band" id="machine" aria-labelledby="h-machine">
+<section class="story" id="machine" aria-labelledby="h-story">
+ <div class="story-pin">
+  <canvas id="storyc" aria-hidden="true"></canvas>
+  <img class="fallback" src="og/img/assembly.png" width="2033" height="1004" loading="lazy" decoding="async"
+       alt="The full OpenGonio assembly from the CAD model: a square printed deck, the light arm on its ring, the tilting sample table in the middle and the fixed camera on a rail to the right.">
+  <h2 id="h-story" class="sr-only">The machine, assembled and moving</h2>
+  <ol class="chapters">
+   <li class="chapter"><p class="ch-title"><span id="st-parts">77</span> parts, one point.</p><p class="ch-sub">Printed in black ABS and held with M2 screws, every part aims at the same spot, 150 mm above the deck.</p></li>
+   <li class="chapter"><p class="ch-title"><b>M4</b> swings the lamp.</p><p class="ch-sub">A 3000 K lamp rides a 12 inch ring, anywhere from 20° to 324° around the sample.</p></li>
+   <li class="chapter"><p class="ch-title"><b>M3</b> turns the table.</p><p class="ch-sub">The sample turns to meet the camera at a new angle.</p></li>
+   <li class="chapter"><p class="ch-title"><b>M2</b> tilts the sample.</p><p class="ch-sub">Light and view leave the plane.</p></li>
+   <li class="chapter"><p class="ch-title"><b>M1</b> spins it.</p><p class="ch-sub">For brushed metal, fabric, anything with a grain.</p></li>
+   <li class="chapter"><p class="ch-title">The camera never moves.</p><p class="ch-sub">It sits 350 mm away, behind a 16 mm lens. Every angle comes from the motors alone.</p></li>
+  </ol>
+  <nav class="story-index" aria-label="Chapters">
+   <button type="button" data-ch="0">Build</button><button type="button" data-ch="1">M4</button><button type="button" data-ch="2">M3</button>
+   <button type="button" data-ch="3">M2</button><button type="button" data-ch="4">M1</button><button type="button" data-ch="5">Camera</button>
+  </nav>
+  <dl class="rig-angles story-angles" aria-hidden="true"><div><dt>θi</dt><dd id="st-ti">–</dd></div><div><dt>θr</dt><dd id="st-tr">–</dd></div></dl>
+  <p class="rig-loading" id="st-loading">Loading the CAD model…</p>
+  <p class="story-note">The CAD assembly, moved with the clash check's own rotations and lit only by its lamp. A render, not a photograph.</p>
+ </div>
+</section>
+
+<section class="band rig-band" id="drive" aria-labelledby="h-drive">
  <div class="wrap rig-head reveal">
-  <h2 id="h-machine">Four axes around one point</h2>
-  <p class="lead">Lamp, table, tilt and spin all move; the camera never does. Watch each axis, or drive it yourself.</p>
+  <h2 id="h-drive">Now drive it yourself</h2>
+  <p class="lead">Play the axes in turn, or take a slider. Drag the machine to look around.</p>
  </div>
  <figure class="rig" id="rig">
   <div class="rig-stage" id="rig-stage">
@@ -98,6 +125,15 @@
    <p class="measure">Lab instruments that do this cost as much as a car. OpenGonio follows the design of Ansari-Asl et al. (2024) and rebuilds it from 3D-printed black ABS (acrylonitrile butadiene styrene), M2 screws and off-the-shelf modules. One person with a printer and a screwdriver can build it: no soldering, drilling, sawing or crimping, and every part comes from Amazon, Digi-Key or Adafruit.</p>
    <p class="measure small" id="costline">Planned cost: $569.10, under a hard cap of $630.</p>
   </div>
+ </div>
+</section>
+
+<section class="band wrap numbers" aria-label="The build in numbers">
+ <div class="num-row reveal">
+  <div><p class="big-num"><span data-count="4">4</span></p><p class="num-label">motorised axes around one point</p></div>
+  <div><p class="big-num"><span id="n-parts" data-count="77">77</span></p><p class="num-label">parts in the CAD model, printed or bought</p></div>
+  <div><p class="big-num"><span id="n-steps" data-count="138">138</span></p><p class="num-label">build steps, each one a checklist (about <span id="n-hours" data-count="95">95</span> hours)</p></div>
+  <div><p class="big-num"><span id="n-cost" data-count="569" data-pre="$">$569</span></p><p class="num-label">of parts planned, under a $630 cap</p></div>
  </div>
 </section>
 
@@ -199,7 +235,9 @@
   <div><h3>Build one</h3><ul>
    <li><a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source#build">Build table and parts</a></li>
    <li><a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/blob/main/PARTS.md">Parts and budget</a></li>
-   <li><a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/tree/main/phases">Stage checklists</a></li></ul></div>
+   <li><a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/tree/main/phases">Stage checklists</a></li>
+   <li><a href="wiring.html">Wiring guide, one wire at a time</a></li>
+   <li><a href="build.html">Build book: printed parts, step by step</a></li></ul></div>
   <div><h3>Read</h3><ul>
    <li><a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/blob/main/paper/build/opengonio.pdf">Paper (PDF)</a></li>
    <li><a href="https://github.com/Normansrule/Gonioreflectometer-Open-Source/wiki">Wiki</a></li>

@@ -1,138 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2293 423" font-family="Segoe UI,Helvetica,Arial,sans-serif">
-<rect width="2293" height="423" rx="14" fill="#0d1117"/>
-<text x="28" y="34" fill="#f0f6fc" font-size="18" font-weight="600">1 · Power box: battery, charger, fuse, e-stop</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1515 285" font-family="Segoe UI,Helvetica,Arial,sans-serif">
+<rect width="1515" height="285" rx="14" fill="#0d1117"/>
+<text x="28" y="34" fill="#f0f6fc" font-size="18" font-weight="600">1 · Power: wall adapter, jack, e-stop</text>
 <text x="28" y="56" fill="#8b949e" font-size="12">Stage 01 · each line is one wire, from the left pin to the right pin; the number matches the table row below.</text>
-<rect x="28" y="78" width="296" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="40" y="98" fill="#f0f6fc" font-size="13" font-weight="600">USB-C charger ≥ 30 W (the laptop's)</text>
-<rect x="34" y="112" width="284" height="18" rx="4" fill="#0d1117"/>
-<text x="42" y="124" fill="#f0f6fc" font-size="11.5">USB-C</text>
-<rect x="474" y="106" width="243" height="101" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="486" y="126" fill="#f0f6fc" font-size="13" font-weight="600">USB-C PD trigger (PWR-27)</text>
-<rect x="480" y="140" width="231" height="18" rx="4" fill="#0d1117"/>
-<text x="488" y="152" fill="#f0f6fc" font-size="11.5">USB-C in</text>
-<rect x="480" y="160" width="231" height="18" rx="4" fill="#0d1117"/>
-<text x="488" y="174" fill="#f0f6fc" font-size="11.5">OUT +</text>
-<rect x="480" y="182" width="231" height="18" rx="4" fill="#0d1117"/>
-<text x="488" y="194" fill="#f0f6fc" font-size="11.5">OUT −</text>
-<rect x="867" y="144" width="197" height="122" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="879" y="164" fill="#f0f6fc" font-size="13" font-weight="600">CC/CV charger (PWR-29)</text>
-<rect x="873" y="178" width="185" height="18" rx="4" fill="#0d1117"/>
-<text x="881" y="191" fill="#f0f6fc" font-size="11.5">IN +</text>
-<rect x="873" y="199" width="185" height="18" rx="4" fill="#0d1117"/>
-<text x="881" y="212" fill="#f0f6fc" font-size="11.5">IN −</text>
-<rect x="873" y="220" width="185" height="18" rx="4" fill="#0d1117"/>
-<text x="881" y="233" fill="#f0f6fc" font-size="11.5">OUT +</text>
-<rect x="873" y="241" width="185" height="18" rx="4" fill="#0d1117"/>
-<text x="881" y="254" fill="#f0f6fc" font-size="11.5">OUT −</text>
-<rect x="28" y="155" width="296" height="80" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="40" y="175" fill="#f0f6fc" font-size="13" font-weight="600">Battery pack (PWR-21)</text>
-<rect x="34" y="188" width="284" height="18" rx="4" fill="#0d1117"/>
-<text x="42" y="202" fill="#f0f6fc" font-size="11.5">red lead</text>
-<rect x="34" y="210" width="284" height="18" rx="4" fill="#0d1117"/>
-<text x="42" y="222" fill="#f0f6fc" font-size="11.5">black lead</text>
-<rect x="474" y="225" width="243" height="80" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="486" y="245" fill="#f0f6fc" font-size="13" font-weight="600">Lever connector BAT+ (2-way)</text>
-<rect x="480" y="258" width="231" height="18" rx="4" fill="#0d1117"/>
-<text x="488" y="272" fill="#f0f6fc" font-size="11.5">1</text>
-<rect x="480" y="280" width="231" height="18" rx="4" fill="#0d1117"/>
-<text x="488" y="292" fill="#f0f6fc" font-size="11.5">2</text>
-<rect x="28" y="253" width="296" height="80" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="40" y="273" fill="#f0f6fc" font-size="13" font-weight="600">Fuse holder (PWR-04)</text>
-<rect x="34" y="286" width="284" height="18" rx="4" fill="#0d1117"/>
-<text x="42" y="300" fill="#f0f6fc" font-size="11.5">lead A</text>
-<rect x="34" y="308" width="284" height="18" rx="4" fill="#0d1117"/>
-<text x="42" y="320" fill="#f0f6fc" font-size="11.5">lead B</text>
-<rect x="1214" y="96" width="250" height="101" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="1226" y="116" fill="#f0f6fc" font-size="13" font-weight="600">Lever connector FUSED (3-way)</text>
-<rect x="1220" y="129" width="238" height="18" rx="4" fill="#0d1117"/>
-<text x="1228" y="142" fill="#f0f6fc" font-size="11.5">1</text>
-<rect x="1220" y="150" width="238" height="18" rx="4" fill="#0d1117"/>
-<text x="1228" y="163" fill="#f0f6fc" font-size="11.5">2</text>
-<rect x="1220" y="171" width="238" height="18" rx="4" fill="#0d1117"/>
-<text x="1228" y="184" fill="#f0f6fc" font-size="11.5">3</text>
-<rect x="1614" y="127" width="342" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="1626" y="147" fill="#f0f6fc" font-size="13" font-weight="600">E-stop (PWR-28)</text>
-<rect x="1620" y="160" width="330" height="18" rx="4" fill="#0d1117"/>
-<text x="1628" y="174" fill="#f0f6fc" font-size="11.5">NC 1</text>
-<rect x="1214" y="214" width="250" height="101" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="1226" y="234" fill="#f0f6fc" font-size="13" font-weight="600">Lever connector GND (3-way)</text>
-<rect x="1220" y="248" width="238" height="18" rx="4" fill="#0d1117"/>
-<text x="1228" y="261" fill="#f0f6fc" font-size="11.5">1</text>
-<rect x="1220" y="269" width="238" height="18" rx="4" fill="#0d1117"/>
-<text x="1228" y="282" fill="#f0f6fc" font-size="11.5">2</text>
-<rect x="1220" y="290" width="238" height="18" rx="4" fill="#0d1117"/>
-<text x="1228" y="303" fill="#f0f6fc" font-size="11.5">3</text>
-<rect x="1614" y="204" width="342" height="80" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="1626" y="224" fill="#f0f6fc" font-size="13" font-weight="600">Lever connector MOT− (3-way, on the tray)</text>
-<rect x="1620" y="238" width="330" height="18" rx="4" fill="#0d1117"/>
-<text x="1628" y="250" fill="#f0f6fc" font-size="11.5">1</text>
-<rect x="1620" y="258" width="330" height="18" rx="4" fill="#0d1117"/>
-<text x="1628" y="272" fill="#f0f6fc" font-size="11.5">2</text>
-<rect x="2106" y="176" width="159" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
-<text x="2118" y="196" fill="#f0f6fc" font-size="13" font-weight="600">SKR Pico (CTL-01)</text>
-<rect x="2112" y="210" width="147" height="18" rx="4" fill="#0d1117"/>
-<text x="2120" y="222" fill="#f0f6fc" font-size="11.5">POWER GND</text>
-<path d="M324,120 C399,120 399,148 474,148" fill="none" stroke="#e3b341" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.29s" repeatCount="indefinite" path="M324,120 C399,120 399,148 474,148"/></circle>
-<circle cx="324" cy="120" r="4.5" fill="#e3b341" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="474" cy="148" r="4.5" fill="#e3b341" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="378" cy="127" r="9" fill="#0d1117" stroke="#e3b341" stroke-width="1.5"/><text x="378" y="131" fill="#f0f6fc" font-size="10" text-anchor="middle">1</text>
-<path d="M717,170 C792,170 792,187 867,187" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.58s" repeatCount="indefinite" path="M717,170 C792,170 792,187 867,187"/></circle>
-<circle cx="717" cy="170" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="867" cy="187" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="813" cy="183" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="813" y="187" fill="#f0f6fc" font-size="10" text-anchor="middle">2</text>
-<path d="M717,190 C792,190 792,208 867,208" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.87s" repeatCount="indefinite" path="M717,190 C792,190 792,208 867,208"/></circle>
-<circle cx="717" cy="190" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="867" cy="208" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="792" cy="199" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="792" y="203" fill="#f0f6fc" font-size="10" text-anchor="middle">3</text>
-<path d="M324,198 C399,198 399,268 474,268" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="1.16s" repeatCount="indefinite" path="M324,198 C399,198 399,268 474,268"/></circle>
-<circle cx="324" cy="198" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="474" cy="268" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="378" cy="214" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="378" y="218" fill="#f0f6fc" font-size="10" text-anchor="middle">4</text>
-<path d="M324,296 C399,296 399,288 474,288" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="1.45s" repeatCount="indefinite" path="M324,296 C399,296 399,288 474,288"/></circle>
-<circle cx="324" cy="296" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="474" cy="288" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="420" cy="290" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="420" y="294" fill="#f0f6fc" font-size="10" text-anchor="middle">5</text>
-<path d="M324,316 H342 V361 H1196 V138 H1214" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="1.74s" repeatCount="indefinite" path="M324,316 H342 V361 H1196 V138 H1214"/></circle>
-<circle cx="324" cy="316" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1214" cy="138" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="739" cy="361" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="739" y="365" fill="#f0f6fc" font-size="10" text-anchor="middle">6</text>
-<path d="M1064,229 C1139,229 1139,159 1214,159" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="2.03s" repeatCount="indefinite" path="M1064,229 C1139,229 1139,159 1214,159"/></circle>
-<circle cx="1064" cy="229" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1214" cy="159" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1118" cy="212" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="1118" y="216" fill="#f0f6fc" font-size="10" text-anchor="middle">7</text>
-<path d="M1464,180 C1539,180 1539,170 1614,170" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="2.32s" repeatCount="indefinite" path="M1464,180 C1539,180 1539,170 1614,170"/></circle>
-<circle cx="1464" cy="180" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1614" cy="170" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1561" cy="172" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="1561" y="176" fill="#f0f6fc" font-size="10" text-anchor="middle">8</text>
-<path d="M324,218 H351 V349 H1187 V257 H1214" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.00s" repeatCount="indefinite" path="M324,218 H351 V349 H1187 V257 H1214"/></circle>
-<circle cx="324" cy="218" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1214" cy="257" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="769" cy="349" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="769" y="353" fill="#f0f6fc" font-size="10" text-anchor="middle">9</text>
-<path d="M1064,250 C1139,250 1139,278 1214,278" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.29s" repeatCount="indefinite" path="M1064,250 C1139,250 1139,278 1214,278"/></circle>
-<circle cx="1064" cy="250" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1214" cy="278" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1118" cy="257" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="1118" y="261" fill="#f0f6fc" font-size="10" text-anchor="middle">10</text>
-<path d="M1464,299 C1539,299 1539,246 1614,246" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.58s" repeatCount="indefinite" path="M1464,299 C1539,299 1539,246 1614,246"/></circle>
-<circle cx="1464" cy="299" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1614" cy="246" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="1561" cy="259" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="1561" y="263" fill="#f0f6fc" font-size="10" text-anchor="middle">11</text>
-<path d="M1956,268 C2031,268 2031,218 2106,218" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
-<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.87s" repeatCount="indefinite" path="M1956,268 C2031,268 2031,218 2106,218"/></circle>
-<circle cx="1956" cy="268" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="2106" cy="218" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
-<circle cx="2031" cy="243" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="2031" y="247" fill="#f0f6fc" font-size="10" text-anchor="middle">12</text>
-<line x1="28" y1="405" x2="50" y2="405" stroke="#e3b341" stroke-width="3"/><text x="56" y="409" fill="#8b949e" font-size="11.5">USB</text>
-<line x1="89" y1="405" x2="111" y2="405" stroke="#f85149" stroke-width="3"/><text x="117" y="409" fill="#8b949e" font-size="11.5">18–24 V</text>
-<line x1="178" y1="405" x2="200" y2="405" stroke="#8b949e" stroke-width="3"/><text x="206" y="409" fill="#8b949e" font-size="11.5">ground / − side</text>
+<rect x="28" y="127" width="228" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="40" y="147" fill="#f0f6fc" font-size="13" font-weight="600">24 V wall adapter (PWR-30)</text>
+<rect x="34" y="160" width="216" height="18" rx="4" fill="#0d1117"/>
+<text x="42" y="174" fill="#f0f6fc" font-size="11.5">round 24 V plug</text>
+<rect x="406" y="106" width="281" height="101" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="418" y="126" fill="#f0f6fc" font-size="13" font-weight="600">Screw-terminal jack (with PWR-30)</text>
+<rect x="412" y="140" width="269" height="18" rx="4" fill="#0d1117"/>
+<text x="420" y="152" fill="#f0f6fc" font-size="11.5">socket</text>
+<rect x="412" y="160" width="269" height="18" rx="4" fill="#0d1117"/>
+<text x="420" y="174" fill="#f0f6fc" font-size="11.5">+</text>
+<rect x="412" y="182" width="269" height="18" rx="4" fill="#0d1117"/>
+<text x="420" y="194" fill="#f0f6fc" font-size="11.5">−</text>
+<rect x="836" y="78" width="342" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="848" y="98" fill="#f0f6fc" font-size="13" font-weight="600">E-stop box (PWR-28)</text>
+<rect x="842" y="112" width="330" height="18" rx="4" fill="#0d1117"/>
+<text x="850" y="124" fill="#f0f6fc" font-size="11.5">NC 1</text>
+<rect x="836" y="155" width="342" height="80" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="848" y="175" fill="#f0f6fc" font-size="13" font-weight="600">Lever connector MOT− (3-way, on the tray)</text>
+<rect x="842" y="188" width="330" height="18" rx="4" fill="#0d1117"/>
+<text x="850" y="202" fill="#f0f6fc" font-size="11.5">1</text>
+<rect x="842" y="210" width="330" height="18" rx="4" fill="#0d1117"/>
+<text x="850" y="222" fill="#f0f6fc" font-size="11.5">3</text>
+<rect x="1328" y="127" width="159" height="59" rx="9" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+<text x="1340" y="147" fill="#f0f6fc" font-size="13" font-weight="600">SKR Pico (CTL-01)</text>
+<rect x="1334" y="160" width="147" height="18" rx="4" fill="#0d1117"/>
+<text x="1342" y="174" fill="#f0f6fc" font-size="11.5">POWER GND</text>
+<path d="M256,170 C331,170 331,148 406,148" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
+<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.29s" repeatCount="indefinite" path="M256,170 C331,170 331,148 406,148"/></circle>
+<circle cx="256" cy="170" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="406" cy="148" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="309" cy="164" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="309" y="168" fill="#f0f6fc" font-size="10" text-anchor="middle">1</text>
+<path d="M686,170 C761,170 761,120 836,120" fill="none" stroke="#f85149" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
+<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.58s" repeatCount="indefinite" path="M686,170 C761,170 761,120 836,120"/></circle>
+<circle cx="686" cy="170" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="836" cy="120" r="4.5" fill="#f85149" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="783" cy="132" r="9" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/><text x="783" y="136" fill="#f0f6fc" font-size="10" text-anchor="middle">2</text>
+<path d="M686,190 C761,190 761,198 836,198" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
+<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="0.87s" repeatCount="indefinite" path="M686,190 C761,190 761,198 836,198"/></circle>
+<circle cx="686" cy="190" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="836" cy="198" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="761" cy="194" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="761" y="198" fill="#f0f6fc" font-size="10" text-anchor="middle">3</text>
+<path d="M1178,218 C1253,218 1253,170 1328,170" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="9 5" opacity="0.95"><animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.3s" repeatCount="indefinite"/></path>
+<circle r="3.6" fill="#f0f6fc"><animateMotion dur="2.6s" begin="1.16s" repeatCount="indefinite" path="M1178,218 C1253,218 1253,170 1328,170"/></circle>
+<circle cx="1178" cy="218" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="1328" cy="170" r="4.5" fill="#8b949e" stroke="#0d1117" stroke-width="1.5"/>
+<circle cx="1232" cy="207" r="9" fill="#0d1117" stroke="#8b949e" stroke-width="1.5"/><text x="1232" y="211" fill="#f0f6fc" font-size="10" text-anchor="middle">4</text>
+<line x1="28" y1="267" x2="50" y2="267" stroke="#f85149" stroke-width="3"/><text x="56" y="271" fill="#8b949e" font-size="11.5">18–24 V</text>
+<line x1="117" y1="267" x2="139" y2="267" stroke="#8b949e" stroke-width="3"/><text x="145" y="271" fill="#8b949e" font-size="11.5">ground / − side</text>
 </svg>

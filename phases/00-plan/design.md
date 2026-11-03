@@ -15,7 +15,7 @@ Camera fixed, sample turns on three axes, light turns on an arm; all meet at one
 | M2 | Tilt | ±90° | 5:1 belt | 0.0225° | 08 |
 | M1 | Spin | ±180° | direct drive (pancake motor), 1/64 microstep | 0.028° | 09 |
 
-Optical home per axis; over-travel switches in the e-stop loop; software keep-out ≥ 30 mm and ≥ 5° light–camera gap [R1].
+Optical home per axis; one over-travel switch in the e-stop loop (light arm, at 17°; the other ends rely on soft limits and the e-stop); software keep-out ≥ 30 mm and ≥ 5° light–camera gap [R1].
 
 ### Frame
 
@@ -42,9 +42,9 @@ Origin = sample surface. +Z up. Camera on +X (350 mm; 650 mm for scans). Light a
 
 | Code | Connector | Pins |
 |---|---|---|
-| J1 | 6S pack → fuse → lever connectors; USB-C → PD trigger → DROK CC/CV charges it | +18–24 V, GND |
-| J2 | 18 AWG pair → SKR Pico POWER screw terminal | 18–24 V after e-stop (red), GND (black) |
-| J3 | the red wire itself, through the switch's COM–NC screws | over-travel switch (NC) |
+| J1 | 24 V wall adapter → screw-terminal jack → e-stop | +24 V, GND |
+| J2 | 18 AWG pair → MOT+ / MOT− lever connectors → SKR Pico POWER screw terminal | 24 V after e-stop (red), GND (black) |
+| J3 | the limit switch's own black (COM) and grey (NC) wires, in the red line | over-travel switch (NC) |
 | SENSE | opto module (PWR-10) screw terminals + jumpers | isolated motion-power sense → ESP32-S3 GPIO 17, GND, 3V3 |
 | M-x | the 5-pack's 1 m cables (6-pin motor end → XH2.54 4-pin); M1 pancake: bare leads spliced to a spare cable with lever connectors | SKR Pico socket pins 2B 1B 1A 2A |
 | E-x | double-ended JST-XH leads (CTL-06), XH housing on the module pins | signal, GND, 5 V (TCST2103) from the SKR Pico X/Y/Z/E0-STOP ports |
@@ -56,7 +56,7 @@ Origin = sample surface. +Z up. Camera on +X (350 mm; 650 mm for scans). Light a
 1. Create one document, **OpenGonio**, with a Variable Studio `OG globals`: `#clear` `#og40` `#cam_d`=350 `#scan_d`=650 `#light_d`=300 `#zero_h`=150 `#ring_r`=140.
 2. Import the whole machine: **Create → Import** `cad/assembly/opengonio_assembly.step` (or `dist/opengonio-cad.zip` from `make cad-zip`, every STEP at once). Origin = deck top under the zero point (zero point at z = 150 mm), +X toward the camera, +Z up. Printed parts are black, bought parts are dummies (tan) — [cad/README.md](../../cad/README.md) lists the model for every part.
 3. Import the starter parts you edit: **Insert → Import** each `phases/NN/3d/*.step`. STEP arrives as editable solids; STL would arrive as a fixed mesh. Real vendor models (`bash scripts/get_cad.sh` → `cad/vendor/`) replace dummies at the same origin.
-4. One Part Studio per stage; name parts by BOM ID (e.g. `PWR-18a`). Run interference check on the assembly.
+4. One Part Studio per stage; name parts by BOM ID (e.g. `PWR-18`). Run interference check on the assembly.
 5. Release: export STEP + STL back into that stage's `3d/`, commit with `bash scripts/update.sh "…"`.
 
 Or edit the numbers in `tools/cad/parts.py` and run `python tools/cad/parts.py` to regenerate every file.
