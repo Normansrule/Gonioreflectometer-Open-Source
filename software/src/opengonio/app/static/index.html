@@ -14,7 +14,7 @@
 <body>
 <a class="skip btn btn-light" href="#controls">Skip to the controls</a>
 <header class="bar">
- <h1 class="mark">OpenGonio <span class="sr-only">control</span></h1>
+ <h1 class="mark">OpenGonio<span class="mark-sub">Control</span></h1>
  <p class="conn" id="conn" role="status"><span class="patch open" aria-hidden="true"></span><span id="conn-text">Starting…</span></p>
  <button class="btn ghost" type="button" id="disconnect" hidden>Disconnect</button>
  <button class="btn theme" type="button" data-theme-toggle><span data-theme-label>Light</span></button>
@@ -26,11 +26,22 @@
  <button class="btn ghost" type="button" id="banner-close" aria-label="Dismiss message">Dismiss</button>
 </div>
 
+<nav class="devices" id="devices" aria-label="Devices" hidden></nav>
+
 <main class="app" id="app" aria-busy="true">
  <!-- not connected: the empty state -->
  <section class="connect" id="connect" aria-labelledby="h-connect" hidden>
-  <h2 class="title" id="h-connect">Connect to a machine</h2>
-  <p class="lead">Every control works on the simulated machine; nothing moves and nothing is powered.</p>
+  <div class="connect-head">
+   <h2 class="title" id="h-connect">Connect to a machine</h2>
+   <p class="lead">Every control works on the simulated machine; nothing moves and nothing is powered.</p>
+  </div>
+  <svg class="orbit" viewBox="-120 -120 240 240" aria-hidden="true">
+   <circle class="o-ring" r="96"/><circle class="o-travel" r="96"/>
+   <line class="o-ray-out" x1="0" y1="0" x2="112" y2="0"/>
+   <g class="o-arm"><line class="o-ray-in" x1="0" y1="0" x2="96" y2="0"/><circle class="o-halo" cx="96" r="16"/><circle class="o-lamp" cx="96" r="6"/></g>
+   <line class="o-sample" x1="0" y1="-26" x2="0" y2="26"/>
+   <rect class="o-cam" x="106" y="-8" width="14" height="16"/>
+  </svg>
   <div class="choices">
    <form class="choice" id="f-sim">
     <h2>Simulated machine</h2>
@@ -44,15 +55,19 @@
     <button class="btn" type="submit">Connect to the machine</button>
    </form>
   </div>
+  <div class="dev-table">
+   <h3>What this app talks to</h3>
+   <ul id="dev-list"></ul>
+  </div>
  </section>
 
  <!-- connected -->
  <section class="controls" id="controls" aria-labelledby="h-axes" hidden>
   <div class="group">
-   <div class="group-head"><h2 id="h-axes">Axes</h2><button class="btn" type="button" id="home">Home all</button></div>
+   <div class="group-head"><h2 id="h-axes">Axes</h2><button class="btn ghost" type="button" id="home">Home all</button></div>
    <p class="note" id="homenote" hidden><span class="patch lamp" aria-hidden="true"></span>Home the axes before moving: the app only trusts positions it has homed.</p>
    <div id="axes"></div>
-   <div class="row-2"><button class="btn" type="button" id="move">Move</button><button class="btn ghost" type="button" id="specular">Mirror pose</button></div>
+   <div class="row-2"><button class="btn ghost" type="button" id="specular">Mirror pose</button><button class="btn" type="button" id="move">Move</button></div>
    <p class="small" id="check" aria-live="polite"></p>
   </div>
   <div class="group">
@@ -78,15 +93,15 @@
    <circle class="lamp-halo" id="lamp-halo" r="20"/>
    <circle class="lamp" id="lamp" r="9" tabindex="0" role="slider" aria-label="Lamp angle M4" aria-valuemin="20" aria-valuemax="324"/>
   </svg>
-  <dl class="angles" id="angles">
+  <dl class="angles" id="angles" aria-label="BRDF angles at the homed pose">
    <div><dt>Incidence θi</dt><dd id="a-ti">–</dd></div>
    <div><dt>Reflection θr</dt><dd id="a-tr">–</dd></div>
    <div><dt>Azimuth Δφ</dt><dd id="a-dp">–</dd></div>
    <div><dt>Clearance</dt><dd id="a-cl">–</dd></div>
   </dl>
   <figure class="frame">
-   <div class="frame-img" id="frame-box"><p id="frame-empty">No frame yet</p></div>
-   <figcaption><span id="frame-cap">Camera</span><button class="btn ghost" type="button" id="grab">Grab frame</button></figcaption>
+   <div class="frame-img" id="frame-box"><p id="frame-empty">No frame yet</p><span class="roi" aria-hidden="true"></span></div>
+   <figcaption><span class="frame-title">Camera</span><span id="frame-cap">Camera</span><button class="btn ghost" type="button" id="grab">Grab frame</button></figcaption>
   </figure>
  </section>
 
@@ -112,6 +127,27 @@
    <h2>Earlier runs</h2>
    <ul class="runlist" id="runlist"><li class="empty small">No runs yet. Run a capture and its curve appears here.</li></ul>
    <p class="small dim" id="datadir"></p>
+  </div>
+ </section>
+
+ <section class="sensors" id="sensors" aria-labelledby="h-sensors" hidden>
+  <div class="group spectral">
+   <div class="group-head"><h2 id="h-sensors">Spectral sensor</h2><button class="btn ghost" type="button" id="spec-read">Read once</button></div>
+   <div class="bars" id="spec-bars" role="img" aria-label="No spectral reading yet"></div>
+   <p class="small" id="spec-note"></p>
+  </div>
+  <div class="group quality">
+   <h2>Run quality</h2>
+   <dl class="tiles">
+    <div><dt>Lamp drift</dt><dd id="q-drift">–</dd><dd class="note" id="q-drift-n">last run</dd></div>
+    <div><dt>Mirror peak</dt><dd id="q-peak">–</dd><dd class="note" id="q-peak-n">error from expected</dd></div>
+    <div><dt>Exposure</dt><dd id="q-exp">–</dd><dd class="note" id="q-exp-n">locked in M17.2</dd></div>
+    <div><dt>Homed</dt><dd id="q-homed">–</dd><dd class="note" id="q-homed-n">axes trusted</dd></div>
+   </dl>
+  </div>
+  <div class="group log-group">
+   <h2>Session</h2>
+   <ol class="log" id="log" aria-live="polite"><li class="empty small">Actions and results appear here.</li></ol>
   </div>
  </section>
 

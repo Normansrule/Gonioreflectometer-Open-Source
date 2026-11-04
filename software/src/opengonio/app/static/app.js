@@ -28,10 +28,29 @@
   let dismissed = "";
   function say(msg) { $("banner-text").innerHTML = codeify(msg || ""); $("banner").hidden = !msg; }
   const codeify = t => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>");
+  const ACT_NAMES = { "/api/home": "Home all", "/api/move": "Move", "/api/stop": "STOP", "/api/light": "Light",
+    "/api/connect": "Connect", "/api/disconnect": "Disconnect", "/api/run": "Capture", "/api/spectral": "Spectral reading" };
   async function act(path, body, after) {
-    try { const r = await api(path, body); say(""); if (after) after(r); }
-    catch (e) { if (!offline) say(e.message); }
+    const what = ACT_NAMES[path] || path;
+    try { const r = await api(path, body); say(""); log(describe(path, body), "ok"); if (after) after(r); }
+    catch (e) { if (!offline) { say(e.message); log(`${what} refused: ${e.message}`, "block"); } }
     await refresh();
+  }
+  function describe(path, body) {
+    if (path === "/api/move") return "Moved to " + Object.entries(body.pose).map(([k, v]) => `${k} ${(+v).toFixed(1)}°`).join(", ");
+    if (path === "/api/light") return `${body.name === "white" ? "White lamp" : body.name} ${body.on ? "on" : "off"}`;
+    if (path === "/api/connect") return body.mode === "sim" ? `Connected to the simulator (${body.material})` : "Connected over USB";
+    if (path === "/api/run") return `Capture started: ${PLAN_INFO[body.plan].label.toLowerCase()}`;
+    return ACT_NAMES[path] || path;
+  }
+
+  /* ---------- session log: what happened, newest first (this browser only) ---------- */
+  const events = [];
+  function log(text, kind = "open") {
+    events.unshift({ t: new Date(), text, kind }); events.length = Math.min(events.length, 40);
+    const ol = $("log"); if (!ol) return;
+    ol.innerHTML = events.map(e => `<li><time>${e.t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</time>` +
+      `<span class="patch ${e.kind}" aria-hidden="true"></span><span>${codeify(e.text)}</span></li>`).join("");
   }
 
   /* ---------- state ---------- */
@@ -52,13 +71,66 @@
     if (!S) return;
     const on = S.mode !== "disconnected", running = S.job && S.job.status === "running";
     $("connect").hidden = on; $("controls").hidden = !on; $("exhibit").hidden = !on; $("runs").hidden = !on;
+    $("sensors").hidden = !on; $("devices").hidden = !on;
     $("disconnect").hidden = !on;
     document.body.classList.toggle("busy", !!running);
+    renderDevices();
     if (!on) { setConn("open", "Not connected"); fillMaterials(); return; }
     setConn(running ? "lamp live" : S.mode === "sim" ? "sim" : "ok",
       (S.mode === "sim" ? `Simulated machine · ${S.material}` : "Machine over USB · untested") + (running ? " · capturing" : ""));
     if (S.last_error && S.last_error !== dismissed && $("banner").hidden) say(S.last_error);
-    renderAxes(running); renderLights(running); renderPose(); renderAngles(); renderRun(running);
+    renderAxes(running); renderLights(running); renderPose(); renderAngles(); renderRun(running); renderSensors(running);
+    trackJob();
+  }
+
+  /* ---------- devices: what the app talks to, from the server (simulated / connected / not built) ---------- */
+  const STATUS = { simulated: ["sim", "Simulated"], connected: ["ok", "Connected"], standby: ["open", "Standby"], offline: ["open", "Offline"],
+    not_built: ["open", "Not built yet"], not_in_app: ["open", "Not in the app yet"] };
+  function renderDevices() {
+    const d = S.devices || [], key = JSON.stringify(d); if (renderDevices.key === key) return; renderDevices.key = key;
+    $("devices").innerHTML = d.map(x => { const [k, w] = STATUS[x.status] || ["open", x.status];
+      return `<div class="dev ${x.status}"><span class="dev-name">${esc(x.name)}</span><span class="dev-part">${esc(x.part)}</span>` +
+        `<span class="dev-st"><span class="patch ${k}" aria-hidden="true"></span>${w}${x.detail ? `<span class="dev-d"> · ${codeify(x.detail)}</span>` : ""}</span></div>`; }).join("");
+    $("dev-list").innerHTML = d.map(x => `<li><span class="dev-name">${esc(x.name)}</span><span class="dev-part">${esc(x.part)}</span>` +
+      `<span class="dev-stage">stage ${String(x.stage).padStart(2, "0")}</span></li>`).join("");
+  }
+
+  /* ---------- sensors and run quality ---------- */
+  const NM = [415, 445, 480, 515, 555, 590, 630, 680];
+  function nmColour(nm) {                                  // a muted hue per AS7341 band (the band's own wavelength)
+    const hue = nm < 440 ? 265 : nm < 490 ? 265 - (nm - 440) * 1.9 : nm < 580 ? 170 - (nm - 490) * 1.25 : Math.max(0, 58 - (nm - 580) * 0.55);
+    return `hsl(${hue.toFixed(0)} 52% 58%)`;
+  }
+  function renderSensors(running) {
+    const sp = S.spectral, homed = ORDER.every(k => !S.axes[k].installed || S.axes[k].homed), dev = (S.devices || []).find(d => d.id === "spectral") || {};
+    $("spec-read").disabled = !!running || S.mode !== "sim" || !homed;
+    $("spec-note").innerHTML = S.mode !== "sim" ? `Not read by the app yet: the AS7341 sits on the button hub (${esc(dev.detail || "stage 10")}).`
+      : !homed ? "Home the axes first: a reading is tied to a trusted pose."
+      : sp ? `Simulated reading at M4 ${(+sp.pose.M4).toFixed(1)}°, M3 ${(+sp.pose.M3).toFixed(1)}°. Raw counts, 0–65535.`
+      : "One reading of the 8 colour bands, clear and near-infrared at this pose. Simulated: the lamp must be on for counts.";
+    const box = $("spec-bars"), names = sp ? sp.channels : ["F1 415", "F2 445", "F3 480", "F4 515", "F5 555", "F6 590", "F7 630", "F8 680", "Clear", "NIR"];
+    const max = sp ? Math.max(...sp.counts, 1) : 1;
+    box.innerHTML = names.map((n, i) => { const v = sp ? sp.counts[i] : null, h = v == null ? 0 : Math.max(0.02, v / max);
+      const col = i < 8 ? nmColour(NM[i]) : i === 8 ? "var(--ink-2)" : "hsl(0 30% 42%)";
+      return `<div class="sbar"><span class="v num">${v == null ? "–" : v}</span><span class="col"><i style="transform:scaleY(${h.toFixed(3)});background:${col}"></i></span>` +
+        `<span class="n">${esc(n.split(" ")[0])}</span><span class="nm">${esc(n.split(" ")[1] || "")}</span></div>`; }).join("");
+    box.classList.toggle("empty", !sp);
+    box.setAttribute("aria-label", sp ? "Spectral reading: " + names.map((n, i) => `${n} ${sp.counts[i]}`).join(", ") : "No spectral reading yet");
+    const r = (S.job && S.job.result) || {};
+    const fmt = (v, u, d = 2) => v == null ? "–" : `${v > 0 && u === "°" ? "+" : ""}${(+v).toFixed(d)}${u === "°" ? u : `<small>${u}</small>`}`;
+    $("q-drift").innerHTML = fmt(r.lamp_drift_pct, "%", 2); $("q-peak").innerHTML = fmt(r.mirror_peak_error_deg, "°", 2);
+    $("q-drift-n").textContent = r.lamp_drift_pct == null ? "needs a run with a white reference" : "over the last run";
+    $("q-peak-n").textContent = r.mirror_peak_error_deg == null ? "from a mirror sweep" : "from the expected angle";
+    $("q-exp").innerHTML = S.camera ? `${S.camera.exposure_ms}<small>ms</small>` : "–";
+    const inst = ORDER.filter(k => S.axes[k].installed), h = inst.filter(k => S.axes[k].homed);
+    $("q-homed").textContent = `${h.length} / ${inst.length}`; $("q-homed-n").textContent = h.length === inst.length ? "every axis trusted" : "home before moving";
+  }
+  let jobSeen = "";
+  function trackJob() {
+    const j = S.job; if (!j) return; const key = j.name + j.status; if (key === jobSeen) return;
+    if (jobSeen && j.status !== "running") log(j.status === "finished" ? `Capture finished: ${j.name}, ${j.done} shots` + (j.result && j.result.result ? `, verify ${j.result.result}` : "")
+      : `Capture ${j.status}: ${j.error || j.name}`, j.status === "finished" ? (j.result && j.result.result === "FAIL" ? "block" : "ok") : "block");
+    jobSeen = key;
   }
   function setConn(kind, text) {
     $("conn").querySelector(".patch").className = "patch " + kind; $("conn-text").textContent = text;
@@ -138,8 +210,12 @@
   const P = (deg, r) => [r * Math.cos(deg * Math.PI / 180), -r * Math.sin(deg * Math.PI / 180)];
   (function ticks() {
     let h = "";
-    for (let a = 0; a < 360; a += 30) { const [x1, y1] = P(a, 150), [x2, y2] = P(a, a % 90 ? 158 : 164); h += `<line class="tick" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
-      if (a % 90 === 0 && a) { const [tx, ty] = P(a, 178); h += `<text class="tick-lbl" x="${tx}" y="${ty + 4}" text-anchor="middle">${a}°</text>`; } }
+    for (let a = 0; a < 360; a += 10) { const major = a % 90 === 0, mid = a % 30 === 0;
+      const [x1, y1] = P(a, 150), [x2, y2] = P(a, major ? 166 : mid ? 160 : 155);
+      h += `<line class="tick${major ? " major" : mid ? "" : " minor"}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      if (major && a) { const [tx, ty] = P(a, 180); h += `<text class="tick-lbl" x="${tx}" y="${ty + 4}" text-anchor="middle">${a}°</text>`; } }
+    const [t0x, t0y] = P(20, 141), [t1x, t1y] = P(324, 141);           // the lamp's travel, 20..324 deg
+    h += `<path class="travel" d="M${t0x} ${t0y} A141 141 0 1 0 ${t1x} ${t1y}"/>`;
     $("ticks").innerHTML = h;
   })();
   function arc(el, a0, a1, r) {
@@ -201,7 +277,7 @@
   function renderAngles() {
     const a = S.angles;
     $("a-ti").textContent = a ? a.theta_i.toFixed(1) + "°" : "–"; $("a-tr").textContent = a ? a.theta_r.toFixed(1) + "°" : "–";
-    $("a-dp").textContent = a ? a.delta_phi.toFixed(0) + "°" : "–"; $("a-cl").textContent = a ? a.clearance_mm.toFixed(0) + " mm" : "–";
+    $("a-dp").textContent = a ? a.delta_phi.toFixed(0) + "°" : "–"; $("a-cl").innerHTML = a ? `${a.clearance_mm.toFixed(0)}<small>mm</small>` : "–";
   }
   async function grab() {
     try {
@@ -229,6 +305,7 @@
     grabSoon();
   }));
   $("grab").addEventListener("click", grab);
+  $("spec-read").addEventListener("click", () => act("/api/spectral", {}));
   $("stop").addEventListener("click", () => act("/api/stop", {}, () => say("Stopped. The controller was reset: home the axes before moving again.")));
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !e.defaultPrevented) $("stop").click(); });
   const reset = () => { target = {}; dirty.clear(); $("axes").innerHTML = ""; };
@@ -309,22 +386,35 @@
     const pts = curveRows.filter(r => r.valid !== "no").map(r => mirror ? [+r.M3, yv(r), 0] : [+r.theta_r, yv(r), +r.theta_i])
       .filter(p => p[1] != null && isFinite(p[1]));
     if (!pts.length) return;
-    const L = 40, R = 10, T = 10, B = 30, xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    const L = 40, R = 10, T = 30, B = 34, xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);   // T: room above the plot for the axis words
     const x0 = Math.min(...xs), x1 = Math.max(...xs), y1 = Math.max(...ys) * 1.08 || 1;
     const X = x => L + (x - x0) / ((x1 - x0) || 1) * (W - L - R), Y = y => H - B - y / y1 * (H - T - B);
     g.strokeStyle = K.rule; g.fillStyle = K.ink2; g.lineWidth = 1;
     for (let i = 0; i <= 4; i++) { const y = y1 * i / 4; g.beginPath(); g.moveTo(L, Y(y)); g.lineTo(W - R, Y(y)); g.stroke(); g.fillText(y1 < 10 ? y.toFixed(2) : y.toFixed(0), 2, Y(y) + 4); }
-    g.textAlign = "right"; g.fillText(mirror ? "table angle M3 (°)" : "reflection angle θr (°)", W - R, H - 6); g.textAlign = "left";
-    g.fillText(absolute ? "BRDF, per sr" : "brightness, relative", L + 6, T + 12);
-    g.fillText(x0.toFixed(0) + "°", L, H - 14);
+    g.fillText((absolute ? "BRDF, per sr" : "brightness, relative") + (mirror ? " · against table angle M3" : " · against reflection angle θr"), 2, 14);
+    g.textAlign = "center";
+    for (let i = 0; i <= 4; i++) { const x = x0 + (x1 - x0) * i / 4; g.fillText(x.toFixed(x1 - x0 < 10 ? 1 : 0) + "°", X(x), H - B + 16); }
+    g.textAlign = "left";
     const groups = {}; pts.forEach(p => (groups[p[2]] = groups[p[2]] || []).push(p));
     const keys = Object.keys(groups).sort((a, b) => a - b);
     keys.forEach((k, i) => {
       const t = keys.length > 1 ? i / (keys.length - 1) : 1;
       g.strokeStyle = keys.length > 1 ? OG.alpha(K.blue, 0.35 + 0.65 * t) : K.blue; g.fillStyle = g.strokeStyle; g.lineWidth = 1.75;
-      const s = groups[k].sort((a, b) => a[0] - b[0]); g.beginPath(); s.forEach(([x, y], j) => j ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y))); g.stroke();
+      const s = groups[k].sort((a, b) => a[0] - b[0]);
+      if (keys.length === 1) {                                       // one curve: a soft fill under it
+        const grd = g.createLinearGradient(0, T, 0, H - B); grd.addColorStop(0, OG.alpha(K.blue, 0.28)); grd.addColorStop(1, OG.alpha(K.blue, 0));
+        g.fillStyle = grd; g.beginPath(); g.moveTo(X(s[0][0]), Y(0)); s.forEach(([x, y]) => g.lineTo(X(x), Y(y))); g.lineTo(X(s[s.length - 1][0]), Y(0)); g.fill();
+        g.fillStyle = g.strokeStyle;
+      }
+      g.beginPath(); s.forEach(([x, y], j) => j ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y))); g.stroke();
       s.forEach(([x, y]) => { g.beginPath(); g.arc(X(x), Y(y), 2.5, 0, 7); g.fill(); });
     });
+    if (mirror) {                                                    // the peak: where the table really faces the camera
+      const pk = pts.reduce((a, b) => (b[1] > a[1] ? b : a));
+      g.strokeStyle = K.ink2; g.setLineDash([3, 4]); g.beginPath(); g.moveTo(X(pk[0]), T); g.lineTo(X(pk[0]), H - B); g.stroke(); g.setLineDash([]);
+      g.fillStyle = K.ink; g.textAlign = X(pk[0]) > W - 110 ? "right" : "left";
+      g.fillText(`peak ${pk[0].toFixed(1)}°`, X(pk[0]) + (g.textAlign === "right" ? -6 : 6), T + 12); g.textAlign = "left";
+    }
     cv.setAttribute("aria-label", mirror ? `Brightness against table angle, ${pts.length} shots` : `BRDF against reflection angle for ${keys.length} incidence angles`);
   }
   window.addEventListener("og:theme", () => { drawCurve(); drawPose(); });

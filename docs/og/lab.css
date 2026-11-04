@@ -91,7 +91,6 @@ td, th { border-bottom: 1px solid var(--rule); padding: var(--s-3) var(--s-2); t
 th { color: var(--ink-2); font-weight: 500; }
 td:first-child { white-space: nowrap; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 
-.foot { max-width: 1240px; margin: 0 auto; padding: var(--s-7) var(--margin); color: var(--ink-2); font-size: var(--step-small); display: grid; gap: var(--s-2); }
 
 @media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
   .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out); }

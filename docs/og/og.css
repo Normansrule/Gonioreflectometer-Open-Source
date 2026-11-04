@@ -142,6 +142,15 @@ input, select, textarea, button { font: inherit; color: inherit; caret-color: va
 .skip { position: absolute; left: var(--s-4); top: -100px; z-index: 50; }
 .skip:focus { top: var(--s-4); }
 
+/* the closing bar of the inner pages (lab, wiring guide, build book): the same bone ground as the landing page footer */
+.site-foot { background: var(--ink); color: var(--ground); padding: var(--s-7) var(--margin) var(--s-6); margin-top: var(--s-6);
+  display: grid; gap: var(--s-5); }
+.site-foot a { color: inherit; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 0.2em; }
+.site-foot nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s-3) var(--s-5); font-size: var(--step-small); }
+.site-foot .mark { font-family: var(--font-display); font-size: 1.75rem; text-decoration: none; margin-right: var(--s-4); }
+.site-foot [aria-current="page"] { text-decoration: none; font-weight: 600; }
+.site-foot p { margin: 0; font-size: 0.8125rem; display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-5); opacity: 0.78; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }

@@ -140,6 +140,8 @@ def app(p) -> None:
                     pg.click('[data-light="white"]'); pg.wait_for_timeout(300)
                     pg.fill("#n-M4", "120"); pg.dispatch_event("#n-M4", "change"); pg.click("#specular"); pg.wait_for_timeout(300)
                     pg.click("#move"); pg.wait_for_timeout(1200); pg.click("#grab"); pg.wait_for_timeout(500)
+                    pg.click("#spec-read"); pg.wait_for_timeout(500)
+                    pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(400)   # the clicks scrolled the console
                 jpg(pg.screenshot(), name, width=w * (2 if w < 500 else 1))
                 pg.close()
             pg = p.new_page(viewport={"width": 1440, "height": 900}, color_scheme="dark")

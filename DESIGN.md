@@ -62,7 +62,8 @@ typography:
 rounded:
   xs: "1px"
   sm: "2px"
-  switch: "15px"
+  switch: "14px"
+  pill: "999px"
 spacing:
   xs: "4px"
   sm: "8px"
@@ -181,11 +182,16 @@ are separated by tone and space.
 | Sticky stage picture | build stages | the simulator at each build stage, crossfading as the list scrolls |
 | Q and A | questions | large serif question, answer beside it |
 | Inverted footer | landing | ink ground, full-width wordmark |
+| Page footer | lab, wiring guide, build book (`.site-foot` in `og.css`) | the same ink ground, smaller: Gloock mark, links to every page, licences; the current page bold, no underline |
 | Wiring guide | `docs/wiring.html` (`og/wiring-page.js`, `og/guide.css`) | every wire from `docs/wiring.yaml`, one per step: the section diagram in SVG, wires already made stay drawn, the current wire thick with a moving-dot arrow and pulsing tungsten rings on its two pins, the next wire dashed. Wire kinds told apart by colour and line pattern (ground = black core with a light edge). Section chips with progress (bone bar, scaleX); `#step-N` links; arrow keys. Wide screens show the whole section; phones scroll to the wire's start pin. |
 | Build book | `docs/build.html` (`og/build-page.js`, `og/guide.css`) | toy-brick instruction book from `docs/assembly.yaml` (`tools/build_book.py`): the CAD assembly (`og/model/rig.js`) in WebGL, parts already on in flat grey, this step's parts lit: tungsten = print it (the thing to do now, as the lamp marks it), bone = buy it. They slide in once per step along dashed ink arrows with a ground halo (900 ms each, 70 ms apart, exponential ease-out), then the page stops drawing; "Play again" repeats it. Parts box top left (a WebGL thumbnail per part, ×count, screws drawn to length), Gloock step number with "/total" bottom left, words from the stage checklist. Chips = parts of the machine (`section`). Drag to turn, double-click or "Reset view" to put it back; reduced motion: parts in place, arrows only. `?print`: one A4 landscape page per step, light theme (`exports/build-book.pdf`). |
 | Pose view | app | top view: ring, lamp, sample and normal, camera; dashed ghost = target; drag or arrow-key the lamp |
 | Switch | app lights | `role="switch"`; blocked lights disabled with the reason under "Blocked" |
 | STOP | app header | always enabled, red patch colour, Esc |
+| Device strip | app, under the header; connect screen | one cell per device from `/api/state` `devices`: motion board, camera, lamp, spectral sensor, button hub. Status = patch + word (simulated = blue, connected = green, standby, offline, not built, not in this app), the stage that builds it, and why. Scrolls sideways on phones. |
+| Spectral bars | app sensors panel | ten AS7341 channels (F1–F8, Clear, NIR), each bar in its wavelength's hue, raw counts 0–65535; "Read once" calls `POST /api/spectral`. Simulator only: on hardware the app says the sensor reads through the button hub, which it doesn't open yet. |
+| Run quality | app sensors panel | four tiles: lamp drift, mirror peak error, exposure, homed axes. A dash and the reason until a run supplies the number. |
+| Session log | app sensors panel | the last 40 actions with time and patch (done, refused, finished, failed); `aria-live="polite"` |
 
 ## States (app)
 
@@ -199,6 +205,7 @@ are separated by tone and space.
 | Error / refused | dismissible banner with the server's own message (unsafe pose, not homed, blocked light) |
 | Stopped | banner: controller reset, home again |
 | Results | verify verdict with patch, curve, notes; earlier runs list |
+| Sensor not ready | spectral panel says why (not connected, simulator only, nothing read yet); quality tiles show a dash and what they need |
 
 ## Pictures
 

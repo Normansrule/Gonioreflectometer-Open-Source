@@ -132,3 +132,16 @@ def test_stop_during_a_capture_aborts_it(api):
     if job["status"] == "aborted":
         assert api("/api/state")[1]["last_error"] is None
     assert not any(lt["on"] for lt in api("/api/state")[1]["lights"])
+
+
+def test_devices_and_spectral_reading(api):
+    devs = {d["id"]: d for d in api("/api/state")[1]["devices"]}
+    assert set(devs) >= {"motion", "camera", "lamp", "spectral", "hub"} and devs["motion"]["status"] == "offline"
+    assert api("/api/spectral", {})[0] == 409                    # not connected
+    api("/api/connect", {"mode": "sim", "material": "ptfe"})
+    api("/api/home", {})
+    api("/api/light", {"name": "white", "on": True})
+    code, r = api("/api/spectral", {})
+    assert code == 200 and r["simulated"] and len(r["counts"]) == len(r["channels"]) == 10
+    s = api("/api/state")[1]
+    assert s["spectral"]["counts"] == r["counts"] and {d["id"]: d["status"] for d in s["devices"]}["spectral"] == "simulated"

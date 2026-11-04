@@ -14,6 +14,7 @@ static/ and talks to these endpoints:
     POST /api/check {pose}              angles and keep-out check without moving
     POST /api/move {pose} | /api/light {name, on}
     POST /api/run {plan, theta, step}   capture -> verify -> curve, in the background
+    POST /api/spectral                  one AS7341 reading (simulator only for now: the app doesn't open the hub yet)
     GET  /api/frame.png                 one camera frame (the simulated camera is 64 x 48 px)
     GET  /api/runs | /api/curve?run=NAME
 SPDX-License-Identifier: GPL-3.0-or-later
@@ -44,6 +45,7 @@ from ..plans import hemisphere, inplane
 STATIC = Path(__file__).parent / "static"
 MATERIALS = ("mirror", "ptfe", "matte", "paper", "plastic")
 PLANS = ("mirror", "inplane", "isotropic")
+SPECTRAL_CHANNELS = ("F1 415", "F2 445", "F3 480", "F4 515", "F5 555", "F6 590", "F7 630", "F8 680", "Clear", "NIR")   # AS7341, nm
 
 
 class Refused(Exception):
@@ -78,6 +80,7 @@ class App:
         self.job: Job | None = None
         self.stop_flag = threading.Event()
         self.last_error: str | None = None
+        self.spectral_last: dict | None = None
 
     # ---- connection -----------------------------------------------------------------------------------------
     def connect(self, mode: str, material: str | None = None) -> None:
@@ -116,6 +119,7 @@ class App:
             if self.cam is not None and hasattr(self.cam, "close"):
                 self.cam.close()
             self.g, self.cam, self.mode, self.material = None, None, "disconnected", None
+            self.spectral_last = None
             self.cfg = self.base_cfg
 
     def _gantry(self) -> Gantry:
@@ -261,6 +265,45 @@ class App:
                 raise Refused("not connected")
             return encode_png(cam.grab())
 
+    def spectral(self) -> dict:
+        """One AS7341 reading (raw counts, 8 bands + clear + NIR) at the current pose. The simulator answers from its
+        material model; on the machine the sensor sits on the button hub, which the app doesn't open yet."""
+        with self.lock:
+            self._busy_refuse()
+            if self.mode == "disconnected":
+                raise Refused("not connected")
+            if self.mode != "sim":
+                raise Refused("the spectral sensor (AS7341, stage 10) reads through the button hub, which this app "
+                              "doesn't open yet: it arrives with the hub in the app")
+            counts = self.cam.spectral()
+            self.spectral_last = {"channels": list(SPECTRAL_CHANNELS), "counts": counts, "simulated": True,
+                                  "pose": dict(self._gantry().position), "time": time.time()}
+            return self.spectral_last
+
+    def devices(self) -> list[dict]:
+        """What the app talks to, and how: simulated, connected, offline, or not built yet (stage in `stage`).
+        Status words are for people; nothing here claims a part works before it has been built and tested."""
+        sim, hw = self.mode == "sim", self.mode == "hardware"
+        cam = self.cfg.camera
+        white = next((spec for n, spec in self.cfg.lights.items() if n == "white"), {})
+        phase = self.cfg.installed_phase
+        return [
+            {"id": "motion", "name": "Motion board", "part": "BTT SKR Pico · grblHAL · USB-C", "stage": 2,
+             "status": "simulated" if sim else "connected" if hw else "offline",
+             "detail": "4 × TMC2209, firmware simulated" if sim else "untested: no machine built yet" if hw else "connect to start"},
+            {"id": "camera", "name": "Measuring camera", "part": f"Arducam IMX477 · {cam['width']} × {cam['height']}", "stage": 6,
+             "status": "simulated" if sim else ("connected" if self.cam is not None else "standby") if hw else "offline",
+             "detail": "64 × 48 px stand-in" if sim else "opens on the first frame" if hw else ""},
+            {"id": "lamp", "name": "White lamp", "part": "3000 K COB · CRI 97", "stage": int(white.get("phase", 6)),
+             "status": "simulated" if sim else "connected" if hw else "offline",
+             "detail": f"warm-up {white.get('warmup_s', 60)} s" if white else ""},
+            {"id": "spectral", "name": "Spectral sensor", "part": "AS7341 · 10 channels", "stage": 10,
+             "status": "simulated" if sim else "not_built" if phase < 10 else "not_in_app",
+             "detail": "read on demand" if sim else f"built in stage 10 (installed: {phase:02d})" if phase < 10 else "on the button hub"},
+            {"id": "hub", "name": "Button hub", "part": "ESP32-S3 · MicroPython", "stage": 2,
+             "status": "not_in_app", "detail": "buttons, display and sensors: used by `opengonio station`"},
+        ]
+
     def runs(self) -> list[dict]:
         out = []
         if self.data.is_dir():
@@ -298,7 +341,9 @@ class App:
         s = {"version": __version__, "mode": self.mode, "material": self.material, "installed_phase": cfg.installed_phase,
              "materials": list(MATERIALS), "plans": list(PLANS), "axes": axes, "lights": lights,
              "position": dict(g.position) if g else {}, "last_error": self.last_error,
-             "job": self.job.__dict__ if self.job else None, "data_dir": str(self.data)}
+             "job": self.job.__dict__ if self.job else None, "data_dir": str(self.data),
+             "devices": self.devices(), "spectral": self.spectral_last,
+             "camera": {"exposure_ms": float(cfg.camera.get("exposure_ms", 20)), "width": cfg.camera["width"], "height": cfg.camera["height"]}}
         if g and all(k in g.position and k in g.homed for k in g.axes):     # angles only from a trusted (homed) pose
             s["angles"] = self.check({})
         return s
@@ -403,6 +448,7 @@ class Handler(SimpleHTTPRequestHandler):
             "/api/move": lambda: a.move(b["pose"]),
             "/api/check": lambda: a.check(b.get("pose", {})),
             "/api/light": lambda: a.light(b["name"], b["on"]),
+            "/api/spectral": a.spectral,
             "/api/run": lambda: {"job": a.run(b.get("plan", "mirror"), b.get("theta", 30), b.get("step", 10)).__dict__},
         }
         fn = routes.get(u.path)
